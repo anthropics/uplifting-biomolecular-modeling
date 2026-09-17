@@ -1,0 +1,16 @@
+# OpenFold3 0.4.1 stock inference configuration UNDER THE DETERMINISM RECIPE (`--det 1|2`, opt/openfold3_opt/det.py): stock_cueq_on_predict.yml with
+# the DS4Sci evoformer attention OFF (use_deepspeed_evo_attention: false — that kernel is bf16 and not run-to-run deterministic; with it off the shapes
+# cuEquivariance declines run upstream's own PyTorch attention). The equality runs' stock arm (`pred --mode off --det 1`) and `exact --det 1` run this
+# file; `exact --det 1` is bitwise identical to it, structure and confidence files alike. Never a speed configuration.
+# Precision: Lightning's bf16-mixed (pl_trainer_args.precision) — the trunk, MSA module, template embedder and confidence heads under bf16 autocast where
+# upstream's predict entry point runs fp32; the diffusion rollout stays in upstream's own fp32 region. Part of what stock is: the documented setting that makes it faster.
+pl_trainer_args:
+  precision: bf16-mixed
+model_update:
+  presets: [predict]
+  custom:
+    settings:
+      memory:
+        eval:
+          use_deepspeed_evo_attention: false
+          use_cueq_triangle_kernels: true

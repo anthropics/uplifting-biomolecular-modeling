@@ -1,0 +1,60 @@
+# Patch: 08_fused_triattn.diff
+# Lever: L10, the fused triangle attention of predict_pdb.py: -fused_triattn resolves the model-opt tree's fused triangle-attention block (opt_core.kernels.fpf_pallas_serve.tri_attn_block, float32 with TF32 products) through the kit adapter af2ig_opt.triattn before any design and installs it as alphafold TriangleAttention.__call__ (alphafold/model/*.py untouched); refused calls run the stock body and are counted by reason; the census is written as `fused_triattn` timer records and the tree's per-lever line at exit
+# Numerics class: TIER-2: changes numerics (online-softmax re-association, fused projections, TF32 float32 products; deterministic; not bitwise vs the stock body)
+# Default: off; enabled only by predict_pdb.py -fused_triattn (the af2ig_opt mode `fast` passes it after -flash_attn, and `big` on its fast base)
+# Applies to: af2_initial_guess/predict_pdb.py as left by patches 00-07 (apply in numeric order with `patch -p1` from the dl_binder_design checkout root)
+--- a/af2_initial_guess/predict_pdb.py
++++ b/af2_initial_guess/predict_pdb.py
+@@ -98,6 +98,7 @@
+ parser.add_argument( "-host_outputs", action="store_true", default=False, help='L6: copy the model outputs to host NumPy arrays in one transfer (jax.device_get) before post-processing, instead of letting numpy/scipy pull each device array lazily op by op; the arrays (float32 values) are the same' )
+ parser.add_argument( "-precompile", type=int, default=0, help='L7: before the prediction loop, featurize one input per distinct length and trigger the XLA compilations of the jitted model for all of them from N host threads in parallel (0 = off). The compiled executables are the ones the loop would have compiled serially; outputs unchanged' )
+ parser.add_argument( "-flash_attn", action="store_true", default=False, help='L8 (changes numerics slightly, see CHANGES.md): the attention core (logits + bias, softmax, weighted sum) of every eligible alphafold Attention call computed by the kit adapter af2ig_opt.flash_attn over the shared Pallas flash-attention kernel of the model-opt tree (opt_core.kernels.pallas_attn) instead of the three XLA ops; ineligible calls run the stock ops and are counted in the flash_attn timer record' )
++parser.add_argument( "-fused_triattn", action="store_true", default=False, help='L10 (changes numerics slightly, see CHANGES.md): every TriangleAttention module (starting / ending node; Evoformer and template pair stack) computed by the model-opt tree\'s fused triangle-attention block (opt_core.kernels.fpf_pallas_serve.tri_attn_block via af2ig_opt.triattn: LayerNorm + pair bias + q|k|v|gate projections + flash core + gating + output projection in one Pallas program, float32 with TF32 products) instead of the stock body; calls the block refuses run the stock body and are counted by reason' )
+ parser.add_argument( "-subbatch", type=int, default=0, help='L9: the row sub-batch of every Attention module and every Transition (alphafold global_config.subbatch_size, run through mapping.inference_subbatch; stock 4 rows, sized for 16 GB cards) set to N rows: the same per-row math in N-row chunks, N/rows scan iterations of large GEMMs instead of many small ones; the decision record is the model-opt tree\'s shared sub-batch policy (opt_core.jax_design.subbatch_policy via af2ig_opt.subbatch). 0 = stock' )
+ parser.add_argument( "-fast", action="store_true", default=False, help='Recommended exact stack: -host_outputs -device_params -sort_by_length (all exact: the stock output bytes)' )
+ parser.add_argument( "-trimul_chunk", type=str, default='', help='M1 memory lever (changes numerics slightly, see CHANGES.md): "<rows>:<min residues>" — TriangleMultiplication evaluated in row chunks of <rows> pair rows once the compiled length reaches <min residues>, through the model-opt tree\'s shared row-chunk producer (opt_core.mem.rowpair_jax.rowchunk via af2ig_opt.pairstack); shorter lengths run the stock body' )
+@@ -120,6 +121,14 @@
+     from af2ig_opt import flash_attn as FLASH_ATTN
+     _probe = FLASH_ATTN.setup()
+     print(f"flash_attn: kernel {FLASH_ATTN.census()['impl']} origin={FLASH_ATTN.census()['origin']} jax={_probe.get('jax')} tested={_probe.get('tested')} min_tokens={_probe.get('min_tokens')} scope={'all' if _probe.get('all_calls') else 'pair_bias'}")
++FUSED_TRIATTN = None
++if args.fused_triattn:
++    # L10: the kit's adapter over the model-opt tree's fused triangle-attention block. Resolved here, before any design (a core without the
++    # block, a jax below its floor, a CPU backend or a GPU without a tile table stops the run with the reason named), then installed as
++    # TriangleAttention's __call__: refused calls run the stock body and are counted by reason, never silently.
++    from af2ig_opt import triattn as FUSED_TRIATTN
++    _tprobe = FUSED_TRIATTN.setup()
++    print(f"fused_triattn: block {FUSED_TRIATTN.IMPL} origin=core jax={_tprobe.get('jax')} cc={_tprobe.get('cc')} tiles={_tprobe.get('tiles')} precision={_tprobe.get('precision')} key_mask={_tprobe.get('key_mask')}")
+ PAIRSTACK = None
+ if args.trimul_chunk:
+     # M1: the memory line's pair-stack lever, installed ONCE here, before the model runner is built: the kit's
+@@ -532,6 +541,9 @@
+         if FLASH_ATTN is not None and new_shape:
+             # L8 evidence: the adapter's trace-time census of Attention calls routed to the kernel / left on the stock ops (cumulative over the shapes compiled so far)
+             timers.emit('flash_attn', L_compiled=L, **FLASH_ATTN.census())
++        if FUSED_TRIATTN is not None and new_shape:
++            # L10 evidence: the adapter's trace-time census of TriangleAttention calls served by the fused block / left on the stock body, by reason
++            timers.emit('fused_triattn', L_compiled=L, **FUSED_TRIATTN.census())
+         if PAIRSTACK is not None and new_shape:
+             # M1 evidence: the pair-stack install's census (trimul_chunk traces engaged / disengaged)
+             timers.emit('pairstack', L_compiled=L, **PAIRSTACK.census())
+@@ -746,6 +758,8 @@
+             timers.emit('precompile_shape', L_compiled=L, dt=dt)
+             if FLASH_ATTN is not None:
+                 timers.emit('flash_attn', L_compiled=L, **FLASH_ATTN.census())
++            if FUSED_TRIATTN is not None:
++                timers.emit('fused_triattn', L_compiled=L, **FUSED_TRIATTN.census())
+             if PAIRSTACK is not None:
+                 timers.emit('pairstack', L_compiled=L, **PAIRSTACK.census())
+             if SUBBATCH is not None:
+@@ -784,6 +798,10 @@
+     # L8 evidence at exit: the whole run's census as the last flash_attn record, and the tree's per-lever line on stderr
+     timers.emit('flash_attn', L_compiled=None, final=True, **FLASH_ATTN.census())
+     FLASH_ATTN.emit()
++if FUSED_TRIATTN is not None:
++    # L10 evidence at exit: the whole run's census as the last fused_triattn record, and the tree's per-lever line on stderr
++    timers.emit('fused_triattn', L_compiled=None, final=True, **FUSED_TRIATTN.census())
++    FUSED_TRIATTN.emit()
+ if PAIRSTACK is not None:
+     # M1 evidence at exit: the whole run's pair-stack census as the last pairstack record, and the per-lever lines on stderr
+     timers.emit('pairstack', L_compiled=None, final=True, **PAIRSTACK.census())

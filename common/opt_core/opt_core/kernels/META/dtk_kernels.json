@@ -1,0 +1,14 @@
+{
+ "exports": {},
+ "kind": "module",
+ "license": "the release tree's own code (no third-party header)",
+ "mechanism": "attn.diffusion_or_atom_attention",
+ "name": "dtk_kernels",
+ "not_carried": {
+  "REPORT.md": "the bracket report (evidence, not code)",
+  "dtk_bench.py": "module-level bracket driver",
+  "dtk_modules.py": "per-model-family stock replicas + the fused block built on these kernels (module-level benchmark code, imports this kernel by name)"
+ },
+ "runtime_imports": [],
+ "version": "DTK v0.2 (docstring header; periodic modulation / gate / row-mask operands, post-sigmoid gate option, the optional third SwiGLU factor, atom -> token segment reduction; backward-compatible keyword arguments)"
+}

@@ -1,0 +1,17 @@
+BlockFuse XL-prologue add-on for FlashPairformer v0 — Copyright 2026 Anthropic, PBC. Apache License 2.0.
+
+This add-on contains NO new numerical kernel mathematics. Credits:
+ * blockfuse/biasln.py `_bias_ln_kernel` = the F1 fused-LayerNorm prologue kernel of the MK-PF package (third_party/fpf_mkpf, Apache-2.0) with the
+   q/k/v/g projection loops deleted; its in-register LayerNorm helper `_ln_rows` is imported from fpf_mkpf unchanged; the 'welford' LayerNorm
+   arithmetic is the FPF integrator's fast_layernorm emulation (third_party/fpf_triatt_pro, FPF Fusion package, Apache-2.0).
+ * pass-2 producer = fpf_mkpf.kernels.prologue_ln (MK-PF package), called unchanged; epilogue = fpf_triatt_epi (FPF Fusion package), unchanged;
+   attention = NVIDIA cuEquivariance triangle_attention as installed with Protenix 2.0.0 (stock kernel, unchanged).
+ * The row-chunked two-pass lean statement structure and the XL token policy it plugs into are the XL policy authors' (PTX_FPF_CHUNK_MODE=prologue);
+   this add-on replaces only that branch's pass 1 (one bias_ln launch instead of per-chunk full prologues) and reads z by strides in pass 2.
+ * blockfuse/chunked.py research variants call K2B v1.1 (PF-kernels package, Apache-2.0) unchanged; K2BPrep mirrors K2B's own wrapper code.
+ * Conventions: K2E op timing (convention A2), TB timing (attempt-B convention); DET recipe: detref v1.1 (partner kit), unchanged.
+Third-party: Triton (MIT), PyTorch (BSD-3), cuEquivariance (NVIDIA, as licensed with the Protenix image), Protenix 2.0.0 (Apache-2.0).
+LICENSE in this directory is Protenix's licence text (Apache License 2.0, "Copyright 2024 ByteDance and/or its affiliates."): portions of
+this add-on derive from Protenix v2.0.0 (https://github.com/bytedance/Protenix) — blockfuse/biasln.py and the kernels credited above re-state
+the arithmetic of Protenix's pair-stack LayerNorm and triangle-bias projection (protenix/model/layer_norm, protenix/model/triangular/*);
+no Protenix source file is included. The LICENSE file is not a statement by ByteDance about the add-on's own code.

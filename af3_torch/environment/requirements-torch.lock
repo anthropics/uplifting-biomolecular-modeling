@@ -1,0 +1,39 @@
+# AF3-torch optimization kit — the tested stack of the model interpreter (AF3_TORCH_PY): `uv pip freeze` of /torch_venv, a uv 0.9.24 virtual
+# environment of CPython 3.12.1 (python-build-standalone 20240107, /usr/local/bin/python3.12) on Ubuntu 24.04 with the CUDA 12.6.3 base image and gcc 13.3.
+# torch 2.13.0 is PyPI's CUDA 13.0 build (torch.__version__ 2.13.0+cu130): it loads the CUDA 13.0 runtime, cuBLAS 13.1, cuDNN 9.20 and NCCL 2.29 from
+# the nvidia-* wheels below by path; triton 3.7.1 builds the kit's kernels at first use with its own ptxas and the system C compiler (gcc). The GPU
+# driver is the host's and must run CUDA 13.0 (driver 580 or newer). xfold itself is not a package of this environment: the kit carries its copy
+# (STOCK.md). Every package comes from PyPI: `uv pip install --python /torch_venv/bin/python --no-deps -r requirements-torch.lock` (environment/Dockerfile).
+cuda-bindings==13.3.1
+cuda-pathfinder==1.8.0
+cuda-toolkit==13.0.3.0
+einops==0.8.2
+filelock==3.32.4
+fsspec==2026.7.0
+jinja2==3.1.6
+markupsafe==3.0.3
+mpmath==1.3.0
+networkx==3.6.1
+numpy==2.4.1
+nvidia-cublas==13.1.1.3
+nvidia-cuda-cupti==13.0.85
+nvidia-cuda-nvrtc==13.0.88
+nvidia-cuda-runtime==13.0.96
+nvidia-cudnn-cu13==9.20.0.48
+nvidia-cufft==12.0.0.61
+nvidia-cufile==1.15.1.6
+nvidia-curand==10.4.0.35
+nvidia-cusolver==12.0.4.66
+nvidia-cusparse==12.6.3.3
+nvidia-cusparselt-cu13==0.8.1
+nvidia-ml-py==13.610.43
+nvidia-nccl-cu13==2.29.7
+nvidia-nvjitlink==13.3.33
+nvidia-nvshmem-cu13==3.4.5
+nvidia-nvtx==13.0.85
+setuptools==84.0.0
+sympy==1.14.0
+torch==2.13.0
+triton==3.7.1
+typing-extensions==4.16.0
+zstandard==0.25.0

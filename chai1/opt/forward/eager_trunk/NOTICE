@@ -1,0 +1,13 @@
+chai1_eager_trunk — an eager-PyTorch re-expression of the Chai-1 trunk
+
+This work is derived from Chai-1:
+  Chai-1 (chai-lab 0.6.1), Copyright 2024 Chai Discovery, Inc. — https://github.com/chaidiscovery/chai-lab
+  Code and model weights licensed under the Apache License, Version 2.0.
+The module structure, operation order and numerics implemented in chai1_eager/trunk.py, and the TorchScript sources executed by
+chai1_eager/ts2eager.py, are read from the exported TorchScript archives distributed by Chai Discovery (models_v2/*.pt). No weights are
+included in this package; they are loaded at run time from the user's chai-lab download directory (CHAI_DOWNLOADS_DIR).
+
+Kernels this package can bind at run time (not bundled in this directory):
+  NVIDIA cuEquivariance (cuequivariance_torch) — its own licence, installed from NVIDIA's distribution;
+  the shared core's fpf_trimul_v4 triangle-multiplication kernel (common/opt_core; original code of this source tree,
+  Apache License 2.0, Copyright 2026 Anthropic, PBC).

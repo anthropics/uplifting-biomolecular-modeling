@@ -1,0 +1,30 @@
+# Evo 2 optimization kit — Apptainer / Singularity image made FROM the container image of evo2/environment/Dockerfile: the same stack and the
+# same /kit, for hosts that run Apptainer instead of Docker. The source is the image tagged evo2-kit:dev in the local Docker daemon (build it
+# first: README.md 'Setup' — with `--build-arg STACK=img_a100` for the A100 stack); for a published tag the two header lines read
+# `Bootstrap: docker` / `From: <registry>/evo2-kit:<tag>`.
+#   apptainer build evo2.sif evo2/environment/apptainer.def
+#   apptainer run --nv --cleanenv --bind /path/to/evo2_weights:/weights --env EVO2_OPT_WEIGHTS=/weights --bind "$PWD/out":/out evo2.sif \
+#     score --model_name evo2_7b --input /out/windows.fa --out_dir /out/exact
+# The image is read-only: give every verb an --out_dir on a bound, writable path and keep the input FASTA there too; Triton's kernel cache goes
+# under $HOME/.triton (bound by default) unless TRITON_CACHE_DIR names another bound path; %environment keeps a host user site-packages (PEP 370)
+# from shadowing the pinned stack, --cleanenv keeps the host's variables out.
+Bootstrap: docker-daemon
+From: evo2-kit:dev
+
+%post
+    mkdir -p /opt/culib && ln -s /.singularity.d/libs/libcuda.so.1 /opt/culib/libcuda.so && ln -s /.singularity.d/libs/libcuda.so.1 /opt/culib/libcuda.so.1
+
+%environment
+    export PYTHONNOUSERSITE=1
+    # Triton <= 3.5 links its launcher stub with -lcuda: offer the unversioned name when --nv bound only libcuda.so.1
+    if [ -z "${TRITON_LIBCUDA_PATH:-}" ] && [ -e /opt/culib/libcuda.so ]; then export TRITON_LIBCUDA_PATH=/opt/culib; fi
+
+%runscript
+    exec bash /kit/evo2/run.sh "$@"
+
+%help
+    Evo 2 optimization kit: drop-in modes that make stock Evo 2 (evo2 0.6.0 on vtx 1.1.0; variants 7b and 40b) faster at per-base scoring and
+    prompted generation without changing how it is called and without changing the outputs — one mode, exact (identical outputs, faster; the
+    default); off = the stock. `apptainer run --nv evo2.sif <verb> ...` = `bash /kit/evo2/run.sh <verb> ...` (verbs: install, check, score;
+    /kit/evo2/README.md inside the image). Requires an NVIDIA driver that runs CUDA 12.8 (570 or newer) and EVO2_OPT_WEIGHTS naming the weights
+    directory; H100 80GB for the default stack (evo2_7b on one visible device, evo2_40b on two), A100 80GB for an image built with STACK=img_a100 (evo2_7b).

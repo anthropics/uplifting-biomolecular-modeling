@@ -1,0 +1,249 @@
+[build-system]
+# torch used at build needs to match the one at runtime
+requires = ["setuptools", "wheel", "setuptools-scm>=8"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "openfold3"
+dynamic = ["version"]
+authors = [
+    { name = "OpenFold Team", email = "support@openfold.io" }
+]
+description = "OpenFold's Biological Structure Prediction Model based on DeepMind's AlphaFold 3"
+readme = "README.md"
+license = { text = "Apache-2.0" }
+classifiers = [
+    "License :: OSI Approved :: Apache Software License",
+    "Operating System :: POSIX :: Linux",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+urls.Homepage = "https://openfold.io/"
+urls.Documentation = "https://openfold-3.readthedocs.io/en/latest/"
+urls.Repository = "https://github.com/aqlaboratory/openfold-3"
+urls.Issues = "https://github.com/aqlaboratory/openfold-3/issues"
+
+requires-python = ">=3.10"
+dependencies = [
+    "numpy",
+    "scipy",
+    "pandas",
+    "torch", # ==2.5.1",
+    "ml-collections",
+    "pytorch-lightning >=2.1",
+    "biotite",
+    "rdkit<2026", # aqlaboratory/openfold-3/issues/285 
+    "pdbeccdutils",
+    "kalign-python",
+    "requests",
+    "awscli",
+    "awscrt",
+    "boto3",
+    "PyYAML",
+    "ijson",
+    "memory_profiler",
+    "wandb",
+    "func_timeout",
+    "tqdm",
+    "typing-extensions",
+    "lmdb",
+]
+
+optional-dependencies.dev = [
+    "pytest",
+    "pytest-xdist",
+    "pytest-cov",
+    "pytest-benchmark",
+    "pytest-regressions",
+    "pytest-vcr",
+    "ruff",
+    "mypy",
+    "mypy-baseline",
+    "pre-commit",
+
+    # used for documentation
+    "sphinx",
+    "myst-parser",
+    "furo"
+]
+optional-dependencies.cuequivariance = [
+    "cuequivariance>=0.8",
+    "cuequivariance-ops-torch-cu12>=0.8",
+    "cuequivariance-torch>=0.8",
+    "torch>=2.7",
+]
+optional-dependencies.deepspeed = [
+    "deepspeed>=0.18.7",
+]
+
+[project.scripts]
+run_openfold="openfold3.run_openfold:cli"
+setup_openfold="openfold3.setup_openfold:main"
+validate-openfold3-rocm="openfold3.entry_points.validate_rocm:main"
+
+# Let's take a decision if these are optional-dependencies or dependency-groups
+# See: https://github.com/astral-sh/uv/issues/9011
+# Leaving here to not break ongoing docker revamp efforts
+[dependency-groups]
+test = [
+    "pytest",
+    "ruff",
+    "awscli",
+    "aria2",
+    "pytest-xdist",
+    "pytest-cov",
+    "pytest-benchmark",
+    "pytest-regressions",
+    "pytest-recording",
+    "debugpy",
+]
+
+
+[tool.setuptools_scm]
+fallback_version = "0.5.0"
+
+[tool.setuptools]
+include-package-data = true
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["openfold3*"]
+
+[tool.setuptools.package-data]
+openfold3 = [
+    "projects/*/config/*.yml",
+    "tests/test_data/**/*"
+]
+
+# much of the cibuildwheel config taken from benfred/implicit
+[tool.cibuildwheel]
+before-all = "devtools/install_cuda.sh"
+manylinux-x86_64-image = "manylinux2014"
+
+[tool.cibuildwheel.linux]
+repair-wheel-command = """
+AUDITWHEEL_PLAT=manylinux2014_$(uname -m) \
+auditwheel repair \
+    --exclude libc10.so \
+    --exclude libtorch.so \
+    --exclude libtorch_cpu.so \
+    --exclude libtorch_python.so \
+    -w {dest_dir} {wheel}
+"""
+
+[tool.cibuildwheel.linux.environment]
+CUDACXX = "/usr/local/cuda/bin/nvcc"
+
+[tool.ruff]
+line-length = 88
+extend-exclude = ["docs"]
+
+[tool.ruff.lint]
+select = [
+    # pycodestyle
+    "E",
+    # Pyflakes
+    "F",
+    # pyupgrade
+    "UP",
+    # flake8-bugbear
+    "B",
+    # flake8-simplify
+    "SIM",
+    # isort
+    "I",
+    # flake8-tidy-imports (TID252 bans relative imports)
+    "TID",
+]
+ignore = [
+    "E741",
+    "SIM108",
+    "B905",  # explicit strict= for zip
+]
+extend-safe-fixes = ["UP006"]
+
+[tool.ruff.lint.flake8-tidy-imports]
+ban-relative-imports = "all"
+
+[tool.ruff.lint.per-file-ignores]
+"**/tests/**" = ["E501"]
+
+[tool.mypy]
+# So that a bare `mypy` (as used by the typecheck tasks) checks the whole project.
+files = ["openfold3", "scripts"]
+# The version every pixi environment currently resolves to, and the only one CI
+# runs. Pinning it (rather than following the active interpreter) keeps the
+# baseline from drifting on an unrelated `pixi update`; bump it deliberately,
+# together with a `typecheck-sync`, when the environments move to a new Python.
+# Note this means the `requires-python = ">=3.10"` floor above is not type-checked.
+python_version = "3.14"
+# The baseline is recorded on, and enforced by, linux-64 CI. Without pinning the
+# platform, `sys.platform` branches (device selection, MPS vs CUDA fallbacks) are
+# analysed on a developer's mac and skipped in CI, so a mac run reports errors
+# that CI never sees and vice versa. The cost is that darwin-only branches are
+# not type-checked anywhere; consistency with the enforcing platform wins.
+platform = "linux"
+# Most of our scientific dependencies (rdkit, biotite, pdbeccdutils, wandb, ...)
+# ship no stubs. Without this, the baseline would be dominated by import noise.
+ignore_missing_imports = true
+# mypy-baseline parses one error per line, so the compact format is required.
+pretty = false
+
+# rdkit and gemmi are compiled extension modules whose conda-forge builds ship
+# inline .pyi stubs on linux-64 but not on osx-arm64 -- same package version,
+# different build contents. mypy therefore introspects them in CI and treats
+# them as Any on a mac, which made ~15 baseline entries platform-dependent
+# (e.g. `Module has no attribute "EmbedMolecule"`, or `tuple[Mol, str]` where a
+# mac reports `tuple[Any, str]`). Skipping the import forces Any everywhere, so
+# the baseline records the same errors no matter where it is generated. Drop
+# this once both builds ship stubs and the stubs are accurate enough to type
+# against.
+#
+# `follow_imports = "skip"` alone is not enough: mypy fully analyses stub files
+# regardless of that setting unless `follow_imports_for_stubs` is also on. The
+# latter is a no-op for every other module, since `follow_imports` stays at its
+# default of "normal" outside this override.
+follow_imports_for_stubs = true
+
+[[tool.mypy.overrides]]
+module = ["rdkit.*", "gemmi.*"]
+follow_imports = "skip"
+
+[tool.mypy-baseline]
+# Keep the baseline sorted so its diffs stay reviewable.
+sort_baseline = true
+
+[tool.pytest.ini_options]
+log_cli = true
+log_cli_level = "WARNING"
+log_cli_format = "%(asctime)s [%(levelname)8s] %(message)s (%(filename)s:%(lineno)s)"
+log_cli_date_format = "%Y-%m-%d %H:%M:%S"
+testpaths = ["openfold3/tests"]
+python_files = ["test_*.py"]
+markers = [
+    "inference_verification: Tests to verify installation on inference example",
+    "slow: Large size test"
+]
+
+# Exclude directories during collection
+[tool.coverage.run]
+omit = [
+    "openfold3/tests/*",
+]
+
+# Exclude directories from reporting
+[tool.coverage.report]
+omit = [
+    "openfold3/tests/*",
+]
+
+# Map /opt/openfold3/openfold3/ (docker path) to openfold3/ (local path) during `coverage combine`
+[tool.coverage.paths]
+source = [
+    "openfold3/",
+    "/opt/openfold3/openfold3/",
+]

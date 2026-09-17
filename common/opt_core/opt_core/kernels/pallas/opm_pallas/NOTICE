@@ -1,0 +1,5 @@
+opm_pallas -- outer-product-mean rows: opm_stock (the stock body re-stated op by op: bitwise the XLA statement),
+opm_reassoc (pure-XLA re-association, wins at small MSA depth), opm_two_launch (XLA GEMM-1 in natural layout + one Pallas
+projection / normalisation kernel; forward only).  Origin: the JAX kernel-optimisation study's opm_pallas package (version
+0.2) in this repository's history, file opm_pallas.py carried byte for byte; its serve helper and notes are not carried.
+The formula follows AlphaFold 2's OuterProductMean (DeepMind, Apache-2.0); no upstream source is copied here.

@@ -1,0 +1,14 @@
+# The big lines' pinned-plan configuration (opt/forward/offload/config/stock_predict_c16.yml: the kernels-off base, chunk_size 16,
+# tune_chunk_size false) with upstream's own bf16 trainer precision (pl_trainer_args.precision: bf16-mixed, the block of
+# opt/openfold3_opt/fast_bf16_predict.yml). The runner yaml of the three big lines (modes.Line.runner_yaml of resident, streamed, tp;
+# the ×P launcher tp.py pins the run's chunk plan and the tuners off on top of it, tp.pinned_yaml); also `pred --mode big --runner-yaml <this file>`.
+pl_trainer_args:
+  precision: bf16-mixed
+model_update:
+  presets: [predict]
+  custom:
+    settings:
+      memory:
+        eval: {use_deepspeed_evo_attention: false, chunk_size: 16}
+    architecture:
+      pairformer: {tune_chunk_size: false}

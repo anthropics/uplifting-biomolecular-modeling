@@ -1,0 +1,293 @@
+# Copyright 2024 DeepMind Technologies Limited
+#
+# AlphaFold 3 source code is licensed under the Apache License, Version 2.0
+# (the "License"); you may not use this file except in compliance with the
+# License. You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+# To request access to the AlphaFold 3 model parameters, follow the process set
+# out at https://github.com/google-deepmind/alphafold3. You may only use these
+# if received directly from Google. Use is subject to terms of use available at
+# https://github.com/google-deepmind/alphafold3/blob/main/WEIGHTS_TERMS_OF_USE.md
+
+"""Confidence categories for predictions."""
+
+from collections.abc import Sequence
+import dataclasses
+import enum
+import json
+from typing import Any, Self
+
+from absl import logging
+from alphafold3.cpp import json_serialize
+from alphafold3.model import model
+import jax
+import numpy as np
+
+
+def _dump_json(data: Any, indent: int | None = None) -> str:
+  """Dumps a json string with JSON compatible NaN representation."""
+  json_str = json.dumps(
+      data,
+      sort_keys=True,
+      indent=indent,
+      separators=(',', ': '),
+  )
+  return json_str.replace('NaN', 'null')
+
+
+@enum.unique
+class ConfidenceCategory(enum.Enum):
+  """Confidence categories for AlphaFold predictions."""
+
+  HIGH = 0
+  MEDIUM = 1
+  LOW = 2
+  DISORDERED = 3
+
+  @classmethod
+  def from_char(cls, char: str) -> Self:
+    match char:
+      case 'H':
+        return cls.HIGH
+      case 'M':
+        return cls.MEDIUM
+      case 'L':
+        return cls.LOW
+      case 'D':
+        return cls.DISORDERED
+      case _:
+        raise ValueError(
+            f'Unknown character. Expected one of H, M, L or D; got: {char}'
+        )
+
+  def to_char(self) -> str:
+    match self:
+      case self.HIGH:
+        return 'H'
+      case self.MEDIUM:
+        return 'M'
+      case self.LOW:
+        return 'L'
+      case self.DISORDERED:
+        return 'D'
+
+  @classmethod
+  def from_confidence_score(cls, confidence: float) -> Self:
+    if 90 <= confidence <= 100:
+      return cls.HIGH
+    if 70 <= confidence < 90:
+      return cls.MEDIUM
+    if 50 <= confidence < 70:
+      return cls.LOW
+    if 0 <= confidence < 50:
+      return cls.DISORDERED
+    raise ValueError(f'Confidence score out of range [0, 100]: {confidence}')
+
+
+@dataclasses.dataclass()
+class AtomConfidence:
+  """Dataclass for 1D per-atom confidences from AlphaFold."""
+
+  chain_id: list[str]
+  atom_number: list[int]
+  confidence: list[float]
+  confidence_category: list[ConfidenceCategory]
+
+  def __post_init__(self):
+    num_res = len(self.atom_number)
+    if not all(
+        len(v) == num_res
+        for v in [self.chain_id, self.confidence, self.confidence_category]
+    ):
+      raise ValueError('All confidence fields must have the same length.')
+
+  @classmethod
+  def from_inference_result(
+      cls, inference_result: model.InferenceResult
+  ) -> Self:
+    """Instantiates an AtomConfidence from a structure.
+
+    Args:
+      inference_result: Inference result from AlphaFold.
+
+    Returns:
+      Scores in AtomConfidence dataclass.
+    """
+    struc = inference_result.predicted_structure
+    as_dict = {
+        'chain_id': [],
+        'atom_number': [],
+        'confidence': [],
+        'confidence_category': [],
+    }
+    for atom_number, atom in enumerate(struc.iter_atoms()):
+      this_confidence = float(struc.atom_b_factor[atom_number])
+      as_dict['chain_id'].append(atom['chain_id'])
+      as_dict['atom_number'].append(atom_number)
+      as_dict['confidence'].append(round(this_confidence, 2))
+      as_dict['confidence_category'].append(
+          ConfidenceCategory.from_confidence_score(this_confidence)
+      )
+    return cls(**as_dict)
+
+  @classmethod
+  def from_json(cls, json_string: str) -> Self:
+    """Instantiates a AtomConfidence from a json string."""
+    input_dict = json.loads(json_string)
+    input_dict['confidence_category'] = [
+        ConfidenceCategory.from_char(k)
+        for k in input_dict['confidence_category']
+    ]
+    return cls(**input_dict)
+
+  def to_json(self) -> str:
+    output = dataclasses.asdict(self)
+    output['confidence_category'] = [
+        k.to_char() for k in output['confidence_category']
+    ]
+    output['atom_number'] = [int(k) for k in output['atom_number']]
+    return _dump_json(output)
+
+
+@dataclasses.dataclass(frozen=True, slots=True, kw_only=True)
+class StructureConfidenceSummary:
+  """Dataclass for the summary of structure scores from AlphaFold.
+
+  Attributes:
+   ptm: Predicted TM global score.
+   iptm: Interface predicted TM global score.
+   ranking_score: Ranking score extracted from CIF metadata.
+   fraction_disordered: Fraction disordered, measured with RASA.
+   has_clash: Has significant clashing.
+   chain_pair_pae_min: [num_chains, num_chains] Minimum cross chain PAE.
+   chain_pair_iptm: [num_chains, num_chains] Chain pair ipTM.
+   chain_ptm: [num_chains] Chain pTM.
+   chain_iptm: [num_chains] Mean cross chain ipTM for a chain.
+   chain_ids: [num_chains] Chain IDs in the same order as the chain-level
+     arrays.
+  """
+
+  ptm: float
+  iptm: float
+  ranking_score: float
+  fraction_disordered: float
+  has_clash: float
+  chain_pair_pae_min: np.ndarray
+  chain_pair_iptm: np.ndarray
+  chain_ptm: np.ndarray
+  chain_iptm: np.ndarray
+  chain_ids: Sequence[str] = dataclasses.field(default_factory=list)
+
+  @classmethod
+  def from_inference_result(
+      cls, inference_result: model.InferenceResult
+  ) -> Self:
+    """Returns a new instance based on a given inference result."""
+    chain_ids = [str(c) for c in inference_result.metadata['token_chain_ids']]
+    return cls(
+        ptm=float(inference_result.metadata['ptm']),
+        iptm=float(inference_result.metadata['iptm']),
+        ranking_score=float(inference_result.metadata['ranking_score']),
+        fraction_disordered=float(
+            inference_result.metadata['fraction_disordered']
+        ),
+        has_clash=float(inference_result.metadata['has_clash']),
+        chain_pair_pae_min=inference_result.metadata['chain_pair_pae_min'],  # pyrefly: ignore[bad-argument-type]
+        chain_pair_iptm=inference_result.metadata['chain_pair_iptm'],  # pyrefly: ignore[bad-argument-type]
+        chain_ptm=inference_result.metadata['iptm_ichain'],  # pyrefly: ignore[bad-argument-type]
+        chain_iptm=inference_result.metadata['iptm_xchain'],  # pyrefly: ignore[bad-argument-type]
+        chain_ids=chain_ids,
+    )
+
+  @classmethod
+  def from_json(cls, json_string: str) -> Self:
+    """Returns a new instance from a given json string."""
+    return cls(**json.loads(json_string))
+
+  def to_json(self) -> str:
+    """Returns a JSON representation of the dataclass."""
+
+    def convert(data):
+      if isinstance(data, np.ndarray):
+        # Cast to np.float64 before rounding, since casting to Python float will
+        # cast to a 64 bit float, potentially undoing np.float32 rounding.
+        rounded_data = np.round(data.astype(np.float64), decimals=2).tolist()
+      elif isinstance(data, str):
+        # String leaves (e.g. chain_ids entries) are passed through unchanged.
+        rounded_data = data
+      else:
+        rounded_data = np.round(data, decimals=2)
+      return rounded_data
+
+    return _dump_json(jax.tree.map(convert, dataclasses.asdict(self)), indent=1)
+
+
+@dataclasses.dataclass(frozen=True, slots=True, kw_only=True)
+class StructureConfidenceFull:
+  """Dataclass for full structure data from AlphaFold."""
+
+  pae: np.ndarray
+  token_chain_ids: list[str]
+  token_res_ids: list[int]
+  atom_plddts: list[float]
+  atom_chain_ids: list[str]
+  contact_probs: np.ndarray  # [num_tokens, num_tokens]
+
+  @classmethod
+  def from_inference_result(
+      cls, inference_result: model.InferenceResult
+  ) -> Self:
+    """Returns a new instance based on a given inference result."""
+
+    pae = inference_result.numerical_data['full_pae']
+    if not isinstance(pae, np.ndarray):
+      logging.info('%s', type(pae))
+      raise TypeError('pae should be a numpy array.')
+
+    contact_probs = inference_result.numerical_data['contact_probs']
+    if not isinstance(contact_probs, np.ndarray):
+      logging.info('%s', type(contact_probs))
+      raise TypeError('contact_probs should be a numpy array.')
+
+    struc = inference_result.predicted_structure
+    chain_ids = struc.chain_id.tolist()
+    atom_plddts = struc.atom_b_factor.tolist()
+    token_chain_ids = [
+        str(token_id)
+        for token_id in inference_result.metadata['token_chain_ids']  # pyrefly: ignore[not-iterable]
+    ]
+    token_res_ids = [
+        int(token_id) for token_id in inference_result.metadata['token_res_ids']  # pyrefly: ignore[not-iterable]
+    ]
+    return cls(
+        pae=pae,
+        token_chain_ids=token_chain_ids,
+        token_res_ids=token_res_ids,
+        atom_plddts=atom_plddts,
+        atom_chain_ids=chain_ids,
+        contact_probs=contact_probs,
+    )
+
+  @classmethod
+  def from_json(cls, json_string: str) -> Self:
+    """Returns a new instance from a given json string."""
+    return cls(**json.loads(json_string))
+
+  def to_json(self) -> str:
+    """Converts StructureConfidenceFull to json string."""
+    return json_serialize.structure_confidence_full_to_json(
+        pae=self.pae,
+        token_chain_ids=self.token_chain_ids,
+        token_res_ids=self.token_res_ids,
+        atom_plddts=self.atom_plddts,
+        atom_chain_ids=self.atom_chain_ids,
+        contact_probs=self.contact_probs,
+    )

@@ -1,0 +1,38 @@
+# openfold3_opt — explicit interface to the OpenFold3 inference optimizations.
+# Install editable from this directory: `pip install -e openfold3/opt` into the interpreter that owns `openfold3`. The kit code it wraps
+# lives beside the package (forward/: the fast-inference kit, the trunk-kernels add-on, the offload add-on)
+# and is resolved from the package location, so the install must stay editable (or point OPENFOLD3_OPT_HOME at the openfold3/ directory).
+# No install-time dependency on openfold3 (stock/PINS.json): its version is checked at activation. The package stands on the tree's shared
+# core, common/opt_core (pinned below by path and by content: `pip install -e common/opt_core -e openfold3/opt`; the pin is the first gate of
+# every activation). The build backend is the core's template (opt/_build_backend.py, byte-identical to common/opt_core/kit_template/): setuptools
+# plus one step that ships openfold3_opt_autoload.pth at the wheel root, which is what makes `OPENFOLD3_OPT=<mode> run_openfold predict ...`
+# activate without code changes (see openfold3_opt/_autoload.py).
+[build-system]
+requires = ["setuptools>=64", "wheel"]
+build-backend = "_build_backend"
+backend-path = ["."]
+
+[project]
+name = "openfold3_opt"
+dynamic = ["version"]
+description = "OpenFold3 inference optimizations: modes exact/fast/big/off, the add-ons' hook order, lazy autoload, activation report"
+requires-python = ">=3.10"
+classifiers = ["Private :: Do Not Upload"]
+dependencies = []
+
+[project.optional-dependencies]
+test = ["pytest", "pyyaml", "numpy"]               # the package's CPU tests (pyyaml: test_kit_bytes / test_line_yaml read the stock yaml; numpy: test_templ_guard runs the stock template mapper over array stand-ins)
+
+[project.scripts]
+openfold3-opt = "openfold3_opt.__main__:main"      # `openfold3-opt pred|check|warm ...` == `python -m openfold3_opt ...`
+
+[tool.setuptools]
+packages = ["openfold3_opt", "openfold3_opt.tests"]
+include-package-data = false
+
+[tool.setuptools.dynamic]
+version = {attr = "openfold3_opt.__version__"}
+
+[tool.opt_core]
+path = "../../common/opt_core"
+version = "0.5.220.4"

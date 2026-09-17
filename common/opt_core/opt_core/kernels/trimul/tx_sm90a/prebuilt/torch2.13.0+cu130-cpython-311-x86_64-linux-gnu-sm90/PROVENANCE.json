@@ -1,0 +1,51 @@
+{
+ "abi_tag": "torch213_cu130_sm90",
+ "arch": "sm_90a (compute_90a)",
+ "binary": "protenix_trimul_tx_sm90.so",
+ "binary_bytes": 1304824,
+ "binary_sha256": "e913917e2d714daa98feb97f40973adc29994c392b75a26b15db1284928af64a",
+ "build_tool": "the package's build_prebuilt.py --pkg <package dir> (copies csrc to a scratch dir; no line info; path-neutral)",
+ "built_utc": "2026-09-11T07:46:12Z",
+ "host_cc_flags": [
+  "-O2",
+  "-ffile-prefix-map=<scratch>=csrc"
+ ],
+ "link": [
+  "-lcuda",
+  "libtorch / c10 of the stack (torch extension)"
+ ],
+ "loadcheck_fingerprint": {
+  "N": 160,
+  "bmm": "2fcadc8027523d8eec75d584a666c67c",
+  "k1": "d67ded824c44495c0eca1786ea3c8ed3",
+  "k1s": "cc39992a2a52acf6ccba1af032429278",
+  "k3": "9414bfc304fa84bb81a47007d6c9401c",
+  "k3s2": "7e9bf7908ead74ed5717446061edcc53",
+  "k3s3": "18f04baf532336098be2ffaa5c98c160"
+ },
+ "nvcc_flags": [
+  "-O3",
+  "-std=c++17",
+  "-gencode=arch=compute_90a,code=sm_90a",
+  "--expt-relaxed-constexpr",
+  "-DNDEBUG",
+  "-Xptxas=--register-usage-level=10",
+  "-Xcompiler -ffile-prefix-map=<scratch>=csrc"
+ ],
+ "package": "protenix_fpf_trimul_tx",
+ "runtime_requirements": [
+  "CUDA device capability 9.0",
+  "torch 2.13.0+cu130 / CUDA 13.0 ABI (the tag)"
+ ],
+ "sources_sha256": {
+  "csrc/trimul_tx.cu": "19fb2bdf4a6845339592fd0c0c8772470492df105ba4a1a6ea21809da2a2d1aa",
+  "csrc/tx_ptx.h": "848836474c9b3a219c15cfb2dd8494e7438175dd31769c5c15408c782f5b60ec"
+ },
+ "toolchain": {
+  "cuda": "13.0",
+  "device_built_on": "NVIDIA H100 80GB HBM3",
+  "gcc": "gcc (Ubuntu 13.3.0-6ubuntu2~24.04) 13.3.0",
+  "nvcc": "Build cuda_13.0.r13.0/compiler.36424714_0",
+  "torch": "2.13.0+cu130"
+ }
+}

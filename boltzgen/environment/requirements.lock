@@ -1,0 +1,117 @@
+# BoltzGen optimization kit — the tested stack: `python -m pip freeze --all` of its interpreter, Python 3.11.5 (/usr/local/bin/python,
+# python-build-standalone 20230826) on Ubuntu 22.04 with the CUDA 13.0.1 base image and gcc 11.4, less this kit (boltzgen/opt) and its shared core
+# (common/opt_core) — those two install editable on top (README.md 'Setup', STOCK.md 'Stack'). One list, installed with `pip install --no-deps -r`: every line is the
+# package index's file except torch (its CUDA 13.0 build, 2.13.0+cu130) and triton 3.7.1, which are the PyTorch index's wheels, named below by URL and
+# sha256 (the PyTorch index's triton 3.7.1 is its own build of that version, not the package index's file); torch loads the CUDA 13.0 runtime,
+# cuBLAS 13.1, cuDNN 9.20 and NCCL 2.29 from the nvidia-* wheels of this list and nothing from the system; triton builds the launchers of the
+# cuEquivariance kernels at first use with its own ptxas and the system C compiler. cuequivariance 0.11.1 stands on NVIDIA's CUDA-13
+# kernel pair (cuequivariance-ops-cu13, cuequivariance-ops-torch-cu13 0.11.1); boltzgen 0.3.2's wheel metadata names the CUDA-12 pair instead, so
+# `pip check` reports those two names and nothing else (stock/PINS.json stack_of_record freeze_deviation). pip 26.2.1, setuptools 84.0.0 and wheel
+# 0.48.0 replace the interpreter's bundled ones: those three lines install first, by the bundled pip (environment/Dockerfile reads them from this
+# file), then the rest by pip 26.2.1.
+# boltzgen 0.3.2 is the wheel in boltzgen/stock/ (the package index file), installed from there after this list. The GPU driver is the host's and
+# must run CUDA 13.0 (driver 580 or newer).
+aiohappyeyeballs==2.7.1
+aiohttp==3.14.3
+aiosignal==1.4.0
+antlr4-python3-runtime==4.9.3
+anyio==4.14.2
+attrs==26.1.0
+biopython==1.88
+biotite==1.6.0
+biotraj==1.2.2
+boltzgen==0.3.2
+certifi==2026.7.22
+charset-normalizer==3.5.1
+click==8.4.2
+contourpy==1.3.3
+cuda-bindings==13.3.1
+cuda-pathfinder==1.6.1
+cuda-toolkit==13.0.3.0
+cuequivariance==0.11.1
+cuequivariance-ops-cu13==0.11.1
+cuequivariance-ops-torch-cu13==0.11.1
+cuequivariance-torch==0.11.1
+cycler==0.12.1
+edit-distance==1.0.9
+einops==0.8.2
+einx==0.4.3
+filelock==3.32.3
+fonttools==4.63.0
+frozendict==2.4.7
+frozenlist==1.8.0
+fsspec==2026.7.0
+gemmi==0.7.5
+h11==0.16.0
+hf-xet==1.6.0
+httpcore==1.0.9
+httpx==0.28.1
+huggingface_hub==1.28.0
+hydra-core==1.3.5
+hydride==1.2.3
+idna==3.19
+Jinja2==3.1.6
+joblib==1.5.3
+kiwisolver==1.5.0
+lightning-utilities==0.15.3
+llvmlite==0.44.0
+logomaker==0.8.7
+MarkupSafe==3.0.3
+mashumaro==3.22
+matplotlib==3.11.1
+mpmath==1.3.0
+msgpack==1.2.1
+multidict==6.7.1
+narwhals==2.25.0
+networkx==3.6.1
+numba==0.61.0
+numpy==2.0.2
+nvidia-cublas==13.1.1.3
+nvidia-cuda-cupti==13.0.85
+nvidia-cuda-nvrtc==13.0.88
+nvidia-cuda-runtime==13.0.96
+nvidia-cudnn-cu13==9.20.0.48
+nvidia-cufft==12.0.0.61
+nvidia-cufile==1.15.1.6
+nvidia-curand==10.4.0.35
+nvidia-cusolver==12.0.4.66
+nvidia-cusparse==12.6.3.3
+nvidia-cusparselt-cu13==0.8.1
+nvidia-ml-py==13.610.43
+nvidia-nccl-cu13==2.29.7
+nvidia-nvjitlink==13.3.33
+nvidia-nvshmem-cu13==3.4.5
+nvidia-nvtx==13.0.85
+omegaconf==2.3.1
+opt_einsum==3.4.0
+packaging==26.3
+pandas==3.0.5
+pdbeccdutils==1.0.4
+pillow==12.3.0
+pip==26.2.1
+platformdirs==4.11.3
+propcache==0.5.2
+psutil==7.2.2
+pydssp==0.9.1
+pynvml==13.0.1
+pyparsing==3.3.2
+python-dateutil==2.9.0.post0
+pytorch-lightning==2.6.5
+PyYAML==6.0.3
+rdkit==2026.3.5
+redis==8.1.0
+requests==2.34.2
+scikit-learn==1.9.0
+scipy==1.17.1
+setuptools==84.0.0
+six==1.17.0
+sympy==1.14.0
+threadpoolctl==3.6.0
+torch @ https://download.pytorch.org/whl/cu130/torch-2.13.0%2Bcu130-cp311-cp311-manylinux_2_28_x86_64.whl#sha256=794664c05a3470a5e738447b54495cc6bbf1efca48bf2794270a897d9f4356c4
+torchmetrics==1.9.0
+tqdm==4.70.0
+triton @ https://download.pytorch.org/whl/triton-3.7.1-cp311-cp311-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl#sha256=410d3786b2dcf1ef792046670787dc742ba8f800cf2c6dddf56e0656f2260db6
+typing_extensions==4.16.0
+urllib3==2.7.0
+wheel==0.48.0
+yarl==1.24.5

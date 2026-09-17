@@ -1,0 +1,41 @@
+# proteinmpnn_opt — explicit interface to the ProteinMPNN inference optimizations.
+# Install editable with the core: `pip install -e common/opt_core -e proteinmpnn/opt`. The kit code it drives lives beside the package
+# (forward/mpnn_exact_worker, forward/mpnn_pdb_parser) and is resolved from the package location (or from $MODEL_OPT, the proteinmpnn/
+# directory, or $PROTEINMPNN_OPT_HOME), so the install must stay editable. No install-time dependency on the upstream checkout (stock/PINS.json):
+# its pin is checked at activation by stock/check_pins.py. The build backend is the core's template copy, byte for byte (`_build_backend.py`);
+# this kit ships no autoload .pth — the stock entry point is a script (`python protein_mpnn_run.py`), so there is no import to hook and the
+# template builds plain setuptools wheels. The core pin gate (`proteinmpnn_opt/_core_gate.py`, the core's
+# template copy byte for byte; `proteinmpnn_opt.core_gate()` is statement one of every entry) refuses by name with exit 3 on an absent,
+# older, newer or edited core before anything of the core is imported.
+[build-system]
+requires = ["setuptools>=64", "wheel"]
+build-backend = "_build_backend"
+backend-path = ["."]
+
+[project]
+name = "proteinmpnn_opt"
+dynamic = ["version"]
+description = "ProteinMPNN inference optimizations: modes off/exact, weight sets soluble/vanilla, activation report"
+requires-python = ">=3.9"
+classifiers = ["Private :: Do Not Upload"]        # not for a package index: PyPI rejects uploads carrying this classifier
+dependencies = []
+
+[project.optional-dependencies]
+test = ["pytest", "numpy", "setuptools>=64"]       # the package's CPU tests (numpy: the tests' .npz assertions; setuptools: the tests execute _build_backend.py, which imports setuptools.build_meta — the [build-system] floor, absent from a bare python >= 3.12 venv)
+
+[project.scripts]
+proteinmpnn-opt = "proteinmpnn_opt.__main__:main"  # `proteinmpnn-opt design|check|warm ...` == `python -m proteinmpnn_opt ...`
+
+[tool.setuptools]
+packages = ["proteinmpnn_opt", "proteinmpnn_opt.tests"]
+include-package-data = false
+
+[tool.setuptools.dynamic]
+version = {attr = "proteinmpnn_opt.__version__"}
+
+# The shared core this kit stands on (common/opt_core): pinned by path and by minimum version; pip install -e <that path> -e <this directory>;
+# the core pin gate compares this table's pinned version with the installed core's __version__ literal at every entry. The table header line
+# carries nothing but the header (the gate's no-tomllib reader matches it whole).
+[tool.opt_core]
+path = "../../common/opt_core"
+version = "0.5.18.20"

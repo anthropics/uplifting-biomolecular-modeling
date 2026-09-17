@@ -1,0 +1,675 @@
+{
+ "by_cc": {
+  "10.0": "sm100_t37",
+  "9.0": "sm90_t37",
+  "8.0": "sm80_t37"
+ },
+ "by_cc_triton": {
+  "10.0|3.7": "sm100_t37",
+  "9.0|3.7": "sm90_t37",
+  "9.0|3.3": "sm90_t33",
+  "10.0|3.6": "sm100_t36",
+  "8.0|3.7": "sm80_t37"
+ },
+ "entries": {
+  "sm100_t37": {
+   "device": "NVIDIA B200 (cc 10.0, 148 SMs, 178 GB)",
+   "epilogue": {
+    "shape": [
+     256,
+     8,
+     32
+    ],
+    "cfg": {
+     "BI": 8,
+     "BJ": 16,
+     "num_warps": 8,
+     "num_stages": 1,
+     "KC": 32,
+     "NUM_STAGES_K": 3,
+     "WS": 0
+    },
+    "kernel": "epilogue_v3 (K-chunk loop, KC=32, 3-stage)",
+    "bitwise_vs_shipped": true,
+    "verify_rows": 28,
+    "speedup_vs_shipped": {
+     "356": [
+      1.415,
+      1.432
+     ],
+     "546": [
+      1.431,
+      1.437
+     ],
+     "705": [
+      1.432,
+      1.437
+     ],
+     "813": [
+      1.441,
+      1.446
+     ],
+     "1493": [
+      1.442,
+      1.448
+     ]
+    },
+    "arm": "E+T",
+    "runner_up": {
+     "cfg": {
+      "BI": 16,
+      "BJ": 8,
+      "num_warps": 8,
+      "num_stages": 1,
+      "KC": 32,
+      "NUM_STAGES_K": 3,
+      "WS": 0
+     },
+     "bitwise_vs_shipped": true,
+     "verify_rows": 28
+    }
+   },
+   "transition": {
+    "shape": [
+     256,
+     1024
+    ],
+    "cfg": {
+     "BM": 128,
+     "BH": 32,
+     "num_warps": 8,
+     "num_stages": 3,
+     "IL": 1,
+     "WS": 1,
+     "FLAT": 0
+    },
+    "kernel": "transition_v3 (pinned body, IL=1 interleaved Wa|Wb, warp_specialize on the hidden-chunk loop)",
+    "bitwise_vs_shipped": true,
+    "verify_rows": 10,
+    "speedup_vs_shipped": {
+     "356": [
+      1.406,
+      1.407
+     ],
+     "546": [
+      1.474,
+      1.477
+     ],
+     "705": [
+      1.478,
+      1.481
+     ],
+     "813": [
+      1.477,
+      1.479
+     ],
+     "1493": [
+      1.485,
+      1.486
+     ]
+    },
+    "arm": "E+T",
+    "runner_up": {
+     "cfg": {
+      "BM": 128,
+      "BH": 32,
+      "num_warps": 8,
+      "num_stages": 2,
+      "IL": 1,
+      "WS": 1,
+      "FLAT": 0
+     },
+     "bitwise_vs_shipped": true,
+     "verify_rows": 10
+    }
+   },
+   "prologue": {
+    "shape": [
+     256,
+     256
+    ],
+    "cfg": {
+     "BI": 8,
+     "BJ": 16,
+     "num_warps": 8,
+     "num_stages": 2,
+     "BN": 128,
+     "NUM_STAGES_W": 2,
+     "WS": 0,
+     "GLOOP": 1
+    },
+    "kernel": "prologue_v4 (runtime W-chunk loop, 2-stage cp.async pipeline, q/k/v in one [3,I,H,J,D] buffer -> contiguous views)",
+    "bitwise_vs_shipped": true,
+    "verify_rows": 20,
+    "speedup_vs_shipped": {
+     "356": [
+      1.224,
+      1.232
+     ],
+     "546": [
+      1.163,
+      1.169
+     ],
+     "705": [
+      1.114,
+      1.118
+     ],
+     "813": [
+      1.262,
+      1.27
+     ],
+     "1493": [
+      1.117,
+      1.123
+     ]
+    },
+    "arm": "E+T",
+    "note": "modest (x1.11-1.27): kernel is output-store-bound; 206 KB smem -> 1 CTA/SM (HAZARDS #2). Can be disabled alone with PTX_GLUE_V2_FAMILIES=epilogue,transition."
+   },
+   "fallback_v1": {
+    "transition (shipped kernel)": {
+     "BM": 128,
+     "BH": 32,
+     "num_warps": 8,
+     "num_stages": 2,
+     "IL": 1
+    },
+    "prologue (shipped kernel)": "unchanged {16,16,8,2}",
+    "epilogue (shipped kernel)": "unchanged {v2,8,16,8,1}"
+   }
+  },
+  "sm90_t37": {
+   "device": "NVIDIA H100 80GB HBM3 (cc 9.0)",
+   "epilogue": {
+    "shape": [
+     256,
+     8,
+     32
+    ],
+    "cfg": {
+     "BI": 16,
+     "BJ": 8,
+     "num_warps": 8,
+     "num_stages": 1,
+     "KC": 64,
+     "NUM_STAGES_K": 3,
+     "WS": 0
+    },
+    "kernel": "epilogue_v3 (KC=64, 3-stage)",
+    "bitwise_vs_shipped": true,
+    "verify_rows": 28,
+    "speedup_vs_shipped": {
+     "356": [
+      1.598,
+      1.625
+     ],
+     "546": [
+      1.594,
+      1.622
+     ],
+     "705": [
+      1.58,
+      1.615
+     ],
+     "813": [
+      1.598,
+      1.66
+     ],
+     "1493": [
+      1.579,
+      1.651
+     ]
+    },
+    "arm": "E+T",
+    "runner_up": {
+     "cfg": {
+      "BI": 8,
+      "BJ": 8,
+      "num_warps": 4,
+      "num_stages": 1,
+      "KC": 32,
+      "NUM_STAGES_K": 3,
+      "WS": 0
+     },
+     "bitwise_vs_shipped": true,
+     "verify_rows": 28
+    }
+   },
+   "prologue": {
+    "shape": [
+     256,
+     256
+    ],
+    "cfg": {
+     "BI": 8,
+     "BJ": 16,
+     "num_warps": 8,
+     "num_stages": 2,
+     "BN": 64,
+     "NUM_STAGES_W": 3,
+     "WS": 1,
+     "GLOOP": 1
+    },
+    "kernel": "prologue_v4 (BN=64, 3-stage W pipeline, warp_specialize)",
+    "bitwise_vs_shipped": true,
+    "verify_rows": 20,
+    "speedup_vs_shipped": {
+     "356": [
+      1.471,
+      1.493
+     ],
+     "546": [
+      1.489,
+      1.509
+     ],
+     "705": [
+      1.509,
+      1.526
+     ],
+     "813": [
+      1.52,
+      1.524
+     ],
+     "1493": [
+      1.489,
+      1.492
+     ]
+    },
+    "arm": "E+T",
+    "runner_up": {
+     "cfg": {
+      "BI": 8,
+      "BJ": 16,
+      "num_warps": 8,
+      "num_stages": 2,
+      "BN": 64,
+      "NUM_STAGES_W": 3,
+      "WS": 0,
+      "GLOOP": 1
+     },
+     "bitwise_vs_shipped": true,
+     "verify_rows": 20,
+     "speedup_vs_shipped": {
+      "356": [
+       1.479,
+       1.487
+      ],
+      "546": [
+       1.462,
+       1.499
+      ],
+      "705": [
+       1.513,
+       1.518
+      ],
+      "813": [
+       1.523,
+       1.543
+      ],
+      "1493": [
+       1.49,
+       1.503
+      ]
+     },
+     "note": "same speed without warp_specialize -> use this if WS is undesired on sm90"
+    }
+   },
+   "transition": "NOT included: warp_specialize gives no gain on sm90 (x1.07 = the IL=1 effect alone); use fallback_v1 (shipped kernel, {128,32,8,3,IL=1}, optional, +5-9% <=813, flat @1493)",
+   "fallback_v1": {
+    "prologue (shipped kernel)": {
+     "BI": 16,
+     "BJ": 16,
+     "num_warps": 8,
+     "num_stages": 1
+    },
+    "transition (shipped kernel, optional)": {
+     "BM": 128,
+     "BH": 32,
+     "num_warps": 8,
+     "num_stages": 3,
+     "IL": 1
+    },
+    "epilogue (shipped kernel)": "unchanged {v2,16,8,8,1}"
+   }
+  },
+  "sm90_t33": {
+   "device": "NVIDIA H100 80GB HBM3 (cc 9.0), torch 2.7.1+cu126, triton 3.3.1, cuequivariance 0.8.0 = the release stack",
+   "epilogue": {
+    "shape": [
+     256,
+     8,
+     32
+    ],
+    "cfg": {
+     "BI": 16,
+     "BJ": 8,
+     "num_warps": 8,
+     "num_stages": 1,
+     "KC": 64,
+     "NUM_STAGES_K": 3,
+     "WS": 0
+    },
+    "kernel": "epilogue_v3 (KC=64, 3-stage)",
+    "bitwise_vs_shipped": true,
+    "verify_rows": 28,
+    "speedup_vs_shipped": {
+     "356": [
+      1.549,
+      1.557
+     ],
+     "546": [
+      1.546,
+      1.571
+     ],
+     "705": [
+      1.554,
+      1.571
+     ],
+     "813": [
+      1.559,
+      1.59
+     ],
+     "1493": [
+      1.544,
+      1.591
+     ]
+    },
+    "arm": "E+T",
+    "runner_up": {
+     "cfg": {
+      "BI": 8,
+      "BJ": 8,
+      "num_warps": 4,
+      "num_stages": 1,
+      "KC": 32,
+      "NUM_STAGES_K": 3,
+      "WS": 0
+     },
+     "bitwise_vs_shipped": true,
+     "verify_rows": 28,
+     "speedup_vs_shipped": {
+      "356": [
+       1.617,
+       1.637
+      ],
+      "546": [
+       1.56,
+       1.611
+      ],
+      "705": [
+       1.55,
+       1.583
+      ],
+      "813": [
+       1.543,
+       1.593
+      ],
+      "1493": [
+       1.535,
+       1.589
+      ]
+     },
+     "note": "marginally faster on 3.3.1 (best of a 48-cfg sweep); the same cell as 3.7 is kept as primary for one-cell-per-cc simplicity"
+    }
+   },
+   "prologue": {
+    "shape": [
+     256,
+     256
+    ],
+    "cfg": {
+     "BI": 8,
+     "BJ": 16,
+     "num_warps": 8,
+     "num_stages": 2,
+     "BN": 64,
+     "NUM_STAGES_W": 3,
+     "WS": 0,
+     "GLOOP": 1
+    },
+    "kernel": "prologue_v4 (BN=64, 3-stage; WS flag off \u2014 warp_specialize does not exist on triton 3.3, the probe drops it anyway)",
+    "bitwise_vs_shipped": true,
+    "verify_rows": 20,
+    "speedup_vs_shipped": {
+     "356": [
+      1.459,
+      1.466
+     ],
+     "546": [
+      1.451,
+      1.482
+     ],
+     "705": [
+      1.49,
+      1.503
+     ],
+     "813": [
+      1.505,
+      1.512
+     ],
+     "1493": [
+      1.48,
+      1.481
+     ]
+    },
+    "arm": "E+T"
+   },
+   "transition": "NOT included (no WS on triton 3.3; and see fallback_v1 warning: IL=1 REGRESSES on 3.3.1)",
+   "fallback_v1": {
+    "WARNING": "the fragment-v1 pure-config cells for the SHIPPED kernels do NOT transfer to triton 3.3.1: prologue {16,16,8,1} = x{'356': [0.941, 0.96], '546': [1.037, 1.048], '705': [1.051, 1.059], '813': [1.028, 1.028], '1493': [1.088, 1.091]} (no gain), transition {128,32,8,3,IL=1} = x{'356': [0.878, 0.894], '546': [0.894, 0.906], '705': [0.893, 0.905], '813': [0.891, 0.896], '1493': [0.863, 0.896]} (REGRESSION) -> on the pinned image keep the shipped sm90 cells {8,16,8,2} / {128,32,8,3,IL=0}."
+   }
+  },
+  "sm100_t36": {
+   "device": "NVIDIA B200 (cc 10.0), torch 2.11.0+cu128, triton 3.6.0, cuequivariance 0.11.1",
+   "epilogue": {
+    "shape": [
+     256,
+     8,
+     32
+    ],
+    "cfg": {
+     "BI": 8,
+     "BJ": 16,
+     "num_warps": 8,
+     "num_stages": 1,
+     "KC": 32,
+     "NUM_STAGES_K": 3,
+     "WS": 0
+    },
+    "kernel": "epilogue_v3",
+    "bitwise_vs_shipped": true,
+    "verify_rows": 28,
+    "speedup_vs_shipped": {
+     "356": [
+      1.453,
+      1.476
+     ],
+     "546": [
+      1.445,
+      1.461
+     ],
+     "705": [
+      1.481,
+      1.498
+     ],
+     "813": [
+      1.488,
+      1.506
+     ],
+     "1493": [
+      1.492,
+      1.512
+     ]
+    },
+    "arm": "E+T"
+   },
+   "transition": {
+    "shape": [
+     256,
+     1024
+    ],
+    "cfg": {
+     "BM": 128,
+     "BH": 32,
+     "num_warps": 8,
+     "num_stages": 3,
+     "IL": 1,
+     "WS": 1,
+     "FLAT": 0
+    },
+    "kernel": "transition_v3 (+WS)",
+    "bitwise_vs_shipped": true,
+    "verify_rows": 10,
+    "speedup_vs_shipped": {
+     "356": [
+      1.189,
+      1.189
+     ],
+     "546": [
+      1.207,
+      1.209
+     ],
+     "705": [
+      1.214,
+      1.214
+     ],
+     "813": [
+      1.212,
+      1.212
+     ],
+     "1493": [
+      1.215,
+      1.215
+     ]
+    },
+    "arm": "E+T",
+    "note": "WS gain on triton 3.6 is smaller than on 3.7 (x1.19-1.22 vs x1.41-1.49); still ahead of the fallback_v1 IL=1 cell (x{'356': [1.153, 1.154], '546': [1.169, 1.171], '705': [1.171, 1.171], '813': [1.171, 1.171], '1493': [1.171, 1.172]})"
+   },
+   "prologue": {
+    "shape": [
+     256,
+     256
+    ],
+    "cfg": {
+     "BI": 8,
+     "BJ": 16,
+     "num_warps": 8,
+     "num_stages": 2,
+     "BN": 128,
+     "NUM_STAGES_W": 2,
+     "WS": 0,
+     "GLOOP": 1
+    },
+    "kernel": "prologue_v4",
+    "bitwise_vs_shipped": true,
+    "verify_rows": 20,
+    "speedup_vs_shipped": {
+     "356": [
+      1.216,
+      1.229
+     ],
+     "546": [
+      1.146,
+      1.152
+     ],
+     "705": [
+      1.108,
+      1.109
+     ],
+     "813": [
+      1.268,
+      1.271
+     ],
+     "1493": [
+      1.114,
+      1.117
+     ]
+    },
+    "arm": "E+T"
+   },
+   "fallback_v1": {
+    "transition (shipped kernel)": {
+     "cfg": {
+      "BM": 128,
+      "BH": 32,
+      "num_warps": 8,
+      "num_stages": 2,
+      "IL": 1
+     },
+     "bitwise_vs_shipped": true,
+     "speedup_vs_shipped": {
+      "356": [
+       1.153,
+       1.154
+      ],
+      "546": [
+       1.169,
+       1.171
+      ],
+      "705": [
+       1.171,
+       1.171
+      ],
+      "813": [
+       1.171,
+       1.171
+      ],
+      "1493": [
+       1.171,
+       1.172
+      ]
+     }
+    }
+   }
+  },
+  "sm80_t37": {
+   "device": "NVIDIA A100-SXM4-80GB (cc 8.0, 108 SMs, 80 GB; 164 KB opt-in shared memory per block)",
+   "arm": "E+T",
+   "class": "EXACT within the composed block statement from CELLS.json blk2_triatt_min_tokens up: --det 1 predictions byte-identical to --mode off at 400 and 956 tokens with MK-PF F1 as the statement's prologue (below the floor the unit runs the stock tri-attention statement by name)",
+   "prologue": {
+    "shape": [
+     256,
+     256
+    ],
+    "cfg": {
+     "BI": 8,
+     "BJ": 8,
+     "num_warps": 8,
+     "num_stages": 1,
+     "BN": 64,
+     "NUM_STAGES_W": 2,
+     "WS": 0,
+     "GLOOP": 1
+    },
+    "kernel": "prologue_v4 (BN=64, 2-stage W pipeline, no warp_specialize: the sm_100 BN=128 cell needs 206 KB of shared memory, above sm_80's 164 KB)",
+    "arm": "E+T",
+    "note": "serves the row-major stock-LayerNorm calls only; with PTX_MK_PF=F1 (the 8.0 rows) both tri-attention nodes take MK-PF's F1 prologue and this kernel is the by-name remainder"
+   },
+   "epilogue": {
+    "shape": [
+     256,
+     8,
+     32
+    ],
+    "cfg": {
+     "BI": 16,
+     "BJ": 8,
+     "num_warps": 8,
+     "num_stages": 1,
+     "KC": 32,
+     "NUM_STAGES_K": 2,
+     "WS": 0
+    },
+    "kernel": "epilogue_v3 (K-chunk loop, KC=32, 2-stage)",
+    "arm": "E+T",
+    "note": "the unit's own epilogue kernel (CELLS.json epilogue (256, 8, 32, 'sm80'), KVER 2) is bitwise on sm_80 but several times slower per call than the stock statement; this kernel is the one the 8.0 rows run"
+   },
+   "provenance": "lifted verbatim from the donor kit (the c_z-256, 8-head x 32 pairformer kit; named in the campaign notes)'s former sm80 cell tables (kit release 0.3.43, A1 A100 pass: NVIDIA A100-SXM4-80GB cc 8.0, torch 2.13.0+cu130 / triton 3.7.1 / cuequivariance 0.11.1; --det 1 predictions byte-identical to --mode off end to end at 400 and 956 tokens inside the composed block statement); to be re-raced by CORE"
+  }
+ },
+ "triton_tested": [
+  "3.7",
+  "3.6",
+  "3.3"
+ ]
+}

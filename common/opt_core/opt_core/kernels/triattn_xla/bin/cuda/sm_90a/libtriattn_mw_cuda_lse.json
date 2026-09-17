@@ -1,0 +1,65 @@
+{
+ "abi_version": 2,
+ "arch": "sm_90a",
+ "build_s": 6.2,
+ "built_utc": "2026-09-11T15:43:24Z",
+ "bytes": 1386744,
+ "cudart": "static",
+ "device_prefix_bytes": 43363,
+ "entry": "triattn_mw_cuda_fwd_lse",
+ "file": "bin/cuda/sm_90a/libtriattn_mw_cuda_lse.so",
+ "kind": "cuda",
+ "lse": {
+  "dead_row": "log2(key count) (unseeded offset 0)",
+  "dtype": "fp32",
+  "layout": "[B,N,H,S] dense",
+  "units": "log2"
+ },
+ "needed": [
+  "libc.so.6",
+  "libgcc_s.so.1",
+  "libm.so.6",
+  "libstdc++.so.6"
+ ],
+ "nvcc": "Build cuda_13.0.r13.0/compiler.36424714_0",
+ "nvcc_flags": [
+  "-O3",
+  "-std=c++17",
+  "-gencode",
+  "arch=compute_90a,code=sm_90a",
+  "--expt-relaxed-constexpr",
+  "-DNDEBUG",
+  "-Xptxas",
+  "-v",
+  "-DTXLA_LSE=1"
+ ],
+ "ptxas_registers": {
+  "_ZN2mw14mask_or_kernelEPKhxxPhPiiii": 32,
+  "_ZN2mw14triattn_mw_fwdILb0ELb0EEEvNS_6ParamsE": 166,
+  "_ZN2mw14triattn_mw_fwdILb0ELb1EEEvNS_6ParamsE": 163,
+  "_ZN2mw15triattn_mw_listILb0EEEvNS_6ParamsE": 168,
+  "_ZN2mw15triattn_mw_listILb1EEEvNS_6ParamsE": 168,
+  "_ZN2mw16mask_rows_kernelEPKhxxS1_PhPiS3_iiii": 28,
+  "_ZN2mw17stage_bias_kernelI13__nv_bfloat16EEvPKT_xxxxPKhPfiiiiif": 28,
+  "_ZN2mw17stage_bias_kernelI6__halfEEvPKT_xxxxPKhPfiiiiif": 28,
+  "_ZN2mw17stage_bias_kernelIfEEvPKT_xxxxPKhPfiiiiif": 34,
+  "_ZN2mw18mask_tables_kernelEPKhxxPjPhPiiiii": 28
+ },
+ "requires": {
+  "CXXABI_max": "1.3.9",
+  "GLIBCXX_max": "3.4.21",
+  "GLIBC_max": "2.34"
+ },
+ "role": "fwd_lse",
+ "sha256": "7b14bce069723235c444b47dd150398faf4cf30800f2aa62a064cd1f087f21a3",
+ "sources_sha256": {
+  "csrc/cuda_lse.patch": "40a08a06e2683f3e22bc851bd3c3729060f44b73764611c86e5f53fcbc042ea4",
+  "kernels/triattn/cuda_sm90a/csrc/mw_ptx.h": "aa22a8a237f1915f467b2091de84c7060790c1641f6c4d8b3758c33172cf1e33",
+  "kernels/triattn/cuda_sm90a/csrc/triattn_mw.cu": "14eb59c6a2028df19fdc7ff34c180bd9acf0c292484bf3bb7ec013f447be33a5",
+  "kernels/triattn/cuda_sm90a/csrc/triattn_mw.cu[device prefix]": "434e57cbbf16d7419d5824c1686c09d103bebe330dd9ae8488fcc82816ed3f61",
+  "triattn_cuda_abi.h": "1ddc93723760ceacae785fd0e089ad968359acdacbf2945ec5adef2e6f236dfe",
+  "triattn_mw.cu[device prefix + cuda_lse.patch]": "03ae9ca06fbd8c380f7a93e6d7002cb8c19a5ae1a24fb5258a93a00a0263b328",
+  "triattn_mw_cuda.cu": "af9bb47d8597ac5221635f7c8a49717bd1057782511438c3ebef152fe27fac27"
+ },
+ "split_mark": "#include <torch/types.h>"
+}

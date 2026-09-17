@@ -1,0 +1,47 @@
+model:
+  _yaml_: _model.yaml
+  trunk:
+    blocks_per_ckpt: null
+  diffusion_head:
+    blocks_per_ckpt: null
+  confidence_head:
+    blocks_per_ckpt: null
+
+train:
+  _yaml_: _train_base.yaml
+  name: stage4-640
+
+  init_from_ema: ['trunk']
+  training:
+    train_trunk: false
+
+  optimizer:
+    max_lr: 0.001
+    lr_decay_factor: 1.0
+
+  data:
+    max_length: 640
+    max_seq_length: 1280
+    batch_size: 1
+    global_batch_size: 256
+
+    data_root: /data/atlasfold_data/
+    train_datasets:
+      - name: rcsb
+        is_distillation: false
+        weight: 0.240
+        sampling_strategy: ["length", "cluster"]
+      - name: disordered_pdb_af2
+        is_distillation: true
+        weight: 0.010
+        sampling_strategy: ["length", "cluster"]
+      - name: mgnify_long
+        is_distillation: true
+        weight: 0.740
+        sampling_strategy: ["plddt"]
+      - name: mgnify_short
+        is_distillation: true
+        weight: 0.010
+        sampling_strategy: ["plddt"]
+    val_dataset:
+      name: cameo_val

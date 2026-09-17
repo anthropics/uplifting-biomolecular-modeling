@@ -1,0 +1,4 @@
+# the two compiled wheels of the pinned stack (stock/PINS.json pinned_stack.image_recipe) are files placed here before an image build with
+# --build-arg WHEELS_FROM=prebuilt (environment/Dockerfile, STOCK.md §Stack); they are never committed — the directory is (environment/Dockerfile copies it)
+stock/wheels/*
+!stock/wheels/.keep

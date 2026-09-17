@@ -1,0 +1,5 @@
+Copyright 2024 Arc Institute. All rights reserved
+Copyright 2024 Michael Poli. All rights reserved
+Copyright 2024 Stanford University. All rights reserved
+
+See LICENSE file for software license. See README for authors and contributors. This software is licensed under the Apache License, Version 2.0.

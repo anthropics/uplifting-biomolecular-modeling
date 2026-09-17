@@ -1,0 +1,4 @@
+protenix_fpf_atom_attn_exact — first-party code of this kit (2026-09); no third-party source included. The kernel re-states, on the model's
+own tensors, the arithmetic that the vendored Protenix v2 code (ByteDance, Apache-2.0, unmodified under stock/) reaches through PyTorch's
+scaled_dot_product_attention math path and cuBLAS for this site; PyTorch (BSD-3-Clause) and CUTLASS (BSD-3-Clause) define the rounding and
+accumulation statements that are reproduced; nothing is copied from them.

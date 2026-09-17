@@ -1,0 +1,189 @@
+{
+ "model": "mosaic",
+ "upstream": {
+  "mosaic": {
+   "repo": "https://github.com/escalante-bio/mosaic",
+   "commit": "70fec525423f5f87156a1a957b4a4048f9f8e676",
+   "version": "0.1.0",
+   "tag": null,
+   "install": "mosaic @ git+https://github.com/escalante-bio/mosaic.git@70fec525423f5f87156a1a957b4a4048f9f8e676",
+   "archive": "stock/mosaic-70fec525.tar.gz",
+   "note": "no tag at this commit; the commit is the pin. pyproject declares git-only and mutually unsatisfiable back-ends (its `esm` needs torch 2.11 vs its own torch==2.7.1): install joltz, boltz and the public requirements first, then mosaic with --no-deps (environment/requirements.lock: the whole set at its versions, the three upstream packages as `name @ git+https://...@<commit>` lines, installed --no-deps). The archive carries src/mosaic/proteinmpnn/weights/ (three .pt files, 33 MB: [tool.hatch.build] artifacts)"
+  },
+  "joltz": {
+   "repo": "https://github.com/nboyd/joltz",
+   "commit": "ed0f04257dac85bd4b7bf45521cc280f86d38ded",
+   "version": "0.1.0",
+   "tag": null,
+   "install": "joltz @ git+https://github.com/nboyd/joltz.git@ed0f04257dac85bd4b7bf45521cc280f86d38ded",
+   "archive": "stock/joltz-ed0f0425.tar.gz",
+   "note": "no tag at this commit; pyproject declares boltz>=2.0.3 (floating): the escalante fork pin below is the boltz this tree runs"
+  },
+  "boltz": {
+   "repo": "https://github.com/escalante-bio/boltz",
+   "commit": "1acc397b6e81f30dc07a80d17a26c38f9c6f6942",
+   "version": "2.2.1",
+   "tag": null,
+   "install": "boltz @ git+https://github.com/escalante-bio/boltz.git@1acc397b6e81f30dc07a80d17a26c38f9c6f6942",
+   "archive": "stock/boltz-1acc397b.tar.gz",
+   "note": "escalante-bio fork of jwohlwend/boltz; no tag at this commit. Provides the torch Boltz2 module the checkpoint loads into, the featurizer (process_inputs) and download_boltz2"
+  }
+ },
+ "archive_recipe": "git archive --format=tar --prefix=<name>-<commit8>/ <commit> <paths> | gzip -n -9  (mosaic: src/mosaic pyproject.toml LICENSE README.md; joltz: src/joltz pyproject.toml LICENSE NOTICE README.md; boltz: src/boltz pyproject.toml LICENSE README.md)",
+ "python": "3.12",
+ "pinned_stack": {
+  "python": "3.12",
+  "jax": "0.10.2",
+  "jaxlib": "0.10.2",
+  "jax-cuda12-plugin": "0.10.2",
+  "jax-cuda12-pjrt": "0.10.2",
+  "cuda": "12.x via nvidia-*-cu12 wheels (nvidia-cudnn-cu12 9.24.0.43, nvidia-cublas-cu12 12.9.2.10); driver >= 550",
+  "triton": null,
+  "torch": "2.7.1+cpu",
+  "container_base": "nvidia/cuda:12.8.1-runtime-ubuntu22.04 + CPython 3.12.1 (python-build-standalone), the stack in the virtual environment /kit/venv (environment/Dockerfile; the distribution list is environment/requirements.lock)",
+  "install": "environment/requirements.lock, every distribution at its version, pip install --no-deps into a virtual environment (README.md 'Setup'; environment/Dockerfile builds /kit/venv the same way); the kit's lever files, copied into site-packages/mosaic/fast/ by run.sh install (opt/mosaic_opt/leverfiles.py), are not part of the stock install"
+ },
+ "pins": {
+  "jax": "0.10.2",
+  "jaxlib": "0.10.2",
+  "jax-cuda12-plugin": "0.10.2",
+  "jax-cuda12-pjrt": "0.10.2",
+  "equinox": "0.13.8",
+  "torch": "2.7.1+cpu",
+  "numpy": "2.5.2",
+  "optax": "0.2.8",
+  "scipy": "1.18.1",
+  "gemmi": "0.7.5",
+  "jaxtyping": "0.3.11",
+  "dm-haiku": "0.0.17"
+ },
+ "pins_asserted_by_kit": [
+  "jax",
+  "jaxlib",
+  "jax-cuda12-plugin",
+  "jax-cuda12-pjrt",
+  "equinox"
+ ],
+ "system": {
+  "compiler": "none required at run time (XLA emits its own fusions; no Triton)",
+  "gpu_class": "NVIDIA H100 80GB HBM3",
+  "optional_absent": [
+   "flax",
+   "orbax",
+   "transformers",
+   "esm",
+   "protenix",
+   "boltzgen",
+   "jopenfold3",
+   "jopendde",
+   "opendde",
+   "jproteina-complexa",
+   "jpromera",
+   "esmjfold2",
+   "jablang",
+   "ablang",
+   "joltzgen",
+   "accelerate",
+   "safetensors"
+  ],
+  "note": "the declared-but-omitted packages are not imported on the Boltz-2 path (src/mosaic/__init__.py is empty; the Boltz-2 modules import jax, torch, numpy, equinox, jaxtyping, gemmi, boltz, joltz, scipy, mosaic and the standard library)"
+ },
+ "weights": {
+  "boltz2_conf.ckpt": {
+   "path": "$MOSAIC_CACHE_DIR/boltz/boltz2_conf.ckpt",
+   "sha256": "090e82ac8c92f5e943fa1b39e7410a44027bea7243c0bbb3caa67a77fc1428e1",
+   "source": "boltz.main.download_boltz2() \u2014 public Boltz hosts (model-gateway.boltz.bio, huggingface.co/boltz-community/boltz-2); downloaded on first Boltz2() when absent (src/mosaic/losses/boltz2.py:49-55)",
+   "redistributed": false,
+   "size_note": "~5 GB with the CCD molecules (mols/)"
+  },
+  "joltz_parameters": {
+   "sha256_all_leaves": "103f750d44578a021a5fb08755d6ef5d0a13b234aa8466863da7a8fbc681e5be",
+   "leaves": 437,
+   "params": 521023231,
+   "source": "joltz.from_torch at load time (src/mosaic/losses/boltz2.py:79); recorded by the kit driver as params_sha256_all_leaves"
+  },
+  "ccd": {
+   "path": "$MOSAIC_CACHE_DIR/boltz/mols.tar, unpacked to mols/ by the same call",
+   "sha256": "39e076d96dbec6b4e86982bbda16f3a53a2a60c9bdc17828d88f6f9a0c7d1fd7",
+   "source": "boltz.main.download_boltz2() (same call as the checkpoint)",
+   "note": "the archive is the pinned unit: install --weights hashes mols.tar and refuses it off the pin; mols/ is its content; the driver's results.json records what was loaded"
+  },
+  "proteinmpnn": {
+   "files": {
+    "v_48_020.pt": {
+     "size_bytes": 6681301,
+     "read_on_path": true
+    },
+    "soluble_v_48_020.pt": {
+     "size_bytes": 6681301,
+     "read_on_path": false
+    },
+    "abmpnn.pt": {
+     "size_bytes": 20060943,
+     "read_on_path": false
+    }
+   },
+   "path": "src/mosaic/proteinmpnn/weights/ (inside the mosaic archive; installed under site-packages/mosaic/proteinmpnn/weights/)",
+   "source": "committed in escalante-bio/mosaic @ 70fec525; the files are tracked in this repo's archive (stock/mosaic-70fec525.tar.gz) at that commit \u2014 named by the commit, not by a stored digest"
+  }
+ },
+ "entry_point": {
+  "cli": null,
+  "model": "mosaic.models.boltz2.Boltz2()  (src/mosaic/losses/boltz2.py:49-79: torch checkpoint -> joltz.from_torch)",
+  "features": "model.binder_features(binder_length=L, chains=[TargetChain(seq)])  (examples/boltz_notebook.py:101; TargetChain.use_msa defaults to True, src/mosaic/structure_prediction.py:27)",
+  "loss": "model.build_loss(loss=2*BinderTargetContact() + WithinBinderContact() + 5.0*InverseFoldingSequenceRecovery(mpnn, temp=0.01), features=features)  (examples/boltz_notebook.py:119-124; recycling_steps=1, sampling_steps=25, deterministic=True, src/mosaic/models/boltz2.py:143-150)",
+  "design": "simplex_APGM(loss, n_steps=75, x=softmax(0.5*gumbel(key, (L,20))), stepsize=0.1, momentum=0.0) then simplex_APGM(loss, n_steps=50, x=PSSM, stepsize=0.5, scale=1.5, momentum=0.0)  (examples/boltz_notebook.py:136-146, 154-160)",
+  "refold": "model.predict(PSSM=PSSM_sharper, features=features, writer=structure_writer, key=key(0))  (examples/boltz_notebook.py:167-168, 198)",
+  "script": "opt/mosaic_opt/tools/public_design_run.py --weights torch (the kit driver with every lever off; the one scriptable form of the calls above: opt/mosaic_opt/stock_design.py)",
+  "notebook": {
+   "path": "stock/src/mosaic/examples/boltz_notebook.py",
+   "repo_path": "examples/boltz_notebook.py",
+   "note": "the recipe module, copied from the pinned commit; not part of the installable archive (archive_recipe packages src/mosaic only)"
+  }
+ },
+ "library_defaults": {
+  "binder_length": 75,
+  "use_msa": true,
+  "recycling_steps": 1,
+  "sampling_steps": 25,
+  "deterministic": true,
+  "n_steps": [
+   75,
+   50
+  ],
+  "stepsize": [
+   0.1,
+   0.5
+  ],
+  "scale_stage2": 1.5,
+  "momentum": 0.0,
+  "mpnn": "ProteinMPNN v_48_020, temp 0.01",
+  "loss_weights": {
+   "BinderTargetContact": 2,
+   "WithinBinderContact": 1,
+   "InverseFoldingSequenceRecovery": 5.0
+  },
+  "seed": "np.random.randint(100000) for x0; key(0) for the refold (examples/boltz_notebook.py:141, 198)",
+  "precision": "JAX defaults (float32; no JAX_DEFAULT_MATMUL_PRECISION, no JAX_ENABLE_X64)",
+  "note": "the kit driver's form of the recipe (tools/recipe.py, the one recipe module): binder_length 80, the public target single-sequence (use_msa=False) by default, any protein target by --target-fasta with its MSA from a staged alignment by --msa <boltz processed .csv | .a3m> (use_msa=True with the ColabFold fetch done ahead of time; no server is contacted), explicit keys (tools/public_design_run.py:5-12)"
+ },
+ "stock_environment": {
+  "reads": [
+   "MOSAIC_CACHE_DIR"
+  ],
+  "must_be_absent_prefixes": [
+   "JAX_COMPILATION_CACHE_DIR",
+   "JAX_PERSISTENT_CACHE_",
+   "XLA_FLAGS",
+   "MOSAIC_OPT"
+  ],
+  "allowed_exceptions": [
+   "MOSAIC_CACHE_DIR"
+  ],
+  "must_be_unset_every_arm": [
+   "JAX_ENABLE_X64",
+   "JAX_DEFAULT_MATMUL_PRECISION"
+  ],
+  "note": "MOSAIC_CACHE_DIR is the library's own weights-cache variable (src/mosaic/cache.py:11), the one exception. The package's own path variables (MOSAIC_OPT_HOME, MOSAIC_OPT_KIT, MOSAIC_OPT_CACHE_ROOT) carry the MOSAIC_OPT prefix and are stripped from every arm's environment like its switches (opt/mosaic_opt/driver.py compose); the package reads them in its own process only. JAX_ENABLE_X64 / JAX_DEFAULT_MATMUL_PRECISION are refused for every arm, stock included (the kit never changes precision: opt/mosaic_opt/det.py MUST_BE_UNSET). XLA_PYTHON_CLIENT_PREALLOCATE and PYTHONUNBUFFERED are the allocator / stdio settings the kit exports for every arm (opt/mosaic_opt/det.py ENV) and are tolerated"
+ }
+}

@@ -1,0 +1,21 @@
+--- kernels/triattn/cuda_sm90a/csrc/triattn_mw.cu (device section)
++++ triattn_mw.cu + lse (bin/cuda/sm_90a/libtriattn_mw_cuda_lse.so)
+@@ -66,6 +66,9 @@
+   float c1;                                                      // scale * log2(e)
+   int dbg;                                                       // experiments only: 32 = no renormalisation, 64 = timeline (MW_TIMELINE builds), 256 = all tiles through the safe pass
+   long long* tl;                                                 // [TL_CTAS][WARPS+1][TL_T][4] clock64 stamps (dbg & 64)
++  float* lse;                                                    // [B,N,H,S] fp32 dense, or nullptr: per query row log2(sum_k 2^(s2_k)) = m + log2(l) at the
++                                                                 // epilogue (s2 = the log2-domain logit incl. bias) -- the residual a backward reads; a row that
++                                                                 // attends no key (uniform average) stores log2(l) + m with its unseeded offset (0: log2 of its key count)
+ };
+ constexpr int TL_CTAS = 16, TL_T = 64;
+ 
+@@ -506,6 +509,8 @@
+           uint32_t* dst = reinterpret_cast<uint32_t*>(ob + (long long)qrow * p.o_sS + 2 * t);
+ #pragma unroll
+           for (int dn = 0; dn < 4; ++dn) dst[4 * dn] = w[dn];
++          if (p.lse != nullptr && t == 0)                            // lse variant: the row's log2-sum-exp from the running offset and sum (every pass that
++            p.lse[(((long long)b * p.N + i_row) * p.H + h) * (long long)S + qrow] = l > 0.f ? f.m[mt][hh] + log2f(l) : -INFINITY;   // stores O stores it)
+         }
+       }
+   }

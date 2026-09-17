@@ -1,0 +1,30 @@
+# AlphaFold 3 (JAX) optimization kit — Apptainer / Singularity image made FROM the container image of af3_jax/environment/Dockerfile: the same stack and
+# the same /kit, for hosts that run Apptainer instead of Docker. The source is the image tagged af3_jax-kit:dev in the local Docker daemon (build it first:
+# README.md Setup).
+#   apptainer build af3_jax.sif af3_jax/environment/apptainer.def
+#   apptainer run --nv --cleanenv --bind /path/to/af3_params:/params --env AF3_JAX_PARAMS_ROOT=/params --bind /path/to/af3_cache:/cache \
+#     --env AF3_JAX_CACHE_ROOT=/cache --bind "$PWD/inputs":/inputs --bind "$PWD/out":/out af3_jax.sif \
+#     pred --config h100 --variant p2 --mode fast --input_dir /inputs --output_dir /out/fast
+# The image is read-only: give every verb an --output_dir and a cache root (AF3_JAX_CACHE_ROOT; `warm` fills it, `pred` reads it) on bound, writable paths;
+# %environment keeps a host user site-packages (PEP 370) from shadowing the pinned stack, --cleanenv keeps the host's variables out.
+Bootstrap: docker-daemon
+From: af3_jax-kit:dev
+
+%post
+    mkdir -p /opt/culib && ln -s /.singularity.d/libs/libcuda.so.1 /opt/culib/libcuda.so && ln -s /.singularity.d/libs/libcuda.so.1 /opt/culib/libcuda.so.1
+
+%environment
+    export PYTHONNOUSERSITE=1
+    # Triton <= 3.5 links its launcher stub with -lcuda: offer the unversioned name when --nv bound only libcuda.so.1
+    if [ -z "${TRITON_LIBCUDA_PATH:-}" ] && [ -e /opt/culib/libcuda.so ]; then export TRITON_LIBCUDA_PATH=/opt/culib; fi
+
+%runscript
+    cd /kit/af3_jax && exec bash /kit/af3_jax/run.sh "$@"
+
+%help
+    AlphaFold 3 (JAX) optimization kit: drop-in modes that make the AlphaFold 3 open inference code (the sokrypton/alphafold3 fork at tag v3.1.4) faster,
+    or lighter on GPU memory, when it runs the converted OpenFold3-preview2 weights (variant p2) — off = stock exactly; exact = identical outputs, faster;
+    fast = small documented numeric differences, faster still (the default); big = lowest memory for large inputs. `apptainer run --nv af3_jax.sif
+    <verb> ...` = `bash /kit/af3_jax/run.sh <verb> ...` (verbs: install, pred, check, warm; /kit/af3_jax/README.md inside the image). Requires an NVIDIA
+    driver that runs CUDA 12 (550 or newer), AF3_JAX_PARAMS_ROOT naming the converted parameters (`install --weights DIR` makes them) and, for the kit
+    modes, AF3_JAX_CACHE_ROOT naming a writable cache root.

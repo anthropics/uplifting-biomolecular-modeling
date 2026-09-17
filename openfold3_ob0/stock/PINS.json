@@ -1,0 +1,153 @@
+{
+ "openfold3_version": "0.5.0",
+ "upstream": {
+  "repo": "https://github.com/aqlaboratory/openfold-3",
+  "tag": "v0.5.0",
+  "commit": "c4771653c5d0a3ebb0b3af71b05efd64bc44ee86"
+ },
+ "wheel": {
+  "file": "stock/openfold3-0.5.0-py3-none-any.whl",
+  "pypi": "openfold3==0.5.0",
+  "pypi_upload": "2026-08-21T08:55:14Z",
+  "sha256": "9948071ed086ec063dac2b7d47a8d31a352536baab80a23f436158dbedfde721",
+  "bytes": 12689832,
+  "install": "run.sh install (stock/install_upstream.py): the file in stock/, or fetched from PyPI, or a copy handed over as --wheel FILE — judged against sha256 + bytes before it is placed, then pip install --no-deps when openfold3 is not installed"
+ },
+ "source": {
+  "dir": "stock/src",
+  "files": 589,
+  "install": "run.sh install (stock/install_upstream.py): the directory in stock/, or the repository archive of the pinned commit (upstream repo + commit: <repo>/archive/<commit>.tar.gz), or a copy handed over as --src TARBALL — extracted, then judged by check_pins.py --wheel-vs-source before it stays",
+  "wheel_vs_source": "427/427 files of the wheel's openfold3/ package byte-identical to stock/src/openfold3/ (check_pins.py --wheel-vs-source); every file of the tagged tree under openfold3/ is packaged in the wheel (projects/*/config/*.yml and tests/test_data/** included as package data)"
+ },
+ "console_script": {
+  "run_openfold": "openfold3.run_openfold:cli",
+  "setup_openfold": "openfold3.setup_openfold:main (writes <cache>/ckpt_root, downloads the default checkpoint into the parameter directory, then setup_biotite_ccd(ccd_path=biotite.setup_ccd.OUTPUT_CCD, force_download=False) places https://openfold3-data.s3.amazonaws.com/components.bcif over biotite's bundled CCD subset; setup_openfold.py:289-307,208-222)",
+  "predict": "openfold3/run_openfold.py:180-190 (predict(query_json, inference_ckpt_path, inference_ckpt_name, num_diffusion_samples, num_model_seeds, runner_yaml, use_msa_server, use_templates, output_dir, use_tf32))"
+ },
+ "weights": {
+  "file": "of3-ob-2025-06-30-174k.pt",
+  "name": "OpenBind-0 (checkpoint name openbind-2025-06-30-174k, version_compatibility >=0.5.0, 174,000 training steps; docs/source/parameters_reference.md)",
+  "url": "https://openfold3-data.s3.amazonaws.com/openfold3-parameters/of3-ob-2025-06-30-174k.pt (upstream's public bucket openfold3-data, key openfold3-parameters/of3-ob-2025-06-30-174k.pt, unsigned requests — what openfold3.entry_points.parameters.download_model_parameters fetches)",
+  "path_env": "OPENFOLD3_OB0_CKPT",
+  "licence": "not stated by upstream for the parameters (the code and repository are Apache-2.0, README.md)",
+  "registry": "openfold3/entry_points/parameters.py:38-54 (checkpoint of3-ob-2025-06-30-174k.pt, version_compatibility >=0.5.0; DEFAULT_CHECKPOINT_NAME openbind-2025-06-30-174k; openfold3-p1, openfold3-p2-145k, openfold3-p2-155k are LEGACY_CHECKPOINTS, parameters.py:58, refused for download); S3 key openfold3-parameters/<file> in bucket openfold3-data (parameters.py:29,81); cache root OPENFOLD_CACHE or ~/.openfold3, parameter directory named by <cache>/ckpt_root (parameters.py:26-27,112-133)",
+  "sha256": "bd43301c011d5f87580d3e8b548658869433e4488399feb03035ba248f8e29e4",
+  "bytes": 2287872989
+ },
+ "ccd": {
+  "file": "components.bcif",
+  "source": "https://openfold3-data.s3.amazonaws.com/components.bcif (public, unsigned)",
+  "bytes": 63393643,
+  "sha256": "473d845c8b250b188dbed9bf505ae206692a178a2a7c4869bf8f9de707ffcc0c",
+  "installed_at": "biotite.setup_ccd.OUTPUT_CCD = <site-packages>/biotite/structure/info/components.bcif in the installed environment (replaces the CCD subset biotite 1.6.0 ships there; nothing fetches the CCD at inference, so an environment without this step silently runs on biotite's bundled subset)",
+  "placed_by": "openfold3.setup_openfold.setup_biotite_ccd(ccd_path=biotite.setup_ccd.OUTPUT_CCD, force_download=False) \u2014 the call setup_openfold's run_setup makes \u2014 run by `run.sh install` (opt/openfold3_ob0_opt/weights.py --ccd; environment/Dockerfile runs it at image build), which hashes the placed file against the bytes + sha256 above and refuses by name on any other digest; a file already at this digest is only hashed; `run.sh install --ccd FILE` (a machine without network access) takes a copy fetched beforehand instead: hashed against the same bytes + sha256 first, refused by name on any other digest, then copied to biotite.setup_ccd.OUTPUT_CCD \u2014 no fetch"
+ },
+ "stock_config": {
+  "file": "opt/openfold3_ob0_opt/stock_cueq_bf16_notune_predict.yml",
+  "sets": {
+   "model_update.presets": [
+    "predict"
+   ],
+   "model_update.custom.settings.memory.eval": {
+    "use_triton_triangle_kernels": true,
+    "use_cueq_triangle_kernels": true,
+    "use_deepspeed_evo_attention": false,
+    "tune_chunk_size": false,
+    "chunk_size": 1024
+   },
+   "pl_trainer_args.precision": "bf16-mixed"
+  },
+  "resolved_kernels": "triangle attention: cuEquivariance (cuequivariance_ops_torch triangle_attention); triangle multiplicative update: cuEquivariance triangle_multiplicative_update; everything else upstream's shipped path (Triton fused softmax/linear where upstream uses it); DeepSpeed DS4Sci evoformer attention OFF \u2014 read per run from <output>/model_config.json, upstream precedence attention cuEq > DS4Sci > Triton > torch (core/model/primitives/attention.py:433-467), trimul cuEq > Triton-fused > torch (core/model/layers/triangular_multiplicative_update.py:1124-1169)",
+  "chunk_plan": "pair-stack chunking pinned: tune_chunk_size false, chunk_size 1024 (upstream's autotuner's own choice on an 80 GB H100 at every ChunkSizeTuner instance for 400-2000-token inputs); the `default` arm (the bare shipped command) keeps the autotuner",
+  "det_file": "opt/openfold3_ob0_opt/stock_cueq_bf16_notune_predict.yml",
+  "det_sets": "the same file; `--det 1` adds, INSIDE the stock process through the det site (opt_core.precision.det_site, the one PYTHONPATH exception the ENV-CLEAN proof names): torch.use_deterministic_algorithms(True), cudnn deterministic / benchmark off, CUBLAS_WORKSPACE_CONFIG=:4096:8; upstream's seed as given (default 42). Bitwise run-to-run reproducible within and across H100 hosts at level 1 (structures + confidences); level 0 is not; a configuration with use_deepspeed_evo_attention on is NOT reproducible at level 1",
+  "reason": "the fastest correct configuration upstream 0.5.0's own runner-yaml keys reach on H100: steady-state `Model forward time` 0.83 / 0.77 / 0.69 / 0.64 of the shipped configuration (Triton kernels, 32-true) at 400 / 800 / 1200 / 2000 tokens, bracketed fresh-process measurement; DS4Sci ties the shipped configuration and is not deterministic; kernels-off is 1.2-1.6x slower at 2-3x the memory",
+  "kernels_off_file": "opt/openfold3_ob0_opt/stock_kernels_off_32_predict.yml",
+  "shipped_file": "opt/openfold3_ob0_opt/shipped_predict.yml",
+  "templates": "upstream 0.5.0 consumes templates on the stock route (template_preprocessor_settings {structure_directory, structure_file_format: cif, fetch_missing_structures: false} in the runner yaml; per-chain template keys in the query JSON). A templated input passes its template keys with --use-templates true; an UNTEMPLATED arm must STRIP the template keys from the query JSON \u2014 `--use-templates false` with template keys present fails inside upstream (the .a3m path is read as a preprocessed pickle: UnpicklingError)"
+ },
+ "wheel_requires": {
+  "torch": "unpinned",
+  "pytorch-lightning": ">=2.1",
+  "rdkit": "<2026",
+  "numpy": "unpinned",
+  "deepspeed": "not a core requirement: optional extra `deepspeed` = deepspeed>=0.18.7",
+  "extra cuequivariance": "cuequivariance>=0.8, cuequivariance-ops-torch-cu12>=0.8, cuequivariance-torch>=0.8, torch>=2.7",
+  "requires_python": ">=3.10",
+  "note": "the wheel's own ranges float; the versions above are the stack the kit runs on"
+ },
+ "upstream_declared_stack": {
+  "source": "stock/src/pixi.lock environment openfold3-cuda12, installed by stock/src/docker/Dockerfile.pixi (docker/DOCKER.md: the recommended build; base ubuntu:22.04, CUDA from conda-forge); the legacy conda route stock/src/environments/production-linux-64.lock + docker/Dockerfile.conda (nvidia/cuda:12.1.1-cudnn8-devel-ubuntu22.04) pins python 3.12.13, pytorch 2.5.1 (cuda 12.4 build), deepspeed 0.19.2 (pip), numpy 2.3.5, rdkit 2025.09.3, pytorch_lightning 2.6.1",
+  "python": "3.14.6",
+  "pytorch": "2.10.0 (conda-forge cuda129 mkl build)",
+  "pytorch_cuda": "12.9",
+  "triton": "3.6.0",
+  "deepspeed": "0.19.0",
+  "numpy": "2.3.5",
+  "rdkit": "2025.09.6",
+  "pytorch_lightning": "2.6.1",
+  "cuequivariance_torch": "0.10.0 (pypi)",
+  "cutlass": "4.5.2",
+  "biotite": "1.7.1"
+ },
+ "cli_defaults": {
+  "num_model_seeds": "unset: experiment_settings.seeds = [42], one seed (openfold3/entry_points/validator.py:311)",
+  "start_seed": 42,
+  "seed_stream": "generate_seeds(42, num_model_seeds) when --num_model_seeds is given (openfold3/entry_points/experiment_runner.py:693-695; validator.py:301-304)",
+  "num_diffusion_samples": 5,
+  "num_recycles": 3,
+  "diffusion_steps": 200,
+  "num_workers": 10,
+  "use_msa_server": true,
+  "use_templates": true,
+  "precision": "fp32 weights, TF32 matmuls (--use_tf32 default true -> torch.set_float32_matmul_precision('high'), openfold3/run_openfold.py:174-179,194-195, openfold3/entry_points/import_utils.py:23-33)",
+  "eval_kernels": "use_deepspeed_evo_attention false, use_cueq_triangle_kernels false, use_triton_triangle_kernels true, tune_chunk_size true (openfold3/projects/of3_all_atom/config/model_config.py:53,116-119); predict preset: chunk_size 1024, offload_inference.confidence_heads true with token_cutoff 2800 (openfold3/projects/of3_all_atom/config/model_setting_presets.yml)",
+  "default_runner_yaml": "$OPENFOLD_CACHE/runner.yml (else ~/.openfold3/runner.yml) is loaded first and --runner-yaml deep-updated over it whenever that file exists (openfold3/run_openfold.py:209-221): a stock process runs with no such file",
+  "source": "openfold3/projects/of3_all_atom/config/model_config.py:178,184,186 (num_recycles, no_full_rollout_samples, no_full_rollout_steps); openfold3/entry_points/validator.py:112,313-314 (num_workers, use_msa_server, use_templates; the CLI flags are tri-state overrides, run_openfold.py:147-166)"
+ },
+ "stock_environment": {
+  "must_be_absent_prefixes": [
+   "OF3_",
+   "OF3T_",
+   "OF3O_",
+   "OF3TP_",
+   "BFTP_",
+   "ROWPAIR_",
+   "FPF_TRIMUL_V4_",
+   "OPENFOLD3_OPT",
+   "OPENFOLD3_OB0_OPT",
+   "CUBLAS_WORKSPACE_CONFIG",
+   "CUDA_MPS_",
+   "CUTLASS_PATH",
+   "CUEQ_"
+  ],
+  "reads": [
+   "OPENFOLD3_OB0_CKPT",
+   "OPENFOLD_CACHE",
+   "CUDA_VISIBLE_DEVICES"
+  ],
+  "upstream_reads": {
+   "OF3_TRITON_DYNAMIC_SHAPES": "openfold3/core/model/primitives/attention.py:671 (TritonEvoformerDynamic vs static-shape kernel selection)",
+   "OF3_TRITON_EXP2": "openfold3/core/kernels/triton/evoformer.py:1167 (exp2-based softmax in upstream's Triton evoformer kernel)"
+  },
+  "note": "every must_be_absent entry is a name prefix: the add-ons' switch families (OF3_*, OF3T_*, OF3O_*, OF3TP_*, BFTP_*, ROWPAIR_*, FPF_TRIMUL_V4_* \u2014 the names this tree's units read), the package switch families (OPENFOLD3_OPT*, OPENFOLD3_OB0_OPT*), the deterministic-recipe workspace variable (exported by the recipe itself under --det 1, allowed under the stock proof's det exception only), CUDA MPS and the DS4Sci CUTLASS override; a stock process carries none of them and no add-on directory on PYTHONPATH. upstream_reads are upstream 0.5.0's OWN switches that happen to sit under the OF3_ prefix: stock's surface \u2014 passed to the stock child unchanged, recorded in the proof, never refused. reads are recorded in the proof when present."
+ },
+ "pinned_stack": {
+  "python": "3.11.5",
+  "torch": "2.10.0+cu128",
+  "triton": "3.6.0",
+  "cuda": "12.8",
+  "cudnn": "9.10.2.21",
+  "deepspeed": "0.19.2",
+  "pytorch_lightning": "2.6.5",
+  "numpy": "2.4.6",
+  "rdkit": "2025.9.3",
+  "cuequivariance_torch": "0.10.0",
+  "biotite": "1.6.0",
+  "os": "Ubuntu 22.04.5 LTS",
+  "freeze": "environment/requirements.lock",
+  "freeze_pins": 115,
+  "resolution": "openfold3 0.5.0's 22 declared runtime requirements resolved by pip and frozen (environment/requirements.lock, 115 lines; pip check clean): rdkit 2025.9.3 (the wheel requires rdkit<2026; 2025.09.3 is upstream's conda-lock value); gemmi, packaging, click and pydantic (imported by openfold3/__init__.py, run_openfold.py, setup_openfold.py but not declared) are in the freeze; plus setuptools and wheel, the two build tools the editable installs use",
+  "tested_on": "NVIDIA H100 80GB HBM3 with the stack above installed from environment/requirements.lock (a documentation line, nothing compares against it)"
+ }
+}

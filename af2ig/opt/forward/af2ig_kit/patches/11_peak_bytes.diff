@@ -1,0 +1,34 @@
+# Patch: 11_peak_bytes.diff
+# Lever: none (report only): the driver's per-design `design` timer record carries `peak_bytes_in_use` — the JAX allocator's peak bytes in use on the first local device (`jax.local_devices()[0].memory_stats()['peak_bytes_in_use']`, `_peak_bytes_in_use`), read after the design's outputs are written; process-cumulative (JAX has no peak reset); `null` where the backend keeps no memory statistics (CPU). nvidia-smi reads the preallocated pool (XLA_PYTHON_CLIENT_MEM_FRACTION), not this. af2ig_opt prints it as `[af2ig-opt] PEAK item=<tag> inuse_gib=<GiB>` per design and one `[af2ig-opt] PEAK-NOTE scope=pass ...` line per process, on both arms (af2ig_opt.report.peak_lines)
+# Numerics class: NONE (no computation changes: an allocator counter is read after the design's outputs; no array is created, moved or read)
+# Default: always (the stock line writes the same record: instrumentation, like the timer records themselves)
+# Applies to: af2_initial_guess/predict_pdb.py as left by patches 00-10 (apply in numeric order with `patch -p1` from the dl_binder_design checkout root)
+--- a/af2_initial_guess/predict_pdb.py
++++ b/af2_initial_guess/predict_pdb.py
+@@ -565,7 +565,7 @@
+                     t_load=feat_holder.t_load, t_feat=feat_holder.t_feat, t_tf=feat_holder.t_tf,
+                     t_wait_inputs=t_feat - t_start, t_model=t_model - t_feat, t_output=t_out - t_model, t_total=t_out - t_start,
+                     pae_interaction=float(feat_holder.score_dict['pae_interaction']),
+-                    plddt_total=float(feat_holder.score_dict['plddt_total']))
++                    plddt_total=float(feat_holder.score_dict['plddt_total']), peak_bytes_in_use=_peak_bytes_in_use())
+ 
+ 
+ class StructManager():
+@@ -703,6 +703,17 @@
+ ####### Main #######
+ ####################
+ 
++def _peak_bytes_in_use():
++    """Report only (the `design` record's peak_bytes_in_use): the JAX allocator's peak bytes in use on the first local device,
++    read after the design's outputs are written; process-cumulative (JAX has no peak reset). None where the backend keeps no
++    memory statistics (CPU). nvidia-smi shows the preallocated pool (XLA_PYTHON_CLIENT_MEM_FRACTION), not this."""
++    try:
++        stats = jax.local_devices()[0].memory_stats() or {}
++    except Exception:
++        return None
++    v = stats.get('peak_bytes_in_use')
++    return None if v is None else int(v)
++
+ device = jax.default_backend()
+ if device == 'gpu':
+     print('/' * 60)

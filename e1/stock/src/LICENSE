@@ -1,0 +1,86 @@
+Profluent-E1 Clickthrough License Agreement
+-------------------------------------------
+
+Please read this Profluent-E1 Clickthrough License Agreement (the “Agreement”) carefully before using Profluent-E1 (as defined below), which is offered by Profluent Bio Inc. (“Profluent”).
+
+By downloading Profluent-E1, or otherwise using Profluent-E1 in any manner, You agree that You have read and agree to be bound by the terms of this Agreement. If You are accessing Profluent-E1 on behalf of an organization or entity, You represent and warrant that You are authorized to enter into this Agreement on that organization's or entity's behalf and bind them to the terms of this Agreement (in which case, the references to “You” and “Your” in this Agreement, except for in this sentence, refer to that organization or entity). Use of Profluent-E1 and all other Profluent-E1 IP is expressly conditioned upon Your assent to all terms of this Agreement, including the Attribution Guidelines incorporated herein, to the exclusion of all other terms.
+
+1. Definitions.
+
+    1.1 “AAA Rules” shall mean the Commercial Arbitration Rules and Mediation Procedures of the American Arbitration Association (“AAA”).
+
+    1.2 “Claim” shall mean any claim (including any tort claim), cause of action, and/or dispute under, arising out of, or relating to this Agreement.
+
+    1.3 “Contribution” shall mean any work of authorship, including the original version of Profluent-E1 and any modifications or additions to that Profluent-E1 or Derivative Works thereof, that is intentionally submitted to Profluent for inclusion in Profluent-E1 by the copyright owner or by an individual or Legal Entity authorized to submit on behalf of the copyright owner. For the purposes of this definition, "submitted" means any form of electronic, verbal, or written communication sent to Profluent or its representatives, including but not limited to communication on electronic mailing lists, source code control systems, and issue tracking systems that are managed by, or on behalf of, Profluent for the purpose of discussing and improving Profluent-E1, but excluding communication that is conspicuously marked or otherwise designated in writing by the copyright owner as "Not a Contribution."
+
+    1.4 “Contributor” shall mean Profluent and any individual or Legal Entity on behalf of whom a Contribution has been received by Profluent and subsequently incorporated within Profluent-E1.
+
+    1.5 “Derivative Works” shall mean any work, whether in Source or Object form, that is based on (or derived from) Profluent-E1 and for which the editorial revisions, annotations, elaborations, or other modifications represent, as a whole, an original work of authorship. For the purposes of this Agreement, Derivative Works shall not include works that remain separable from, or merely link (or bind by name) to the interfaces of, Profluent-E1 and Derivative Works thereof.
+
+    1.6 “GitHub Page” shall mean the page made available at https://github.com/Profluent-AI/E1, as may be updated and amended from time to time.
+
+    1.7 “Hugging Face Pages” shall mean the pages made available at  https://huggingface.co/Profluent-Bio/E1-600m, https://huggingface.co/Profluent-Bio/E1-300m and https://huggingface.co/Profluent-Bio/E1-150m, each as may be updated and amended from time to time.
+
+    1.8 “Legal Entity” shall mean the union of the acting entity and all other entities that control, are controlled by, or are under common control with that entity. For the purposes of this definition, “control” means (i) the power, direct or indirect, to cause the direction or management of such entity, whether by contract or otherwise, or (ii) ownership of fifty percent (50%) or more of the outstanding shares, or (iii) beneficial ownership of such entity.
+
+    1.9 “Object” form shall mean any form resulting from mechanical transformation or translation of a Source form, including but not limited to compiled object code, generated documentation, and conversions to other media types.
+
+    1.10 “Profluent-E1” shall mean the Profluent-E1 Model Code, Profluent-E1 Model Weights and all software, algorithms, machine-learning model code, inference-enabling code, training-enabling code, fine-tuning enabling code and other elements of the foregoing distributed or made available to You by Profluent on the GitHub Page, each as may be updated and amended from time to time, whether in Source or Object form.
+
+    1.11 “Profluent-E1 Model Code” shall mean the code and data for Profluent-E1 made available to You at https://github.com/Profluent-AI/E1, as may be updated and amended from time to time.
+
+    1.12 “Profluent-E1 Model Weights” shall mean the trained model weights for Profluent-E1 made available to You on one or more of the Hugging Face Pages, as may be updated and amended from time to time, including all model weights that are directly or indirectly accessed or copied from the Hugging Face Pages by You or any third party.
+
+    1.13 “Source” form shall mean the preferred form for making modifications, including but not limited to software source code, documentation source, and configuration files.
+
+    1.14 “You” or “Your” shall mean an individual entering into this Agreement or the organization or Legal Entity on whose behalf such individual is entering into this Agreement.
+
+2. Grant of Copyright License. Subject to the terms and conditions of this Agreement, each Contributor hereby grants to You a perpetual, worldwide, non-exclusive, no-charge, royalty-free, irrevocable copyright license to reproduce, prepare Derivative Works of, publicly display, publicly perform, sublicense, and distribute Profluent-E1 and such Derivative Works in Source or Object form.
+
+3. Grant of Patent License. Subject to the terms and conditions of this Agreement, each Contributor hereby grants to You a perpetual, worldwide, non-exclusive, no-charge, royalty-free, irrevocable (except as stated in this section) patent license to make, have made, use, offer to sell, sell, import, and otherwise transfer Profluent-E1, where such license applies only to those patent claims licensable by such Contributor that are necessarily infringed by their Contribution(s) alone or by combination of their Contribution(s) with Profluent-E1 to which such Contribution(s) was submitted. If You institute patent litigation against any entity (including a cross-claim or counterclaim in a lawsuit) alleging that Profluent-E1 or a Contribution incorporated within Profluent-E1 constitutes direct or contributory patent infringement, then any patent licenses granted to You under this Agreement for Profluent-E1 shall terminate as of the date such litigation is filed.
+
+4. Use of Profluent-E1 Model Code. Your access to and use of the Profluent-E1 Model Code separate and apart from Profluent-E1 and the Profluent-E1 Model Weights is subject to the Apache License, Version 2.0 made available at https://www.apache.org/licenses/LICENSE-2.0, as may be updated and amended from time to time.
+
+5. Redistribution. You may reproduce and distribute copies of Profluent-E1 or Derivative Works thereof in any medium, with or without modifications, and in Source or Object form, provided that You meet the following conditions:
+
+    (a) You must give any other recipients of Profluent-E1 or Derivative Works a copy of this Agreement; and
+
+    (b) You must cause any modified files to carry prominent notices stating that You changed the files; and
+
+    (c) You must retain, in the Source form of any Derivative Works that You distribute, all copyright, patent, trademark, and attribution notices from the Source form of Profluent-E1, excluding those notices that do not pertain to any part of the Derivative Works; and
+
+    (d) If Profluent-E1 includes a "NOTICE" text file as part of its distribution or there is otherwise a “NOTICE” text file available on the GitHub Page, then any Derivative Works that You distribute must include a readable copy of the attribution notices contained within such NOTICE file, excluding those notices that do not pertain to any part of the Derivative Works, in at least one of the following places: within a NOTICE text file distributed as part of the Derivative Works; within the Source form or documentation, if provided along with the Derivative Works; or, within a display generated by the Derivative Works, if and wherever such third-party notices normally appear. The contents of the NOTICE file are for informational purposes only and do not modify this Agreement. You may add Your own attribution notices within Derivative Works that You distribute, alongside or as an addendum to the NOTICE text from Profluent-E1, provided that such additional attribution notices cannot be construed as modifying this Agreement; and
+
+    (e) You must comply with the Attribution Guidelines and provide attribution to Profluent-E1 in accordance therewith.
+
+    You may add Your own copyright statement to Your modifications and may provide additional or different license terms and conditions for use, reproduction, or distribution of Your modifications, or for any such Derivative Works as a whole, provided Your use, reproduction, and distribution of Profluent-E1 otherwise complies with the conditions stated in this License.
+
+6. Submission of Contributions. Unless You explicitly state otherwise, any Contribution intentionally submitted for inclusion in Profluent-E1 by You to Profluent shall be under the terms and conditions of this Agreement, without any additional terms or conditions. Notwithstanding the above, nothing herein shall supersede or modify the terms of any separate license agreement you may have executed with Profluent regarding such Contributions.
+
+7. Trademarks. This Agreement does not grant permission to use any Profluent trade names, trademarks, service marks, or product names, except as required for reasonable and customary use in describing the origin of Profluent-E1, reproducing the content of the NOTICE file and complying with the Attribution Guidelines.
+
+8. Disclaimer of Warranty. Unless required by applicable law or agreed to in writing, Profluent provides Profluent-E1 (and each Contributor provides its Contributions) on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied, including, without limitation, any warranties or conditions of TITLE, NON-INFRINGEMENT, MERCHANTABILITY, or FITNESS FOR A PARTICULAR PURPOSE. You are solely responsible for determining the appropriateness of using or redistributing Profluent-E1 and assume any risks associated with Your exercise of permissions under this Agreement. FOR THE AVOIDANCE OF DOUBT AND NOTWITHSTANDING ANYTHING TO THE CONTRARY, YOU ACKNOWLEDGE AND AGREE THAT PROFLUENT IS NOT RESPONSIBLE OR LIABLE FOR ANYTHING YOU BUILD, CREATE, DEVELOP OR DERIVE FROM YOUR USE OF PROFLUENT-E1, INCLUDING ANY DERIVATIVE WORKS.
+
+9. Limitation of Liability. In no event and under no legal theory, whether in tort (including negligence), contract, or otherwise, unless required by applicable law (such as deliberate and grossly negligent acts) or agreed to in writing, shall any Contributor be liable to You for damages, including any direct, indirect, special, incidental, or consequential damages of any character arising as a result of this Agreement or out of the use or inability to use Profluent-E1 (including but not limited to damages for loss of goodwill, work stoppage, computer failure or malfunction, or any and all other commercial damages or losses), even if such Contributor has been advised of the possibility of such damages.
+
+10. Accepting Warranty or Additional Liability. While redistributing Profluent-E1 or Derivative Works thereof, You may choose to offer, and charge a fee for, acceptance of support, warranty, indemnity, or other liability obligations and/or rights consistent with this Agreement. However, in accepting such obligations, You may act only on Your own behalf and on Your sole responsibility, not on behalf of any other Contributor, and only if You agree to indemnify, defend, and hold each Contributor harmless for any liability incurred by, or claims asserted against, such Contributor by reason of your accepting any such warranty or additional liability.
+
+11. Term and Termination. The term of this Agreement will commence upon Your acceptance of this Agreement or access to Profluent-E1 and will continue in full force and effect until terminated in accordance with the terms and conditions herein. Profluent may terminate this Agreement if You are in breach of any term or condition of this Agreement. Upon termination of this Agreement, you shall delete and cease use of Profluent-E1. All provisions of this Agreement which by their nature should survive termination shall survive termination, including, without limitation, ownership provisions, warranty disclaimers, indemnity obligations, limitations of liability and provisions regarding dispute resolution.
+
+12. General.
+
+    12.1 This Agreement constitutes the entire agreement between You and Profluent relating to the subject matter hereof and supersedes all proposals, understandings, or discussions, whether written or oral, relating to the subject matter of this Agreement and all past dealing or industry custom. The failure of either party to enforce its rights under this Agreement at any time for any period shall not be construed as a waiver of such rights.
+
+    12.2 Profluent may amend or modify this Agreement from time to time and will use reasonable efforts to provide You with notice of any material changes that may negatively impact Your use of Profluent-E1 through the GitHub Page or through another means made available to You. No other changes, modifications or waivers to this Agreement will be effective unless in writing and signed by both parties.
+
+    12.3 You and Profluent are independent contractors, and nothing herein shall be deemed to constitute either party as the agent or representative of the other or both parties as joint venturers or partners for any purpose.
+
+    12.4 You shall comply with the U.S. Foreign Corrupt Practices Act and all applicable export laws, restrictions and regulations of the U.S. Department of Commerce, and any other applicable U.S. and foreign authority.
+
+    12.5 This Agreement and the rights and obligations herein may not be assigned or transferred, in whole or in part, by You without the prior written consent of Profluent. Any assignment in violation of this provision is void. Profluent may freely assign or transfer this Agreement, in whole or in part. This Agreement shall be binding upon, and inure to the benefit of, the successors and permitted assigns of the parties.
+
+    12.6 This Agreement shall be governed by and construed under the Federal Arbitration Act, applicable federal law, and the laws of the State of California and the United States without regard to conflicts of laws provisions thereof, and without regard to the Uniform Computer Information Transactions Act.
+
+    12.7 If You have a Claim, You agree to provide Profluent with at least sixty (60) days' written notice so that the parties may attempt to resolve the Claim internally before requesting arbitration. In case of any Claims or disputes between You and Profluent that cannot be resolved through informal internal discussions, You agree that, subject to the provisions of this section, any and all Claims will be settled by final and binding arbitration in accordance with the AAA Rules by an arbitrator selected pursuant to the AAA Rules; provided, however, that Claims arising out of or relating to Your violations of Profluent's intellectual property rights, including copyright infringement, patent infringement, trademark infringement, or efforts to use Profluent-E1 in unauthorized ways will not be subject to such obligation for settlement by final and binding arbitration, and such claims will instead be brought in the state and federal courts of Alameda County, California. The arbitrator's decision and award will be non-appealable and may be entered in, and will be enforceable in, any court of competent jurisdiction. The arbitration will take place in Alameda County, California. Each party will bear its own costs of arbitration unless the arbitrator directs otherwise. The arbitrator may not award relief or damages in excess of or contrary to what this Agreement provides, or order consolidation or arbitration on a class-wide or representative basis.
+
+    12.8 If any provision of this Agreement is held to be invalid, illegal or unenforceable in any respect, that provision shall be limited or eliminated to the minimum extent necessary so that this Agreement otherwise remains in full force and effect and enforceable.

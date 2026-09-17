@@ -1,0 +1,522 @@
+$ nvcc -cubin -arch=sm_80 -O3 -std=c++17 -DNDEBUG --expt-relaxed-constexpr -Xptxas -v -I csrc -I csrc/sm80 -o /tmp/tn_build_5m19tigi/trimul_k3_sm80.cubin csrc/sm80/trimul_k3_sm80.cu
+csrc/sm80/math_sm80.cuh(263): warning #128-D: loop is not reachable
+    for (int kk = 0; kk < KK; ++kk) {
+    ^
+          detected during:
+            instantiation of "void tm80::row_ln(const tm80::RowRaw<K> &, const float *, const float *, float, int, uint32_t (&)[<expression>]) [with K=256, EXACT=true]" at line 166 of csrc/sm80/trimul_k3_sm80.cu
+            instantiation of "void k3_body<ZT,C,D,BM,BN,WM,STAGES,LNX,PRELN,SIG,OPTS>(const K3Params &) [with ZT=__nv_bfloat16, C=256, D=256, BM=64, BN=16, WM=32, STAGES=1, LNX=1, PRELN=false, SIG=0, OPTS=-1]" at line 346 of csrc/sm80/trimul_k3_sm80.cu
+
+Remark: The warnings can be suppressed with "-diag-suppress <warning-number>"
+
+csrc/sm80/math_sm80.cuh(263): warning #128-D: loop is not reachable
+    for (int kk = 0; kk < KK; ++kk) {
+    ^
+          detected during:
+            instantiation of "void tm80::row_ln(const tm80::RowRaw<K> &, const float *, const float *, float, int, uint32_t (&)[<expression>]) [with K=64, EXACT=true]" at line 166 of csrc/sm80/trimul_k3_sm80.cu
+            instantiation of "void k3_body<ZT,C,D,BM,BN,WM,STAGES,LNX,PRELN,SIG,OPTS>(const K3Params &) [with ZT=__nv_bfloat16, C=64, D=64, BM=64, BN=64, WM=16, STAGES=1, LNX=1, PRELN=false, SIG=0, OPTS=-1]" at line 348 of csrc/sm80/trimul_k3_sm80.cu
+
+csrc/sm80/math_sm80.cuh(263): warning #128-D: loop is not reachable
+    for (int kk = 0; kk < KK; ++kk) {
+    ^
+          detected during:
+            instantiation of "void tm80::row_ln(const tm80::RowRaw<K> &, const float *, const float *, float, int, uint32_t (&)[<expression>]) [with K=128, EXACT=true]" at line 166 of csrc/sm80/trimul_k3_sm80.cu
+            instantiation of "void k3_body<ZT,C,D,BM,BN,WM,STAGES,LNX,PRELN,SIG,OPTS>(const K3Params &) [with ZT=__nv_bfloat16, C=128, D=128, BM=128, BN=32, WM=32, STAGES=2, LNX=1, PRELN=false, SIG=0, OPTS=-1]" at line 350 of csrc/sm80/trimul_k3_sm80.cu
+
+csrc/sm80/math_sm80.cuh(263): warning #128-D: loop is not reachable
+    for (int kk = 0; kk < KK; ++kk) {
+    ^
+          detected during:
+            instantiation of "void tm80::row_ln(const tm80::RowRaw<K> &, const float *, const float *, float, int, uint32_t (&)[<expression>]) [with K=384, EXACT=true]" at line 166 of csrc/sm80/trimul_k3_sm80.cu
+            instantiation of "void k3_body<ZT,C,D,BM,BN,WM,STAGES,LNX,PRELN,SIG,OPTS>(const K3Params &) [with ZT=__nv_bfloat16, C=384, D=384, BM=64, BN=32, WM=16, STAGES=1, LNX=1, PRELN=false, SIG=0, OPTS=-1]" at line 352 of csrc/sm80/trimul_k3_sm80.cu
+
+ptxas info    : 0 bytes gmem
+ptxas info    : Compiling entry function 'k3p_f32_c384_h384_bm64_bn32_wm16_s1_mb1' for 'sm_80'
+ptxas info    : Function properties for k3p_f32_c384_h384_bm64_bn32_wm16_s1_mb1
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 255 registers, used 1 barriers, 480 bytes cmem[0]
+ptxas info    : Compile time = 198.066 ms
+ptxas info    : Compiling entry function 'k3_bf16_c384_h384_bm64_bn32_wm16_s1_mb1' for 'sm_80'
+ptxas info    : Function properties for k3_bf16_c384_h384_bm64_bn32_wm16_s1_mb1
+    128 bytes stack frame, 60 bytes spill stores, 60 bytes spill loads
+ptxas info    : Used 255 registers, used 1 barriers, 128 bytes cumulative stack size, 480 bytes cmem[0]
+ptxas info    : Compile time = 299.824 ms
+ptxas info    : Compiling entry function 'k3_bf16_c384_h384_bm64_bn16_wm16_s1_mb2' for 'sm_80'
+ptxas info    : Function properties for k3_bf16_c384_h384_bm64_bn16_wm16_s1_mb2
+    80 bytes stack frame, 16 bytes spill stores, 16 bytes spill loads
+ptxas info    : Used 255 registers, used 1 barriers, 80 bytes cumulative stack size, 480 bytes cmem[0]
+ptxas info    : Compile time = 317.051 ms
+ptxas info    : Compiling entry function 'k3_bf16_c384_h384_bm64_bn16_wm16_s2_mb1' for 'sm_80'
+ptxas info    : Function properties for k3_bf16_c384_h384_bm64_bn16_wm16_s2_mb1
+    128 bytes stack frame, 52 bytes spill stores, 52 bytes spill loads
+ptxas info    : Used 255 registers, used 1 barriers, 128 bytes cumulative stack size, 480 bytes cmem[0]
+ptxas info    : Compile time = 274.243 ms
+ptxas info    : Compiling entry function 'k3t_bf16_c256_h256_bm64_bn16_wm32_s1_mb4' for 'sm_80'
+ptxas info    : Function properties for k3t_bf16_c256_h256_bm64_bn16_wm32_s1_mb4
+    176 bytes stack frame, 172 bytes spill stores, 172 bytes spill loads
+ptxas info    : Used 255 registers, used 1 barriers, 176 bytes cumulative stack size, 480 bytes cmem[0]
+ptxas info    : Compile time = 432.910 ms
+ptxas info    : Compiling entry function 'k3t_bf16_c64_h128_bm64_bn32_wm32_s2_mb4' for 'sm_80'
+ptxas info    : Function properties for k3t_bf16_c64_h128_bm64_bn32_wm32_s2_mb4
+    48 bytes stack frame, 48 bytes spill stores, 48 bytes spill loads
+ptxas info    : Used 255 registers, used 1 barriers, 48 bytes cumulative stack size, 480 bytes cmem[0]
+ptxas info    : Compile time = 204.239 ms
+ptxas info    : Compiling entry function 'k3t_bf16_c64_h64_bm128_bn32_wm32_s2_mb4' for 'sm_80'
+ptxas info    : Function properties for k3t_bf16_c64_h64_bm128_bn32_wm32_s2_mb4
+    40 bytes stack frame, 40 bytes spill stores, 40 bytes spill loads
+ptxas info    : Used 128 registers, used 1 barriers, 40 bytes cumulative stack size, 480 bytes cmem[0]
+ptxas info    : Compile time = 125.147 ms
+ptxas info    : Compiling entry function 'k3t_bf16_c128_h128_bm128_bn32_wm32_s2_mb2' for 'sm_80'
+ptxas info    : Function properties for k3t_bf16_c128_h128_bm128_bn32_wm32_s2_mb2
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 252 registers, used 1 barriers, 480 bytes cmem[0]
+ptxas info    : Compile time = 207.729 ms
+ptxas info    : Compiling entry function 'k3_bf16_c128_h128_bm64_bn32_wm16_s2_mb3' for 'sm_80'
+ptxas info    : Function properties for k3_bf16_c128_h128_bm64_bn32_wm16_s2_mb3
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 168 registers, used 1 barriers, 480 bytes cmem[0]
+ptxas info    : Compile time = 116.334 ms
+ptxas info    : Compiling entry function 'k3_bf16_c128_h128_bm64_bn32_wm16_s2_mb2' for 'sm_80'
+ptxas info    : Function properties for k3_bf16_c128_h128_bm64_bn32_wm16_s2_mb2
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 254 registers, used 1 barriers, 480 bytes cmem[0]
+ptxas info    : Compile time = 107.360 ms
+ptxas info    : Compiling entry function 'k3_bf16_c256_h256_bm64_bn16_wm16_s2_mb2' for 'sm_80'
+ptxas info    : Function properties for k3_bf16_c256_h256_bm64_bn16_wm16_s2_mb2
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 255 registers, used 1 barriers, 480 bytes cmem[0]
+ptxas info    : Compile time = 164.826 ms
+ptxas info    : Compiling entry function 'k3_bf16_c256_h256_bm64_bn32_wm16_s1_mb2' for 'sm_80'
+ptxas info    : Function properties for k3_bf16_c256_h256_bm64_bn32_wm16_s1_mb2
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 255 registers, used 1 barriers, 480 bytes cmem[0]
+ptxas info    : Compile time = 178.161 ms
+ptxas info    : Compiling entry function 'k3p_f32_c128_h128_bm64_bn32_wm16_s2_mb2' for 'sm_80'
+ptxas info    : Function properties for k3p_f32_c128_h128_bm64_bn32_wm16_s2_mb2
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 162 registers, used 1 barriers, 480 bytes cmem[0]
+ptxas info    : Compile time = 68.840 ms
+ptxas info    : Compiling entry function 'k3p_f32_c128_h128_bm64_bn32_wm16_s1_mb2' for 'sm_80'
+ptxas info    : Function properties for k3p_f32_c128_h128_bm64_bn32_wm16_s1_mb2
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 164 registers, used 1 barriers, 480 bytes cmem[0]
+ptxas info    : Compile time = 59.821 ms
+ptxas info    : Compiling entry function 'k3p_f32_c384_h256_bm64_bn16_wm16_s1_mb2' for 'sm_80'
+ptxas info    : Function properties for k3p_f32_c384_h256_bm64_bn16_wm16_s1_mb2
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 255 registers, used 1 barriers, 480 bytes cmem[0]
+ptxas info    : Compile time = 92.561 ms
+ptxas info    : Compiling entry function 'k3p_f32_c384_h128_bm64_bn16_wm16_s1_mb2' for 'sm_80'
+ptxas info    : Function properties for k3p_f32_c384_h128_bm64_bn16_wm16_s1_mb2
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 172 registers, used 1 barriers, 480 bytes cmem[0]
+ptxas info    : Compile time = 61.822 ms
+ptxas info    : Compiling entry function 'k3p_f32_c384_h64_bm64_bn16_wm16_s1_mb2' for 'sm_80'
+ptxas info    : Function properties for k3p_f32_c384_h64_bm64_bn16_wm16_s1_mb2
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 166 registers, used 1 barriers, 480 bytes cmem[0]
+ptxas info    : Compile time = 49.630 ms
+ptxas info    : Compiling entry function 'k3p_f32_c256_h384_bm64_bn16_wm16_s1_mb2' for 'sm_80'
+ptxas info    : Function properties for k3p_f32_c256_h384_bm64_bn16_wm16_s1_mb2
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 255 registers, used 1 barriers, 480 bytes cmem[0]
+ptxas info    : Compile time = 144.043 ms
+ptxas info    : Compiling entry function 'k3p_f32_c256_h128_bm64_bn16_wm32_s1_mb4' for 'sm_80'
+ptxas info    : Function properties for k3p_f32_c256_h128_bm64_bn16_wm32_s1_mb4
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 254 registers, used 1 barriers, 480 bytes cmem[0]
+ptxas info    : Compile time = 114.549 ms
+ptxas info    : Compiling entry function 'k3p_f32_c256_h64_bm64_bn16_wm32_s1_mb4' for 'sm_80'
+ptxas info    : Function properties for k3p_f32_c256_h64_bm64_bn16_wm32_s1_mb4
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 182 registers, used 1 barriers, 480 bytes cmem[0]
+ptxas info    : Compile time = 79.738 ms
+ptxas info    : Compiling entry function 'k3p_f32_c128_h384_bm64_bn16_wm16_s1_mb2' for 'sm_80'
+ptxas info    : Function properties for k3p_f32_c128_h384_bm64_bn16_wm16_s1_mb2
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 255 registers, used 1 barriers, 480 bytes cmem[0]
+ptxas info    : Compile time = 135.124 ms
+ptxas info    : Compiling entry function 'k3p_f32_c128_h256_bm64_bn16_wm32_s1_mb4' for 'sm_80'
+ptxas info    : Function properties for k3p_f32_c128_h256_bm64_bn16_wm32_s1_mb4
+    136 bytes stack frame, 132 bytes spill stores, 132 bytes spill loads
+ptxas info    : Used 255 registers, used 1 barriers, 136 bytes cumulative stack size, 480 bytes cmem[0]
+ptxas info    : Compile time = 193.508 ms
+ptxas info    : Compiling entry function 'k3p_f32_c128_h64_bm64_bn32_wm32_s1_mb4' for 'sm_80'
+ptxas info    : Function properties for k3p_f32_c128_h64_bm64_bn32_wm32_s1_mb4
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 178 registers, used 1 barriers, 480 bytes cmem[0]
+ptxas info    : Compile time = 96.849 ms
+ptxas info    : Compiling entry function 'k3p_f32_c64_h384_bm64_bn16_wm16_s1_mb2' for 'sm_80'
+ptxas info    : Function properties for k3p_f32_c64_h384_bm64_bn16_wm16_s1_mb2
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 255 registers, used 1 barriers, 480 bytes cmem[0]
+ptxas info    : Compile time = 132.966 ms
+ptxas info    : Compiling entry function 'k3p_f32_c64_h256_bm64_bn16_wm32_s1_mb4' for 'sm_80'
+ptxas info    : Function properties for k3p_f32_c64_h256_bm64_bn16_wm32_s1_mb4
+    120 bytes stack frame, 116 bytes spill stores, 116 bytes spill loads
+ptxas info    : Used 255 registers, used 1 barriers, 120 bytes cumulative stack size, 480 bytes cmem[0]
+ptxas info    : Compile time = 198.391 ms
+ptxas info    : Compiling entry function 'k3p_f32_c384_h384_bm64_bn16_wm16_s1_mb1' for 'sm_80'
+ptxas info    : Function properties for k3p_f32_c384_h384_bm64_bn16_wm16_s1_mb1
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 255 registers, used 1 barriers, 480 bytes cmem[0]
+ptxas info    : Compile time = 156.722 ms
+ptxas info    : Compiling entry function 'k3p_f32_c64_h128_bm128_bn16_wm32_s2_mb4' for 'sm_80'
+ptxas info    : Function properties for k3p_f32_c64_h128_bm128_bn16_wm32_s2_mb4
+    416 bytes stack frame, 420 bytes spill stores, 420 bytes spill loads
+ptxas info    : Used 128 registers, used 1 barriers, 416 bytes cumulative stack size, 480 bytes cmem[0]
+ptxas info    : Compile time = 123.637 ms
+ptxas info    : Compiling entry function 'k3p_f32_c64_h64_bm128_bn16_wm32_s2_mb4' for 'sm_80'
+ptxas info    : Function properties for k3p_f32_c64_h64_bm128_bn16_wm32_s2_mb4
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 126 registers, used 1 barriers, 480 bytes cmem[0]
+ptxas info    : Compile time = 75.477 ms
+ptxas info    : Compiling entry function 'k3p_f32_c256_h256_bm64_bn32_wm32_s1_mb2' for 'sm_80'
+ptxas info    : Function properties for k3p_f32_c256_h256_bm64_bn32_wm32_s1_mb2
+    128 bytes stack frame, 124 bytes spill stores, 124 bytes spill loads
+ptxas info    : Used 255 registers, used 1 barriers, 128 bytes cumulative stack size, 480 bytes cmem[0]
+ptxas info    : Compile time = 255.670 ms
+ptxas info    : Compiling entry function 'k3p_f32_c256_h256_bm64_bn16_wm32_s1_mb4' for 'sm_80'
+ptxas info    : Function properties for k3p_f32_c256_h256_bm64_bn16_wm32_s1_mb4
+    112 bytes stack frame, 108 bytes spill stores, 108 bytes spill loads
+ptxas info    : Used 255 registers, used 1 barriers, 112 bytes cumulative stack size, 480 bytes cmem[0]
+ptxas info    : Compile time = 201.688 ms
+ptxas info    : Compiling entry function 'k3p_f32_c256_h256_bm64_bn32_wm16_s1_mb2' for 'sm_80'
+ptxas info    : Function properties for k3p_f32_c256_h256_bm64_bn32_wm16_s1_mb2
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 255 registers, used 1 barriers, 480 bytes cmem[0]
+ptxas info    : Compile time = 103.255 ms
+ptxas info    : Compiling entry function 'k3p_f32_c256_h256_bm64_bn16_wm16_s2_mb2' for 'sm_80'
+ptxas info    : Function properties for k3p_f32_c256_h256_bm64_bn16_wm16_s2_mb2
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 255 registers, used 1 barriers, 480 bytes cmem[0]
+ptxas info    : Compile time = 86.594 ms
+ptxas info    : Compiling entry function 'k3p_f32_c128_h128_bm64_bn16_wm32_s2_mb4' for 'sm_80'
+ptxas info    : Function properties for k3p_f32_c128_h128_bm64_bn16_wm32_s2_mb4
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 254 registers, used 1 barriers, 480 bytes cmem[0]
+ptxas info    : Compile time = 106.900 ms
+ptxas info    : Compiling entry function 'k3p_f32_c128_h128_bm64_bn32_wm32_s1_mb4' for 'sm_80'
+ptxas info    : Function properties for k3p_f32_c128_h128_bm64_bn32_wm32_s1_mb4
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 253 registers, used 1 barriers, 480 bytes cmem[0]
+ptxas info    : Compile time = 126.628 ms
+ptxas info    : Compiling entry function 'k3p_f32_c128_h128_bm128_bn32_wm32_s1_mb2' for 'sm_80'
+ptxas info    : Function properties for k3p_f32_c128_h128_bm128_bn32_wm32_s1_mb2
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 253 registers, used 1 barriers, 480 bytes cmem[0]
+ptxas info    : Compile time = 136.477 ms
+ptxas info    : Compiling entry function 'k3p_f32_c128_h128_bm64_bn16_wm16_s2_mb4' for 'sm_80'
+ptxas info    : Function properties for k3p_f32_c128_h128_bm64_bn16_wm16_s2_mb4
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 128 registers, used 1 barriers, 480 bytes cmem[0]
+ptxas info    : Compile time = 59.340 ms
+ptxas info    : Compiling entry function 'k3p_f32_c128_h128_bm128_bn16_wm32_s2_mb2' for 'sm_80'
+ptxas info    : Function properties for k3p_f32_c128_h128_bm128_bn16_wm32_s2_mb2
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 254 registers, used 1 barriers, 480 bytes cmem[0]
+ptxas info    : Compile time = 110.518 ms
+ptxas info    : Compiling entry function 'k3_f32_c384_h256_bm64_bn16_wm16_s1_mb2' for 'sm_80'
+ptxas info    : Function properties for k3_f32_c384_h256_bm64_bn16_wm16_s1_mb2
+    80 bytes stack frame, 8 bytes spill stores, 8 bytes spill loads
+ptxas info    : Used 255 registers, used 1 barriers, 80 bytes cumulative stack size, 480 bytes cmem[0]
+ptxas info    : Compile time = 258.307 ms
+ptxas info    : Compiling entry function 'k3_bf16_c384_h256_bm64_bn16_wm16_s1_mb2' for 'sm_80'
+ptxas info    : Function properties for k3_bf16_c384_h256_bm64_bn16_wm16_s1_mb2
+    64 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 255 registers, used 1 barriers, 64 bytes cumulative stack size, 480 bytes cmem[0]
+ptxas info    : Compile time = 253.060 ms
+ptxas info    : Compiling entry function 'k3_f32_c384_h128_bm64_bn16_wm16_s1_mb2' for 'sm_80'
+ptxas info    : Function properties for k3_f32_c384_h128_bm64_bn16_wm16_s1_mb2
+    64 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 255 registers, used 1 barriers, 64 bytes cumulative stack size, 480 bytes cmem[0]
+ptxas info    : Compile time = 204.990 ms
+ptxas info    : Compiling entry function 'k3_bf16_c384_h128_bm64_bn16_wm16_s1_mb2' for 'sm_80'
+ptxas info    : Function properties for k3_bf16_c384_h128_bm64_bn16_wm16_s1_mb2
+    64 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 255 registers, used 1 barriers, 64 bytes cumulative stack size, 480 bytes cmem[0]
+ptxas info    : Compile time = 200.210 ms
+ptxas info    : Compiling entry function 'k3_f32_c384_h64_bm64_bn16_wm16_s1_mb2' for 'sm_80'
+ptxas info    : Function properties for k3_f32_c384_h64_bm64_bn16_wm16_s1_mb2
+    64 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 255 registers, used 1 barriers, 64 bytes cumulative stack size, 480 bytes cmem[0]
+ptxas info    : Compile time = 180.703 ms
+ptxas info    : Compiling entry function 'k3_bf16_c384_h64_bm64_bn16_wm16_s1_mb2' for 'sm_80'
+ptxas info    : Function properties for k3_bf16_c384_h64_bm64_bn16_wm16_s1_mb2
+    64 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 255 registers, used 1 barriers, 64 bytes cumulative stack size, 480 bytes cmem[0]
+ptxas info    : Compile time = 157.097 ms
+ptxas info    : Compiling entry function 'k3_f32_c256_h384_bm64_bn16_wm16_s1_mb2' for 'sm_80'
+ptxas info    : Function properties for k3_f32_c256_h384_bm64_bn16_wm16_s1_mb2
+    272 bytes stack frame, 284 bytes spill stores, 284 bytes spill loads
+ptxas info    : Used 255 registers, used 1 barriers, 272 bytes cumulative stack size, 480 bytes cmem[0], 8 bytes cmem[2]
+ptxas info    : Compile time = 199.019 ms
+ptxas info    : Compiling entry function 'k3_bf16_c256_h384_bm64_bn16_wm16_s1_mb2' for 'sm_80'
+ptxas info    : Function properties for k3_bf16_c256_h384_bm64_bn16_wm16_s1_mb2
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 255 registers, used 1 barriers, 480 bytes cmem[0]
+ptxas info    : Compile time = 232.783 ms
+ptxas info    : Compiling entry function 'k3_f32_c256_h128_bm64_bn16_wm32_s1_mb4' for 'sm_80'
+ptxas info    : Function properties for k3_f32_c256_h128_bm64_bn16_wm32_s1_mb4
+    96 bytes stack frame, 92 bytes spill stores, 92 bytes spill loads
+ptxas info    : Used 255 registers, used 1 barriers, 96 bytes cumulative stack size, 480 bytes cmem[0], 8 bytes cmem[2]
+ptxas info    : Compile time = 360.623 ms
+ptxas info    : Compiling entry function 'k3_bf16_c256_h128_bm64_bn16_wm32_s1_mb4' for 'sm_80'
+ptxas info    : Function properties for k3_bf16_c256_h128_bm64_bn16_wm32_s1_mb4
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 255 registers, used 1 barriers, 480 bytes cmem[0]
+ptxas info    : Compile time = 260.918 ms
+ptxas info    : Compiling entry function 'k3_f32_c256_h64_bm64_bn16_wm32_s1_mb4' for 'sm_80'
+ptxas info    : Function properties for k3_f32_c256_h64_bm64_bn16_wm32_s1_mb4
+    96 bytes stack frame, 96 bytes spill stores, 96 bytes spill loads
+ptxas info    : Used 255 registers, used 1 barriers, 96 bytes cumulative stack size, 480 bytes cmem[0], 8 bytes cmem[2]
+ptxas info    : Compile time = 301.843 ms
+ptxas info    : Compiling entry function 'k3_bf16_c256_h64_bm64_bn16_wm32_s1_mb4' for 'sm_80'
+ptxas info    : Function properties for k3_bf16_c256_h64_bm64_bn16_wm32_s1_mb4
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 255 registers, used 1 barriers, 480 bytes cmem[0]
+ptxas info    : Compile time = 228.605 ms
+ptxas info    : Compiling entry function 'k3_f32_c128_h384_bm64_bn16_wm16_s1_mb2' for 'sm_80'
+ptxas info    : Function properties for k3_f32_c128_h384_bm64_bn16_wm16_s1_mb2
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 255 registers, used 1 barriers, 480 bytes cmem[0], 8 bytes cmem[2]
+ptxas info    : Compile time = 190.003 ms
+ptxas info    : Compiling entry function 'k3_bf16_c128_h384_bm64_bn16_wm16_s1_mb2' for 'sm_80'
+ptxas info    : Function properties for k3_bf16_c128_h384_bm64_bn16_wm16_s1_mb2
+    120 bytes stack frame, 120 bytes spill stores, 120 bytes spill loads
+ptxas info    : Used 255 registers, used 1 barriers, 120 bytes cumulative stack size, 480 bytes cmem[0]
+ptxas info    : Compile time = 160.599 ms
+ptxas info    : Compiling entry function 'k3_f32_c128_h256_bm64_bn16_wm32_s1_mb4' for 'sm_80'
+ptxas info    : Function properties for k3_f32_c128_h256_bm64_bn16_wm32_s1_mb4
+    432 bytes stack frame, 428 bytes spill stores, 428 bytes spill loads
+ptxas info    : Used 255 registers, used 1 barriers, 432 bytes cumulative stack size, 480 bytes cmem[0], 8 bytes cmem[2]
+ptxas info    : Compile time = 576.896 ms
+ptxas info    : Compiling entry function 'k3_bf16_c128_h256_bm64_bn16_wm32_s1_mb4' for 'sm_80'
+ptxas info    : Function properties for k3_bf16_c128_h256_bm64_bn16_wm32_s1_mb4
+    152 bytes stack frame, 152 bytes spill stores, 152 bytes spill loads
+ptxas info    : Used 255 registers, used 1 barriers, 152 bytes cumulative stack size, 480 bytes cmem[0]
+ptxas info    : Compile time = 318.687 ms
+ptxas info    : Compiling entry function 'k3_f32_c128_h64_bm64_bn32_wm32_s1_mb4' for 'sm_80'
+ptxas info    : Function properties for k3_f32_c128_h64_bm64_bn32_wm32_s1_mb4
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 255 registers, used 1 barriers, 480 bytes cmem[0]
+ptxas info    : Compile time = 212.931 ms
+ptxas info    : Compiling entry function 'k3_bf16_c128_h64_bm128_bn32_wm32_s2_mb2' for 'sm_80'
+ptxas info    : Function properties for k3_bf16_c128_h64_bm128_bn32_wm32_s2_mb2
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 182 registers, used 1 barriers, 480 bytes cmem[0]
+ptxas info    : Compile time = 158.610 ms
+ptxas info    : Compiling entry function 'k3_f32_c64_h384_bm64_bn16_wm16_s1_mb2' for 'sm_80'
+ptxas info    : Function properties for k3_f32_c64_h384_bm64_bn16_wm16_s1_mb2
+    24 bytes stack frame, 24 bytes spill stores, 24 bytes spill loads
+ptxas info    : Used 255 registers, used 1 barriers, 24 bytes cumulative stack size, 480 bytes cmem[0]
+ptxas info    : Compile time = 175.126 ms
+ptxas info    : Compiling entry function 'k3_bf16_c64_h384_bm64_bn16_wm16_s1_mb2' for 'sm_80'
+ptxas info    : Function properties for k3_bf16_c64_h384_bm64_bn16_wm16_s1_mb2
+    208 bytes stack frame, 204 bytes spill stores, 204 bytes spill loads
+ptxas info    : Used 255 registers, used 1 barriers, 208 bytes cumulative stack size, 480 bytes cmem[0]
+ptxas info    : Compile time = 165.570 ms
+ptxas info    : Compiling entry function 'k3_f32_c64_h256_bm64_bn16_wm32_s1_mb4' for 'sm_80'
+ptxas info    : Function properties for k3_f32_c64_h256_bm64_bn16_wm32_s1_mb4
+    384 bytes stack frame, 380 bytes spill stores, 380 bytes spill loads
+ptxas info    : Used 255 registers, used 1 barriers, 384 bytes cumulative stack size, 480 bytes cmem[0], 8 bytes cmem[2]
+ptxas info    : Compile time = 401.991 ms
+ptxas info    : Compiling entry function 'k3_bf16_c64_h256_bm64_bn16_wm32_s1_mb4' for 'sm_80'
+ptxas info    : Function properties for k3_bf16_c64_h256_bm64_bn16_wm32_s1_mb4
+    448 bytes stack frame, 540 bytes spill stores, 544 bytes spill loads
+ptxas info    : Used 255 registers, used 1 barriers, 448 bytes cumulative stack size, 480 bytes cmem[0]
+ptxas info    : Compile time = 364.510 ms
+ptxas info    : Compiling entry function 'k3x2_bf16_c256_h256_bm64_bn32_wm16_s1_mb2' for 'sm_80'
+ptxas info    : Function properties for k3x2_bf16_c256_h256_bm64_bn32_wm16_s1_mb2
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 254 registers, used 1 barriers, 480 bytes cmem[0]
+ptxas info    : Compile time = 252.703 ms
+ptxas info    : Compiling entry function 'k3x1_bf16_c256_h256_bm64_bn32_wm16_s1_mb2' for 'sm_80'
+ptxas info    : Function properties for k3x1_bf16_c256_h256_bm64_bn32_wm16_s1_mb2
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 255 registers, used 1 barriers, 480 bytes cmem[0]
+ptxas info    : Compile time = 184.890 ms
+ptxas info    : Compiling entry function 'k3x2_bf16_c384_h384_bm64_bn32_wm16_s1_mb1' for 'sm_80'
+ptxas info    : Function properties for k3x2_bf16_c384_h384_bm64_bn32_wm16_s1_mb1
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 255 registers, used 1 barriers, 480 bytes cmem[0]
+ptxas info    : Compile time = 453.836 ms
+ptxas info    : Compiling entry function 'k3x1_bf16_c384_h384_bm64_bn32_wm16_s1_mb1' for 'sm_80'
+ptxas info    : Function properties for k3x1_bf16_c384_h384_bm64_bn32_wm16_s1_mb1
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 255 registers, used 1 barriers, 480 bytes cmem[0]
+ptxas info    : Compile time = 366.625 ms
+ptxas info    : Compiling entry function 'k3x2_bf16_c128_h128_bm128_bn32_wm32_s2_mb2' for 'sm_80'
+ptxas info    : Function properties for k3x2_bf16_c128_h128_bm128_bn32_wm32_s2_mb2
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 254 registers, used 1 barriers, 480 bytes cmem[0]
+ptxas info    : Compile time = 439.534 ms
+ptxas info    : Compiling entry function 'k3x1_bf16_c128_h128_bm128_bn32_wm32_s2_mb2' for 'sm_80'
+ptxas info    : Function properties for k3x1_bf16_c128_h128_bm128_bn32_wm32_s2_mb2
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 255 registers, used 1 barriers, 480 bytes cmem[0]
+ptxas info    : Compile time = 273.089 ms
+ptxas info    : Compiling entry function 'k3x2_bf16_c64_h64_bm64_bn64_wm16_s1_mb4' for 'sm_80'
+ptxas info    : Function properties for k3x2_bf16_c64_h64_bm64_bn64_wm16_s1_mb4
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 128 registers, used 1 barriers, 480 bytes cmem[0]
+ptxas info    : Compile time = 107.706 ms
+ptxas info    : Compiling entry function 'k3x1_bf16_c64_h64_bm64_bn64_wm16_s1_mb4' for 'sm_80'
+ptxas info    : Function properties for k3x1_bf16_c64_h64_bm64_bn64_wm16_s1_mb4
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 128 registers, used 1 barriers, 480 bytes cmem[0]
+ptxas info    : Compile time = 71.765 ms
+ptxas info    : Compiling entry function 'k3x2_bf16_c256_h256_bm64_bn16_wm32_s1_mb4' for 'sm_80'
+ptxas info    : Function properties for k3x2_bf16_c256_h256_bm64_bn16_wm32_s1_mb4
+    240 bytes stack frame, 240 bytes spill stores, 240 bytes spill loads
+ptxas info    : Used 255 registers, used 1 barriers, 240 bytes cumulative stack size, 480 bytes cmem[0]
+ptxas info    : Compile time = 718.669 ms
+ptxas info    : Compiling entry function 'k3x1_bf16_c256_h256_bm64_bn16_wm32_s1_mb4' for 'sm_80'
+ptxas info    : Function properties for k3x1_bf16_c256_h256_bm64_bn16_wm32_s1_mb4
+    208 bytes stack frame, 204 bytes spill stores, 204 bytes spill loads
+ptxas info    : Used 255 registers, used 1 barriers, 208 bytes cumulative stack size, 480 bytes cmem[0]
+ptxas info    : Compile time = 461.452 ms
+ptxas info    : Compiling entry function 'k3_f32_c384_h384_bm64_bn16_wm16_s1_mb1' for 'sm_80'
+ptxas info    : Function properties for k3_f32_c384_h384_bm64_bn16_wm16_s1_mb1
+    224 bytes stack frame, 152 bytes spill stores, 152 bytes spill loads
+ptxas info    : Used 255 registers, used 1 barriers, 224 bytes cumulative stack size, 480 bytes cmem[0]
+ptxas info    : Compile time = 283.432 ms
+ptxas info    : Compiling entry function 'k3_bf16_c384_h384_bm64_bn16_wm16_s1_mb1' for 'sm_80'
+ptxas info    : Function properties for k3_bf16_c384_h384_bm64_bn16_wm16_s1_mb1
+    80 bytes stack frame, 24 bytes spill stores, 24 bytes spill loads
+ptxas info    : Used 255 registers, used 1 barriers, 80 bytes cumulative stack size, 480 bytes cmem[0]
+ptxas info    : Compile time = 294.820 ms
+ptxas info    : Compiling entry function 'k3_bf16_c64_h128_bm64_bn64_wm16_s1_mb3' for 'sm_80'
+ptxas info    : Function properties for k3_bf16_c64_h128_bm64_bn64_wm16_s1_mb3
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 168 registers, used 1 barriers, 480 bytes cmem[0]
+ptxas info    : Compile time = 98.748 ms
+ptxas info    : Compiling entry function 'k3_bf16_c64_h128_bm64_bn32_wm32_s2_mb4' for 'sm_80'
+ptxas info    : Function properties for k3_bf16_c64_h128_bm64_bn32_wm32_s2_mb4
+    48 bytes stack frame, 48 bytes spill stores, 48 bytes spill loads
+ptxas info    : Used 255 registers, used 1 barriers, 48 bytes cumulative stack size, 480 bytes cmem[0]
+ptxas info    : Compile time = 206.356 ms
+ptxas info    : Compiling entry function 'k3_bf16_c64_h128_bm128_bn32_wm32_s2_mb3' for 'sm_80'
+ptxas info    : Function properties for k3_bf16_c64_h128_bm128_bn32_wm32_s2_mb3
+    296 bytes stack frame, 336 bytes spill stores, 336 bytes spill loads
+ptxas info    : Used 168 registers, used 1 barriers, 296 bytes cumulative stack size, 480 bytes cmem[0]
+ptxas info    : Compile time = 194.023 ms
+ptxas info    : Compiling entry function 'k3_f32_c64_h128_bm128_bn16_wm32_s2_mb4' for 'sm_80'
+ptxas info    : Function properties for k3_f32_c64_h128_bm128_bn16_wm32_s2_mb4
+    456 bytes stack frame, 456 bytes spill stores, 456 bytes spill loads
+ptxas info    : Used 128 registers, used 1 barriers, 456 bytes cumulative stack size, 480 bytes cmem[0], 8 bytes cmem[2]
+ptxas info    : Compile time = 195.291 ms
+ptxas info    : Compiling entry function 'k3_bf16_c64_h128_bm128_bn16_wm32_s2_mb4' for 'sm_80'
+ptxas info    : Function properties for k3_bf16_c64_h128_bm128_bn16_wm32_s2_mb4
+    656 bytes stack frame, 936 bytes spill stores, 940 bytes spill loads
+ptxas info    : Used 128 registers, used 1 barriers, 656 bytes cumulative stack size, 480 bytes cmem[0]
+ptxas info    : Compile time = 187.466 ms
+ptxas info    : Compiling entry function 'k3_bf16_c64_h64_bm64_bn32_wm32_s2_mb6' for 'sm_80'
+ptxas info    : Function properties for k3_bf16_c64_h64_bm64_bn32_wm32_s2_mb6
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 168 registers, used 1 barriers, 480 bytes cmem[0]
+ptxas info    : Compile time = 141.588 ms
+ptxas info    : Compiling entry function 'k3_bf16_c64_h64_bm128_bn32_wm32_s2_mb4' for 'sm_80'
+ptxas info    : Function properties for k3_bf16_c64_h64_bm128_bn32_wm32_s2_mb4
+    40 bytes stack frame, 40 bytes spill stores, 40 bytes spill loads
+ptxas info    : Used 128 registers, used 1 barriers, 40 bytes cumulative stack size, 480 bytes cmem[0]
+ptxas info    : Compile time = 122.566 ms
+ptxas info    : Compiling entry function 'k3_f32_c64_h64_bm128_bn16_wm32_s2_mb4' for 'sm_80'
+ptxas info    : Function properties for k3_f32_c64_h64_bm128_bn16_wm32_s2_mb4
+    64 bytes stack frame, 64 bytes spill stores, 64 bytes spill loads
+ptxas info    : Used 128 registers, used 1 barriers, 64 bytes cumulative stack size, 480 bytes cmem[0], 8 bytes cmem[2]
+ptxas info    : Compile time = 107.048 ms
+ptxas info    : Compiling entry function 'k3_bf16_c64_h64_bm64_bn64_wm16_s1_mb4' for 'sm_80'
+ptxas info    : Function properties for k3_bf16_c64_h64_bm64_bn64_wm16_s1_mb4
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 128 registers, used 1 barriers, 480 bytes cmem[0]
+ptxas info    : Compile time = 76.541 ms
+ptxas info    : Compiling entry function 'k3_bf16_c64_h64_bm128_bn16_wm32_s2_mb4' for 'sm_80'
+ptxas info    : Function properties for k3_bf16_c64_h64_bm128_bn16_wm32_s2_mb4
+    72 bytes stack frame, 72 bytes spill stores, 72 bytes spill loads
+ptxas info    : Used 128 registers, used 1 barriers, 72 bytes cumulative stack size, 480 bytes cmem[0]
+ptxas info    : Compile time = 103.819 ms
+ptxas info    : Compiling entry function 'k3_f32_c256_h256_bm64_bn32_wm32_s1_mb2' for 'sm_80'
+ptxas info    : Function properties for k3_f32_c256_h256_bm64_bn32_wm32_s1_mb2
+    352 bytes stack frame, 356 bytes spill stores, 364 bytes spill loads
+ptxas info    : Used 255 registers, used 1 barriers, 352 bytes cumulative stack size, 480 bytes cmem[0]
+ptxas info    : Compile time = 834.884 ms
+ptxas info    : Compiling entry function 'k3_f32_c256_h256_bm64_bn16_wm32_s1_mb4' for 'sm_80'
+ptxas info    : Function properties for k3_f32_c256_h256_bm64_bn16_wm32_s1_mb4
+    224 bytes stack frame, 236 bytes spill stores, 236 bytes spill loads
+ptxas info    : Used 255 registers, used 1 barriers, 224 bytes cumulative stack size, 480 bytes cmem[0], 8 bytes cmem[2]
+ptxas info    : Compile time = 425.715 ms
+ptxas info    : Compiling entry function 'k3_f32_c256_h256_bm64_bn16_wm16_s2_mb2' for 'sm_80'
+ptxas info    : Function properties for k3_f32_c256_h256_bm64_bn16_wm16_s2_mb2
+    8 bytes stack frame, 4 bytes spill stores, 4 bytes spill loads
+ptxas info    : Used 255 registers, used 1 barriers, 8 bytes cumulative stack size, 480 bytes cmem[0]
+ptxas info    : Compile time = 159.491 ms
+ptxas info    : Compiling entry function 'k3_bf16_c256_h256_bm64_bn16_wm32_s1_mb4' for 'sm_80'
+ptxas info    : Function properties for k3_bf16_c256_h256_bm64_bn16_wm32_s1_mb4
+    176 bytes stack frame, 172 bytes spill stores, 172 bytes spill loads
+ptxas info    : Used 255 registers, used 1 barriers, 176 bytes cumulative stack size, 480 bytes cmem[0]
+ptxas info    : Compile time = 416.919 ms
+ptxas info    : Compiling entry function 'k3_bf16_c256_h256_bm64_bn16_wm32_s2_mb2' for 'sm_80'
+ptxas info    : Function properties for k3_bf16_c256_h256_bm64_bn16_wm32_s2_mb2
+    184 bytes stack frame, 188 bytes spill stores, 188 bytes spill loads
+ptxas info    : Used 255 registers, used 1 barriers, 184 bytes cumulative stack size, 480 bytes cmem[0]
+ptxas info    : Compile time = 435.345 ms
+ptxas info    : Compiling entry function 'k3_bf16_c256_h256_bm64_bn32_wm32_s1_mb2' for 'sm_80'
+ptxas info    : Function properties for k3_bf16_c256_h256_bm64_bn32_wm32_s1_mb2
+    160 bytes stack frame, 168 bytes spill stores, 180 bytes spill loads
+ptxas info    : Used 255 registers, used 1 barriers, 160 bytes cumulative stack size, 480 bytes cmem[0]
+ptxas info    : Compile time = 481.208 ms
+ptxas info    : Compiling entry function 'k3_f32_c128_h128_bm64_bn16_wm32_s2_mb4' for 'sm_80'
+ptxas info    : Function properties for k3_f32_c128_h128_bm64_bn16_wm32_s2_mb4
+    48 bytes stack frame, 48 bytes spill stores, 48 bytes spill loads
+ptxas info    : Used 255 registers, used 1 barriers, 48 bytes cumulative stack size, 480 bytes cmem[0], 8 bytes cmem[2]
+ptxas info    : Compile time = 244.629 ms
+ptxas info    : Compiling entry function 'k3_f32_c128_h128_bm64_bn32_wm32_s1_mb4' for 'sm_80'
+ptxas info    : Function properties for k3_f32_c128_h128_bm64_bn32_wm32_s1_mb4
+    80 bytes stack frame, 76 bytes spill stores, 76 bytes spill loads
+ptxas info    : Used 255 registers, used 1 barriers, 80 bytes cumulative stack size, 480 bytes cmem[0]
+ptxas info    : Compile time = 275.162 ms
+ptxas info    : Compiling entry function 'k3_f32_c128_h128_bm128_bn32_wm32_s1_mb2' for 'sm_80'
+ptxas info    : Function properties for k3_f32_c128_h128_bm128_bn32_wm32_s1_mb2
+    80 bytes stack frame, 76 bytes spill stores, 76 bytes spill loads
+ptxas info    : Used 255 registers, used 1 barriers, 80 bytes cumulative stack size, 480 bytes cmem[0]
+ptxas info    : Compile time = 276.338 ms
+ptxas info    : Compiling entry function 'k3_f32_c128_h128_bm64_bn16_wm16_s2_mb4' for 'sm_80'
+ptxas info    : Function properties for k3_f32_c128_h128_bm64_bn16_wm16_s2_mb4
+    32 bytes stack frame, 28 bytes spill stores, 28 bytes spill loads
+ptxas info    : Used 128 registers, used 1 barriers, 32 bytes cumulative stack size, 480 bytes cmem[0]
+ptxas info    : Compile time = 88.404 ms
+ptxas info    : Compiling entry function 'k3_f32_c128_h128_bm128_bn16_wm32_s2_mb2' for 'sm_80'
+ptxas info    : Function properties for k3_f32_c128_h128_bm128_bn16_wm32_s2_mb2
+    48 bytes stack frame, 48 bytes spill stores, 48 bytes spill loads
+ptxas info    : Used 255 registers, used 1 barriers, 48 bytes cumulative stack size, 480 bytes cmem[0], 8 bytes cmem[2]
+ptxas info    : Compile time = 243.140 ms
+ptxas info    : Compiling entry function 'k3_bf16_c128_h128_bm64_bn32_wm32_s1_mb4' for 'sm_80'
+ptxas info    : Function properties for k3_bf16_c128_h128_bm64_bn32_wm32_s1_mb4
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 255 registers, used 1 barriers, 480 bytes cmem[0]
+ptxas info    : Compile time = 199.562 ms
+ptxas info    : Compiling entry function 'k3_bf16_c128_h128_bm128_bn32_wm32_s1_mb2' for 'sm_80'
+ptxas info    : Function properties for k3_bf16_c128_h128_bm128_bn32_wm32_s1_mb2
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 255 registers, used 1 barriers, 480 bytes cmem[0]
+ptxas info    : Compile time = 200.274 ms
+ptxas info    : Compiling entry function 'k3_bf16_c128_h128_bm64_bn32_wm32_s2_mb3' for 'sm_80'
+ptxas info    : Function properties for k3_bf16_c128_h128_bm64_bn32_wm32_s2_mb3
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 252 registers, used 1 barriers, 480 bytes cmem[0]
+ptxas info    : Compile time = 208.249 ms
+ptxas info    : Compiling entry function 'k3_bf16_c128_h128_bm64_bn16_wm16_s2_mb4' for 'sm_80'
+ptxas info    : Function properties for k3_bf16_c128_h128_bm64_bn16_wm16_s2_mb4
+    24 bytes stack frame, 24 bytes spill stores, 24 bytes spill loads
+ptxas info    : Used 128 registers, used 1 barriers, 24 bytes cumulative stack size, 480 bytes cmem[0]
+ptxas info    : Compile time = 85.190 ms
+ptxas info    : Compiling entry function 'k3_bf16_c128_h128_bm128_bn32_wm32_s2_mb2' for 'sm_80'
+ptxas info    : Function properties for k3_bf16_c128_h128_bm128_bn32_wm32_s2_mb2
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 252 registers, used 1 barriers, 480 bytes cmem[0]
+ptxas info    : Compile time = 206.698 ms
+ptxas info    : Compiling entry function 'k3_bf16_c128_h128_bm128_bn16_wm32_s2_mb3' for 'sm_80'
+ptxas info    : Function properties for k3_bf16_c128_h128_bm128_bn16_wm32_s2_mb3
+    40 bytes stack frame, 36 bytes spill stores, 36 bytes spill loads
+ptxas info    : Used 168 registers, used 1 barriers, 40 bytes cumulative stack size, 480 bytes cmem[0]
+ptxas info    : Compile time = 201.751 ms

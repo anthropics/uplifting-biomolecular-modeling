@@ -1,0 +1,3 @@
+# the tested stock wheel (STOCK.md; cited by sha256 in stock/PINS.json) is placed here for environment/Dockerfile --build-arg WHEELS_FROM=prebuilt and never committed
+stock/wheels/*
+!stock/wheels/.keep

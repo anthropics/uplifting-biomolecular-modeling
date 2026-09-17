@@ -1,0 +1,482 @@
+# lever: L1 featurisation prefetch + WRITER output writer thread + autotune-retry fix (run_alphafold.py; flags --featurisation_workers/--featurisation_prefetch, --output_writer)
+# what: (L1) featurise upcoming (input, seed) items in forked worker processes with the identical featurise_input call while the GPU runs the current item (needs --norun_data_pipeline so every work item is known up front); (fix) the fork's tokamax autotune attempt is made once per process and its failure printed once, instead of a failed 10-25 s attempt per new bucket; the jitted forward is exposed as ModelRunner._jitted_apply (the same hk.transform + jax.jit as upstream's _model, which becomes functools.partial(_jitted_apply, params)); (WRITER) with --output_writer each fold job's result extraction (extract_inference_results / embeddings / distogram) and write_outputs run on ONE writer thread, in submission order, while the next fold job's inference runs — the same calls, the same files; every pending job is written ('Fold job … done') before 'Done running N fold jobs.'
+# why-faster: removes 1.4-10 s of CPU featurisation per seed from the GPU's critical path (GPU duty cycle 66% -> 84%); first-in-bucket cost no longer includes a repeated failed autotune; (WRITER) the 1.5-2 s of host-side result extraction + file writing per fold job (about 5 % of a 1,200-token fast item on H100) leave the GPU's critical path in a multi-job pass: per-item wall -2.4 % at 448 and -3.8 % at 1,216 padded tokens, the inference timer unchanged
+# numerics class: bitwise vs stock that loaded the same --cache_dir (XLA autotune results)
+# RNG: unchanged (each item is featurised with its own RandomState(seed) exactly as upstream; jax PRNGKey(seed) untouched)
+# measured: 1.27-1.40x job wall against the stock script run before and after it on the same H100 host, 16 inputs x 5 seeds at 167-705 tokens (HOWTO.md §1)
+# applies-to: github.com/sokrypton/alphafold3@bc32b22ff5902e3daffd5d1f7203d7f2ab6cb997 (upstream google-deepmind/alphafold3 main: the L1 hunks apply to the same functions; the tokamax-autotune block is fork-specific)
+# default: off (both flags default to upstream behaviour; opt-in, numerics class unchanged when on)
+diff --git a/run_alphafold.py b/run_alphafold.py
+index f641e72..ac47766 100644
+--- a/run_alphafold.py
++++ b/run_alphafold.py
+@@ -29,6 +29,8 @@
+ """
+ 
+ from collections.abc import Callable, Sequence
++import collections
++import concurrent.futures
+ import csv
+ import dataclasses
+ import datetime
+@@ -376,6 +378,30 @@
+         ' --flash_attention_implementation=xla for you.'
+     ),
+ )
++_FEATURISATION_WORKERS = flags.DEFINE_integer(
++    'featurisation_workers',
++    0,
++    'Fast-inference patch: number of CPU worker processes that featurise'
++    ' upcoming (fold input, seed) items ahead of time while the GPU runs the'
++    ' current one (0 = upstream behaviour: featurise all seeds of an input,'
++    ' then run inference). Outputs are identical: each item is featurised by'
++    ' exactly the same call with the same per-seed RandomState.',
++)
++_FEATURISATION_PREFETCH = flags.DEFINE_integer(
++    'featurisation_prefetch',
++    4,
++    'Fast-inference patch: how many (fold input, seed) items to featurise'
++    ' ahead of the GPU when --featurisation_workers > 0.',
++)
++_OUTPUT_WRITER = flags.DEFINE_bool(
++    'output_writer',
++    False,
++    'Fast-inference patch: extract each fold job\'s inference results and'
++    ' write its output files on one writer thread while the next fold job\'s'
++    ' inference runs on the GPU (the same extraction and writing calls, the'
++    ' same files byte for byte; they leave the GPU\'s critical path). Every'
++    ' pending job is written before the process reports done.',
++)
+ _BUCKETS = flags.DEFINE_list(
+     'buckets',
+     # pyformat: disable
+@@ -595,11 +621,7 @@
+     return params.get_model_haiku_params(model_dir=self._model_dir)
+ 
+   @functools.cached_property
+-  def _model(
+-      self,
+-  ) -> Callable[[jnp.ndarray, features.BatchDict], model.ModelResult]:
+-    """Loads model parameters and returns a jitted model forward pass."""
+-
++  def _jitted_apply(self):
+     @hk.transform
+     def forward_fn(batch):
+       return model.Model(self._model_config)(batch)
+@@ -607,7 +629,14 @@
+     apply_fn = forward_fn.apply
+     if not _NOJIT.value:
+       apply_fn = jax.jit(apply_fn, device=self._device)
+-    return functools.partial(apply_fn, self.model_params)
++    return apply_fn
++
++  @functools.cached_property
++  def _model(
++      self,
++  ) -> Callable[[jnp.ndarray, features.BatchDict], model.ModelResult]:
++    """Loads model parameters and returns a jitted model forward pass."""
++    return functools.partial(self._jitted_apply, self.model_params)
+ 
+   def run_inference(
+       self, featurised_example: features.BatchDict, rng_key: jnp.ndarray
+@@ -620,7 +649,11 @@
+         self._device,
+     )
+ 
+-    if self._autotune_result is None and self._autotune_cache_path:
++    if (
++        self._autotune_result is None
++        and self._autotune_cache_path
++        and not getattr(self, '_autotune_failed', False)
++    ):
+       try:
+         self._autotune_result = tokamax.autotune(self._model, rng_key, featurised_example)
+         os.makedirs(os.path.dirname(os.path.abspath(self._autotune_cache_path)), exist_ok=True)
+@@ -628,8 +661,22 @@
+           self._autotune_result.dump(f)
+         print(f'Tokamax autotune cache saved to {self._autotune_cache_path}')
+         print('Subsequent runs will load this cache and skip autotuning.')
+-      except Exception:
+-        pass  # Autotune not supported on this device/jaxlib combo; runs fine without it.
++      except Exception as e:  # pylint: disable=broad-except
++        # Autotune not supported on this device/jaxlib combo; runs fine without
++        # it. Fast-inference patch: remember the failure so the (10-25 s)
++        # attempt is not repeated for every new bucket, and say so once: the
++        # cause, and tokamax's rule for a shape with no autotuning-table entry
++        # (its packaged per-GPU tables, else tokamax_autotuning_cache_miss_fallback:
++        # heuristics | autotune | error), which is what applies from here on.
++        self._autotune_failed = True
++        try:
++          from tokamax import config as tokamax_config  # pylint: disable=g-import-not-at-top
++          policy = tokamax_config.autotuning_cache_miss_fallback.value
++        except Exception:  # pylint: disable=broad-except
++          policy = 'unknown'
++        cause = (str(e).strip().splitlines() or [''])[-1][:200]
++        print(f'Tokamax autotune unavailable ({type(e).__name__}: {cause}); kernel configs from '
++              f"tokamax's packaged tables, else tokamax_autotuning_cache_miss_fallback={policy}.")
+ 
+     if self._autotune_result is not None:
+       with self._autotune_result:
+@@ -704,6 +751,105 @@
+   distogram: np.ndarray | None = None
+ 
+ 
++def _featurise_one_seed(
++    fold_input: folding_input.Input,
++    seed: int,
++    buckets: Sequence[int] | None,
++    ref_max_modified_date: datetime.date | None,
++    conformer_max_iterations: int | None,
++    resolve_msa_overlaps: bool,
++    fix_standalone_glycans: bool,
++) -> features.BatchDict:
++  """Featurises one seed of one fold input exactly as featurise_input does."""
++  ccd = chemical_components.Ccd(user_ccd=fold_input.user_ccd)
++  single_seed_input = dataclasses.replace(fold_input, rng_seeds=(seed,))
++  return featurisation.featurise_input(
++      fold_input=single_seed_input,
++      buckets=buckets,
++      ccd=ccd,
++      verbose=False,
++      ref_max_modified_date=ref_max_modified_date,
++      conformer_max_iterations=conformer_max_iterations,
++      resolve_msa_overlaps=resolve_msa_overlaps,
++      fix_standalone_glycans=fix_standalone_glycans,
++  )[0]
++
++
++class FeaturisationPrefetcher:
++  """Featurises (fold input, seed) items in worker processes ahead of the GPU.
++
++  Items are submitted in the exact order the main loop will consume them; each
++  item is computed by `_featurise_one_seed`, i.e. by the same code with the same
++  per-seed RandomState as the sequential path, so features are identical.
++  """
++
++  def __init__(self, num_workers: int, prefetch: int):
++    import concurrent.futures
++    import multiprocessing
++
++    self._pool = concurrent.futures.ProcessPoolExecutor(
++        max_workers=num_workers, mp_context=multiprocessing.get_context('fork')
++    )
++    self._prefetch = max(1, prefetch)
++    self._pending = collections.OrderedDict()
++    self._queue = collections.deque()
++
++  def enqueue(self, key, fold_input, seed, **featurise_kwargs):
++    self._queue.append((key, fold_input, seed, featurise_kwargs))
++    self._top_up()
++
++  def _top_up(self):
++    while self._queue and len(self._pending) < self._prefetch:
++      key, fold_input, seed, kw = self._queue.popleft()
++      self._pending[key] = self._pool.submit(_featurise_one_seed, fold_input, seed, **kw)
++
++  def get(self, key) -> features.BatchDict:
++    self._top_up()
++    if key not in self._pending:
++      raise KeyError(f'Featurisation item {key} was never enqueued.')
++    example = self._pending.pop(key).result()
++    self._top_up()
++    return example
++
++  def shutdown(self):
++    self._pool.shutdown(wait=False, cancel_futures=True)
++
++
++class OutputWriter:
++  """One writer thread behind the GPU (--output_writer): fold job i's result
++  extraction and output writing run on it while fold job i+1's inference runs.
++
++  Tasks run strictly in submission order on the one thread (per-seed
++  extraction, then the job's write), so a job's write sees its extractions
++  finished; a failure on the thread is re-raised in the main thread at the
++  next submission or at drain().
++  """
++
++  def __init__(self):
++    self._pool = concurrent.futures.ThreadPoolExecutor(
++        max_workers=1, thread_name_prefix='output_writer'
++    )
++    self._pending: list[concurrent.futures.Future] = []
++
++  def submit(self, fn, *args, **kwargs) -> concurrent.futures.Future:
++    for done in [f for f in self._pending if f.done()]:
++      self._pending.remove(done)
++      done.result()  # re-raise an earlier extraction / write failure here
++    future = self._pool.submit(fn, *args, **kwargs)
++    self._pending.append(future)
++    return future
++
++  def drain(self) -> None:
++    """Blocks until every submitted extraction and write has finished."""
++    pending, self._pending = self._pending, []
++    for future in pending:
++      future.result()
++
++  def shutdown(self) -> None:
++    self.drain()
++    self._pool.shutdown(wait=True)
++
++
+ def predict_structure(
+     fold_input: folding_input.Input,
+     model_runner: ModelRunner,
+@@ -713,22 +859,37 @@
+     conformer_max_iterations: int | None = None,
+     resolve_msa_overlaps: bool = True,
+     fix_standalone_glycans: bool = False,
+-) -> Sequence[ResultsForSeed]:
+-  """Runs the full inference pipeline to predict structures for each seed."""
++    prefetcher: 'FeaturisationPrefetcher | None' = None,
++    writer: OutputWriter | None = None,
++) -> Sequence[ResultsForSeed] | Sequence[concurrent.futures.Future]:
++  """Runs the full inference pipeline to predict structures for each seed.
++
++  With a `writer` (--output_writer) each seed's result extraction is submitted
++  to the writer thread as soon as its inference returns and the per-seed
++  entries are futures of ResultsForSeed, resolved in seed order on that thread.
++  """
+ 
+   print(f'Featurising data with {len(fold_input.rng_seeds)} seed(s)...')
+   featurisation_start_time = time.time()
+-  ccd = chemical_components.Ccd(user_ccd=fold_input.user_ccd)
+-  featurised_examples = featurisation.featurise_input(
+-      fold_input=fold_input,
+-      buckets=buckets,
+-      ccd=ccd,
+-      verbose=True,
+-      ref_max_modified_date=ref_max_modified_date,
+-      conformer_max_iterations=conformer_max_iterations,
+-      resolve_msa_overlaps=resolve_msa_overlaps,
+-      fix_standalone_glycans=fix_standalone_glycans,
+-  )
++  if prefetcher is None:
++    ccd = chemical_components.Ccd(user_ccd=fold_input.user_ccd)
++    featurised_examples = featurisation.featurise_input(
++        fold_input=fold_input,
++        buckets=buckets,
++        ccd=ccd,
++        verbose=True,
++        ref_max_modified_date=ref_max_modified_date,
++        conformer_max_iterations=conformer_max_iterations,
++        resolve_msa_overlaps=resolve_msa_overlaps,
++        fix_standalone_glycans=fix_standalone_glycans,
++    )
++  else:
++    # Lazily fetched per seed below (featurised in worker processes while the
++    # GPU runs earlier seeds / earlier fold inputs).
++    featurised_examples = (
++        prefetcher.get((fold_input.name, seed_idx))
++        for seed_idx in range(len(fold_input.rng_seeds))
++    )
+   print(
+       f'Featurising data with {len(fold_input.rng_seeds)} seed(s) took'
+       f' {time.time() - featurisation_start_time:.2f} seconds.'
+@@ -748,32 +909,40 @@
+         f'Running model inference with seed {seed} took'
+         f' {time.time() - inference_start_time:.2f} seconds.'
+     )
+-    print(f'Extracting inference results with seed {seed}...')
+-    extract_structures = time.time()
+-    inference_results = model_runner.extract_inference_results(
+-        batch=example, result=result, target_name=fold_input.name
+-    )
+-    num_tokens = len(inference_results[0].metadata['token_chain_ids'])  # pyrefly: ignore[bad-argument-type]
+-    embeddings = model_runner.extract_embeddings(
+-        result=result, num_tokens=num_tokens
+-    )
+-    distogram = model_runner.extract_distogram(
+-        result=result, num_tokens=num_tokens
+-    )
+-    print(
+-        f'Extracting {len(inference_results)} inference samples with'
+-        f' seed {seed} took {time.time() - extract_structures:.2f} seconds.'
+-    )
+ 
+-    all_inference_results.append(
+-        ResultsForSeed(
+-            seed=seed,
+-            inference_results=inference_results,
+-            full_fold_input=fold_input,
+-            embeddings=embeddings,
+-            distogram=distogram,
+-        )
+-    )
++    def extract(seed=seed, example=example, result=result) -> ResultsForSeed:
++      print(f'Extracting inference results with seed {seed}...')
++      extract_structures = time.time()
++      inference_results = model_runner.extract_inference_results(
++          batch=example, result=result, target_name=fold_input.name
++      )
++      num_tokens = len(inference_results[0].metadata['token_chain_ids'])  # pyrefly: ignore[bad-argument-type]
++      embeddings = model_runner.extract_embeddings(
++          result=result, num_tokens=num_tokens
++      )
++      distogram = model_runner.extract_distogram(
++          result=result, num_tokens=num_tokens
++      )
++      print(
++          f'Extracting {len(inference_results)} inference samples with'
++          f' seed {seed} took {time.time() - extract_structures:.2f}'
++          ' seconds.'
++      )
++      return ResultsForSeed(
++          seed=seed,
++          inference_results=inference_results,
++          full_fold_input=fold_input,
++          embeddings=embeddings,
++          distogram=distogram,
++      )
++
++    if writer is None:
++      all_inference_results.append(extract())
++    else:
++      # --output_writer: extracted on the writer thread while the next seed /
++      # fold job runs; the entry is a Future[ResultsForSeed].
++      all_inference_results.append(writer.submit(extract))
++      del example, result
+   print(
+       'Running model inference and extracting output structures with'
+       f' {len(fold_input.rng_seeds)} seed(s) took'
+@@ -955,9 +1124,15 @@
+     force_output_dir: bool = False,
+     compress_large_output_files: bool = False,
+     save_terms_of_use: bool = True,
+-) -> folding_input.Input | Sequence[ResultsForSeed]:
++    prefetcher: 'FeaturisationPrefetcher | None' = None,
++    writer: OutputWriter | None = None,
++) -> folding_input.Input | Sequence[ResultsForSeed] | concurrent.futures.Future:
+   """Runs data pipeline and/or inference on a single fold input.
+ 
++  With a `writer` (--output_writer) the job's result extraction and output
++  writing are submitted to the writer thread and the return value is the
++  Future of its Sequence[ResultsForSeed], resolved once the outputs are written.
++
+   Args:
+     fold_input: Fold input to process.
+     data_pipeline_config: Data pipeline config to use. If None, skip the data
+@@ -1046,16 +1221,32 @@
+         conformer_max_iterations=conformer_max_iterations,
+         resolve_msa_overlaps=resolve_msa_overlaps,
+         fix_standalone_glycans=fix_standalone_glycans,
++        prefetcher=prefetcher,
++        writer=writer,
+     )
+     print(f'Writing outputs with {len(fold_input.rng_seeds)} seed(s)...')
+-    write_outputs(
+-        all_inference_results=all_inference_results,
+-        output_dir=output_dir,
+-        job_name=fold_input.sanitised_name(),
+-        compress_large_output_files=compress_large_output_files,
+-        save_terms_of_use=save_terms_of_use,
++
++    def write(results: Sequence[ResultsForSeed]) -> Sequence[ResultsForSeed]:
++      write_outputs(
++          all_inference_results=results,
++          output_dir=output_dir,
++          job_name=fold_input.sanitised_name(),
++          compress_large_output_files=compress_large_output_files,
++          save_terms_of_use=save_terms_of_use,
++      )
++      print(f'Fold job {fold_input.name} done, output written to {output_dir}\n')
++      return results
++
++    if writer is None:
++      return write(all_inference_results)
++    # --output_writer: the per-seed entries are futures resolved on the writer
++    # thread ahead of this task (one thread, submission order); the job is
++    # written there while the caller moves on to the next fold job.
++    return writer.submit(
++        lambda futures=all_inference_results: write(
++            [f.result() for f in futures]
++        )
+     )
+-    output = all_inference_results
+ 
+   print(f'Fold job {fold_input.name} done, output written to {output_dir}\n')
+   return output
+@@ -1262,9 +1453,54 @@
+   else:
+     model_runner = None
+ 
++  prefetcher = None
++  buckets_for_inference = (
++      None if _NOJIT.value else tuple(int(bucket) for bucket in _BUCKETS.value)
++  )
++  if (
++      _FEATURISATION_WORKERS.value > 0
++      and model_runner is not None
++      and data_pipeline_config is None
++      and not _USE_MSA_SERVER.value
++  ):
++    # Fast-inference patch: featurise (fold input, seed) items in worker
++    # processes ahead of the GPU. Requires the inference-only mode (inputs
++    # already carry MSAs/templates), so every input is known up front.
++    fold_inputs = list(fold_inputs)
++    if _NUM_SEEDS.value is not None:
++      fold_inputs = [fi.with_multiple_seeds(_NUM_SEEDS.value) for fi in fold_inputs]
++    prefetcher = FeaturisationPrefetcher(
++        num_workers=_FEATURISATION_WORKERS.value,
++        prefetch=_FEATURISATION_PREFETCH.value,
++    )
++    for fi in fold_inputs:
++      for seed_idx, seed in enumerate(fi.rng_seeds):
++        prefetcher.enqueue(
++            (fi.name, seed_idx),
++            fi,
++            seed,
++            buckets=buckets_for_inference,
++            ref_max_modified_date=max_template_date,
++            conformer_max_iterations=_CONFORMER_MAX_ITERATIONS.value,
++            resolve_msa_overlaps=_RESOLVE_MSA_OVERLAPS.value,
++            fix_standalone_glycans=_FIX_STANDALONE_GLYCANS.value,
++        )
++    print(
++        f'Featurisation prefetch enabled: {_FEATURISATION_WORKERS.value} worker'
++        f' process(es), {_FEATURISATION_PREFETCH.value} item(s) ahead.'
++    )
++
++  writer = None
++  if _OUTPUT_WRITER.value and model_runner is not None:
++    writer = OutputWriter()
++    print(
++        'Output writer enabled: result extraction and output writing run on'
++        ' one writer thread behind the next fold job.'
++    )
++
+   num_fold_inputs = 0
+   for fold_input in fold_inputs:
+-    if _NUM_SEEDS.value is not None:
++    if _NUM_SEEDS.value is not None and prefetcher is None:
+       print(f'Expanding fold job {fold_input.name} to {_NUM_SEEDS.value} seeds')
+       fold_input = fold_input.with_multiple_seeds(_NUM_SEEDS.value)
+     if _USE_MSA_SERVER.value:
+@@ -1279,9 +1515,7 @@
+         data_pipeline_config=data_pipeline_config,
+         model_runner=model_runner,
+         output_dir=_OUTPUT_DIR.value / fold_input.sanitised_name(),
+-        buckets=None
+-        if _NOJIT.value
+-        else tuple(int(bucket) for bucket in _BUCKETS.value),
++        buckets=buckets_for_inference,
+         ref_max_modified_date=max_template_date,
+         conformer_max_iterations=_CONFORMER_MAX_ITERATIONS.value,
+         resolve_msa_overlaps=_RESOLVE_MSA_OVERLAPS.value,
+@@ -1289,9 +1523,15 @@
+         force_output_dir=_FORCE_OUTPUT_DIR.value,
+         compress_large_output_files=_COMPRESS_LARGE_OUTPUT_FILES.value,
+         save_terms_of_use=_SAVE_TERMS_OF_USE.value,
++        prefetcher=prefetcher,
++        writer=writer,
+     )
+     num_fold_inputs += 1
+ 
++  if writer is not None:
++    writer.shutdown()  # every pending job extracted and written ('Fold job ... done' printed) before the run reports done
++  if prefetcher is not None:
++    prefetcher.shutdown()
+   print(f'Done running {num_fold_inputs} fold jobs.')
+ 
+ 

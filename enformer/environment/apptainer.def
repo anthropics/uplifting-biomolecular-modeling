@@ -1,0 +1,28 @@
+# Enformer optimization kit — Apptainer / Singularity image made FROM the container image of enformer/environment/Dockerfile: the same stack and
+# the same /kit, for hosts that run Apptainer instead of Docker. The source is the image tagged enformer-kit:dev in the local Docker daemon (build
+# it first with enformer/environment/Dockerfile); for a published tag the two header lines read `Bootstrap: docker` / `From: <registry>/enformer-kit:<tag>`.
+#   apptainer build enformer.sif enformer/environment/apptainer.def
+#   apptainer run --nv --cleanenv --bind /data/hf_home:/weights --env HF_HOME=/weights --bind "$PWD/out":/out enformer.sif \
+#     check
+# The image is read-only; %environment keeps a host user site-packages (PEP 370) from
+# shadowing the pinned stack, --cleanenv keeps the host's variables out.
+Bootstrap: docker-daemon
+From: enformer-kit:dev
+
+%post
+    mkdir -p /opt/culib && ln -s /.singularity.d/libs/libcuda.so.1 /opt/culib/libcuda.so && ln -s /.singularity.d/libs/libcuda.so.1 /opt/culib/libcuda.so.1
+
+%environment
+    export PYTHONNOUSERSITE=1
+    # Triton <= 3.5 links its launcher stub with -lcuda: offer the unversioned name when --nv bound only libcuda.so.1
+    if [ -z "${TRITON_LIBCUDA_PATH:-}" ] && [ -e /opt/culib/libcuda.so ]; then export TRITON_LIBCUDA_PATH=/opt/culib; fi
+
+%runscript
+    cd /kit/enformer && exec bash /kit/enformer/run.sh "$@"
+
+%help
+    Enformer optimization kit: a drop-in that makes stock enformer-pytorch 0.8.12 (official EleutherAI/enformer-official-rough weights)
+    faster on one GPU without changing how it is called — off = stock exactly; exact = identical outputs, faster (the one optimized mode).
+    `apptainer run --nv enformer.sif <verb> ...` = `bash /kit/enformer/run.sh <verb> ...` (verbs: install, check; /kit/enformer/README.md
+    inside the image — your own code runs with ENFORMER_OPT=exact). Requires an NVIDIA driver that runs CUDA 13.0 (580 or newer) and HF_HOME
+    naming the weights cache.

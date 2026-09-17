@@ -1,0 +1,39 @@
+# rfdiffusion1_opt — the RFdiffusion-1 optimization kit's package: modes, the resident-driver caller, the stock caller, the activation report.
+# Install the shared core, then this package, both editable: `pip install -e common/opt_core -e rfdiffusion1/opt`. The install must stay editable: the
+# core pin gate reads [tool.opt_core] from this file, above the package, and the kit code the package wraps lives beside it (forward/fast_inference,
+# forward/se3fast_addon), resolved from the package location (RFDIFFUSION1_OPT_HOME / MODEL_OPT relocate the
+# rfdiffusion1/ directory the kits and stock pins are read from, never the pin). No install-time dependency on the upstream
+# package (stock/PINS.json): its checkout is checked at activation. The build backend (the core's kit template, byte for byte) is setuptools
+# plus one step that ships rfdiffusion1_opt_autoload.pth at the wheel root, which is what makes `RFDIFFUSION1_OPT=<mode>` act at the stock
+# command line (see rfdiffusion1_opt/_autoload.py: it refuses kit modes there by name; `off` is inert).
+[build-system]
+requires = ["setuptools>=64", "wheel"]
+build-backend = "_build_backend"
+backend-path = ["."]
+
+[project]
+name = "rfdiffusion1_opt"
+dynamic = ["version"]
+description = "RFdiffusion-1 inference optimizations: modes off/exact/fast (fast: exact's line + the SE(3) add-on's Triton line, Triton LayerNorm, TF32), the stock caller, the driver caller, activation report"
+requires-python = ">=3.10"
+classifiers = ["Private :: Do Not Upload"]
+dependencies = []
+
+[project.optional-dependencies]
+test = ["pytest", "setuptools>=64"]                                    # the package's CPU tests; setuptools: the tests exec opt/_build_backend.py (the build requirement, same floor as [build-system])
+
+[project.scripts]
+rfdiffusion1-opt = "rfdiffusion1_opt.__main__:main"  # `rfdiffusion1-opt design|check|warm ...` == `python -m rfdiffusion1_opt ...`
+
+[tool.setuptools]
+packages = ["rfdiffusion1_opt", "rfdiffusion1_opt.tests"]
+include-package-data = false
+
+[tool.setuptools.dynamic]
+version = {attr = "rfdiffusion1_opt.__version__"}
+
+# the shared core this kit runs on (common/opt_core): pinned by path and a MINIMUM version (a floor). The core pin gate
+# (rfdiffusion1_opt/_core_gate.py, statement one of every entry) refuses by name with exit 3 on an absent or older core before anything of the core is imported
+[tool.opt_core]
+path = "../../common/opt_core"
+version = "0.5.18.20"

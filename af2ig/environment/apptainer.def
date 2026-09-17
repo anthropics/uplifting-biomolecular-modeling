@@ -1,0 +1,28 @@
+# AF2 initial guess optimization kit — Apptainer / Singularity image made FROM the container image of af2ig/environment/Dockerfile: the same stack and
+# the same /kit, for hosts that run Apptainer instead of Docker. The source is the image tagged af2ig-kit:dev in the local Docker daemon (build it
+# first: `docker build -f af2ig/environment/Dockerfile -t af2ig-kit:dev .` from the directory holding af2ig/ and common/); for a published tag the two header lines read `Bootstrap: docker` / `From: <registry>/af2ig-kit:<tag>`.
+#   apptainer build af2ig.sif af2ig/environment/apptainer.def
+#   apptainer run --nv --cleanenv --bind /path/to/af2_params:/weights --env AF2_PARAMS=/weights --bind "$PWD/out":/out af2ig.sif \
+#     pred --config h100 --mode fast --pdbdir /kit/af2ig/opt/forward/af2ig_kit/tests/inputs/pdbs --out /out/fast
+# The image is read-only: give every verb an --out on a bound, writable path; the digest memo goes under $HOME/.cache (bound by default);
+# %environment keeps a host user site-packages (PEP 370) from shadowing the pinned stack, --cleanenv keeps the host's variables out.
+Bootstrap: docker-daemon
+From: af2ig-kit:dev
+
+%post
+    mkdir -p /opt/culib && ln -s /.singularity.d/libs/libcuda.so.1 /opt/culib/libcuda.so && ln -s /.singularity.d/libs/libcuda.so.1 /opt/culib/libcuda.so.1
+
+%environment
+    export PYTHONNOUSERSITE=1
+    # Triton <= 3.5 links its launcher stub with -lcuda: offer the unversioned name when --nv bound only libcuda.so.1
+    if [ -z "${TRITON_LIBCUDA_PATH:-}" ] && [ -e /opt/culib/libcuda.so ]; then export TRITON_LIBCUDA_PATH=/opt/culib; fi
+
+%runscript
+    cd /kit/af2ig && exec bash /kit/af2ig/run.sh "$@"
+
+%help
+    AF2 initial guess optimization kit: drop-in modes that make stock AF2 initial guess (af2_initial_guess of nrbennet/dl_binder_design @ cafa3853,
+    AlphaFold-2 model_1_ptm) faster and lighter on GPU memory without changing how it is called — off = stock exactly; exact = identical outputs,
+    faster; fast = small documented numeric differences, faster still (the default); big = lowest memory. `apptainer run --nv af2ig.sif <verb> ...`
+    = `bash /kit/af2ig/run.sh <verb> ...` (verbs: install, pred, check, warm; /kit/af2ig/README.md inside the image). Requires an NVIDIA driver that
+    runs CUDA 12 (525.60.13 or newer) and AF2_PARAMS naming the directory that holds params/params_model_1_ptm.npz.

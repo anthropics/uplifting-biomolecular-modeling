@@ -1,0 +1,108 @@
+# Patch: 05_flash_attention.diff
+# Lever: L8 flash-attention core for alphafold Attention (global_config.use_flash_attention, set only by predict_pdb.py -flash_attn): the logits/softmax/weighted-sum core of every eligible Attention call is computed by the kit's adapter af2ig_opt.flash_attn (the tree's shared Pallas kernel); ineligible calls run the stock ops and are counted
+# Numerics class: TIER-2: changes numerics (online-softmax re-association; not bitwise vs the stock ops)
+# Default: off; enabled only by predict_pdb.py -flash_attn
+# Applies to: nrbennet/dl_binder_design @ cafa3853ac94dceb1b908c8d9e6954d71749871a with 00-03 applied (predict_pdb.py exists after 00; config.py carries 02 + 03); apply with: patch -p1 < 05_flash_attention.diff  (from the repository root)
+# Licence: MIT, same as upstream dl_binder_design; files under af2_initial_guess/alphafold/ are Apache-2.0 (AlphaFold, DeepMind) and our modifications to them are contributed under Apache-2.0
+#
+--- a/af2_initial_guess/alphafold/model/config.py
++++ b/af2_initial_guess/alphafold/model/config.py
+@@ -325,6 +325,7 @@
+         'global_config': {
+             'deterministic': False,
+             'subbatch_size': 4,
++            'use_flash_attention': False,
+             'use_remat': False,
+             'zero_init': True
+         },
+--- a/af2_initial_guess/alphafold/model/modules.py
++++ b/af2_initial_guess/alphafold/model/modules.py
+@@ -589,11 +589,22 @@
+     q = jnp.einsum('bqa,ahc->bqhc', q_data, q_weights) * key_dim**(-0.5)
+     k = jnp.einsum('bka,ahc->bkhc', m_data, k_weights)
+     v = jnp.einsum('bka,ahc->bkhc', m_data, v_weights)
+-    logits = jnp.einsum('bqhc,bkhc->bhqk', q, k) + bias
+-    if nonbatched_bias is not None:
+-      logits += jnp.expand_dims(nonbatched_bias, axis=0)
+-    weights = jax.nn.softmax(logits)
+-    weighted_avg = jnp.einsum('bhqk,bkhc->bqhc', weights, v)
++    weighted_avg = None
++    if self.global_config.use_flash_attention:
++      # Tier-2 lever L8 (kit): the attention core (logits + mask/pair bias,
++      # softmax, weighted sum) computed by the kit's flash-attention adapter
++      # (af2ig_opt.flash_attn.core -> the tree's shared Pallas kernel) without
++      # materialising the [b, h, q, k] logits; None = a call the kernel does not
++      # take (counted with its reason there), which runs the stock ops below.
++      # Not bitwise vs the stock ops (re-associated softmax reductions).
++      from af2ig_opt import flash_attn as _flash_attn
++      weighted_avg = _flash_attn.core(q, k, v, bias, nonbatched_bias, key_dim, value_dim)
++    if weighted_avg is None:
++      logits = jnp.einsum('bqhc,bkhc->bhqk', q, k) + bias
++      if nonbatched_bias is not None:
++        logits += jnp.expand_dims(nonbatched_bias, axis=0)
++      weights = jax.nn.softmax(logits)
++      weighted_avg = jnp.einsum('bhqk,bkhc->bqhc', weights, v)
+ 
+     if self.global_config.zero_init:
+       init = hk.initializers.Constant(0.0)
+--- a/af2_initial_guess/predict_pdb.py
++++ b/af2_initial_guess/predict_pdb.py
+@@ -97,11 +97,20 @@
+ parser.add_argument( "-device_params", action="store_true", default=False, help='L1: put the model parameters on the GPU once at start-up instead of passing host numpy arrays to every model call (stock re-uploads ~370 MB of weights per design)' )
+ parser.add_argument( "-host_outputs", action="store_true", default=False, help='L6: copy the model outputs to host NumPy arrays in one transfer (jax.device_get) before post-processing, instead of letting numpy/scipy pull each device array lazily op by op; the arrays (float32 values) are the same' )
+ parser.add_argument( "-precompile", type=int, default=0, help='L7: before the prediction loop, featurize one input per distinct length and trigger the XLA compilations of the jitted model for all of them from N host threads in parallel (0 = off). The compiled executables are the ones the loop would have compiled serially; outputs unchanged' )
++parser.add_argument( "-flash_attn", action="store_true", default=False, help='L8 (changes numerics slightly, see CHANGES.md): the attention core (logits + bias, softmax, weighted sum) of every eligible alphafold Attention call computed by the kit adapter af2ig_opt.flash_attn over the shared Pallas flash-attention kernel of the model-opt tree (opt_core.kernels.pallas_attn) instead of the three XLA ops; ineligible calls run the stock ops and are counted in the flash_attn timer record' )
+ parser.add_argument( "-fast", action="store_true", default=False, help='Recommended exact stack: -host_outputs -device_params -sort_by_length (all exact: the stock output bytes)' )
+ 
+ args = parser.parse_args()
+ if args.fast:
+     args.device_params = True; args.host_outputs = True; args.sort_by_length = True
++FLASH_ATTN = None
++if args.flash_attn:
++    # L8: the kit's adapter over the model-opt tree's shared Pallas flash-attention kernel. The kernel is
++    # resolved here, before any design: a core without it, a jax below its floor or a CPU backend stops the
++    # run with the reason named instead of falling back to the stock ops silently.
++    from af2ig_opt import flash_attn as FLASH_ATTN
++    _probe = FLASH_ATTN.setup()
++    print(f"flash_attn: kernel {FLASH_ATTN.census()['impl']} origin={FLASH_ATTN.census()['origin']} jax={_probe.get('jax')} tested={_probe.get('tested')} min_tokens={_probe.get('min_tokens')} scope={'all' if _probe.get('all_calls') else 'pair_bias'}")
+ 
+ #################################
+ # Timers (pure instrumentation)
+@@ -279,6 +288,9 @@
+         model_params = data.get_model_haiku_params(model_name=self.model_name, data_dir=params_dir)
+         timers.emit('params_loaded', dt=time.time() - t, params_dir=params_dir)
+ 
++        if FLASH_ATTN is not None:
++            # L8: the attention core of eligible Attention calls on the flash-attention kernel (modules.py Attention, patch 05)
++            model_config.model.global_config.use_flash_attention = True
+         self.model_config = model_config
+ 
+         self.model_runner = model.RunModel(model_config, model_params)
+@@ -497,6 +509,9 @@
+         self.process_output(feat_holder, feature_dict, prediction_result)
+         t_out = time.time()
+ 
++        if FLASH_ATTN is not None and new_shape:
++            # L8 evidence: the adapter's trace-time census of Attention calls routed to the kernel / left on the stock ops (cumulative over the shapes compiled so far)
++            timers.emit('flash_attn', L_compiled=L, **FLASH_ATTN.census())
+         timers.emit('design', tag=usetag, L=L, L_compiled=L, binderlen=binderlen, monomer=monomer, new_shape=new_shape,
+                     t_load=feat_holder.t_load, t_feat=feat_holder.t_feat, t_tf=feat_holder.t_tf,
+                     t_wait_inputs=t_feat - t_start, t_model=t_model - t_feat, t_output=t_out - t_model, t_total=t_out - t_start,
+@@ -703,6 +718,8 @@
+         for L, dt in pool.map(_compile, prepared):
+             print(f'precompile: length {L} compiled+ran in {dt:.1f} s')
+             timers.emit('precompile_shape', L_compiled=L, dt=dt)
++            if FLASH_ATTN is not None:
++                timers.emit('flash_attn', L_compiled=L, **FLASH_ATTN.census())
+     timers.emit('precompile_done', n_shapes=len(prepared), threads=num_threads, dt=time.time() - t0)
+     print(f'precompile: done in {time.time() - t0:.1f} s')
+ 
+@@ -733,4 +750,8 @@
+     _run_one(pdb)
+     n_done += 1
+ 
++if FLASH_ATTN is not None:
++    # L8 evidence at exit: the whole run's census as the last flash_attn record, and the tree's per-lever line on stderr
++    timers.emit('flash_attn', L_compiled=None, final=True, **FLASH_ATTN.census())
++    FLASH_ATTN.emit()
+ timers.emit('proc_end', n_done=n_done, t_since_proc0=time.time() - T_PROC0)

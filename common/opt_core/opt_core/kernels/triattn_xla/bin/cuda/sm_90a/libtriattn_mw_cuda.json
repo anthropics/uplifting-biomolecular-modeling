@@ -1,0 +1,56 @@
+{
+ "abi_version": 1,
+ "arch": "sm_90a",
+ "build_s": 6.2,
+ "built_utc": "2026-09-11T15:43:18Z",
+ "bytes": 1370352,
+ "cudart": "static",
+ "device_prefix_bytes": 42559,
+ "entry": "triattn_mw_cuda_fwd",
+ "file": "bin/cuda/sm_90a/libtriattn_mw_cuda.so",
+ "kind": "cuda",
+ "needed": [
+  "libc.so.6",
+  "libgcc_s.so.1",
+  "libm.so.6",
+  "libstdc++.so.6"
+ ],
+ "nvcc": "Build cuda_13.0.r13.0/compiler.36424714_0",
+ "nvcc_flags": [
+  "-O3",
+  "-std=c++17",
+  "-gencode",
+  "arch=compute_90a,code=sm_90a",
+  "--expt-relaxed-constexpr",
+  "-DNDEBUG",
+  "-Xptxas",
+  "-v"
+ ],
+ "ptxas_registers": {
+  "_ZN2mw14mask_or_kernelEPKhxxPhPiiii": 32,
+  "_ZN2mw14triattn_mw_fwdILb0ELb0EEEvNS_6ParamsE": 166,
+  "_ZN2mw14triattn_mw_fwdILb0ELb1EEEvNS_6ParamsE": 163,
+  "_ZN2mw15triattn_mw_listILb0EEEvNS_6ParamsE": 168,
+  "_ZN2mw15triattn_mw_listILb1EEEvNS_6ParamsE": 168,
+  "_ZN2mw16mask_rows_kernelEPKhxxS1_PhPiS3_iiii": 28,
+  "_ZN2mw17stage_bias_kernelI13__nv_bfloat16EEvPKT_xxxxPKhPfiiiiif": 28,
+  "_ZN2mw17stage_bias_kernelI6__halfEEvPKT_xxxxPKhPfiiiiif": 28,
+  "_ZN2mw17stage_bias_kernelIfEEvPKT_xxxxPKhPfiiiiif": 34,
+  "_ZN2mw18mask_tables_kernelEPKhxxPjPhPiiiii": 28
+ },
+ "requires": {
+  "CXXABI_max": "1.3.9",
+  "GLIBCXX_max": "3.4.21",
+  "GLIBC_max": "2.34"
+ },
+ "role": "fwd",
+ "sha256": "3fb0a62950de01c078528aaf8541b531160b4f25ddf5f245a97c2e83b8d7c32f",
+ "sources_sha256": {
+  "kernels/triattn/cuda_sm90a/csrc/mw_ptx.h": "aa22a8a237f1915f467b2091de84c7060790c1641f6c4d8b3758c33172cf1e33",
+  "kernels/triattn/cuda_sm90a/csrc/triattn_mw.cu": "14eb59c6a2028df19fdc7ff34c180bd9acf0c292484bf3bb7ec013f447be33a5",
+  "kernels/triattn/cuda_sm90a/csrc/triattn_mw.cu[device prefix]": "434e57cbbf16d7419d5824c1686c09d103bebe330dd9ae8488fcc82816ed3f61",
+  "triattn_cuda_abi.h": "1ddc93723760ceacae785fd0e089ad968359acdacbf2945ec5adef2e6f236dfe",
+  "triattn_mw_cuda.cu": "af9bb47d8597ac5221635f7c8a49717bd1057782511438c3ebef152fe27fac27"
+ },
+ "split_mark": "#include <torch/types.h>"
+}

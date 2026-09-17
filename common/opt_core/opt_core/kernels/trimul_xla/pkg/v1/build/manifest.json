@@ -1,0 +1,4233 @@
+{
+ "nvcc": {
+  "build": "Build cuda_13.0.r13.0/compiler.36424714_0",
+  "path": "/usr/local/cuda-13.0/bin/nvcc",
+  "release": "Cuda compilation tools, release 13.0, V13.0.88"
+ },
+ "package": "trimul_native",
+ "schema": 1,
+ "sealed": {
+  "commit": "ed4543ad5a3f51a0a4d68629ea8415eba0d1641e",
+  "utc": "2026-09-12T02:40:09Z",
+  "version": "1.0.1"
+ },
+ "units": {
+  "tmn90_z128_h128/sm_90a": {
+   "arch": "sm_90a",
+   "built_utc": "2026-09-12T01:44:47Z",
+   "cubin": "sm_90a/tmn90_z128_h128.cubin",
+   "cubin_bytes": 1381040,
+   "cubin_sha256": "b8f491d2dd5f86c4b63222181d00bd0f7645a1bf85205d8c9f421456b6de3724",
+   "defines": [],
+   "dev": false,
+   "elf": {
+    "abi_version": 8,
+    "cuinfo": "02005a0082000000",
+    "cuinfo_sm": 90,
+    "elf": true,
+    "flags": "0x06005a04",
+    "osabi": 65,
+    "sm": 90,
+    "tkinfo": [
+     "ptxas",
+     "Cuda compilation tools, release 13.0, V13.0.88",
+     "Build cuda_13.0.r13.0/compiler.36424714_0",
+     "-v  -arch sm_90a -m 64 "
+    ],
+    "toolkit_version": 130,
+    "version": 1
+   },
+   "flags": [
+    "-cubin",
+    "-arch=sm_90a",
+    "-O3",
+    "-std=c++17",
+    "-DNDEBUG",
+    "--expt-relaxed-constexpr",
+    "-Xptxas",
+    "-v",
+    "-I",
+    "csrc"
+   ],
+   "kernels": {
+    "tmn_info": {
+     "arch": "sm_90a",
+     "barriers": 0,
+     "regs": 26,
+     "spill_loads": 0,
+     "spill_stores": 0,
+     "stack": 0
+    },
+    "tmn_k1_z128_h128_b_t1x128_s8k2_m0_l1_v0": {
+     "arch": "sm_90a",
+     "barriers": 16,
+     "regs": 168,
+     "spill_loads": 0,
+     "spill_stores": 0,
+     "stack": 0
+    },
+    "tmn_k1_z128_h128_b_t1x128_s8k2_m0_l2_v0": {
+     "arch": "sm_90a",
+     "barriers": 16,
+     "regs": 168,
+     "spill_loads": 0,
+     "spill_stores": 0,
+     "stack": 0
+    },
+    "tmn_k1_z128_h128_b_t1x128_s8k2_m1_l1_v0": {
+     "arch": "sm_90a",
+     "barriers": 16,
+     "regs": 168,
+     "spill_loads": 0,
+     "spill_stores": 0,
+     "stack": 0
+    },
+    "tmn_k1_z128_h128_b_t1x128_s8k2_m1_l1_v1": {
+     "arch": "sm_90a",
+     "barriers": 16,
+     "regs": 168,
+     "spill_loads": 0,
+     "spill_stores": 0,
+     "stack": 0
+    },
+    "tmn_k1_z128_h128_b_t1x128_s8k2_m1_l2_v0": {
+     "arch": "sm_90a",
+     "barriers": 16,
+     "regs": 168,
+     "spill_loads": 0,
+     "spill_stores": 0,
+     "stack": 0
+    },
+    "tmn_k1_z128_h128_b_t2x64_s4k2_m0_l1_v0": {
+     "arch": "sm_90a",
+     "barriers": 16,
+     "regs": 168,
+     "spill_loads": 0,
+     "spill_stores": 0,
+     "stack": 0
+    },
+    "tmn_k1_z128_h128_b_t2x64_s4k2_m0_l2_v0": {
+     "arch": "sm_90a",
+     "barriers": 16,
+     "regs": 168,
+     "spill_loads": 0,
+     "spill_stores": 0,
+     "stack": 0
+    },
+    "tmn_k1_z128_h128_b_t2x64_s4k2_m1_l1_v0": {
+     "arch": "sm_90a",
+     "barriers": 16,
+     "regs": 168,
+     "spill_loads": 0,
+     "spill_stores": 0,
+     "stack": 0
+    },
+    "tmn_k1_z128_h128_b_t2x64_s4k2_m1_l1_v1": {
+     "arch": "sm_90a",
+     "barriers": 16,
+     "regs": 168,
+     "spill_loads": 0,
+     "spill_stores": 0,
+     "stack": 0
+    },
+    "tmn_k1_z128_h128_b_t2x64_s4k2_m1_l2_v0": {
+     "arch": "sm_90a",
+     "barriers": 16,
+     "regs": 168,
+     "spill_loads": 0,
+     "spill_stores": 0,
+     "stack": 0
+    },
+    "tmn_k1_z128_h128_b_t2x64_s8k2_m0_l1_v0": {
+     "arch": "sm_90a",
+     "barriers": 16,
+     "regs": 168,
+     "spill_loads": 0,
+     "spill_stores": 0,
+     "stack": 0
+    },
+    "tmn_k1_z128_h128_b_t2x64_s8k2_m0_l2_v0": {
+     "arch": "sm_90a",
+     "barriers": 16,
+     "regs": 168,
+     "spill_loads": 0,
+     "spill_stores": 0,
+     "stack": 0
+    },
+    "tmn_k1_z128_h128_b_t2x64_s8k2_m1_l1_v0": {
+     "arch": "sm_90a",
+     "barriers": 16,
+     "regs": 168,
+     "spill_loads": 0,
+     "spill_stores": 0,
+     "stack": 0
+    },
+    "tmn_k1_z128_h128_b_t2x64_s8k2_m1_l1_v1": {
+     "arch": "sm_90a",
+     "barriers": 16,
+     "regs": 168,
+     "spill_loads": 0,
+     "spill_stores": 0,
+     "stack": 0
+    },
+    "tmn_k1_z128_h128_b_t2x64_s8k2_m1_l2_v0": {
+     "arch": "sm_90a",
+     "barriers": 16,
+     "regs": 168,
+     "spill_loads": 0,
+     "spill_stores": 0,
+     "stack": 0
+    },
+    "tmn_k1_z128_h128_f_t2x64_s8k2_m0_l1_v0": {
+     "arch": "sm_90a",
+     "barriers": 16,
+     "regs": 168,
+     "spill_loads": 0,
+     "spill_stores": 0,
+     "stack": 0
+    },
+    "tmn_k1_z128_h128_f_t2x64_s8k2_m1_l1_v0": {
+     "arch": "sm_90a",
+     "barriers": 16,
+     "regs": 168,
+     "spill_loads": 0,
+     "spill_stores": 0,
+     "stack": 0
+    },
+    "tmn_k3_z128_h128_b_t1x128_s8a1_l1": {
+     "arch": "sm_90a",
+     "barriers": 1,
+     "regs": 168,
+     "spill_loads": 0,
+     "spill_stores": 0,
+     "stack": 0
+    },
+    "tmn_k3_z128_h128_b_t1x128_s8a1_l2": {
+     "arch": "sm_90a",
+     "barriers": 1,
+     "regs": 168,
+     "spill_loads": 0,
+     "spill_stores": 0,
+     "stack": 0
+    },
+    "tmn_k3_z128_h128_b_t1x128_s8a1_l3": {
+     "arch": "sm_90a",
+     "barriers": 1,
+     "regs": 168,
+     "spill_loads": 0,
+     "spill_stores": 0,
+     "stack": 0
+    },
+    "tmn_k3_z128_h128_b_t1x64_s8a1_l1": {
+     "arch": "sm_90a",
+     "barriers": 1,
+     "regs": 168,
+     "spill_loads": 0,
+     "spill_stores": 0,
+     "stack": 0
+    },
+    "tmn_k3_z128_h128_b_t1x64_s8a1_l2": {
+     "arch": "sm_90a",
+     "barriers": 1,
+     "regs": 168,
+     "spill_loads": 0,
+     "spill_stores": 0,
+     "stack": 0
+    },
+    "tmn_k3_z128_h128_b_t1x64_s8a1_l3": {
+     "arch": "sm_90a",
+     "barriers": 1,
+     "regs": 168,
+     "spill_loads": 0,
+     "spill_stores": 0,
+     "stack": 0
+    },
+    "tmn_k3_z128_h128_b_t2x64_s4a1_l1": {
+     "arch": "sm_90a",
+     "barriers": 1,
+     "regs": 168,
+     "spill_loads": 0,
+     "spill_stores": 0,
+     "stack": 0
+    },
+    "tmn_k3_z128_h128_b_t2x64_s4a1_l2": {
+     "arch": "sm_90a",
+     "barriers": 1,
+     "regs": 168,
+     "spill_loads": 0,
+     "spill_stores": 0,
+     "stack": 0
+    },
+    "tmn_k3_z128_h128_b_t2x64_s4a1_l3": {
+     "arch": "sm_90a",
+     "barriers": 1,
+     "regs": 168,
+     "spill_loads": 0,
+     "spill_stores": 0,
+     "stack": 0
+    },
+    "tmn_k3_z128_h128_b_t2x64_s8a1_l1": {
+     "arch": "sm_90a",
+     "barriers": 1,
+     "regs": 168,
+     "spill_loads": 0,
+     "spill_stores": 0,
+     "stack": 0
+    },
+    "tmn_k3_z128_h128_b_t2x64_s8a1_l2": {
+     "arch": "sm_90a",
+     "barriers": 1,
+     "regs": 168,
+     "spill_loads": 0,
+     "spill_stores": 0,
+     "stack": 0
+    },
+    "tmn_k3_z128_h128_b_t2x64_s8a1_l3": {
+     "arch": "sm_90a",
+     "barriers": 1,
+     "regs": 168,
+     "spill_loads": 0,
+     "spill_stores": 0,
+     "stack": 0
+    },
+    "tmn_k3_z128_h128_b_t2x64_s8a2_l1": {
+     "arch": "sm_90a",
+     "barriers": 1,
+     "regs": 168,
+     "spill_loads": 0,
+     "spill_stores": 0,
+     "stack": 0
+    },
+    "tmn_k3_z128_h128_b_t2x64_s8a2_l2": {
+     "arch": "sm_90a",
+     "barriers": 1,
+     "regs": 168,
+     "spill_loads": 0,
+     "spill_stores": 0,
+     "stack": 0
+    },
+    "tmn_k3_z128_h128_b_t2x64_s8a2_l3": {
+     "arch": "sm_90a",
+     "barriers": 1,
+     "regs": 168,
+     "spill_loads": 0,
+     "spill_stores": 0,
+     "stack": 0
+    },
+    "tmn_k3_z128_h128_f_t1x64_s8a1_l1": {
+     "arch": "sm_90a",
+     "barriers": 1,
+     "regs": 168,
+     "spill_loads": 0,
+     "spill_stores": 0,
+     "stack": 0
+    },
+    "tmn_k3_z128_h128_f_t2x64_s8a1_l1": {
+     "arch": "sm_90a",
+     "barriers": 1,
+     "regs": 168,
+     "spill_loads": 0,
+     "spill_stores": 0,
+     "stack": 0
+    }
+   },
+   "nvcc": "Cuda compilation tools, release 13.0, V13.0.88",
+   "nvcc_build": "Build cuda_13.0.r13.0/compiler.36424714_0",
+   "ptxas_log": "sm_90a/tmn90_z128_h128.ptxas.txt",
+   "serves": [
+    {
+     "c_hidden": 128,
+     "c_z": 128,
+     "exact": true,
+     "fast": true,
+     "form": "b",
+     "kernels": [
+      "tmn_k1_z128_h128_b_t2x64_s8k2_m0_l2_v0",
+      "tmn_k1_z128_h128_b_t2x64_s8k2_m1_l2_v0",
+      "tmn_k3_z128_h128_b_t2x64_s8a1_l1",
+      "tmn_k3_z128_h128_b_t2x64_s8a2_l1",
+      "tmn_k3_z128_h128_b_t2x64_s8a1_l2",
+      "tmn_k3_z128_h128_b_t2x64_s8a1_l3"
+     ],
+     "missing": []
+    },
+    {
+     "c_hidden": 128,
+     "c_z": 128,
+     "exact": false,
+     "fast": true,
+     "form": "f",
+     "k3_mode": "f",
+     "kernels": [
+      "tmn_k1_z128_h128_f_t2x64_s8k2_m0_l1_v0",
+      "tmn_k1_z128_h128_f_t2x64_s8k2_m1_l1_v0",
+      "tmn_k3_z128_h128_f_t2x64_s8a1_l1"
+     ],
+     "missing": []
+    }
+   ],
+   "source": "tmn90_z128_h128.cu",
+   "sources": {
+    "csrc/common/tmn_math.cuh": "3504d522868ad81d2d072a3a744fe042da5b3761736729aca1a5be3fbfe57f8b",
+    "csrc/tmn90_z128_h128.cu": "05985b78b0e823b113530a85559d04d276784aecd5938eb2dc6b35fbd56620a4",
+    "csrc/tmn_kernels.cuh": "bbd80a814fa45229be4dc397a20cd233b950da49f667c65b2e8db1689b67a88e",
+    "csrc/tmn_ptx.cuh": "0bd49dbc85d1fd7cb260d9a96a11602f1818ed06767efcc36a7ed54caf85c8ed",
+    "csrc/tmn_sm90_unit.cuh": "0a6eceb793903acb86e002717e0216d8ab15cd39369bb9ac4f812a432618ee15"
+   },
+   "unit": "tmn90_z128_h128"
+  },
+  "tmn90_z256_h256/sm_90a": {
+   "arch": "sm_90a",
+   "built_utc": "2026-09-12T01:44:56Z",
+   "cubin": "sm_90a/tmn90_z256_h256.cubin",
+   "cubin_bytes": 1889520,
+   "cubin_sha256": "b25ac69629cc56ddd58ebdd60f39ce06707a46a5af1291e5b73a21633ea6ad60",
+   "defines": [],
+   "dev": false,
+   "elf": {
+    "abi_version": 8,
+    "cuinfo": "02005a0082000000",
+    "cuinfo_sm": 90,
+    "elf": true,
+    "flags": "0x06005a04",
+    "osabi": 65,
+    "sm": 90,
+    "tkinfo": [
+     "ptxas",
+     "Cuda compilation tools, release 13.0, V13.0.88",
+     "Build cuda_13.0.r13.0/compiler.36424714_0",
+     "-v  -arch sm_90a -m 64 "
+    ],
+    "toolkit_version": 130,
+    "version": 1
+   },
+   "flags": [
+    "-cubin",
+    "-arch=sm_90a",
+    "-O3",
+    "-std=c++17",
+    "-DNDEBUG",
+    "--expt-relaxed-constexpr",
+    "-Xptxas",
+    "-v",
+    "-I",
+    "csrc"
+   ],
+   "kernels": {
+    "tmn_info": {
+     "arch": "sm_90a",
+     "barriers": 0,
+     "regs": 26,
+     "spill_loads": 0,
+     "spill_stores": 0,
+     "stack": 0
+    },
+    "tmn_k1_z256_h256_b_t1x128_s8k2_m0_l1_v0": {
+     "arch": "sm_90a",
+     "barriers": 16,
+     "regs": 168,
+     "spill_loads": 0,
+     "spill_stores": 0,
+     "stack": 0
+    },
+    "tmn_k1_z256_h256_b_t1x128_s8k2_m0_l2_v0": {
+     "arch": "sm_90a",
+     "barriers": 16,
+     "regs": 168,
+     "spill_loads": 0,
+     "spill_stores": 0,
+     "stack": 0
+    },
+    "tmn_k1_z256_h256_b_t1x128_s8k2_m1_l1_v0": {
+     "arch": "sm_90a",
+     "barriers": 16,
+     "regs": 168,
+     "spill_loads": 0,
+     "spill_stores": 0,
+     "stack": 0
+    },
+    "tmn_k1_z256_h256_b_t1x128_s8k2_m1_l1_v1": {
+     "arch": "sm_90a",
+     "barriers": 16,
+     "regs": 168,
+     "spill_loads": 0,
+     "spill_stores": 0,
+     "stack": 0
+    },
+    "tmn_k1_z256_h256_b_t1x128_s8k2_m1_l2_v0": {
+     "arch": "sm_90a",
+     "barriers": 16,
+     "regs": 168,
+     "spill_loads": 0,
+     "spill_stores": 0,
+     "stack": 0
+    },
+    "tmn_k1_z256_h256_b_t2x64_s4k4_m0_l1_v0": {
+     "arch": "sm_90a",
+     "barriers": 16,
+     "regs": 168,
+     "spill_loads": 0,
+     "spill_stores": 0,
+     "stack": 0
+    },
+    "tmn_k1_z256_h256_b_t2x64_s4k4_m0_l2_v0": {
+     "arch": "sm_90a",
+     "barriers": 16,
+     "regs": 168,
+     "spill_loads": 0,
+     "spill_stores": 0,
+     "stack": 0
+    },
+    "tmn_k1_z256_h256_b_t2x64_s4k4_m1_l1_v0": {
+     "arch": "sm_90a",
+     "barriers": 16,
+     "regs": 168,
+     "spill_loads": 0,
+     "spill_stores": 0,
+     "stack": 0
+    },
+    "tmn_k1_z256_h256_b_t2x64_s4k4_m1_l1_v1": {
+     "arch": "sm_90a",
+     "barriers": 16,
+     "regs": 168,
+     "spill_loads": 0,
+     "spill_stores": 0,
+     "stack": 0
+    },
+    "tmn_k1_z256_h256_b_t2x64_s4k4_m1_l2_v0": {
+     "arch": "sm_90a",
+     "barriers": 16,
+     "regs": 168,
+     "spill_loads": 0,
+     "spill_stores": 0,
+     "stack": 0
+    },
+    "tmn_k1_z256_h256_b_t2x64_s8k2_m0_l1_v0": {
+     "arch": "sm_90a",
+     "barriers": 16,
+     "regs": 168,
+     "spill_loads": 0,
+     "spill_stores": 0,
+     "stack": 0
+    },
+    "tmn_k1_z256_h256_b_t2x64_s8k2_m0_l2_v0": {
+     "arch": "sm_90a",
+     "barriers": 16,
+     "regs": 168,
+     "spill_loads": 0,
+     "spill_stores": 0,
+     "stack": 0
+    },
+    "tmn_k1_z256_h256_b_t2x64_s8k2_m0_l4_v0": {
+     "arch": "sm_90a",
+     "barriers": 16,
+     "regs": 168,
+     "spill_loads": 0,
+     "spill_stores": 0,
+     "stack": 0
+    },
+    "tmn_k1_z256_h256_b_t2x64_s8k2_m1_l1_v0": {
+     "arch": "sm_90a",
+     "barriers": 16,
+     "regs": 168,
+     "spill_loads": 0,
+     "spill_stores": 0,
+     "stack": 0
+    },
+    "tmn_k1_z256_h256_b_t2x64_s8k2_m1_l1_v1": {
+     "arch": "sm_90a",
+     "barriers": 16,
+     "regs": 168,
+     "spill_loads": 0,
+     "spill_stores": 0,
+     "stack": 0
+    },
+    "tmn_k1_z256_h256_b_t2x64_s8k2_m1_l2_v0": {
+     "arch": "sm_90a",
+     "barriers": 16,
+     "regs": 168,
+     "spill_loads": 0,
+     "spill_stores": 0,
+     "stack": 0
+    },
+    "tmn_k1_z256_h256_b_t2x64_s8k2_m1_l4_v0": {
+     "arch": "sm_90a",
+     "barriers": 16,
+     "regs": 168,
+     "spill_loads": 0,
+     "spill_stores": 0,
+     "stack": 0
+    },
+    "tmn_k1_z256_h256_f_t2x64_s4k2_m0_l1_v0": {
+     "arch": "sm_90a",
+     "barriers": 16,
+     "regs": 168,
+     "spill_loads": 0,
+     "spill_stores": 0,
+     "stack": 0
+    },
+    "tmn_k1_z256_h256_f_t2x64_s4k2_m0_l1_v0_x1": {
+     "arch": "sm_90a",
+     "barriers": 16,
+     "regs": 168,
+     "spill_loads": 0,
+     "spill_stores": 0,
+     "stack": 0
+    },
+    "tmn_k1_z256_h256_f_t2x64_s4k2_m1_l1_v0": {
+     "arch": "sm_90a",
+     "barriers": 16,
+     "regs": 168,
+     "spill_loads": 0,
+     "spill_stores": 0,
+     "stack": 0
+    },
+    "tmn_k1_z256_h256_f_t2x64_s4k2_m1_l1_v0_x1": {
+     "arch": "sm_90a",
+     "barriers": 16,
+     "regs": 168,
+     "spill_loads": 0,
+     "spill_stores": 0,
+     "stack": 0
+    },
+    "tmn_k3_z256_h256_b_t1x128_s4a1_l1": {
+     "arch": "sm_90a",
+     "barriers": 1,
+     "regs": 168,
+     "spill_loads": 8,
+     "spill_stores": 8,
+     "stack": 8
+    },
+    "tmn_k3_z256_h256_b_t1x128_s4a1_l2": {
+     "arch": "sm_90a",
+     "barriers": 1,
+     "regs": 168,
+     "spill_loads": 48,
+     "spill_stores": 48,
+     "stack": 48
+    },
+    "tmn_k3_z256_h256_b_t1x128_s4a1_l3": {
+     "arch": "sm_90a",
+     "barriers": 1,
+     "regs": 168,
+     "spill_loads": 24,
+     "spill_stores": 24,
+     "stack": 24
+    },
+    "tmn_k3_z256_h256_b_t1x64_s4a1_l1": {
+     "arch": "sm_90a",
+     "barriers": 1,
+     "regs": 168,
+     "spill_loads": 236,
+     "spill_stores": 220,
+     "stack": 224
+    },
+    "tmn_k3_z256_h256_b_t1x64_s4a1_l2": {
+     "arch": "sm_90a",
+     "barriers": 1,
+     "regs": 168,
+     "spill_loads": 356,
+     "spill_stores": 340,
+     "stack": 344
+    },
+    "tmn_k3_z256_h256_b_t1x64_s4a1_l3": {
+     "arch": "sm_90a",
+     "barriers": 1,
+     "regs": 168,
+     "spill_loads": 356,
+     "spill_stores": 340,
+     "stack": 344
+    },
+    "tmn_k3_z256_h256_b_t2x64_s4a1_l1": {
+     "arch": "sm_90a",
+     "barriers": 1,
+     "regs": 168,
+     "spill_loads": 4,
+     "spill_stores": 4,
+     "stack": 8
+    },
+    "tmn_k3_z256_h256_b_t2x64_s4a1_l2": {
+     "arch": "sm_90a",
+     "barriers": 1,
+     "regs": 168,
+     "spill_loads": 8,
+     "spill_stores": 8,
+     "stack": 8
+    },
+    "tmn_k3_z256_h256_b_t2x64_s4a1_l3": {
+     "arch": "sm_90a",
+     "barriers": 1,
+     "regs": 168,
+     "spill_loads": 8,
+     "spill_stores": 8,
+     "stack": 8
+    },
+    "tmn_k3_z256_h256_b_t2x64_s4a1_l4": {
+     "arch": "sm_90a",
+     "barriers": 1,
+     "regs": 168,
+     "spill_loads": 20,
+     "spill_stores": 4,
+     "stack": 8
+    },
+    "tmn_k3_z256_h256_c_t2x64_s4a1_l1": {
+     "arch": "sm_90a",
+     "barriers": 1,
+     "regs": 168,
+     "spill_loads": 240,
+     "spill_stores": 224,
+     "stack": 224
+    },
+    "tmn_k3_z256_h256_c_t2x64_s4a1_l2": {
+     "arch": "sm_90a",
+     "barriers": 1,
+     "regs": 168,
+     "spill_loads": 276,
+     "spill_stores": 260,
+     "stack": 264
+    },
+    "tmn_k3_z256_h256_f_t1x64_s4a1_l1": {
+     "arch": "sm_90a",
+     "barriers": 1,
+     "regs": 168,
+     "spill_loads": 360,
+     "spill_stores": 344,
+     "stack": 304
+    },
+    "tmn_k3_z256_h256_p_t2x64_s4a1_l1": {
+     "arch": "sm_90a",
+     "barriers": 1,
+     "regs": 168,
+     "spill_loads": 0,
+     "spill_stores": 0,
+     "stack": 0
+    }
+   },
+   "nvcc": "Cuda compilation tools, release 13.0, V13.0.88",
+   "nvcc_build": "Build cuda_13.0.r13.0/compiler.36424714_0",
+   "ptxas_log": "sm_90a/tmn90_z256_h256.ptxas.txt",
+   "serves": [
+    {
+     "c_hidden": 256,
+     "c_z": 256,
+     "exact": true,
+     "fast": true,
+     "form": "b",
+     "kernels": [
+      "tmn_k1_z256_h256_b_t2x64_s4k4_m0_l2_v0",
+      "tmn_k1_z256_h256_b_t2x64_s4k4_m1_l2_v0",
+      "tmn_k3_z256_h256_b_t2x64_s4a1_l1",
+      "tmn_k3_z256_h256_b_t2x64_s4a1_l2",
+      "tmn_k3_z256_h256_b_t2x64_s4a1_l3"
+     ],
+     "missing": []
+    },
+    {
+     "c_hidden": 256,
+     "c_z": 256,
+     "exact": false,
+     "fast": true,
+     "form": "f",
+     "k3_mode": "c",
+     "kernels": [
+      "tmn_k1_z256_h256_b_t2x64_s4k4_m0_l2_v0",
+      "tmn_k1_z256_h256_b_t2x64_s4k4_m1_l2_v0",
+      "tmn_k3_z256_h256_c_t2x64_s4a1_l1",
+      "tmn_k3_z256_h256_b_t2x64_s4a1_l1"
+     ],
+     "missing": []
+    }
+   ],
+   "source": "tmn90_z256_h256.cu",
+   "sources": {
+    "csrc/common/tmn_math.cuh": "3504d522868ad81d2d072a3a744fe042da5b3761736729aca1a5be3fbfe57f8b",
+    "csrc/tmn90_z256_h256.cu": "9b4f1220b17e1510609fa17b4a394e0e29ec2336c97aa24a995d7505d0d9cdb1",
+    "csrc/tmn_kernels.cuh": "bbd80a814fa45229be4dc397a20cd233b950da49f667c65b2e8db1689b67a88e",
+    "csrc/tmn_ptx.cuh": "0bd49dbc85d1fd7cb260d9a96a11602f1818ed06767efcc36a7ed54caf85c8ed",
+    "csrc/tmn_sm90_unit.cuh": "0a6eceb793903acb86e002717e0216d8ab15cd39369bb9ac4f812a432618ee15"
+   },
+   "unit": "tmn90_z256_h256"
+  },
+  "tmn90_z384_h384/sm_90a": {
+   "arch": "sm_90a",
+   "built_utc": "2026-09-12T01:44:35Z",
+   "cubin": "sm_90a/tmn90_z384_h384.cubin",
+   "cubin_bytes": 228400,
+   "cubin_sha256": "443b7fcff95e69ee2cfd239ff5eee05ac403847c2c2bdddfceb446b3d115c830",
+   "defines": [],
+   "dev": false,
+   "elf": {
+    "abi_version": 8,
+    "cuinfo": "02005a0082000000",
+    "cuinfo_sm": 90,
+    "elf": true,
+    "flags": "0x06005a04",
+    "osabi": 65,
+    "sm": 90,
+    "tkinfo": [
+     "ptxas",
+     "Cuda compilation tools, release 13.0, V13.0.88",
+     "Build cuda_13.0.r13.0/compiler.36424714_0",
+     "-v  -arch sm_90a -m 64 "
+    ],
+    "toolkit_version": 130,
+    "version": 1
+   },
+   "flags": [
+    "-cubin",
+    "-arch=sm_90a",
+    "-O3",
+    "-std=c++17",
+    "-DNDEBUG",
+    "--expt-relaxed-constexpr",
+    "-Xptxas",
+    "-v",
+    "-I",
+    "csrc"
+   ],
+   "kernels": {
+    "tmn_info": {
+     "arch": "sm_90a",
+     "barriers": 0,
+     "regs": 26,
+     "spill_loads": 0,
+     "spill_stores": 0,
+     "stack": 0
+    },
+    "tmn_k1_z384_h384_b_t2x64_s6k2_m0_l1_v0": {
+     "arch": "sm_90a",
+     "barriers": 16,
+     "regs": 168,
+     "spill_loads": 0,
+     "spill_stores": 0,
+     "stack": 0
+    },
+    "tmn_k1_z384_h384_b_t2x64_s6k2_m0_l2_v0": {
+     "arch": "sm_90a",
+     "barriers": 16,
+     "regs": 168,
+     "spill_loads": 116,
+     "spill_stores": 116,
+     "stack": 120
+    },
+    "tmn_k1_z384_h384_b_t2x64_s6k2_m1_l1_v0": {
+     "arch": "sm_90a",
+     "barriers": 16,
+     "regs": 168,
+     "spill_loads": 0,
+     "spill_stores": 0,
+     "stack": 0
+    },
+    "tmn_k1_z384_h384_b_t2x64_s6k2_m1_l2_v0": {
+     "arch": "sm_90a",
+     "barriers": 16,
+     "regs": 168,
+     "spill_loads": 116,
+     "spill_stores": 116,
+     "stack": 120
+    }
+   },
+   "nvcc": "Cuda compilation tools, release 13.0, V13.0.88",
+   "nvcc_build": "Build cuda_13.0.r13.0/compiler.36424714_0",
+   "ptxas_log": "sm_90a/tmn90_z384_h384.ptxas.txt",
+   "serves": [
+    {
+     "c_hidden": 384,
+     "c_z": 384,
+     "exact": false,
+     "fast": false,
+     "form": "b",
+     "kernels": [],
+     "missing": [
+      "serve_names: none for this width/form"
+     ]
+    }
+   ],
+   "source": "tmn90_z384_h384.cu",
+   "sources": {
+    "csrc/common/tmn_math.cuh": "3504d522868ad81d2d072a3a744fe042da5b3761736729aca1a5be3fbfe57f8b",
+    "csrc/tmn90_z384_h384.cu": "7f00a190cd6823504b4923e541cb96c0ae81cb6092f9ac0682053bc78c29366b",
+    "csrc/tmn_kernels.cuh": "bbd80a814fa45229be4dc397a20cd233b950da49f667c65b2e8db1689b67a88e",
+    "csrc/tmn_ptx.cuh": "0bd49dbc85d1fd7cb260d9a96a11602f1818ed06767efcc36a7ed54caf85c8ed",
+    "csrc/tmn_sm90_unit.cuh": "0a6eceb793903acb86e002717e0216d8ab15cd39369bb9ac4f812a432618ee15"
+   },
+   "unit": "tmn90_z384_h384"
+  },
+  "tmn90_z64_h128/sm_90a": {
+   "arch": "sm_90a",
+   "built_utc": "2026-09-12T01:44:39Z",
+   "cubin": "sm_90a/tmn90_z64_h128.cubin",
+   "cubin_bytes": 687600,
+   "cubin_sha256": "f6fb3685c9c99e66d2c3626a747e2adebaa313ff75a6f7d47470d626f31b14ac",
+   "defines": [],
+   "dev": false,
+   "elf": {
+    "abi_version": 8,
+    "cuinfo": "02005a0082000000",
+    "cuinfo_sm": 90,
+    "elf": true,
+    "flags": "0x06005a04",
+    "osabi": 65,
+    "sm": 90,
+    "tkinfo": [
+     "ptxas",
+     "Cuda compilation tools, release 13.0, V13.0.88",
+     "Build cuda_13.0.r13.0/compiler.36424714_0",
+     "-v  -arch sm_90a -m 64 "
+    ],
+    "toolkit_version": 130,
+    "version": 1
+   },
+   "flags": [
+    "-cubin",
+    "-arch=sm_90a",
+    "-O3",
+    "-std=c++17",
+    "-DNDEBUG",
+    "--expt-relaxed-constexpr",
+    "-Xptxas",
+    "-v",
+    "-I",
+    "csrc"
+   ],
+   "kernels": {
+    "tmn_info": {
+     "arch": "sm_90a",
+     "barriers": 0,
+     "regs": 26,
+     "spill_loads": 0,
+     "spill_stores": 0,
+     "stack": 0
+    },
+    "tmn_k1_z64_h128_b_t1x128_s8k1_m0_l1_v0": {
+     "arch": "sm_90a",
+     "barriers": 16,
+     "regs": 168,
+     "spill_loads": 0,
+     "spill_stores": 0,
+     "stack": 0
+    },
+    "tmn_k1_z64_h128_b_t1x128_s8k1_m0_l2_v0": {
+     "arch": "sm_90a",
+     "barriers": 16,
+     "regs": 168,
+     "spill_loads": 0,
+     "spill_stores": 0,
+     "stack": 0
+    },
+    "tmn_k1_z64_h128_b_t1x128_s8k1_m1_l1_v0": {
+     "arch": "sm_90a",
+     "barriers": 16,
+     "regs": 168,
+     "spill_loads": 0,
+     "spill_stores": 0,
+     "stack": 0
+    },
+    "tmn_k1_z64_h128_b_t1x128_s8k1_m1_l1_v1": {
+     "arch": "sm_90a",
+     "barriers": 16,
+     "regs": 168,
+     "spill_loads": 0,
+     "spill_stores": 0,
+     "stack": 0
+    },
+    "tmn_k1_z64_h128_b_t1x128_s8k1_m1_l2_v0": {
+     "arch": "sm_90a",
+     "barriers": 16,
+     "regs": 168,
+     "spill_loads": 0,
+     "spill_stores": 0,
+     "stack": 0
+    },
+    "tmn_k1_z64_h128_b_t2x64_s8k1_m0_l1_v0": {
+     "arch": "sm_90a",
+     "barriers": 16,
+     "regs": 168,
+     "spill_loads": 0,
+     "spill_stores": 0,
+     "stack": 0
+    },
+    "tmn_k1_z64_h128_b_t2x64_s8k1_m0_l2_v0": {
+     "arch": "sm_90a",
+     "barriers": 16,
+     "regs": 168,
+     "spill_loads": 0,
+     "spill_stores": 0,
+     "stack": 0
+    },
+    "tmn_k1_z64_h128_b_t2x64_s8k1_m1_l1_v0": {
+     "arch": "sm_90a",
+     "barriers": 16,
+     "regs": 168,
+     "spill_loads": 0,
+     "spill_stores": 0,
+     "stack": 0
+    },
+    "tmn_k1_z64_h128_b_t2x64_s8k1_m1_l1_v1": {
+     "arch": "sm_90a",
+     "barriers": 16,
+     "regs": 168,
+     "spill_loads": 0,
+     "spill_stores": 0,
+     "stack": 0
+    },
+    "tmn_k1_z64_h128_b_t2x64_s8k1_m1_l2_v0": {
+     "arch": "sm_90a",
+     "barriers": 16,
+     "regs": 168,
+     "spill_loads": 0,
+     "spill_stores": 0,
+     "stack": 0
+    },
+    "tmn_k1_z64_h128_f_t2x64_s8k1_m0_l1_v0": {
+     "arch": "sm_90a",
+     "barriers": 16,
+     "regs": 168,
+     "spill_loads": 0,
+     "spill_stores": 0,
+     "stack": 0
+    },
+    "tmn_k1_z64_h128_f_t2x64_s8k1_m1_l1_v0": {
+     "arch": "sm_90a",
+     "barriers": 16,
+     "regs": 168,
+     "spill_loads": 0,
+     "spill_stores": 0,
+     "stack": 0
+    },
+    "tmn_k3_z64_h128_b_t1x128_s4a1_l1": {
+     "arch": "sm_90a",
+     "barriers": 1,
+     "regs": 168,
+     "spill_loads": 0,
+     "spill_stores": 0,
+     "stack": 0
+    },
+    "tmn_k3_z64_h128_b_t1x128_s4a1_l2": {
+     "arch": "sm_90a",
+     "barriers": 1,
+     "regs": 168,
+     "spill_loads": 0,
+     "spill_stores": 0,
+     "stack": 0
+    },
+    "tmn_k3_z64_h128_b_t1x128_s4a1_l3": {
+     "arch": "sm_90a",
+     "barriers": 1,
+     "regs": 168,
+     "spill_loads": 0,
+     "spill_stores": 0,
+     "stack": 0
+    },
+    "tmn_k3_z64_h128_b_t2x64_s4a1_l1": {
+     "arch": "sm_90a",
+     "barriers": 1,
+     "regs": 168,
+     "spill_loads": 0,
+     "spill_stores": 0,
+     "stack": 0
+    },
+    "tmn_k3_z64_h128_b_t2x64_s4a1_l2": {
+     "arch": "sm_90a",
+     "barriers": 1,
+     "regs": 168,
+     "spill_loads": 0,
+     "spill_stores": 0,
+     "stack": 0
+    },
+    "tmn_k3_z64_h128_b_t2x64_s4a1_l3": {
+     "arch": "sm_90a",
+     "barriers": 1,
+     "regs": 168,
+     "spill_loads": 0,
+     "spill_stores": 0,
+     "stack": 0
+    },
+    "tmn_k3_z64_h128_f_t2x64_s4a1_l1": {
+     "arch": "sm_90a",
+     "barriers": 1,
+     "regs": 168,
+     "spill_loads": 0,
+     "spill_stores": 0,
+     "stack": 0
+    }
+   },
+   "nvcc": "Cuda compilation tools, release 13.0, V13.0.88",
+   "nvcc_build": "Build cuda_13.0.r13.0/compiler.36424714_0",
+   "ptxas_log": "sm_90a/tmn90_z64_h128.ptxas.txt",
+   "serves": [
+    {
+     "c_hidden": 128,
+     "c_z": 64,
+     "exact": true,
+     "fast": true,
+     "form": "b",
+     "kernels": [
+      "tmn_k1_z64_h128_b_t2x64_s8k1_m0_l2_v0",
+      "tmn_k1_z64_h128_b_t2x64_s8k1_m1_l2_v0",
+      "tmn_k3_z64_h128_b_t2x64_s4a1_l1",
+      "tmn_k3_z64_h128_b_t2x64_s4a1_l2",
+      "tmn_k3_z64_h128_b_t2x64_s4a1_l3"
+     ],
+     "missing": []
+    },
+    {
+     "c_hidden": 128,
+     "c_z": 64,
+     "exact": false,
+     "fast": true,
+     "form": "f",
+     "k3_mode": "f",
+     "kernels": [
+      "tmn_k1_z64_h128_f_t2x64_s8k1_m0_l1_v0",
+      "tmn_k1_z64_h128_f_t2x64_s8k1_m1_l1_v0",
+      "tmn_k3_z64_h128_f_t2x64_s4a1_l1"
+     ],
+     "missing": []
+    }
+   ],
+   "source": "tmn90_z64_h128.cu",
+   "sources": {
+    "csrc/common/tmn_math.cuh": "3504d522868ad81d2d072a3a744fe042da5b3761736729aca1a5be3fbfe57f8b",
+    "csrc/tmn90_z64_h128.cu": "ecfab384ff1dd6433ad1b4ba3661c1758cf92008d27f9fe1a1de737991aaed20",
+    "csrc/tmn_kernels.cuh": "bbd80a814fa45229be4dc397a20cd233b950da49f667c65b2e8db1689b67a88e",
+    "csrc/tmn_ptx.cuh": "0bd49dbc85d1fd7cb260d9a96a11602f1818ed06767efcc36a7ed54caf85c8ed",
+    "csrc/tmn_sm90_unit.cuh": "0a6eceb793903acb86e002717e0216d8ab15cd39369bb9ac4f812a432618ee15"
+   },
+   "unit": "tmn90_z64_h128"
+  },
+  "tmn90_z64_h64/sm_90a": {
+   "arch": "sm_90a",
+   "built_utc": "2026-09-12T01:44:38Z",
+   "cubin": "sm_90a/tmn90_z64_h64.cubin",
+   "cubin_bytes": 648688,
+   "cubin_sha256": "e348e93c6aaae9d18b4078184cbf68b202bd9df88251889712f34503b7013a93",
+   "defines": [],
+   "dev": false,
+   "elf": {
+    "abi_version": 8,
+    "cuinfo": "02005a0082000000",
+    "cuinfo_sm": 90,
+    "elf": true,
+    "flags": "0x06005a04",
+    "osabi": 65,
+    "sm": 90,
+    "tkinfo": [
+     "ptxas",
+     "Cuda compilation tools, release 13.0, V13.0.88",
+     "Build cuda_13.0.r13.0/compiler.36424714_0",
+     "-v  -arch sm_90a -m 64 "
+    ],
+    "toolkit_version": 130,
+    "version": 1
+   },
+   "flags": [
+    "-cubin",
+    "-arch=sm_90a",
+    "-O3",
+    "-std=c++17",
+    "-DNDEBUG",
+    "--expt-relaxed-constexpr",
+    "-Xptxas",
+    "-v",
+    "-I",
+    "csrc"
+   ],
+   "kernels": {
+    "tmn_info": {
+     "arch": "sm_90a",
+     "barriers": 0,
+     "regs": 26,
+     "spill_loads": 0,
+     "spill_stores": 0,
+     "stack": 0
+    },
+    "tmn_k1_z64_h64_b_t1x128_s4k1_m0_l1_v0": {
+     "arch": "sm_90a",
+     "barriers": 16,
+     "regs": 168,
+     "spill_loads": 0,
+     "spill_stores": 0,
+     "stack": 0
+    },
+    "tmn_k1_z64_h64_b_t1x128_s4k1_m0_l2_v0": {
+     "arch": "sm_90a",
+     "barriers": 16,
+     "regs": 168,
+     "spill_loads": 0,
+     "spill_stores": 0,
+     "stack": 0
+    },
+    "tmn_k1_z64_h64_b_t1x128_s4k1_m1_l1_v0": {
+     "arch": "sm_90a",
+     "barriers": 16,
+     "regs": 168,
+     "spill_loads": 0,
+     "spill_stores": 0,
+     "stack": 0
+    },
+    "tmn_k1_z64_h64_b_t1x128_s4k1_m1_l1_v1": {
+     "arch": "sm_90a",
+     "barriers": 16,
+     "regs": 168,
+     "spill_loads": 0,
+     "spill_stores": 0,
+     "stack": 0
+    },
+    "tmn_k1_z64_h64_b_t1x128_s4k1_m1_l2_v0": {
+     "arch": "sm_90a",
+     "barriers": 16,
+     "regs": 168,
+     "spill_loads": 0,
+     "spill_stores": 0,
+     "stack": 0
+    },
+    "tmn_k1_z64_h64_b_t2x64_s4k1_m0_l1_v0": {
+     "arch": "sm_90a",
+     "barriers": 16,
+     "regs": 168,
+     "spill_loads": 0,
+     "spill_stores": 0,
+     "stack": 0
+    },
+    "tmn_k1_z64_h64_b_t2x64_s4k1_m0_l2_v0": {
+     "arch": "sm_90a",
+     "barriers": 16,
+     "regs": 168,
+     "spill_loads": 0,
+     "spill_stores": 0,
+     "stack": 0
+    },
+    "tmn_k1_z64_h64_b_t2x64_s4k1_m1_l1_v0": {
+     "arch": "sm_90a",
+     "barriers": 16,
+     "regs": 168,
+     "spill_loads": 0,
+     "spill_stores": 0,
+     "stack": 0
+    },
+    "tmn_k1_z64_h64_b_t2x64_s4k1_m1_l1_v1": {
+     "arch": "sm_90a",
+     "barriers": 16,
+     "regs": 168,
+     "spill_loads": 0,
+     "spill_stores": 0,
+     "stack": 0
+    },
+    "tmn_k1_z64_h64_b_t2x64_s4k1_m1_l2_v0": {
+     "arch": "sm_90a",
+     "barriers": 16,
+     "regs": 168,
+     "spill_loads": 0,
+     "spill_stores": 0,
+     "stack": 0
+    },
+    "tmn_k1_z64_h64_f_t2x64_s4k1_m0_l1_v0": {
+     "arch": "sm_90a",
+     "barriers": 16,
+     "regs": 168,
+     "spill_loads": 0,
+     "spill_stores": 0,
+     "stack": 0
+    },
+    "tmn_k1_z64_h64_f_t2x64_s4k1_m1_l1_v0": {
+     "arch": "sm_90a",
+     "barriers": 16,
+     "regs": 168,
+     "spill_loads": 0,
+     "spill_stores": 0,
+     "stack": 0
+    },
+    "tmn_k3_z64_h64_b_t1x128_s4a1_l1": {
+     "arch": "sm_90a",
+     "barriers": 1,
+     "regs": 168,
+     "spill_loads": 0,
+     "spill_stores": 0,
+     "stack": 0
+    },
+    "tmn_k3_z64_h64_b_t1x128_s4a1_l2": {
+     "arch": "sm_90a",
+     "barriers": 1,
+     "regs": 168,
+     "spill_loads": 0,
+     "spill_stores": 0,
+     "stack": 0
+    },
+    "tmn_k3_z64_h64_b_t1x128_s4a1_l3": {
+     "arch": "sm_90a",
+     "barriers": 1,
+     "regs": 168,
+     "spill_loads": 0,
+     "spill_stores": 0,
+     "stack": 0
+    },
+    "tmn_k3_z64_h64_b_t2x64_s4a1_l1": {
+     "arch": "sm_90a",
+     "barriers": 1,
+     "regs": 168,
+     "spill_loads": 0,
+     "spill_stores": 0,
+     "stack": 0
+    },
+    "tmn_k3_z64_h64_b_t2x64_s4a1_l2": {
+     "arch": "sm_90a",
+     "barriers": 1,
+     "regs": 168,
+     "spill_loads": 0,
+     "spill_stores": 0,
+     "stack": 0
+    },
+    "tmn_k3_z64_h64_b_t2x64_s4a1_l3": {
+     "arch": "sm_90a",
+     "barriers": 1,
+     "regs": 168,
+     "spill_loads": 0,
+     "spill_stores": 0,
+     "stack": 0
+    },
+    "tmn_k3_z64_h64_f_t2x64_s4a1_l1": {
+     "arch": "sm_90a",
+     "barriers": 1,
+     "regs": 168,
+     "spill_loads": 0,
+     "spill_stores": 0,
+     "stack": 0
+    }
+   },
+   "nvcc": "Cuda compilation tools, release 13.0, V13.0.88",
+   "nvcc_build": "Build cuda_13.0.r13.0/compiler.36424714_0",
+   "ptxas_log": "sm_90a/tmn90_z64_h64.ptxas.txt",
+   "serves": [
+    {
+     "c_hidden": 64,
+     "c_z": 64,
+     "exact": true,
+     "fast": true,
+     "form": "b",
+     "kernels": [
+      "tmn_k1_z64_h64_b_t2x64_s4k1_m0_l2_v0",
+      "tmn_k1_z64_h64_b_t2x64_s4k1_m1_l2_v0",
+      "tmn_k3_z64_h64_b_t2x64_s4a1_l1",
+      "tmn_k3_z64_h64_b_t2x64_s4a1_l2",
+      "tmn_k3_z64_h64_b_t2x64_s4a1_l3"
+     ],
+     "missing": []
+    },
+    {
+     "c_hidden": 64,
+     "c_z": 64,
+     "exact": false,
+     "fast": true,
+     "form": "f",
+     "k3_mode": "f",
+     "kernels": [
+      "tmn_k1_z64_h64_f_t2x64_s4k1_m0_l1_v0",
+      "tmn_k1_z64_h64_f_t2x64_s4k1_m1_l1_v0",
+      "tmn_k3_z64_h64_f_t2x64_s4a1_l1"
+     ],
+     "missing": []
+    }
+   ],
+   "source": "tmn90_z64_h64.cu",
+   "sources": {
+    "csrc/common/tmn_math.cuh": "3504d522868ad81d2d072a3a744fe042da5b3761736729aca1a5be3fbfe57f8b",
+    "csrc/tmn90_z64_h64.cu": "32700d769886445dd32c131dd6173b7ad333290ed4bcfb839c086413c21e58b6",
+    "csrc/tmn_kernels.cuh": "bbd80a814fa45229be4dc397a20cd233b950da49f667c65b2e8db1689b67a88e",
+    "csrc/tmn_ptx.cuh": "0bd49dbc85d1fd7cb260d9a96a11602f1818ed06767efcc36a7ed54caf85c8ed",
+    "csrc/tmn_sm90_unit.cuh": "0a6eceb793903acb86e002717e0216d8ab15cd39369bb9ac4f812a432618ee15"
+   },
+   "unit": "tmn90_z64_h64"
+  },
+  "tmn90w_z128_h384/sm_90a": {
+   "arch": "sm_90a",
+   "built_utc": "2026-09-12T01:44:34Z",
+   "cubin": "sm_90a/tmn90w_z128_h384.cubin",
+   "cubin_bytes": 279728,
+   "cubin_sha256": "3fd4df1819089e536a158044a591ef95bb6686abb4db0745ce1463058db0b9b1",
+   "defines": [
+    "TMN_CZ=128",
+    "TMN_CH=384"
+   ],
+   "dev": false,
+   "elf": {
+    "abi_version": 8,
+    "cuinfo": "02005a0082000000",
+    "cuinfo_sm": 90,
+    "elf": true,
+    "flags": "0x06005a04",
+    "osabi": 65,
+    "sm": 90,
+    "tkinfo": [
+     "ptxas",
+     "Cuda compilation tools, release 13.0, V13.0.88",
+     "Build cuda_13.0.r13.0/compiler.36424714_0",
+     "-v  -warn-spills  -arch sm_90a -m 64 "
+    ],
+    "toolkit_version": 130,
+    "version": 1
+   },
+   "flags": [
+    "-cubin",
+    "-arch=sm_90a",
+    "-O3",
+    "-std=c++17",
+    "-DNDEBUG",
+    "--expt-relaxed-constexpr",
+    "-Xptxas",
+    "-v",
+    "-I",
+    "csrc",
+    "-Xptxas",
+    "--warn-on-spills",
+    "-DTMN_CZ=128",
+    "-DTMN_CH=384"
+   ],
+   "kernels": {
+    "tmn_info": {
+     "arch": "sm_90a",
+     "barriers": 0,
+     "regs": 26,
+     "spill_loads": 0,
+     "spill_stores": 0,
+     "stack": 0
+    },
+    "tmn_k1_z128_h384_b_t2x64_s8k2_m0_l1_v0": {
+     "arch": "sm_90a",
+     "barriers": 16,
+     "regs": 168,
+     "spill_loads": 0,
+     "spill_stores": 0,
+     "stack": 0
+    },
+    "tmn_k1_z128_h384_b_t2x64_s8k2_m0_l2_v0": {
+     "arch": "sm_90a",
+     "barriers": 16,
+     "regs": 168,
+     "spill_loads": 0,
+     "spill_stores": 0,
+     "stack": 0
+    },
+    "tmn_k1_z128_h384_b_t2x64_s8k2_m1_l1_v0": {
+     "arch": "sm_90a",
+     "barriers": 16,
+     "regs": 168,
+     "spill_loads": 0,
+     "spill_stores": 0,
+     "stack": 0
+    },
+    "tmn_k1_z128_h384_b_t2x64_s8k2_m1_l2_v0": {
+     "arch": "sm_90a",
+     "barriers": 16,
+     "regs": 168,
+     "spill_loads": 0,
+     "spill_stores": 0,
+     "stack": 0
+    },
+    "tmn_k3w_z128_h384_b_t2x64_s4a1_l1": {
+     "arch": "sm_90a",
+     "barriers": 16,
+     "regs": 168,
+     "spill_loads": 68,
+     "spill_stores": 52,
+     "stack": 56
+    },
+    "tmn_k3w_z128_h384_b_t2x64_s4a2_l1": {
+     "arch": "sm_90a",
+     "barriers": 16,
+     "regs": 168,
+     "spill_loads": 0,
+     "spill_stores": 0,
+     "stack": 0
+    }
+   },
+   "nvcc": "Cuda compilation tools, release 13.0, V13.0.88",
+   "nvcc_build": "Build cuda_13.0.r13.0/compiler.36424714_0",
+   "ptxas_log": "sm_90a/tmn90w_z128_h384.ptxas.txt",
+   "serves": [],
+   "source": "tmn_sm90_wide.cu",
+   "sources": {
+    "csrc/tmn_sm90_wide.cu": "f11c317207dc56950f3df1f8427deeb069de1d35c94b2d1cf6721c3ee6270638"
+   },
+   "unit": "tmn90w_z128_h384"
+  },
+  "tmn90w_z256_h256/sm_90a": {
+   "arch": "sm_90a",
+   "built_utc": "2026-09-12T01:44:36Z",
+   "cubin": "sm_90a/tmn90w_z256_h256.cubin",
+   "cubin_bytes": 387248,
+   "cubin_sha256": "56d161ed1c2910e1a61b918881af5427d7726f682ced8bcb90cc7d1030324dd2",
+   "defines": [
+    "TMN_CZ=256",
+    "TMN_CH=256"
+   ],
+   "dev": false,
+   "elf": {
+    "abi_version": 8,
+    "cuinfo": "02005a0082000000",
+    "cuinfo_sm": 90,
+    "elf": true,
+    "flags": "0x06005a04",
+    "osabi": 65,
+    "sm": 90,
+    "tkinfo": [
+     "ptxas",
+     "Cuda compilation tools, release 13.0, V13.0.88",
+     "Build cuda_13.0.r13.0/compiler.36424714_0",
+     "-v  -warn-spills  -arch sm_90a -m 64 "
+    ],
+    "toolkit_version": 130,
+    "version": 1
+   },
+   "flags": [
+    "-cubin",
+    "-arch=sm_90a",
+    "-O3",
+    "-std=c++17",
+    "-DNDEBUG",
+    "--expt-relaxed-constexpr",
+    "-Xptxas",
+    "-v",
+    "-I",
+    "csrc",
+    "-Xptxas",
+    "--warn-on-spills",
+    "-DTMN_CZ=256",
+    "-DTMN_CH=256"
+   ],
+   "kernels": {
+    "tmn_info": {
+     "arch": "sm_90a",
+     "barriers": 0,
+     "regs": 26,
+     "spill_loads": 0,
+     "spill_stores": 0,
+     "stack": 0
+    },
+    "tmn_k3w_z256_h256_b_t1x128_s4a1_l1": {
+     "arch": "sm_90a",
+     "barriers": 16,
+     "regs": 168,
+     "spill_loads": 0,
+     "spill_stores": 0,
+     "stack": 0
+    },
+    "tmn_k3w_z256_h256_b_t2x64_s4a1_l1": {
+     "arch": "sm_90a",
+     "barriers": 16,
+     "regs": 168,
+     "spill_loads": 0,
+     "spill_stores": 0,
+     "stack": 0
+    },
+    "tmn_k3w_z256_h256_b_t2x64_s4a1_l2": {
+     "arch": "sm_90a",
+     "barriers": 16,
+     "regs": 168,
+     "spill_loads": 0,
+     "spill_stores": 0,
+     "stack": 0
+    },
+    "tmn_k3w_z256_h256_b_t2x64_s4a1_l3": {
+     "arch": "sm_90a",
+     "barriers": 16,
+     "regs": 168,
+     "spill_loads": 0,
+     "spill_stores": 0,
+     "stack": 0
+    },
+    "tmn_k3w_z256_h256_b_t2x64_s4a2_l1": {
+     "arch": "sm_90a",
+     "barriers": 16,
+     "regs": 168,
+     "spill_loads": 0,
+     "spill_stores": 0,
+     "stack": 0
+    },
+    "tmn_k3w_z256_h256_f_t1x64_s4a1_l1": {
+     "arch": "sm_90a",
+     "barriers": 4,
+     "regs": 168,
+     "spill_loads": 0,
+     "spill_stores": 0,
+     "stack": 0
+    }
+   },
+   "nvcc": "Cuda compilation tools, release 13.0, V13.0.88",
+   "nvcc_build": "Build cuda_13.0.r13.0/compiler.36424714_0",
+   "ptxas_log": "sm_90a/tmn90w_z256_h256.ptxas.txt",
+   "serves": [],
+   "source": "tmn_sm90_wide.cu",
+   "sources": {
+    "csrc/tmn_sm90_wide.cu": "f11c317207dc56950f3df1f8427deeb069de1d35c94b2d1cf6721c3ee6270638"
+   },
+   "unit": "tmn90w_z256_h256"
+  },
+  "tmn90w_z256_h384/sm_90a": {
+   "arch": "sm_90a",
+   "built_utc": "2026-09-12T01:44:35Z",
+   "cubin": "sm_90a/tmn90w_z256_h384.cubin",
+   "cubin_bytes": 259696,
+   "cubin_sha256": "2c707964922e57b37cf1d4aef444463826395715bf23da0f510fb584f5513b1d",
+   "defines": [
+    "TMN_CZ=256",
+    "TMN_CH=384"
+   ],
+   "dev": false,
+   "elf": {
+    "abi_version": 8,
+    "cuinfo": "02005a0082000000",
+    "cuinfo_sm": 90,
+    "elf": true,
+    "flags": "0x06005a04",
+    "osabi": 65,
+    "sm": 90,
+    "tkinfo": [
+     "ptxas",
+     "Cuda compilation tools, release 13.0, V13.0.88",
+     "Build cuda_13.0.r13.0/compiler.36424714_0",
+     "-v  -warn-spills  -arch sm_90a -m 64 "
+    ],
+    "toolkit_version": 130,
+    "version": 1
+   },
+   "flags": [
+    "-cubin",
+    "-arch=sm_90a",
+    "-O3",
+    "-std=c++17",
+    "-DNDEBUG",
+    "--expt-relaxed-constexpr",
+    "-Xptxas",
+    "-v",
+    "-I",
+    "csrc",
+    "-Xptxas",
+    "--warn-on-spills",
+    "-DTMN_CZ=256",
+    "-DTMN_CH=384"
+   ],
+   "kernels": {
+    "tmn_info": {
+     "arch": "sm_90a",
+     "barriers": 0,
+     "regs": 26,
+     "spill_loads": 0,
+     "spill_stores": 0,
+     "stack": 0
+    },
+    "tmn_k1_z256_h384_b_t2x64_s8k2_m0_l1_v0": {
+     "arch": "sm_90a",
+     "barriers": 16,
+     "regs": 168,
+     "spill_loads": 0,
+     "spill_stores": 0,
+     "stack": 0
+    },
+    "tmn_k1_z256_h384_b_t2x64_s8k2_m0_l2_v0": {
+     "arch": "sm_90a",
+     "barriers": 16,
+     "regs": 168,
+     "spill_loads": 0,
+     "spill_stores": 0,
+     "stack": 0
+    },
+    "tmn_k1_z256_h384_b_t2x64_s8k2_m1_l1_v0": {
+     "arch": "sm_90a",
+     "barriers": 16,
+     "regs": 168,
+     "spill_loads": 0,
+     "spill_stores": 0,
+     "stack": 0
+    },
+    "tmn_k1_z256_h384_b_t2x64_s8k2_m1_l2_v0": {
+     "arch": "sm_90a",
+     "barriers": 16,
+     "regs": 168,
+     "spill_loads": 0,
+     "spill_stores": 0,
+     "stack": 0
+    },
+    "tmn_k3w_z256_h384_b_t1x64_s4a1_l1": {
+     "arch": "sm_90a",
+     "barriers": 4,
+     "regs": 168,
+     "spill_loads": 96,
+     "spill_stores": 80,
+     "stack": 72
+    }
+   },
+   "nvcc": "Cuda compilation tools, release 13.0, V13.0.88",
+   "nvcc_build": "Build cuda_13.0.r13.0/compiler.36424714_0",
+   "ptxas_log": "sm_90a/tmn90w_z256_h384.ptxas.txt",
+   "serves": [],
+   "source": "tmn_sm90_wide.cu",
+   "sources": {
+    "csrc/tmn_sm90_wide.cu": "f11c317207dc56950f3df1f8427deeb069de1d35c94b2d1cf6721c3ee6270638"
+   },
+   "unit": "tmn90w_z256_h384"
+  },
+  "tmn90w_z384_h128/sm_90a": {
+   "arch": "sm_90a",
+   "built_utc": "2026-09-12T01:44:41Z",
+   "cubin": "sm_90a/tmn90w_z384_h128.cubin",
+   "cubin_bytes": 354480,
+   "cubin_sha256": "7bcb89325b2a79d70c277e1bed38e28d08eb440879169190a3f0646f8c48323b",
+   "defines": [
+    "TMN_CZ=384",
+    "TMN_CH=128"
+   ],
+   "dev": false,
+   "elf": {
+    "abi_version": 8,
+    "cuinfo": "02005a0082000000",
+    "cuinfo_sm": 90,
+    "elf": true,
+    "flags": "0x06005a04",
+    "osabi": 65,
+    "sm": 90,
+    "tkinfo": [
+     "ptxas",
+     "Cuda compilation tools, release 13.0, V13.0.88",
+     "Build cuda_13.0.r13.0/compiler.36424714_0",
+     "-v  -warn-spills  -arch sm_90a -m 64 "
+    ],
+    "toolkit_version": 130,
+    "version": 1
+   },
+   "flags": [
+    "-cubin",
+    "-arch=sm_90a",
+    "-O3",
+    "-std=c++17",
+    "-DNDEBUG",
+    "--expt-relaxed-constexpr",
+    "-Xptxas",
+    "-v",
+    "-I",
+    "csrc",
+    "-Xptxas",
+    "--warn-on-spills",
+    "-DTMN_CZ=384",
+    "-DTMN_CH=128"
+   ],
+   "kernels": {
+    "tmn_info": {
+     "arch": "sm_90a",
+     "barriers": 0,
+     "regs": 26,
+     "spill_loads": 0,
+     "spill_stores": 0,
+     "stack": 0
+    },
+    "tmn_k1_z384_h128_b_t2x64_s6k2_m0_l1_v0": {
+     "arch": "sm_90a",
+     "barriers": 16,
+     "regs": 168,
+     "spill_loads": 0,
+     "spill_stores": 0,
+     "stack": 0
+    },
+    "tmn_k1_z384_h128_b_t2x64_s6k2_m0_l2_v0": {
+     "arch": "sm_90a",
+     "barriers": 16,
+     "regs": 168,
+     "spill_loads": 116,
+     "spill_stores": 116,
+     "stack": 120
+    },
+    "tmn_k1_z384_h128_b_t2x64_s6k2_m1_l1_v0": {
+     "arch": "sm_90a",
+     "barriers": 16,
+     "regs": 168,
+     "spill_loads": 0,
+     "spill_stores": 0,
+     "stack": 0
+    },
+    "tmn_k1_z384_h128_b_t2x64_s6k2_m1_l2_v0": {
+     "arch": "sm_90a",
+     "barriers": 16,
+     "regs": 168,
+     "spill_loads": 116,
+     "spill_stores": 116,
+     "stack": 120
+    },
+    "tmn_k3w_z384_h128_b_t2x64_s4a1_l1": {
+     "arch": "sm_90a",
+     "barriers": 16,
+     "regs": 168,
+     "spill_loads": 24,
+     "spill_stores": 24,
+     "stack": 24
+    },
+    "tmn_k3w_z384_h128_b_t2x64_s4a2_l1": {
+     "arch": "sm_90a",
+     "barriers": 16,
+     "regs": 168,
+     "spill_loads": 4,
+     "spill_stores": 4,
+     "stack": 8
+    }
+   },
+   "nvcc": "Cuda compilation tools, release 13.0, V13.0.88",
+   "nvcc_build": "Build cuda_13.0.r13.0/compiler.36424714_0",
+   "ptxas_log": "sm_90a/tmn90w_z384_h128.ptxas.txt",
+   "serves": [],
+   "source": "tmn_sm90_wide.cu",
+   "sources": {
+    "csrc/tmn_sm90_wide.cu": "f11c317207dc56950f3df1f8427deeb069de1d35c94b2d1cf6721c3ee6270638"
+   },
+   "unit": "tmn90w_z384_h128"
+  },
+  "tmn90w_z384_h256/sm_90a": {
+   "arch": "sm_90a",
+   "built_utc": "2026-09-12T01:44:40Z",
+   "cubin": "sm_90a/tmn90w_z384_h256.cubin",
+   "cubin_bytes": 298608,
+   "cubin_sha256": "f9fc92637b8023766ef96c078d8964d5de267e7716d16cb4a9bbe29370dcd8db",
+   "defines": [
+    "TMN_CZ=384",
+    "TMN_CH=256"
+   ],
+   "dev": false,
+   "elf": {
+    "abi_version": 8,
+    "cuinfo": "02005a0082000000",
+    "cuinfo_sm": 90,
+    "elf": true,
+    "flags": "0x06005a04",
+    "osabi": 65,
+    "sm": 90,
+    "tkinfo": [
+     "ptxas",
+     "Cuda compilation tools, release 13.0, V13.0.88",
+     "Build cuda_13.0.r13.0/compiler.36424714_0",
+     "-v  -warn-spills  -arch sm_90a -m 64 "
+    ],
+    "toolkit_version": 130,
+    "version": 1
+   },
+   "flags": [
+    "-cubin",
+    "-arch=sm_90a",
+    "-O3",
+    "-std=c++17",
+    "-DNDEBUG",
+    "--expt-relaxed-constexpr",
+    "-Xptxas",
+    "-v",
+    "-I",
+    "csrc",
+    "-Xptxas",
+    "--warn-on-spills",
+    "-DTMN_CZ=384",
+    "-DTMN_CH=256"
+   ],
+   "kernels": {
+    "tmn_info": {
+     "arch": "sm_90a",
+     "barriers": 0,
+     "regs": 26,
+     "spill_loads": 0,
+     "spill_stores": 0,
+     "stack": 0
+    },
+    "tmn_k1_z384_h256_b_t2x64_s6k2_m0_l1_v0": {
+     "arch": "sm_90a",
+     "barriers": 16,
+     "regs": 168,
+     "spill_loads": 0,
+     "spill_stores": 0,
+     "stack": 0
+    },
+    "tmn_k1_z384_h256_b_t2x64_s6k2_m0_l2_v0": {
+     "arch": "sm_90a",
+     "barriers": 16,
+     "regs": 168,
+     "spill_loads": 116,
+     "spill_stores": 116,
+     "stack": 120
+    },
+    "tmn_k1_z384_h256_b_t2x64_s6k2_m1_l1_v0": {
+     "arch": "sm_90a",
+     "barriers": 16,
+     "regs": 168,
+     "spill_loads": 0,
+     "spill_stores": 0,
+     "stack": 0
+    },
+    "tmn_k1_z384_h256_b_t2x64_s6k2_m1_l2_v0": {
+     "arch": "sm_90a",
+     "barriers": 16,
+     "regs": 168,
+     "spill_loads": 116,
+     "spill_stores": 116,
+     "stack": 120
+    },
+    "tmn_k3w_z384_h256_b_t1x64_s4a1_l1": {
+     "arch": "sm_90a",
+     "barriers": 4,
+     "regs": 168,
+     "spill_loads": 132,
+     "spill_stores": 116,
+     "stack": 120
+    }
+   },
+   "nvcc": "Cuda compilation tools, release 13.0, V13.0.88",
+   "nvcc_build": "Build cuda_13.0.r13.0/compiler.36424714_0",
+   "ptxas_log": "sm_90a/tmn90w_z384_h256.ptxas.txt",
+   "serves": [],
+   "source": "tmn_sm90_wide.cu",
+   "sources": {
+    "csrc/tmn_sm90_wide.cu": "f11c317207dc56950f3df1f8427deeb069de1d35c94b2d1cf6721c3ee6270638"
+   },
+   "unit": "tmn90w_z384_h256"
+  },
+  "tmn90w_z384_h384/sm_90a": {
+   "arch": "sm_90a",
+   "built_utc": "2026-09-12T01:44:45Z",
+   "cubin": "sm_90a/tmn90w_z384_h384.cubin",
+   "cubin_bytes": 591216,
+   "cubin_sha256": "e38692bec328e39d786a2188a6d62ba2bcdfcc5835bca2da740d85c22800ad9f",
+   "defines": [
+    "TMN_CZ=384",
+    "TMN_CH=384"
+   ],
+   "dev": false,
+   "elf": {
+    "abi_version": 8,
+    "cuinfo": "02005a0082000000",
+    "cuinfo_sm": 90,
+    "elf": true,
+    "flags": "0x06005a04",
+    "osabi": 65,
+    "sm": 90,
+    "tkinfo": [
+     "ptxas",
+     "Cuda compilation tools, release 13.0, V13.0.88",
+     "Build cuda_13.0.r13.0/compiler.36424714_0",
+     "-v  -warn-spills  -arch sm_90a -m 64 "
+    ],
+    "toolkit_version": 130,
+    "version": 1
+   },
+   "flags": [
+    "-cubin",
+    "-arch=sm_90a",
+    "-O3",
+    "-std=c++17",
+    "-DNDEBUG",
+    "--expt-relaxed-constexpr",
+    "-Xptxas",
+    "-v",
+    "-I",
+    "csrc",
+    "-Xptxas",
+    "--warn-on-spills",
+    "-DTMN_CZ=384",
+    "-DTMN_CH=384"
+   ],
+   "kernels": {
+    "tmn_info": {
+     "arch": "sm_90a",
+     "barriers": 0,
+     "regs": 26,
+     "spill_loads": 0,
+     "spill_stores": 0,
+     "stack": 0
+    },
+    "tmn_k1_z384_h384_b_t1x128_s6k2_m1_l1_v0": {
+     "arch": "sm_90a",
+     "barriers": 16,
+     "regs": 168,
+     "spill_loads": 0,
+     "spill_stores": 0,
+     "stack": 0
+    },
+    "tmn_k1_z384_h384_b_t2x64_s4k3_m1_l1_v0": {
+     "arch": "sm_90a",
+     "barriers": 16,
+     "regs": 168,
+     "spill_loads": 4,
+     "spill_stores": 4,
+     "stack": 8
+    },
+    "tmn_k1_z384_h384_b_t2x64_s6k2_m0_l1_v0": {
+     "arch": "sm_90a",
+     "barriers": 16,
+     "regs": 168,
+     "spill_loads": 0,
+     "spill_stores": 0,
+     "stack": 0
+    },
+    "tmn_k1_z384_h384_b_t2x64_s6k2_m0_l2_v0": {
+     "arch": "sm_90a",
+     "barriers": 16,
+     "regs": 168,
+     "spill_loads": 116,
+     "spill_stores": 116,
+     "stack": 120
+    },
+    "tmn_k1_z384_h384_b_t2x64_s6k2_m1_l1_v0": {
+     "arch": "sm_90a",
+     "barriers": 16,
+     "regs": 168,
+     "spill_loads": 0,
+     "spill_stores": 0,
+     "stack": 0
+    },
+    "tmn_k1_z384_h384_b_t2x64_s6k2_m1_l2_v0": {
+     "arch": "sm_90a",
+     "barriers": 16,
+     "regs": 168,
+     "spill_loads": 116,
+     "spill_stores": 116,
+     "stack": 120
+    },
+    "tmn_k3w_z384_h384_b_t1x64_s4a1_l1": {
+     "arch": "sm_90a",
+     "barriers": 4,
+     "regs": 168,
+     "spill_loads": 200,
+     "spill_stores": 200,
+     "stack": 136
+    },
+    "tmn_k3w_z384_h384_b_t1x64_s4a1_l2": {
+     "arch": "sm_90a",
+     "barriers": 4,
+     "regs": 168,
+     "spill_loads": 344,
+     "spill_stores": 340,
+     "stack": 240
+    },
+    "tmn_k3w_z384_h384_b_t1x64_s4a1_l3": {
+     "arch": "sm_90a",
+     "barriers": 4,
+     "regs": 168,
+     "spill_loads": 360,
+     "spill_stores": 356,
+     "stack": 232
+    }
+   },
+   "nvcc": "Cuda compilation tools, release 13.0, V13.0.88",
+   "nvcc_build": "Build cuda_13.0.r13.0/compiler.36424714_0",
+   "ptxas_log": "sm_90a/tmn90w_z384_h384.ptxas.txt",
+   "serves": [],
+   "source": "tmn_sm90_wide.cu",
+   "sources": {
+    "csrc/tmn_sm90_wide.cu": "f11c317207dc56950f3df1f8427deeb069de1d35c94b2d1cf6721c3ee6270638"
+   },
+   "unit": "tmn90w_z384_h384"
+  },
+  "tmn90w_z384_h64/sm_90a": {
+   "arch": "sm_90a",
+   "built_utc": "2026-09-12T01:44:42Z",
+   "cubin": "sm_90a/tmn90w_z384_h64.cubin",
+   "cubin_bytes": 343216,
+   "cubin_sha256": "3ead6aa721f2bca6f5478698b23182b312c8f48695648c47aa7204ef85c499b7",
+   "defines": [
+    "TMN_CZ=384",
+    "TMN_CH=64"
+   ],
+   "dev": false,
+   "elf": {
+    "abi_version": 8,
+    "cuinfo": "02005a0082000000",
+    "cuinfo_sm": 90,
+    "elf": true,
+    "flags": "0x06005a04",
+    "osabi": 65,
+    "sm": 90,
+    "tkinfo": [
+     "ptxas",
+     "Cuda compilation tools, release 13.0, V13.0.88",
+     "Build cuda_13.0.r13.0/compiler.36424714_0",
+     "-v  -warn-spills  -arch sm_90a -m 64 "
+    ],
+    "toolkit_version": 130,
+    "version": 1
+   },
+   "flags": [
+    "-cubin",
+    "-arch=sm_90a",
+    "-O3",
+    "-std=c++17",
+    "-DNDEBUG",
+    "--expt-relaxed-constexpr",
+    "-Xptxas",
+    "-v",
+    "-I",
+    "csrc",
+    "-Xptxas",
+    "--warn-on-spills",
+    "-DTMN_CZ=384",
+    "-DTMN_CH=64"
+   ],
+   "kernels": {
+    "tmn_info": {
+     "arch": "sm_90a",
+     "barriers": 0,
+     "regs": 26,
+     "spill_loads": 0,
+     "spill_stores": 0,
+     "stack": 0
+    },
+    "tmn_k1_z384_h64_b_t2x64_s6k2_m0_l1_v0": {
+     "arch": "sm_90a",
+     "barriers": 16,
+     "regs": 168,
+     "spill_loads": 0,
+     "spill_stores": 0,
+     "stack": 0
+    },
+    "tmn_k1_z384_h64_b_t2x64_s6k2_m0_l2_v0": {
+     "arch": "sm_90a",
+     "barriers": 16,
+     "regs": 168,
+     "spill_loads": 116,
+     "spill_stores": 116,
+     "stack": 120
+    },
+    "tmn_k1_z384_h64_b_t2x64_s6k2_m1_l1_v0": {
+     "arch": "sm_90a",
+     "barriers": 16,
+     "regs": 168,
+     "spill_loads": 0,
+     "spill_stores": 0,
+     "stack": 0
+    },
+    "tmn_k1_z384_h64_b_t2x64_s6k2_m1_l2_v0": {
+     "arch": "sm_90a",
+     "barriers": 16,
+     "regs": 168,
+     "spill_loads": 116,
+     "spill_stores": 116,
+     "stack": 120
+    },
+    "tmn_k3w_z384_h64_b_t2x64_s4a1_l1": {
+     "arch": "sm_90a",
+     "barriers": 16,
+     "regs": 168,
+     "spill_loads": 24,
+     "spill_stores": 24,
+     "stack": 24
+    },
+    "tmn_k3w_z384_h64_b_t2x64_s4a2_l1": {
+     "arch": "sm_90a",
+     "barriers": 16,
+     "regs": 168,
+     "spill_loads": 4,
+     "spill_stores": 4,
+     "stack": 8
+    }
+   },
+   "nvcc": "Cuda compilation tools, release 13.0, V13.0.88",
+   "nvcc_build": "Build cuda_13.0.r13.0/compiler.36424714_0",
+   "ptxas_log": "sm_90a/tmn90w_z384_h64.ptxas.txt",
+   "serves": [],
+   "source": "tmn_sm90_wide.cu",
+   "sources": {
+    "csrc/tmn_sm90_wide.cu": "f11c317207dc56950f3df1f8427deeb069de1d35c94b2d1cf6721c3ee6270638"
+   },
+   "unit": "tmn90w_z384_h64"
+  },
+  "tmn90w_z64_h384/sm_90a": {
+   "arch": "sm_90a",
+   "built_utc": "2026-09-12T01:44:41Z",
+   "cubin": "sm_90a/tmn90w_z64_h384.cubin",
+   "cubin_bytes": 258224,
+   "cubin_sha256": "288efc25388d9dd61b4c95600674c9690c733b60a9d96876f9190c389a2fab7c",
+   "defines": [
+    "TMN_CZ=64",
+    "TMN_CH=384"
+   ],
+   "dev": false,
+   "elf": {
+    "abi_version": 8,
+    "cuinfo": "02005a0082000000",
+    "cuinfo_sm": 90,
+    "elf": true,
+    "flags": "0x06005a04",
+    "osabi": 65,
+    "sm": 90,
+    "tkinfo": [
+     "ptxas",
+     "Cuda compilation tools, release 13.0, V13.0.88",
+     "Build cuda_13.0.r13.0/compiler.36424714_0",
+     "-v  -warn-spills  -arch sm_90a -m 64 "
+    ],
+    "toolkit_version": 130,
+    "version": 1
+   },
+   "flags": [
+    "-cubin",
+    "-arch=sm_90a",
+    "-O3",
+    "-std=c++17",
+    "-DNDEBUG",
+    "--expt-relaxed-constexpr",
+    "-Xptxas",
+    "-v",
+    "-I",
+    "csrc",
+    "-Xptxas",
+    "--warn-on-spills",
+    "-DTMN_CZ=64",
+    "-DTMN_CH=384"
+   ],
+   "kernels": {
+    "tmn_info": {
+     "arch": "sm_90a",
+     "barriers": 0,
+     "regs": 26,
+     "spill_loads": 0,
+     "spill_stores": 0,
+     "stack": 0
+    },
+    "tmn_k1_z64_h384_b_t2x64_s8k1_m0_l1_v0": {
+     "arch": "sm_90a",
+     "barriers": 16,
+     "regs": 168,
+     "spill_loads": 0,
+     "spill_stores": 0,
+     "stack": 0
+    },
+    "tmn_k1_z64_h384_b_t2x64_s8k1_m0_l2_v0": {
+     "arch": "sm_90a",
+     "barriers": 16,
+     "regs": 168,
+     "spill_loads": 0,
+     "spill_stores": 0,
+     "stack": 0
+    },
+    "tmn_k1_z64_h384_b_t2x64_s8k1_m1_l1_v0": {
+     "arch": "sm_90a",
+     "barriers": 16,
+     "regs": 168,
+     "spill_loads": 0,
+     "spill_stores": 0,
+     "stack": 0
+    },
+    "tmn_k1_z64_h384_b_t2x64_s8k1_m1_l2_v0": {
+     "arch": "sm_90a",
+     "barriers": 16,
+     "regs": 168,
+     "spill_loads": 0,
+     "spill_stores": 0,
+     "stack": 0
+    },
+    "tmn_k3w_z64_h384_b_t2x64_s4a1_l1": {
+     "arch": "sm_90a",
+     "barriers": 16,
+     "regs": 168,
+     "spill_loads": 24,
+     "spill_stores": 24,
+     "stack": 24
+    },
+    "tmn_k3w_z64_h384_b_t2x64_s4a2_l1": {
+     "arch": "sm_90a",
+     "barriers": 16,
+     "regs": 168,
+     "spill_loads": 16,
+     "spill_stores": 16,
+     "stack": 16
+    }
+   },
+   "nvcc": "Cuda compilation tools, release 13.0, V13.0.88",
+   "nvcc_build": "Build cuda_13.0.r13.0/compiler.36424714_0",
+   "ptxas_log": "sm_90a/tmn90w_z64_h384.ptxas.txt",
+   "serves": [],
+   "source": "tmn_sm90_wide.cu",
+   "sources": {
+    "csrc/tmn_sm90_wide.cu": "f11c317207dc56950f3df1f8427deeb069de1d35c94b2d1cf6721c3ee6270638"
+   },
+   "unit": "tmn90w_z64_h384"
+  },
+  "trimul_k1_sm80/sm_80": {
+   "arch": "sm_80",
+   "built_utc": "2026-09-12T01:45:47Z",
+   "cubin": "sm_80/trimul_k1_sm80.cubin",
+   "cubin_bytes": 6086368,
+   "cubin_sha256": "7cbfbdb38e64e9fda65fc230cc6a2125fd5b191987311799891d40aff3269fa4",
+   "defines": [],
+   "dev": false,
+   "elf": {
+    "abi_version": 8,
+    "cuinfo": "0200500082000000",
+    "cuinfo_sm": 80,
+    "elf": true,
+    "flags": "0x06005004",
+    "osabi": 65,
+    "sm": 80,
+    "tkinfo": [
+     "ptxas",
+     "Cuda compilation tools, release 13.0, V13.0.88",
+     "Build cuda_13.0.r13.0/compiler.36424714_0",
+     "-v  -arch sm_80 -m 64 "
+    ],
+    "toolkit_version": 130,
+    "version": 1
+   },
+   "flags": [
+    "-cubin",
+    "-arch=sm_80",
+    "-O3",
+    "-std=c++17",
+    "-DNDEBUG",
+    "--expt-relaxed-constexpr",
+    "-Xptxas",
+    "-v",
+    "-I",
+    "csrc",
+    "-I",
+    "csrc/sm80"
+   ],
+   "kernels": {
+    "k1_bf16_c128_h128_bm128_bn16_wm32_s2_mb2": {
+     "arch": "sm_80",
+     "barriers": 1,
+     "cmem0": 464,
+     "regs": 245,
+     "spill_loads": 0,
+     "spill_stores": 0,
+     "stack": 0
+    },
+    "k1_bf16_c128_h128_bm128_bn16_wm32_s2_mb3": {
+     "arch": "sm_80",
+     "barriers": 1,
+     "cmem0": 464,
+     "regs": 168,
+     "spill_loads": 0,
+     "spill_stores": 0,
+     "stack": 0
+    },
+    "k1_bf16_c128_h128_bm128_bn32_wm32_s2_mb2": {
+     "arch": "sm_80",
+     "barriers": 1,
+     "cmem0": 464,
+     "regs": 245,
+     "spill_loads": 0,
+     "spill_stores": 0,
+     "stack": 0
+    },
+    "k1_bf16_c128_h128_bm128_bn32_wm32_s2_mb3": {
+     "arch": "sm_80",
+     "barriers": 1,
+     "cmem0": 464,
+     "regs": 168,
+     "spill_loads": 68,
+     "spill_stores": 44,
+     "stack": 32
+    },
+    "k1_bf16_c128_h128_bm256_bn16_wm32_s2_mb1": {
+     "arch": "sm_80",
+     "barriers": 1,
+     "cmem0": 464,
+     "regs": 245,
+     "spill_loads": 0,
+     "spill_stores": 0,
+     "stack": 0
+    },
+    "k1_bf16_c128_h128_bm64_bn16_wm16_s2_mb4": {
+     "arch": "sm_80",
+     "barriers": 1,
+     "cmem0": 464,
+     "regs": 128,
+     "spill_loads": 0,
+     "spill_stores": 0,
+     "stack": 0
+    },
+    "k1_bf16_c128_h256_bm128_bn32_wm32_s2_mb3": {
+     "arch": "sm_80",
+     "barriers": 1,
+     "cmem0": 464,
+     "regs": 168,
+     "spill_loads": 68,
+     "spill_stores": 44,
+     "stack": 32
+    },
+    "k1_bf16_c128_h384_bm128_bn32_wm32_s2_mb3": {
+     "arch": "sm_80",
+     "barriers": 1,
+     "cmem0": 464,
+     "regs": 168,
+     "spill_loads": 68,
+     "spill_stores": 44,
+     "stack": 32
+    },
+    "k1_bf16_c128_h64_bm128_bn32_wm32_s2_mb3": {
+     "arch": "sm_80",
+     "barriers": 1,
+     "cmem0": 464,
+     "regs": 168,
+     "spill_loads": 68,
+     "spill_stores": 44,
+     "stack": 32
+    },
+    "k1_bf16_c256_h128_bm128_bn32_wm32_s2_mb2": {
+     "arch": "sm_80",
+     "barriers": 1,
+     "cmem0": 464,
+     "regs": 255,
+     "spill_loads": 80,
+     "spill_stores": 104,
+     "stack": 72
+    },
+    "k1_bf16_c256_h256_bm128_bn16_wm32_s2_mb2": {
+     "arch": "sm_80",
+     "barriers": 1,
+     "cmem0": 464,
+     "regs": 255,
+     "spill_loads": 48,
+     "spill_stores": 48,
+     "stack": 48
+    },
+    "k1_bf16_c256_h256_bm128_bn32_wm32_s2_mb2": {
+     "arch": "sm_80",
+     "barriers": 1,
+     "cmem0": 464,
+     "regs": 255,
+     "spill_loads": 80,
+     "spill_stores": 104,
+     "stack": 72
+    },
+    "k1_bf16_c256_h256_bm64_bn32_wm16_s2_mb3": {
+     "arch": "sm_80",
+     "barriers": 1,
+     "cmem0": 464,
+     "regs": 168,
+     "spill_loads": 0,
+     "spill_stores": 0,
+     "stack": 0
+    },
+    "k1_bf16_c256_h384_bm128_bn32_wm32_s2_mb2": {
+     "arch": "sm_80",
+     "barriers": 1,
+     "cmem0": 464,
+     "regs": 255,
+     "spill_loads": 80,
+     "spill_stores": 104,
+     "stack": 72
+    },
+    "k1_bf16_c256_h64_bm128_bn32_wm32_s2_mb2": {
+     "arch": "sm_80",
+     "barriers": 1,
+     "cmem0": 464,
+     "regs": 255,
+     "spill_loads": 80,
+     "spill_stores": 104,
+     "stack": 72
+    },
+    "k1_bf16_c384_h128_bm64_bn16_wm16_s2_mb2": {
+     "arch": "sm_80",
+     "barriers": 1,
+     "cmem0": 464,
+     "regs": 255,
+     "spill_loads": 8,
+     "spill_stores": 8,
+     "stack": 80
+    },
+    "k1_bf16_c384_h256_bm64_bn16_wm16_s2_mb2": {
+     "arch": "sm_80",
+     "barriers": 1,
+     "cmem0": 464,
+     "regs": 255,
+     "spill_loads": 0,
+     "spill_stores": 0,
+     "stack": 64
+    },
+    "k1_bf16_c384_h384_bm64_bn16_wm16_s2_mb2": {
+     "arch": "sm_80",
+     "barriers": 1,
+     "cmem0": 464,
+     "regs": 255,
+     "spill_loads": 0,
+     "spill_stores": 0,
+     "stack": 64
+    },
+    "k1_bf16_c384_h64_bm64_bn16_wm16_s2_mb2": {
+     "arch": "sm_80",
+     "barriers": 1,
+     "cmem0": 464,
+     "regs": 255,
+     "spill_loads": 4,
+     "spill_stores": 4,
+     "stack": 80
+    },
+    "k1_bf16_c64_h128_bm128_bn16_wm32_s2_mb4": {
+     "arch": "sm_80",
+     "barriers": 1,
+     "cmem0": 464,
+     "regs": 128,
+     "spill_loads": 4,
+     "spill_stores": 4,
+     "stack": 8
+    },
+    "k1_bf16_c64_h128_bm128_bn32_wm32_s2_mb4": {
+     "arch": "sm_80",
+     "barriers": 1,
+     "cmem0": 464,
+     "regs": 128,
+     "spill_loads": 36,
+     "spill_stores": 28,
+     "stack": 32
+    },
+    "k1_bf16_c64_h128_bm128_bn64_wm32_s2_mb3": {
+     "arch": "sm_80",
+     "barriers": 1,
+     "cmem0": 464,
+     "regs": 168,
+     "spill_loads": 60,
+     "spill_stores": 40,
+     "stack": 40
+    },
+    "k1_bf16_c64_h256_bm128_bn32_wm32_s2_mb4": {
+     "arch": "sm_80",
+     "barriers": 1,
+     "cmem0": 464,
+     "regs": 128,
+     "spill_loads": 36,
+     "spill_stores": 28,
+     "stack": 32
+    },
+    "k1_bf16_c64_h384_bm128_bn32_wm32_s2_mb4": {
+     "arch": "sm_80",
+     "barriers": 1,
+     "cmem0": 464,
+     "regs": 128,
+     "spill_loads": 36,
+     "spill_stores": 28,
+     "stack": 32
+    },
+    "k1_bf16_c64_h64_bm128_bn16_wm32_s2_mb4": {
+     "arch": "sm_80",
+     "barriers": 1,
+     "cmem0": 464,
+     "regs": 128,
+     "spill_loads": 4,
+     "spill_stores": 4,
+     "stack": 8
+    },
+    "k1_bf16_c64_h64_bm128_bn32_wm32_s2_mb4": {
+     "arch": "sm_80",
+     "barriers": 1,
+     "cmem0": 464,
+     "regs": 128,
+     "spill_loads": 36,
+     "spill_stores": 28,
+     "stack": 32
+    },
+    "k1_bf16_c64_h64_bm128_bn64_wm32_s2_mb3": {
+     "arch": "sm_80",
+     "barriers": 1,
+     "cmem0": 464,
+     "regs": 168,
+     "spill_loads": 60,
+     "spill_stores": 40,
+     "stack": 40
+    },
+    "k1_f32_c128_h128_bm128_bn16_wm32_s2_mb2": {
+     "arch": "sm_80",
+     "barriers": 1,
+     "cmem0": 464,
+     "regs": 255,
+     "spill_loads": 0,
+     "spill_stores": 0,
+     "stack": 0
+    },
+    "k1_f32_c128_h128_bm128_bn16_wm32_s2_mb3": {
+     "arch": "sm_80",
+     "barriers": 1,
+     "cmem0": 464,
+     "regs": 168,
+     "spill_loads": 8,
+     "spill_stores": 8,
+     "stack": 8
+    },
+    "k1_f32_c128_h128_bm128_bn32_wm32_s2_mb3": {
+     "arch": "sm_80",
+     "barriers": 1,
+     "cmem0": 464,
+     "regs": 168,
+     "spill_loads": 40,
+     "spill_stores": 40,
+     "stack": 24
+    },
+    "k1_f32_c128_h128_bm64_bn16_wm16_s2_mb4": {
+     "arch": "sm_80",
+     "barriers": 1,
+     "cmem0": 464,
+     "regs": 128,
+     "spill_loads": 0,
+     "spill_stores": 0,
+     "stack": 0
+    },
+    "k1_f32_c128_h256_bm128_bn32_wm32_s2_mb3": {
+     "arch": "sm_80",
+     "barriers": 1,
+     "cmem0": 464,
+     "regs": 168,
+     "spill_loads": 40,
+     "spill_stores": 40,
+     "stack": 24
+    },
+    "k1_f32_c128_h384_bm128_bn32_wm32_s2_mb3": {
+     "arch": "sm_80",
+     "barriers": 1,
+     "cmem0": 464,
+     "regs": 168,
+     "spill_loads": 40,
+     "spill_stores": 40,
+     "stack": 24
+    },
+    "k1_f32_c128_h64_bm128_bn32_wm32_s2_mb3": {
+     "arch": "sm_80",
+     "barriers": 1,
+     "cmem0": 464,
+     "regs": 168,
+     "spill_loads": 40,
+     "spill_stores": 40,
+     "stack": 24
+    },
+    "k1_f32_c256_h128_bm128_bn32_wm32_s2_mb2": {
+     "arch": "sm_80",
+     "barriers": 1,
+     "cmem0": 464,
+     "regs": 255,
+     "spill_loads": 112,
+     "spill_stores": 136,
+     "stack": 104
+    },
+    "k1_f32_c256_h256_bm128_bn16_wm32_s2_mb2": {
+     "arch": "sm_80",
+     "barriers": 1,
+     "cmem0": 464,
+     "regs": 255,
+     "spill_loads": 136,
+     "spill_stores": 136,
+     "stack": 136
+    },
+    "k1_f32_c256_h256_bm128_bn32_wm32_s2_mb2": {
+     "arch": "sm_80",
+     "barriers": 1,
+     "cmem0": 464,
+     "regs": 255,
+     "spill_loads": 112,
+     "spill_stores": 136,
+     "stack": 104
+    },
+    "k1_f32_c256_h256_bm64_bn32_wm16_s2_mb3": {
+     "arch": "sm_80",
+     "barriers": 1,
+     "cmem0": 464,
+     "regs": 168,
+     "spill_loads": 12,
+     "spill_stores": 12,
+     "stack": 16
+    },
+    "k1_f32_c256_h384_bm128_bn32_wm32_s2_mb2": {
+     "arch": "sm_80",
+     "barriers": 1,
+     "cmem0": 464,
+     "regs": 255,
+     "spill_loads": 112,
+     "spill_stores": 136,
+     "stack": 104
+    },
+    "k1_f32_c256_h64_bm128_bn32_wm32_s2_mb2": {
+     "arch": "sm_80",
+     "barriers": 1,
+     "cmem0": 464,
+     "regs": 255,
+     "spill_loads": 112,
+     "spill_stores": 136,
+     "stack": 104
+    },
+    "k1_f32_c384_h128_bm64_bn16_wm16_s2_mb2": {
+     "arch": "sm_80",
+     "barriers": 1,
+     "cmem0": 464,
+     "regs": 255,
+     "spill_loads": 8,
+     "spill_stores": 4,
+     "stack": 80
+    },
+    "k1_f32_c384_h256_bm64_bn16_wm16_s2_mb2": {
+     "arch": "sm_80",
+     "barriers": 1,
+     "cmem0": 464,
+     "regs": 255,
+     "spill_loads": 0,
+     "spill_stores": 0,
+     "stack": 64
+    },
+    "k1_f32_c384_h384_bm64_bn16_wm16_s2_mb2": {
+     "arch": "sm_80",
+     "barriers": 1,
+     "cmem0": 464,
+     "regs": 255,
+     "spill_loads": 0,
+     "spill_stores": 0,
+     "stack": 64
+    },
+    "k1_f32_c384_h64_bm64_bn16_wm16_s2_mb2": {
+     "arch": "sm_80",
+     "barriers": 1,
+     "cmem0": 464,
+     "regs": 255,
+     "spill_loads": 0,
+     "spill_stores": 0,
+     "stack": 64
+    },
+    "k1_f32_c64_h128_bm128_bn16_wm32_s2_mb4": {
+     "arch": "sm_80",
+     "barriers": 1,
+     "cmem0": 464,
+     "regs": 128,
+     "spill_loads": 0,
+     "spill_stores": 0,
+     "stack": 0
+    },
+    "k1_f32_c64_h256_bm128_bn16_wm32_s2_mb4": {
+     "arch": "sm_80",
+     "barriers": 1,
+     "cmem0": 464,
+     "regs": 128,
+     "spill_loads": 0,
+     "spill_stores": 0,
+     "stack": 0
+    },
+    "k1_f32_c64_h384_bm128_bn16_wm32_s2_mb4": {
+     "arch": "sm_80",
+     "barriers": 1,
+     "cmem0": 464,
+     "regs": 128,
+     "spill_loads": 0,
+     "spill_stores": 0,
+     "stack": 0
+    },
+    "k1_f32_c64_h64_bm128_bn16_wm32_s2_mb4": {
+     "arch": "sm_80",
+     "barriers": 1,
+     "cmem0": 464,
+     "regs": 128,
+     "spill_loads": 0,
+     "spill_stores": 0,
+     "stack": 0
+    },
+    "k1t_bf16_c128_h128_bm128_bn32_wm32_s2_mb3": {
+     "arch": "sm_80",
+     "barriers": 1,
+     "cmem0": 464,
+     "regs": 168,
+     "spill_loads": 68,
+     "spill_stores": 44,
+     "stack": 32
+    },
+    "k1t_bf16_c256_h256_bm128_bn32_wm32_s2_mb2": {
+     "arch": "sm_80",
+     "barriers": 1,
+     "cmem0": 464,
+     "regs": 255,
+     "spill_loads": 80,
+     "spill_stores": 104,
+     "stack": 72
+    },
+    "k1t_bf16_c64_h128_bm128_bn32_wm32_s2_mb4": {
+     "arch": "sm_80",
+     "barriers": 1,
+     "cmem0": 464,
+     "regs": 128,
+     "spill_loads": 16,
+     "spill_stores": 16,
+     "stack": 16
+    },
+    "k1t_bf16_c64_h64_bm128_bn32_wm32_s2_mb4": {
+     "arch": "sm_80",
+     "barriers": 1,
+     "cmem0": 464,
+     "regs": 128,
+     "spill_loads": 16,
+     "spill_stores": 16,
+     "stack": 16
+    },
+    "k1x_bf16_c256_h256_bm128_bn16_wm32_s2_mb2": {
+     "arch": "sm_80",
+     "barriers": 1,
+     "cmem0": 464,
+     "regs": 255,
+     "spill_loads": 48,
+     "spill_stores": 48,
+     "stack": 48
+    },
+    "k1x_bf16_c256_h256_bm128_bn32_wm32_s2_mb2": {
+     "arch": "sm_80",
+     "barriers": 1,
+     "cmem0": 464,
+     "regs": 255,
+     "spill_loads": 84,
+     "spill_stores": 108,
+     "stack": 80
+    },
+    "k1z_f32_c128_h128_bm128_bn16_wm32_s2_mb2": {
+     "arch": "sm_80",
+     "barriers": 1,
+     "cmem0": 464,
+     "regs": 255,
+     "spill_loads": 0,
+     "spill_stores": 0,
+     "stack": 0
+    },
+    "k1z_f32_c128_h128_bm128_bn16_wm32_s2_mb3": {
+     "arch": "sm_80",
+     "barriers": 1,
+     "cmem0": 464,
+     "regs": 168,
+     "spill_loads": 8,
+     "spill_stores": 8,
+     "stack": 8
+    },
+    "k1z_f32_c128_h128_bm128_bn32_wm32_s2_mb3": {
+     "arch": "sm_80",
+     "barriers": 1,
+     "cmem0": 464,
+     "regs": 168,
+     "spill_loads": 96,
+     "spill_stores": 96,
+     "stack": 80
+    },
+    "k1z_f32_c128_h128_bm64_bn16_wm16_s2_mb4": {
+     "arch": "sm_80",
+     "barriers": 1,
+     "cmem0": 464,
+     "regs": 128,
+     "spill_loads": 0,
+     "spill_stores": 0,
+     "stack": 0
+    },
+    "k1z_f32_c128_h256_bm128_bn32_wm32_s2_mb3": {
+     "arch": "sm_80",
+     "barriers": 1,
+     "cmem0": 464,
+     "regs": 168,
+     "spill_loads": 96,
+     "spill_stores": 96,
+     "stack": 80
+    },
+    "k1z_f32_c128_h384_bm128_bn32_wm32_s2_mb3": {
+     "arch": "sm_80",
+     "barriers": 1,
+     "cmem0": 464,
+     "regs": 168,
+     "spill_loads": 96,
+     "spill_stores": 96,
+     "stack": 80
+    },
+    "k1z_f32_c128_h64_bm128_bn32_wm32_s2_mb3": {
+     "arch": "sm_80",
+     "barriers": 1,
+     "cmem0": 464,
+     "regs": 168,
+     "spill_loads": 96,
+     "spill_stores": 96,
+     "stack": 80
+    },
+    "k1z_f32_c256_h128_bm128_bn32_wm32_s2_mb2": {
+     "arch": "sm_80",
+     "barriers": 1,
+     "cmem0": 464,
+     "regs": 255,
+     "spill_loads": 100,
+     "spill_stores": 100,
+     "stack": 104
+    },
+    "k1z_f32_c256_h256_bm128_bn16_wm32_s2_mb2": {
+     "arch": "sm_80",
+     "barriers": 1,
+     "cmem0": 464,
+     "regs": 255,
+     "spill_loads": 124,
+     "spill_stores": 124,
+     "stack": 128
+    },
+    "k1z_f32_c256_h256_bm128_bn32_wm32_s2_mb2": {
+     "arch": "sm_80",
+     "barriers": 1,
+     "cmem0": 464,
+     "regs": 255,
+     "spill_loads": 100,
+     "spill_stores": 100,
+     "stack": 104
+    },
+    "k1z_f32_c256_h256_bm64_bn32_wm16_s2_mb3": {
+     "arch": "sm_80",
+     "barriers": 1,
+     "cmem0": 464,
+     "regs": 168,
+     "spill_loads": 24,
+     "spill_stores": 24,
+     "stack": 24
+    },
+    "k1z_f32_c256_h384_bm128_bn32_wm32_s2_mb2": {
+     "arch": "sm_80",
+     "barriers": 1,
+     "cmem0": 464,
+     "regs": 255,
+     "spill_loads": 100,
+     "spill_stores": 100,
+     "stack": 104
+    },
+    "k1z_f32_c256_h64_bm128_bn32_wm32_s2_mb2": {
+     "arch": "sm_80",
+     "barriers": 1,
+     "cmem0": 464,
+     "regs": 255,
+     "spill_loads": 100,
+     "spill_stores": 100,
+     "stack": 104
+    },
+    "k1z_f32_c384_h128_bm64_bn16_wm16_s2_mb2": {
+     "arch": "sm_80",
+     "barriers": 1,
+     "cmem0": 464,
+     "regs": 255,
+     "spill_loads": 0,
+     "spill_stores": 0,
+     "stack": 64
+    },
+    "k1z_f32_c384_h256_bm64_bn16_wm16_s2_mb2": {
+     "arch": "sm_80",
+     "barriers": 1,
+     "cmem0": 464,
+     "regs": 255,
+     "spill_loads": 0,
+     "spill_stores": 0,
+     "stack": 64
+    },
+    "k1z_f32_c384_h384_bm64_bn16_wm16_s2_mb2": {
+     "arch": "sm_80",
+     "barriers": 1,
+     "cmem0": 464,
+     "regs": 255,
+     "spill_loads": 0,
+     "spill_stores": 0,
+     "stack": 64
+    },
+    "k1z_f32_c384_h64_bm64_bn16_wm16_s2_mb2": {
+     "arch": "sm_80",
+     "barriers": 1,
+     "cmem0": 464,
+     "regs": 255,
+     "spill_loads": 0,
+     "spill_stores": 0,
+     "stack": 64
+    },
+    "k1z_f32_c64_h128_bm128_bn16_wm32_s2_mb4": {
+     "arch": "sm_80",
+     "barriers": 1,
+     "cmem0": 464,
+     "regs": 128,
+     "spill_loads": 0,
+     "spill_stores": 0,
+     "stack": 0
+    },
+    "k1z_f32_c64_h256_bm128_bn16_wm32_s2_mb4": {
+     "arch": "sm_80",
+     "barriers": 1,
+     "cmem0": 464,
+     "regs": 128,
+     "spill_loads": 0,
+     "spill_stores": 0,
+     "stack": 0
+    },
+    "k1z_f32_c64_h384_bm128_bn16_wm32_s2_mb4": {
+     "arch": "sm_80",
+     "barriers": 1,
+     "cmem0": 464,
+     "regs": 128,
+     "spill_loads": 0,
+     "spill_stores": 0,
+     "stack": 0
+    },
+    "k1z_f32_c64_h64_bm128_bn16_wm32_s2_mb4": {
+     "arch": "sm_80",
+     "barriers": 1,
+     "cmem0": 464,
+     "regs": 128,
+     "spill_loads": 0,
+     "spill_stores": 0,
+     "stack": 0
+    }
+   },
+   "nvcc": "Cuda compilation tools, release 13.0, V13.0.88",
+   "nvcc_build": "Build cuda_13.0.r13.0/compiler.36424714_0",
+   "ptxas_log": "sm_80/trimul_k1_sm80.ptxas.txt",
+   "serves": [
+    {
+     "c_hidden": 64,
+     "c_z": 64,
+     "form": "b",
+     "kernel": "k1_bf16_c64_h64_bm128_bn32_wm32_s2_mb4",
+     "part": "k1",
+     "present": true
+    },
+    {
+     "c_hidden": 64,
+     "c_z": 64,
+     "form": "f",
+     "kernel": "k1z_f32_c64_h64_bm128_bn16_wm32_s2_mb4",
+     "part": "k1",
+     "present": true
+    },
+    {
+     "c_hidden": 128,
+     "c_z": 64,
+     "form": "b",
+     "kernel": "k1_bf16_c64_h128_bm128_bn32_wm32_s2_mb4",
+     "part": "k1",
+     "present": true
+    },
+    {
+     "c_hidden": 128,
+     "c_z": 64,
+     "form": "f",
+     "kernel": "k1z_f32_c64_h128_bm128_bn16_wm32_s2_mb4",
+     "part": "k1",
+     "present": true
+    },
+    {
+     "c_hidden": 256,
+     "c_z": 64,
+     "form": "b",
+     "kernel": "k1_bf16_c64_h256_bm128_bn32_wm32_s2_mb4",
+     "part": "k1",
+     "present": true
+    },
+    {
+     "c_hidden": 256,
+     "c_z": 64,
+     "form": "f",
+     "kernel": "k1z_f32_c64_h256_bm128_bn16_wm32_s2_mb4",
+     "part": "k1",
+     "present": true
+    },
+    {
+     "c_hidden": 384,
+     "c_z": 64,
+     "form": "b",
+     "kernel": "k1_bf16_c64_h384_bm128_bn32_wm32_s2_mb4",
+     "part": "k1",
+     "present": true
+    },
+    {
+     "c_hidden": 384,
+     "c_z": 64,
+     "form": "f",
+     "kernel": "k1z_f32_c64_h384_bm128_bn16_wm32_s2_mb4",
+     "part": "k1",
+     "present": true
+    },
+    {
+     "c_hidden": 64,
+     "c_z": 128,
+     "form": "b",
+     "kernel": "k1_bf16_c128_h64_bm128_bn32_wm32_s2_mb3",
+     "part": "k1",
+     "present": true
+    },
+    {
+     "c_hidden": 64,
+     "c_z": 128,
+     "form": "f",
+     "kernel": "k1z_f32_c128_h64_bm128_bn32_wm32_s2_mb3",
+     "part": "k1",
+     "present": true
+    },
+    {
+     "c_hidden": 128,
+     "c_z": 128,
+     "form": "b",
+     "kernel": "k1_bf16_c128_h128_bm128_bn32_wm32_s2_mb3",
+     "part": "k1",
+     "present": true
+    },
+    {
+     "c_hidden": 128,
+     "c_z": 128,
+     "form": "f",
+     "kernel": "k1z_f32_c128_h128_bm128_bn32_wm32_s2_mb3",
+     "part": "k1",
+     "present": true
+    },
+    {
+     "c_hidden": 256,
+     "c_z": 128,
+     "form": "b",
+     "kernel": "k1_bf16_c128_h256_bm128_bn32_wm32_s2_mb3",
+     "part": "k1",
+     "present": true
+    },
+    {
+     "c_hidden": 256,
+     "c_z": 128,
+     "form": "f",
+     "kernel": "k1z_f32_c128_h256_bm128_bn32_wm32_s2_mb3",
+     "part": "k1",
+     "present": true
+    },
+    {
+     "c_hidden": 384,
+     "c_z": 128,
+     "form": "b",
+     "kernel": "k1_bf16_c128_h384_bm128_bn32_wm32_s2_mb3",
+     "part": "k1",
+     "present": true
+    },
+    {
+     "c_hidden": 384,
+     "c_z": 128,
+     "form": "f",
+     "kernel": "k1z_f32_c128_h384_bm128_bn32_wm32_s2_mb3",
+     "part": "k1",
+     "present": true
+    },
+    {
+     "c_hidden": 64,
+     "c_z": 256,
+     "form": "b",
+     "kernel": "k1_bf16_c256_h64_bm128_bn32_wm32_s2_mb2",
+     "part": "k1",
+     "present": true
+    },
+    {
+     "c_hidden": 64,
+     "c_z": 256,
+     "form": "f",
+     "kernel": "k1z_f32_c256_h64_bm128_bn32_wm32_s2_mb2",
+     "part": "k1",
+     "present": true
+    },
+    {
+     "c_hidden": 128,
+     "c_z": 256,
+     "form": "b",
+     "kernel": "k1_bf16_c256_h128_bm128_bn32_wm32_s2_mb2",
+     "part": "k1",
+     "present": true
+    },
+    {
+     "c_hidden": 128,
+     "c_z": 256,
+     "form": "f",
+     "kernel": "k1z_f32_c256_h128_bm128_bn32_wm32_s2_mb2",
+     "part": "k1",
+     "present": true
+    },
+    {
+     "c_hidden": 256,
+     "c_z": 256,
+     "form": "b",
+     "kernel": "k1_bf16_c256_h256_bm128_bn32_wm32_s2_mb2",
+     "part": "k1",
+     "present": true
+    },
+    {
+     "c_hidden": 256,
+     "c_z": 256,
+     "form": "f",
+     "kernel": "k1z_f32_c256_h256_bm128_bn32_wm32_s2_mb2",
+     "part": "k1",
+     "present": true
+    },
+    {
+     "c_hidden": 384,
+     "c_z": 256,
+     "form": "b",
+     "kernel": "k1_bf16_c256_h384_bm128_bn32_wm32_s2_mb2",
+     "part": "k1",
+     "present": true
+    },
+    {
+     "c_hidden": 384,
+     "c_z": 256,
+     "form": "f",
+     "kernel": "k1z_f32_c256_h384_bm128_bn32_wm32_s2_mb2",
+     "part": "k1",
+     "present": true
+    },
+    {
+     "c_hidden": 64,
+     "c_z": 384,
+     "form": "b",
+     "kernel": "k1_bf16_c384_h64_bm64_bn16_wm16_s2_mb2",
+     "part": "k1",
+     "present": true
+    },
+    {
+     "c_hidden": 64,
+     "c_z": 384,
+     "form": "f",
+     "kernel": "k1z_f32_c384_h64_bm64_bn16_wm16_s2_mb2",
+     "part": "k1",
+     "present": true
+    },
+    {
+     "c_hidden": 128,
+     "c_z": 384,
+     "form": "b",
+     "kernel": "k1_bf16_c384_h128_bm64_bn16_wm16_s2_mb2",
+     "part": "k1",
+     "present": true
+    },
+    {
+     "c_hidden": 128,
+     "c_z": 384,
+     "form": "f",
+     "kernel": "k1z_f32_c384_h128_bm64_bn16_wm16_s2_mb2",
+     "part": "k1",
+     "present": true
+    },
+    {
+     "c_hidden": 256,
+     "c_z": 384,
+     "form": "b",
+     "kernel": "k1_bf16_c384_h256_bm64_bn16_wm16_s2_mb2",
+     "part": "k1",
+     "present": true
+    },
+    {
+     "c_hidden": 256,
+     "c_z": 384,
+     "form": "f",
+     "kernel": "k1z_f32_c384_h256_bm64_bn16_wm16_s2_mb2",
+     "part": "k1",
+     "present": true
+    },
+    {
+     "c_hidden": 384,
+     "c_z": 384,
+     "form": "b",
+     "kernel": "k1_bf16_c384_h384_bm64_bn16_wm16_s2_mb2",
+     "part": "k1",
+     "present": true
+    },
+    {
+     "c_hidden": 384,
+     "c_z": 384,
+     "form": "f",
+     "kernel": "k1z_f32_c384_h384_bm64_bn16_wm16_s2_mb2",
+     "part": "k1",
+     "present": true
+    }
+   ],
+   "source": "sm80/trimul_k1_sm80.cu",
+   "sources": {
+    "csrc/sm80/math_sm80.cuh": "28b3ceb8ca20f5038b6e105eea891d44d1b50b578a66fe858d01cd8db20b3309",
+    "csrc/sm80/trimul_k1_sm80.cu": "75708050b55af63182fba89ff154c32b1bf5acd48e9ee70b65d6c320f02cc748"
+   },
+   "unit": "trimul_k1_sm80"
+  },
+  "trimul_k3_sm80/sm_80": {
+   "arch": "sm_80",
+   "built_utc": "2026-09-12T01:45:35Z",
+   "cubin": "sm_80/trimul_k3_sm80.cubin",
+   "cubin_bytes": 4386080,
+   "cubin_sha256": "a39874467c055d8a39b2da3a3bc54ae5338a469140518d3bed895337888232ad",
+   "defines": [],
+   "dev": false,
+   "elf": {
+    "abi_version": 8,
+    "cuinfo": "0200500082000000",
+    "cuinfo_sm": 80,
+    "elf": true,
+    "flags": "0x06005004",
+    "osabi": 65,
+    "sm": 80,
+    "tkinfo": [
+     "ptxas",
+     "Cuda compilation tools, release 13.0, V13.0.88",
+     "Build cuda_13.0.r13.0/compiler.36424714_0",
+     "-v  -arch sm_80 -m 64 "
+    ],
+    "toolkit_version": 130,
+    "version": 1
+   },
+   "flags": [
+    "-cubin",
+    "-arch=sm_80",
+    "-O3",
+    "-std=c++17",
+    "-DNDEBUG",
+    "--expt-relaxed-constexpr",
+    "-Xptxas",
+    "-v",
+    "-I",
+    "csrc",
+    "-I",
+    "csrc/sm80"
+   ],
+   "kernels": {
+    "k3_bf16_c128_h128_bm128_bn16_wm32_s2_mb3": {
+     "arch": "sm_80",
+     "barriers": 1,
+     "cmem0": 480,
+     "regs": 168,
+     "spill_loads": 180,
+     "spill_stores": 180,
+     "stack": 184
+    },
+    "k3_bf16_c128_h128_bm128_bn32_wm32_s1_mb2": {
+     "arch": "sm_80",
+     "barriers": 1,
+     "cmem0": 480,
+     "regs": 255,
+     "spill_loads": 20,
+     "spill_stores": 20,
+     "stack": 24
+    },
+    "k3_bf16_c128_h128_bm128_bn32_wm32_s2_mb2": {
+     "arch": "sm_80",
+     "barriers": 1,
+     "cmem0": 480,
+     "regs": 255,
+     "spill_loads": 44,
+     "spill_stores": 44,
+     "stack": 48
+    },
+    "k3_bf16_c128_h128_bm64_bn16_wm16_s2_mb4": {
+     "arch": "sm_80",
+     "barriers": 1,
+     "cmem0": 480,
+     "regs": 128,
+     "spill_loads": 20,
+     "spill_stores": 20,
+     "stack": 24
+    },
+    "k3_bf16_c128_h128_bm64_bn32_wm32_s1_mb4": {
+     "arch": "sm_80",
+     "barriers": 1,
+     "cmem0": 480,
+     "regs": 255,
+     "spill_loads": 28,
+     "spill_stores": 28,
+     "stack": 32
+    },
+    "k3_bf16_c128_h128_bm64_bn32_wm32_s2_mb3": {
+     "arch": "sm_80",
+     "barriers": 1,
+     "cmem0": 480,
+     "regs": 255,
+     "spill_loads": 44,
+     "spill_stores": 44,
+     "stack": 48
+    },
+    "k3_bf16_c128_h256_bm64_bn16_wm32_s1_mb4": {
+     "arch": "sm_80",
+     "barriers": 1,
+     "cmem0": 480,
+     "regs": 255,
+     "spill_loads": 428,
+     "spill_stores": 428,
+     "stack": 432
+    },
+    "k3_bf16_c128_h384_bm64_bn16_wm16_s1_mb2": {
+     "arch": "sm_80",
+     "barriers": 1,
+     "cmem0": 480,
+     "regs": 255,
+     "spill_loads": 132,
+     "spill_stores": 132,
+     "stack": 136
+    },
+    "k3_bf16_c128_h64_bm128_bn32_wm32_s2_mb2": {
+     "arch": "sm_80",
+     "barriers": 1,
+     "cmem0": 480,
+     "regs": 255,
+     "spill_loads": 0,
+     "spill_stores": 0,
+     "stack": 0
+    },
+    "k3_bf16_c256_h128_bm64_bn16_wm32_s1_mb4": {
+     "arch": "sm_80",
+     "barriers": 1,
+     "cmem0": 480,
+     "regs": 255,
+     "spill_loads": 220,
+     "spill_stores": 220,
+     "stack": 224
+    },
+    "k3_bf16_c256_h256_bm64_bn16_wm32_s1_mb4": {
+     "arch": "sm_80",
+     "barriers": 1,
+     "cmem0": 480,
+     "regs": 255,
+     "spill_loads": 400,
+     "spill_stores": 400,
+     "stack": 360
+    },
+    "k3_bf16_c256_h256_bm64_bn16_wm32_s2_mb2": {
+     "arch": "sm_80",
+     "barriers": 1,
+     "cmem0": 480,
+     "regs": 255,
+     "spill_loads": 368,
+     "spill_stores": 368,
+     "stack": 328
+    },
+    "k3_bf16_c256_h256_bm64_bn32_wm32_s1_mb2": {
+     "arch": "sm_80",
+     "barriers": 1,
+     "cmem0": 480,
+     "regs": 255,
+     "spill_loads": 392,
+     "spill_stores": 384,
+     "stack": 344
+    },
+    "k3_bf16_c256_h384_bm64_bn16_wm16_s1_mb2": {
+     "arch": "sm_80",
+     "barriers": 1,
+     "cmem0": 480,
+     "regs": 255,
+     "spill_loads": 292,
+     "spill_stores": 288,
+     "stack": 256
+    },
+    "k3_bf16_c256_h64_bm64_bn16_wm32_s1_mb4": {
+     "arch": "sm_80",
+     "barriers": 1,
+     "cmem0": 480,
+     "regs": 255,
+     "spill_loads": 64,
+     "spill_stores": 64,
+     "stack": 64
+    },
+    "k3_bf16_c384_h128_bm64_bn16_wm16_s1_mb2": {
+     "arch": "sm_80",
+     "barriers": 1,
+     "cmem0": 480,
+     "regs": 255,
+     "spill_loads": 0,
+     "spill_stores": 0,
+     "stack": 64
+    },
+    "k3_bf16_c384_h256_bm64_bn16_wm16_s1_mb2": {
+     "arch": "sm_80",
+     "barriers": 1,
+     "cmem0": 480,
+     "regs": 255,
+     "spill_loads": 64,
+     "spill_stores": 64,
+     "stack": 128
+    },
+    "k3_bf16_c384_h384_bm64_bn16_wm16_s1_mb1": {
+     "arch": "sm_80",
+     "barriers": 1,
+     "cmem0": 480,
+     "regs": 255,
+     "spill_loads": 232,
+     "spill_stores": 232,
+     "stack": 304
+    },
+    "k3_bf16_c384_h64_bm64_bn16_wm16_s1_mb2": {
+     "arch": "sm_80",
+     "barriers": 1,
+     "cmem0": 480,
+     "regs": 255,
+     "spill_loads": 0,
+     "spill_stores": 0,
+     "stack": 64
+    },
+    "k3_bf16_c64_h128_bm128_bn16_wm32_s2_mb4": {
+     "arch": "sm_80",
+     "barriers": 1,
+     "cmem0": 480,
+     "regs": 128,
+     "spill_loads": 480,
+     "spill_stores": 480,
+     "stack": 456
+    },
+    "k3_bf16_c64_h128_bm128_bn32_wm32_s2_mb3": {
+     "arch": "sm_80",
+     "barriers": 1,
+     "cmem0": 480,
+     "regs": 168,
+     "spill_loads": 188,
+     "spill_stores": 188,
+     "stack": 144
+    },
+    "k3_bf16_c64_h128_bm64_bn32_wm32_s2_mb4": {
+     "arch": "sm_80",
+     "barriers": 1,
+     "cmem0": 480,
+     "regs": 255,
+     "spill_loads": 8,
+     "spill_stores": 8,
+     "stack": 8
+    },
+    "k3_bf16_c64_h256_bm64_bn16_wm32_s1_mb4": {
+     "arch": "sm_80",
+     "barriers": 1,
+     "cmem0": 480,
+     "regs": 255,
+     "spill_loads": 232,
+     "spill_stores": 232,
+     "stack": 208
+    },
+    "k3_bf16_c64_h384_bm64_bn16_wm16_s1_mb2": {
+     "arch": "sm_80",
+     "barriers": 1,
+     "cmem0": 480,
+     "regs": 255,
+     "spill_loads": 68,
+     "spill_stores": 68,
+     "stack": 72
+    },
+    "k3_bf16_c64_h64_bm128_bn16_wm32_s2_mb4": {
+     "arch": "sm_80",
+     "barriers": 1,
+     "cmem0": 480,
+     "regs": 128,
+     "spill_loads": 28,
+     "spill_stores": 28,
+     "stack": 32
+    },
+    "k3_bf16_c64_h64_bm128_bn32_wm32_s2_mb4": {
+     "arch": "sm_80",
+     "barriers": 1,
+     "cmem0": 480,
+     "regs": 128,
+     "spill_loads": 108,
+     "spill_stores": 100,
+     "stack": 104
+    },
+    "k3_bf16_c64_h64_bm64_bn32_wm32_s2_mb6": {
+     "arch": "sm_80",
+     "barriers": 1,
+     "cmem0": 480,
+     "regs": 168,
+     "spill_loads": 104,
+     "spill_stores": 104,
+     "stack": 104
+    },
+    "k3_f32_c128_h128_bm128_bn16_wm32_s2_mb2": {
+     "arch": "sm_80",
+     "barriers": 1,
+     "cmem0": 480,
+     "regs": 255,
+     "spill_loads": 168,
+     "spill_stores": 168,
+     "stack": 168
+    },
+    "k3_f32_c128_h128_bm128_bn32_wm32_s1_mb2": {
+     "arch": "sm_80",
+     "barriers": 1,
+     "cmem0": 480,
+     "regs": 255,
+     "spill_loads": 100,
+     "spill_stores": 100,
+     "stack": 104
+    },
+    "k3_f32_c128_h128_bm64_bn16_wm16_s2_mb4": {
+     "arch": "sm_80",
+     "barriers": 1,
+     "cmem0": 480,
+     "regs": 128,
+     "spill_loads": 100,
+     "spill_stores": 100,
+     "stack": 104
+    },
+    "k3_f32_c128_h128_bm64_bn16_wm32_s2_mb4": {
+     "arch": "sm_80",
+     "barriers": 1,
+     "cmem0": 480,
+     "regs": 255,
+     "spill_loads": 168,
+     "spill_stores": 168,
+     "stack": 168
+    },
+    "k3_f32_c128_h128_bm64_bn32_wm32_s1_mb4": {
+     "arch": "sm_80",
+     "barriers": 1,
+     "cmem0": 480,
+     "regs": 255,
+     "spill_loads": 100,
+     "spill_stores": 100,
+     "stack": 104
+    },
+    "k3_f32_c128_h256_bm64_bn16_wm32_s1_mb4": {
+     "arch": "sm_80",
+     "barriers": 1,
+     "cmem0": 480,
+     "regs": 255,
+     "spill_loads": 388,
+     "spill_stores": 388,
+     "stack": 384
+    },
+    "k3_f32_c128_h384_bm64_bn16_wm16_s1_mb2": {
+     "arch": "sm_80",
+     "barriers": 1,
+     "cmem0": 480,
+     "regs": 255,
+     "spill_loads": 120,
+     "spill_stores": 120,
+     "stack": 120
+    },
+    "k3_f32_c128_h64_bm64_bn32_wm32_s1_mb4": {
+     "arch": "sm_80",
+     "barriers": 1,
+     "cmem0": 480,
+     "regs": 255,
+     "spill_loads": 4,
+     "spill_stores": 4,
+     "stack": 8
+    },
+    "k3_f32_c256_h128_bm64_bn16_wm32_s1_mb4": {
+     "arch": "sm_80",
+     "barriers": 1,
+     "cmem0": 480,
+     "regs": 255,
+     "spill_loads": 232,
+     "spill_stores": 232,
+     "stack": 232
+    },
+    "k3_f32_c256_h256_bm64_bn16_wm16_s2_mb2": {
+     "arch": "sm_80",
+     "barriers": 1,
+     "cmem0": 480,
+     "regs": 255,
+     "spill_loads": 48,
+     "spill_stores": 48,
+     "stack": 48
+    },
+    "k3_f32_c256_h256_bm64_bn16_wm32_s1_mb4": {
+     "arch": "sm_80",
+     "barriers": 1,
+     "cmem0": 480,
+     "regs": 255,
+     "spill_loads": 368,
+     "spill_stores": 368,
+     "stack": 336
+    },
+    "k3_f32_c256_h256_bm64_bn32_wm32_s1_mb2": {
+     "arch": "sm_80",
+     "barriers": 1,
+     "cmem0": 480,
+     "regs": 255,
+     "spill_loads": 360,
+     "spill_stores": 360,
+     "stack": 328
+    },
+    "k3_f32_c256_h384_bm64_bn16_wm16_s1_mb2": {
+     "arch": "sm_80",
+     "barriers": 1,
+     "cmem0": 480,
+     "regs": 255,
+     "spill_loads": 240,
+     "spill_stores": 240,
+     "stack": 240
+    },
+    "k3_f32_c256_h64_bm64_bn16_wm32_s1_mb4": {
+     "arch": "sm_80",
+     "barriers": 1,
+     "cmem0": 480,
+     "regs": 255,
+     "spill_loads": 156,
+     "spill_stores": 156,
+     "stack": 160
+    },
+    "k3_f32_c384_h128_bm64_bn16_wm16_s1_mb2": {
+     "arch": "sm_80",
+     "barriers": 1,
+     "cmem0": 480,
+     "regs": 255,
+     "spill_loads": 0,
+     "spill_stores": 0,
+     "stack": 64
+    },
+    "k3_f32_c384_h256_bm64_bn16_wm16_s1_mb2": {
+     "arch": "sm_80",
+     "barriers": 1,
+     "cmem0": 480,
+     "regs": 255,
+     "spill_loads": 4,
+     "spill_stores": 4,
+     "stack": 80
+    },
+    "k3_f32_c384_h384_bm64_bn16_wm16_s1_mb1": {
+     "arch": "sm_80",
+     "barriers": 1,
+     "cmem0": 480,
+     "regs": 255,
+     "spill_loads": 160,
+     "spill_stores": 160,
+     "stack": 224
+    },
+    "k3_f32_c384_h64_bm64_bn16_wm16_s1_mb2": {
+     "arch": "sm_80",
+     "barriers": 1,
+     "cmem0": 480,
+     "regs": 255,
+     "spill_loads": 0,
+     "spill_stores": 0,
+     "stack": 64
+    },
+    "k3_f32_c64_h128_bm128_bn16_wm32_s2_mb4": {
+     "arch": "sm_80",
+     "barriers": 1,
+     "cmem0": 480,
+     "regs": 128,
+     "spill_loads": 572,
+     "spill_stores": 572,
+     "stack": 504
+    },
+    "k3_f32_c64_h256_bm64_bn16_wm32_s1_mb4": {
+     "arch": "sm_80",
+     "barriers": 1,
+     "cmem0": 480,
+     "regs": 255,
+     "spill_loads": 336,
+     "spill_stores": 336,
+     "stack": 336
+    },
+    "k3_f32_c64_h384_bm64_bn16_wm16_s1_mb2": {
+     "arch": "sm_80",
+     "barriers": 1,
+     "cmem0": 480,
+     "regs": 255,
+     "spill_loads": 56,
+     "spill_stores": 56,
+     "stack": 56
+    },
+    "k3_f32_c64_h64_bm128_bn16_wm32_s2_mb4": {
+     "arch": "sm_80",
+     "barriers": 1,
+     "cmem0": 480,
+     "regs": 128,
+     "spill_loads": 56,
+     "spill_stores": 56,
+     "stack": 56
+    },
+    "k3p_f32_c128_h128_bm128_bn16_wm32_s2_mb2": {
+     "arch": "sm_80",
+     "barriers": 1,
+     "cmem0": 480,
+     "regs": 255,
+     "spill_loads": 0,
+     "spill_stores": 0,
+     "stack": 0
+    },
+    "k3p_f32_c128_h128_bm128_bn32_wm32_s1_mb2": {
+     "arch": "sm_80",
+     "barriers": 1,
+     "cmem0": 480,
+     "regs": 254,
+     "spill_loads": 0,
+     "spill_stores": 0,
+     "stack": 0
+    },
+    "k3p_f32_c128_h128_bm64_bn16_wm16_s2_mb4": {
+     "arch": "sm_80",
+     "barriers": 1,
+     "cmem0": 480,
+     "regs": 128,
+     "spill_loads": 0,
+     "spill_stores": 0,
+     "stack": 0
+    },
+    "k3p_f32_c128_h128_bm64_bn16_wm32_s2_mb4": {
+     "arch": "sm_80",
+     "barriers": 1,
+     "cmem0": 480,
+     "regs": 254,
+     "spill_loads": 0,
+     "spill_stores": 0,
+     "stack": 0
+    },
+    "k3p_f32_c128_h128_bm64_bn32_wm32_s1_mb4": {
+     "arch": "sm_80",
+     "barriers": 1,
+     "cmem0": 480,
+     "regs": 253,
+     "spill_loads": 0,
+     "spill_stores": 0,
+     "stack": 0
+    },
+    "k3p_f32_c128_h256_bm64_bn16_wm32_s1_mb4": {
+     "arch": "sm_80",
+     "barriers": 1,
+     "cmem0": 480,
+     "regs": 255,
+     "spill_loads": 132,
+     "spill_stores": 132,
+     "stack": 136
+    },
+    "k3p_f32_c128_h384_bm64_bn16_wm16_s1_mb2": {
+     "arch": "sm_80",
+     "barriers": 1,
+     "cmem0": 480,
+     "regs": 255,
+     "spill_loads": 0,
+     "spill_stores": 0,
+     "stack": 0
+    },
+    "k3p_f32_c128_h64_bm64_bn32_wm32_s1_mb4": {
+     "arch": "sm_80",
+     "barriers": 1,
+     "cmem0": 480,
+     "regs": 207,
+     "spill_loads": 0,
+     "spill_stores": 0,
+     "stack": 0
+    },
+    "k3p_f32_c256_h128_bm64_bn16_wm32_s1_mb4": {
+     "arch": "sm_80",
+     "barriers": 1,
+     "cmem0": 480,
+     "regs": 254,
+     "spill_loads": 0,
+     "spill_stores": 0,
+     "stack": 0
+    },
+    "k3p_f32_c256_h256_bm64_bn16_wm16_s2_mb2": {
+     "arch": "sm_80",
+     "barriers": 1,
+     "cmem0": 480,
+     "regs": 254,
+     "spill_loads": 0,
+     "spill_stores": 0,
+     "stack": 0
+    },
+    "k3p_f32_c256_h256_bm64_bn16_wm32_s1_mb4": {
+     "arch": "sm_80",
+     "barriers": 1,
+     "cmem0": 480,
+     "regs": 255,
+     "spill_loads": 132,
+     "spill_stores": 132,
+     "stack": 136
+    },
+    "k3p_f32_c256_h256_bm64_bn32_wm32_s1_mb2": {
+     "arch": "sm_80",
+     "barriers": 1,
+     "cmem0": 480,
+     "regs": 255,
+     "spill_loads": 128,
+     "spill_stores": 128,
+     "stack": 128
+    },
+    "k3p_f32_c256_h384_bm64_bn16_wm16_s1_mb2": {
+     "arch": "sm_80",
+     "barriers": 1,
+     "cmem0": 480,
+     "regs": 255,
+     "spill_loads": 0,
+     "spill_stores": 0,
+     "stack": 0
+    },
+    "k3p_f32_c256_h64_bm64_bn16_wm32_s1_mb4": {
+     "arch": "sm_80",
+     "barriers": 1,
+     "cmem0": 480,
+     "regs": 164,
+     "spill_loads": 0,
+     "spill_stores": 0,
+     "stack": 0
+    },
+    "k3p_f32_c384_h128_bm64_bn16_wm16_s1_mb2": {
+     "arch": "sm_80",
+     "barriers": 1,
+     "cmem0": 480,
+     "regs": 190,
+     "spill_loads": 0,
+     "spill_stores": 0,
+     "stack": 0
+    },
+    "k3p_f32_c384_h256_bm64_bn16_wm16_s1_mb2": {
+     "arch": "sm_80",
+     "barriers": 1,
+     "cmem0": 480,
+     "regs": 255,
+     "spill_loads": 0,
+     "spill_stores": 0,
+     "stack": 0
+    },
+    "k3p_f32_c384_h384_bm64_bn16_wm16_s1_mb1": {
+     "arch": "sm_80",
+     "barriers": 1,
+     "cmem0": 480,
+     "regs": 255,
+     "spill_loads": 0,
+     "spill_stores": 0,
+     "stack": 0
+    },
+    "k3p_f32_c384_h64_bm64_bn16_wm16_s1_mb2": {
+     "arch": "sm_80",
+     "barriers": 1,
+     "cmem0": 480,
+     "regs": 154,
+     "spill_loads": 0,
+     "spill_stores": 0,
+     "stack": 0
+    },
+    "k3p_f32_c64_h128_bm128_bn16_wm32_s2_mb4": {
+     "arch": "sm_80",
+     "barriers": 1,
+     "cmem0": 480,
+     "regs": 128,
+     "spill_loads": 432,
+     "spill_stores": 432,
+     "stack": 392
+    },
+    "k3p_f32_c64_h256_bm64_bn16_wm32_s1_mb4": {
+     "arch": "sm_80",
+     "barriers": 1,
+     "cmem0": 480,
+     "regs": 255,
+     "spill_loads": 120,
+     "spill_stores": 120,
+     "stack": 120
+    },
+    "k3p_f32_c64_h384_bm64_bn16_wm16_s1_mb2": {
+     "arch": "sm_80",
+     "barriers": 1,
+     "cmem0": 480,
+     "regs": 255,
+     "spill_loads": 0,
+     "spill_stores": 0,
+     "stack": 0
+    },
+    "k3p_f32_c64_h64_bm128_bn16_wm32_s2_mb4": {
+     "arch": "sm_80",
+     "barriers": 1,
+     "cmem0": 480,
+     "regs": 128,
+     "spill_loads": 0,
+     "spill_stores": 0,
+     "stack": 0
+    },
+    "k3t_bf16_c128_h128_bm128_bn32_wm32_s2_mb2": {
+     "arch": "sm_80",
+     "barriers": 1,
+     "cmem0": 480,
+     "regs": 255,
+     "spill_loads": 32,
+     "spill_stores": 32,
+     "stack": 32
+    },
+    "k3t_bf16_c256_h256_bm64_bn16_wm32_s1_mb4": {
+     "arch": "sm_80",
+     "barriers": 1,
+     "cmem0": 480,
+     "regs": 255,
+     "spill_loads": 372,
+     "spill_stores": 372,
+     "stack": 336
+    },
+    "k3t_bf16_c64_h128_bm64_bn32_wm32_s2_mb4": {
+     "arch": "sm_80",
+     "barriers": 1,
+     "cmem0": 480,
+     "regs": 255,
+     "spill_loads": 12,
+     "spill_stores": 12,
+     "stack": 16
+    },
+    "k3t_bf16_c64_h64_bm128_bn32_wm32_s2_mb4": {
+     "arch": "sm_80",
+     "barriers": 1,
+     "cmem0": 480,
+     "regs": 128,
+     "spill_loads": 112,
+     "spill_stores": 104,
+     "stack": 104
+    },
+    "k3x1_bf16_c256_h256_bm64_bn16_wm32_s1_mb4": {
+     "arch": "sm_80",
+     "barriers": 1,
+     "cmem0": 480,
+     "regs": 255,
+     "spill_loads": 488,
+     "spill_stores": 484,
+     "stack": 400
+    },
+    "k3x2_bf16_c256_h256_bm64_bn16_wm32_s1_mb4": {
+     "arch": "sm_80",
+     "barriers": 1,
+     "cmem0": 480,
+     "regs": 255,
+     "spill_loads": 496,
+     "spill_stores": 492,
+     "stack": 456
+    }
+   },
+   "nvcc": "Cuda compilation tools, release 13.0, V13.0.88",
+   "nvcc_build": "Build cuda_13.0.r13.0/compiler.36424714_0",
+   "ptxas_log": "sm_80/trimul_k3_sm80.ptxas.txt",
+   "serves": [
+    {
+     "c_hidden": 64,
+     "c_z": 64,
+     "form": "b",
+     "kernel": "k3_bf16_c64_h64_bm128_bn16_wm32_s2_mb4",
+     "part": "k3",
+     "present": true
+    },
+    {
+     "c_hidden": 64,
+     "c_z": 64,
+     "form": "f",
+     "kernel": "k3p_f32_c64_h64_bm128_bn16_wm32_s2_mb4",
+     "part": "k3",
+     "present": true
+    },
+    {
+     "c_hidden": 128,
+     "c_z": 64,
+     "form": "b",
+     "kernel": "k3_bf16_c64_h128_bm64_bn32_wm32_s2_mb4",
+     "part": "k3",
+     "present": true
+    },
+    {
+     "c_hidden": 128,
+     "c_z": 64,
+     "form": "f",
+     "kernel": "k3p_f32_c64_h128_bm128_bn16_wm32_s2_mb4",
+     "part": "k3",
+     "present": true
+    },
+    {
+     "c_hidden": 256,
+     "c_z": 64,
+     "form": "b",
+     "kernel": "k3_bf16_c64_h256_bm64_bn16_wm32_s1_mb4",
+     "part": "k3",
+     "present": true
+    },
+    {
+     "c_hidden": 256,
+     "c_z": 64,
+     "form": "f",
+     "kernel": "k3p_f32_c64_h256_bm64_bn16_wm32_s1_mb4",
+     "part": "k3",
+     "present": true
+    },
+    {
+     "c_hidden": 384,
+     "c_z": 64,
+     "form": "b",
+     "kernel": "k3_bf16_c64_h384_bm64_bn16_wm16_s1_mb2",
+     "part": "k3",
+     "present": true
+    },
+    {
+     "c_hidden": 384,
+     "c_z": 64,
+     "form": "f",
+     "kernel": "k3p_f32_c64_h384_bm64_bn16_wm16_s1_mb2",
+     "part": "k3",
+     "present": true
+    },
+    {
+     "c_hidden": 64,
+     "c_z": 128,
+     "form": "b",
+     "kernel": "k3_bf16_c128_h64_bm128_bn32_wm32_s2_mb2",
+     "part": "k3",
+     "present": true
+    },
+    {
+     "c_hidden": 64,
+     "c_z": 128,
+     "form": "f",
+     "kernel": "k3p_f32_c128_h64_bm64_bn32_wm32_s1_mb4",
+     "part": "k3",
+     "present": true
+    },
+    {
+     "c_hidden": 128,
+     "c_z": 128,
+     "form": "b",
+     "kernel": "k3_bf16_c128_h128_bm128_bn32_wm32_s2_mb2",
+     "part": "k3",
+     "present": true
+    },
+    {
+     "c_hidden": 128,
+     "c_z": 128,
+     "form": "f",
+     "kernel": "k3p_f32_c128_h128_bm128_bn32_wm32_s1_mb2",
+     "part": "k3",
+     "present": true
+    },
+    {
+     "c_hidden": 256,
+     "c_z": 128,
+     "form": "b",
+     "kernel": "k3_bf16_c128_h256_bm64_bn16_wm32_s1_mb4",
+     "part": "k3",
+     "present": true
+    },
+    {
+     "c_hidden": 256,
+     "c_z": 128,
+     "form": "f",
+     "kernel": "k3p_f32_c128_h256_bm64_bn16_wm32_s1_mb4",
+     "part": "k3",
+     "present": true
+    },
+    {
+     "c_hidden": 384,
+     "c_z": 128,
+     "form": "b",
+     "kernel": "k3_bf16_c128_h384_bm64_bn16_wm16_s1_mb2",
+     "part": "k3",
+     "present": true
+    },
+    {
+     "c_hidden": 384,
+     "c_z": 128,
+     "form": "f",
+     "kernel": "k3p_f32_c128_h384_bm64_bn16_wm16_s1_mb2",
+     "part": "k3",
+     "present": true
+    },
+    {
+     "c_hidden": 64,
+     "c_z": 256,
+     "form": "b",
+     "kernel": "k3_bf16_c256_h64_bm64_bn16_wm32_s1_mb4",
+     "part": "k3",
+     "present": true
+    },
+    {
+     "c_hidden": 64,
+     "c_z": 256,
+     "form": "f",
+     "kernel": "k3p_f32_c256_h64_bm64_bn16_wm32_s1_mb4",
+     "part": "k3",
+     "present": true
+    },
+    {
+     "c_hidden": 128,
+     "c_z": 256,
+     "form": "b",
+     "kernel": "k3_bf16_c256_h128_bm64_bn16_wm32_s1_mb4",
+     "part": "k3",
+     "present": true
+    },
+    {
+     "c_hidden": 128,
+     "c_z": 256,
+     "form": "f",
+     "kernel": "k3p_f32_c256_h128_bm64_bn16_wm32_s1_mb4",
+     "part": "k3",
+     "present": true
+    },
+    {
+     "c_hidden": 256,
+     "c_z": 256,
+     "form": "b",
+     "kernel": "k3_bf16_c256_h256_bm64_bn16_wm32_s1_mb4",
+     "part": "k3",
+     "present": true
+    },
+    {
+     "c_hidden": 256,
+     "c_z": 256,
+     "form": "f",
+     "kernel": "k3p_f32_c256_h256_bm64_bn16_wm32_s1_mb4",
+     "part": "k3",
+     "present": true
+    },
+    {
+     "c_hidden": 384,
+     "c_z": 256,
+     "form": "b",
+     "kernel": "k3_bf16_c256_h384_bm64_bn16_wm16_s1_mb2",
+     "part": "k3",
+     "present": true
+    },
+    {
+     "c_hidden": 384,
+     "c_z": 256,
+     "form": "f",
+     "kernel": "k3p_f32_c256_h384_bm64_bn16_wm16_s1_mb2",
+     "part": "k3",
+     "present": true
+    },
+    {
+     "c_hidden": 64,
+     "c_z": 384,
+     "form": "b",
+     "kernel": "k3_bf16_c384_h64_bm64_bn16_wm16_s1_mb2",
+     "part": "k3",
+     "present": true
+    },
+    {
+     "c_hidden": 64,
+     "c_z": 384,
+     "form": "f",
+     "kernel": "k3p_f32_c384_h64_bm64_bn16_wm16_s1_mb2",
+     "part": "k3",
+     "present": true
+    },
+    {
+     "c_hidden": 128,
+     "c_z": 384,
+     "form": "b",
+     "kernel": "k3_bf16_c384_h128_bm64_bn16_wm16_s1_mb2",
+     "part": "k3",
+     "present": true
+    },
+    {
+     "c_hidden": 128,
+     "c_z": 384,
+     "form": "f",
+     "kernel": "k3p_f32_c384_h128_bm64_bn16_wm16_s1_mb2",
+     "part": "k3",
+     "present": true
+    },
+    {
+     "c_hidden": 256,
+     "c_z": 384,
+     "form": "b",
+     "kernel": "k3_bf16_c384_h256_bm64_bn16_wm16_s1_mb2",
+     "part": "k3",
+     "present": true
+    },
+    {
+     "c_hidden": 256,
+     "c_z": 384,
+     "form": "f",
+     "kernel": "k3p_f32_c384_h256_bm64_bn16_wm16_s1_mb2",
+     "part": "k3",
+     "present": true
+    },
+    {
+     "c_hidden": 384,
+     "c_z": 384,
+     "form": "b",
+     "kernel": "k3_bf16_c384_h384_bm64_bn16_wm16_s1_mb1",
+     "part": "k3",
+     "present": true
+    },
+    {
+     "c_hidden": 384,
+     "c_z": 384,
+     "form": "f",
+     "kernel": "k3p_f32_c384_h384_bm64_bn16_wm16_s1_mb1",
+     "part": "k3",
+     "present": true
+    }
+   ],
+   "source": "sm80/trimul_k3_sm80.cu",
+   "sources": {
+    "csrc/sm80/math_sm80.cuh": "28b3ceb8ca20f5038b6e105eea891d44d1b50b578a66fe858d01cd8db20b3309",
+    "csrc/sm80/trimul_k3_sm80.cu": "f60b23e4cd803bf3739124a1e5bf0c86b9b8129a64a38b46977b1d4f64d1307f"
+   },
+   "unit": "trimul_k3_sm80"
+  }
+ }
+}

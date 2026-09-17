@@ -1,0 +1,12 @@
+{
+ "exports": {},
+ "kind": "package",
+ "license": "the release tree's own code (no third-party header)",
+ "mechanism": "pair.transition_swiglu",
+ "name": "fpf_transition_v2",
+ "not_carried": {},
+ "runtime_imports": [],
+ "runtime_imports_note": "none; pure functions over tensors: pack_weights(ln_w, ln_b, w_a, w_b, w_out, eps, device) -> Packed, launch(x2d, packed, mask1d, residual, out2d, cfg) / fused_transition(...); the core's serve layer packs from canonical weight keys and launches with the row of opt_core/attn/pair_fused_cells.json (variant v2_fold)",
+ "served_note": "out = [x +] [mask *] W_out(silu(W_a y) * W_b y), y = LN(x) in-kernel (fp32 statistics), bf16 rows [M, c] with unit column stride and any row stride, mask [M] of any bool/int/float dtype ({0,1} masks folded into the GEMM input rows, general masks multiplied in the epilogue), residual re-read and added in fp32 with one rounding, in place allowed (out2d is x2d); sm_90 rows {(128,512),(64,128),(64,256),(256,1024),(384,1536)}; other capabilities and shapes raise Unsupported by name; int64 row offsets; deterministic (fixed hidden-chunk order, no atomics)",
+ "version": "fpf_transition_v2 2.2.0"
+}

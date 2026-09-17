@@ -1,0 +1,64 @@
+{
+ "carried_digests": {
+  "dit_exact/CELLS.json": "4fd7a3db0f3260065589d3b2c58519298769bfbd476c0d6bd17620e3fd4715dc",
+  "dit_exact/LICENSE_NOTE.md": "f661751ab7f0f34b75ec292f4114e27dc44801db1885fe68e7d7ec544a2d8fb5",
+  "dit_exact/__init__.py": "7d00492db1d8303bfec3ac7ab455ad6deef70fbf49fcca2714641661c7cbdc36",
+  "dit_exact/build_prebuilt.py": "d71a8a6539d10e4bd8661d964a6206ea5b0e7f7b1c668f41462d3ae8a1da59ee",
+  "dit_exact/csrc/dit_attn_exact.cu": "27af200d33676ad05fa1615bf1b3aa18b28a5c0dd211ed6ea60636c98ab8bc7c",
+  "dit_exact/prebuilt/torch2.13.0-cu130-sm90/PROVENANCE.md": "3faccfa2a5a4a5bd24bf0889f37fdbd2de19bd2c779378122091dee169592a40",
+  "dit_exact/prebuilt/torch2.13.0-cu130-sm90/dit_attn_exact.so": "f95aea477b48cd92c960b761c581b816c93a84cf24b6545706490cc25054c9ed",
+  "dit_exact/prebuilt/torch2.13.0-cu130-sm90/manifest.json": "1ea00650f1d727c9c75a88235d812ef22581dd576e8447274ee33be90576b5d9",
+  "dit_exact/vectors.json": "1873f46945e331d7e84a6fe22a97681e3c0eec17b25ac5d8c80631fd96ac80dd",
+  "ditfast/CELLS.json": "32c5fb59550192b4368a05ee8fdedd20e0a21128ebf10fa8cee536eaa663b7cd",
+  "ditfast/NOTICE": "42f8ef55018cb40fce16bd86a0181e796e7601d5097ecafc3aec8d405b4f351b",
+  "ditfast/atom_kernels.py": "9b331bb583150492455f41c9a0d41003ca9ab54f53b3489636f09ec41c6f8b91",
+  "ditfast/kernels.py": "0d778be1ad5160a51acb4561e7eecffce03d984c27cb2aaa6e8ca699e8c60aa6",
+  "ef2/ef2_pairbias_attn.py": "5ad48c423ec89703fcdbeec2a1cdfefef466e58a96da2b84f07e795826c8fcad",
+  "fpf_apb/CELLS.json": "8c1685b536f1913d0922b4c71feb4256c5cdfe53f85f00e08aed9abf2f4ed8b8",
+  "fpf_apb/NOTICE.md": "278d2eb35672bdd6514b6e72826998c025ba9de521a382d55ec226b9caa269f8",
+  "fpf_apb/VECTORS.json": "9af32f25cfe1242598be2c73ea3b74a0cb98f19a94e994d6cd938576970c0752",
+  "fpf_apb/__init__.py": "db5a60e6f3e4dbdab2e421603523959b961f0197ae2474164ca1e0be756f1f43",
+  "fpf_apb/atom_triton.py": "af39e7c06bd8e937513d5f9ccf7c8d7665a489a37eb0c2a2b163f737bed0f4a3",
+  "fpf_apb/install.py": "107093874caba31b496e534940e3c85d9be7e2fb01e676a2bc9419fbd27a2d97",
+  "fpf_apb/loadcheck.py": "e13d974f712d7d4ac835f6c8644a9b2cbb8fefd325d6ff5e3476aa779ead94ff",
+  "fpf_apb/pf_triton.py": "0e5f2e66098be338efd8c656556cd39b1cda15a5f48246ba4188b73a01e520de",
+  "l3a/__init__.py": "12800199863a24fb31c4ebe6cdd991c9e9a96c6773664c27550059b97cecba3d",
+  "l3a/bias_layout.py": "4d2bcb9b0c0c0614767c708c45ea041cf90d0fd23f59d95aae0c4c14471c5b81",
+  "l3a/fab_batched.py": "85444b7b1e52da0c40dbe0def9ac72c7e8402f3f2811d2992c00a130f253b492",
+  "atom_exact/kernel.py": "de7592b04f045a9b509cd0743eebc262e99731b730921cfe6de6791797b95df1",
+  "atom_exact/CELLS.json": "1428cf5c41c627f80a3cecd31bcb3160694ed7c989fc3d26113cce7bc2af0635",
+  "atom_exact/vectors.json": "d40810d8fffa4c8db0cd7102540108f93e93e24ae9309c8a663edf3da406f01f",
+  "atom_exact/NOTICE": "9f9c0f12413ee73879bab168dc8b652aec68af9df70dbe23f07493e0ab13de5c",
+  "atom_exact/README.md": "f2258a8b49afa2bb058bcb71327f72f673a7a6de28dc2a916a0986d1fd4f418a"
+ },
+ "carried_digests_note": "sha256 of every donor-byte file under kernels/apb/ (the face, the cells table, NOTICE / marker files and the entries of not_byte_identical are the core's own); tests/test_apb_provider_cells.py checks the carried copy against these digests always, and against any kit copy of the same NAME found in the release tree with the same digest -- a kit copy that is absent or was edited after the carry SKIPS with the reason named, never fails",
+ "carried_wording": {
+  "fpf_apb/loadcheck.py": "line 1 of its docstring names the source kit's packaging exercise by its project word; the file is carried byte-identically with the rest of the package (the provider's byte-identity test pins it), so the word stays as the source wrote it -- it is provenance text inside a carried file, not this tree's vocabulary"
+ },
+ "exports": {},
+ "kind": "package",
+ "license": "fpf_apb/NOTICE.md (carried package protenix_fpf_apb 0.2.2: original source, this repository; Apache-2.0 lineage of the model code it serves is that kit's PROTENIX_LICENSE, no third-party source copied); dit_exact/LICENSE_NOTE.md (carried package protenix_fpf_dit_attn_exact 1.0.0 incl. csrc/ and the prebuilt sm_90 binary built from it; original source); l3a/NOTICE.md (fab_batched.py + bias_layout.py + __init__.py byte-identical to their source branch; original source, this repository); ef2/ef2_pairbias_attn.py (original source; imports the ESM-family image's transformers fork, none copied); the face and APB_CELLS.json are the core's own; ditfast/NOTICE (carried package: first-party fused-DiT row kernels written in this repository, no third-party source; kernels.py + atom_kernels.py + CELLS.json + NOTICE byte-identical to the three kits' copies); atom_exact/NOTICE (the producing kit's first-party kernel; no third-party source)",
+ "mechanism": "kernels.apb.select / kernels.apb.pair_bias_attention / atom_attention / pair_bias_planes / dit_block_rows",
+ "name": "apb",
+ "not_byte_identical": {
+  "apb/dit_exact/prebuilt/torch2.7.1-cu126-sm90/": "carried byte-identically from the kit-namespaced copy of the same package built on the torch 2.7.1+cu126 image (dit_attn_exact.so sha256 405933ef29262dd15ec073c1c28e93d091381017eaaf6e40b46f115238ddee2e, manifest.json, PROVENANCE.md); the donor package itself ships the cu130 directory only",
+  "apb/fpf_apb/apb_triton.py": "one hunk + one helper, no kernel / arithmetic change: apb_views resolves its launch cell through resolve_cfg(cfg, D, opd, in_fp32) = apb_config(...)'s cell with the caller's cfg merged over it key by key (a partial cfg such as {'BIAS_TMA': False} no longer fails with KeyError 'D1'; None and full cfgs resolve exactly as before; unknown keys raise ValueError by name); LAUNCH_OPTION_KEYS names the launch options a cfg may add"
+ },
+ "not_carried": {
+  "dit_exact/build_prebuilt.py's build products for other ABIs": "two prebuilts exist: torch2.13.0-cu130-sm90 and torch2.7.1-cu126-sm90 (both sm_90a, cpython 3.11; identical load-check output digests); other stacks refuse by name (no_prebuilt_for_stack:<abi>)",
+  "ditfast's model-bound schedules (dit_fast.py FastTokenStack, atom_fast.py FastAtomStack, cond_dedupe.py, _plumbing.py, the package __init__ with its install seams, vectors.py / vectors.json whose cases build the model)": "kit files: they walk an engine's module tree (install(model)) and differ per engine already; the kits bind the row kernels through kernels.apb (row dit_fast, dit_block_rows()); ditfast/__init__.py here is the core's own marker (imports nothing)",
+  "the L3a hand-off note and its bench table": "hand-off documents; the row's parity facts are in APB_CELLS.json rows.l3a and the bench section cited there",
+  "the kits' adapters around these kernels (dit_attention.py / of3_bind.py / stackx-style forwards, lever words, registries, install() monkey-patches' callers, tests)": "kit files: a kit binds a row through its own mechanism; fpf_apb/install.py is carried for byte identity (its install_* functions import the kit's modules lazily) but the face never calls it",
+  "atom_exact's kit binder (install.py: environment words, the trunk-module patch, the exit line)": "engine glue; the face runs the route determination + digest load-check itself"
+ },
+ "runtime_imports": [
+  "apb_attn",
+  "dtk_kernels",
+  "ln_proj",
+  "lnl_fused",
+  "flash_triattn"
+ ],
+ "runtime_imports_note": "rows served by core modules in place (opt_core.attn.apb_core -> kernels.apb_attn; kernels.dtk_kernels; kernels.ln_proj; kernels.lnl_fused; attn.shared_bias_attn -> kernels.flash_triattn; attn.sdpa_bias) are imported at call time inside the face's serving functions; the carried sub-packages import torch / triton (and ef2: transformers.models.esmfold2) at their own module level and are imported only when their row is selected; ditfast.kernels / ditfast.atom_kernels import torch + triton at their module level and are imported only when row dit_fast is selected; the face is standard library at import",
+ "served_note": "APB_CELLS.json apb_cells/v1: 432 measured cells (cc 9.0 and 8.0, 6 stacks), 12 fpf_apb retune cells, 42 target-coverage rows; dit_exact = cc 9.0, torch 2.13.0/cu130 and 2.7.1/cu126 ABIs (cpython 3.11); ds4sci is named capture-UNSAFE (replay-stale 12/12 probes); fpf_apb on cc 8.0 engages its non-TMA cell (16/18 sm_80 tiles valid); dit_fast = the fused DiT block's row kernels (token c_a=768 / atom c_atom=128 cells per op, both cards where measured), aliases ditfast | dit_fused | atom_fused",
+ "version": "1.0.0"
+}

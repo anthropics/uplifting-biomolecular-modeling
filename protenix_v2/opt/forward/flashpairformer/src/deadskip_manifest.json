@@ -1,0 +1,1998 @@
+{
+ "format": "deadskip_manifest/v1",
+ "created": "2026-08-23T07:46:15Z",
+ "checkpoint_path": "${PROTENIX_ROOT_DIR}/checkpoint/protenix-v2.pt",
+ "checkpoint_sha256": "8f931f9774a396b67033d0e58628e1834f4a1448165e04254b40a780b0c0d599",
+ "thr_absmax": 1e-30,
+ "probe_sizes": [
+  64,
+  160
+ ],
+ "gpu": "NVIDIA H100 80GB HBM3",
+ "torch": "2.7.1+cu126",
+ "modules": [
+  {
+   "path": "confidence_head.pairformer_stack.blocks.0.tri_att_end",
+   "class": "TriangleAttention",
+   "kind": "tri_att_end",
+   "param_absmax": 4.907297896359565e-37,
+   "n_params": 330240,
+   "probe_pass": true,
+   "probe_rows": [
+    {
+     "N": 64,
+     "out_shape": [
+      64,
+      64,
+      256
+     ],
+     "out_dtype": "torch.bfloat16",
+     "absmax": 0.0,
+     "all_zero": true,
+     "has_neg_zero": false,
+     "base_plus_out_bitwise_base": true
+    },
+    {
+     "N": 160,
+     "out_shape": [
+      160,
+      160,
+      256
+     ],
+     "out_dtype": "torch.bfloat16",
+     "absmax": 0.0,
+     "all_zero": true,
+     "has_neg_zero": false,
+     "base_plus_out_bitwise_base": true
+    }
+   ]
+  },
+  {
+   "path": "confidence_head.pairformer_stack.blocks.0.tri_att_start",
+   "class": "TriangleAttention",
+   "kind": "tri_att_start",
+   "param_absmax": 4.907297896359565e-37,
+   "n_params": 330240,
+   "probe_pass": true,
+   "probe_rows": [
+    {
+     "N": 64,
+     "out_shape": [
+      64,
+      64,
+      256
+     ],
+     "out_dtype": "torch.bfloat16",
+     "absmax": 0.0,
+     "all_zero": true,
+     "has_neg_zero": false,
+     "base_plus_out_bitwise_base": true
+    },
+    {
+     "N": 160,
+     "out_shape": [
+      160,
+      160,
+      256
+     ],
+     "out_dtype": "torch.bfloat16",
+     "absmax": 0.0,
+     "all_zero": true,
+     "has_neg_zero": false,
+     "base_plus_out_bitwise_base": true
+    }
+   ]
+  },
+  {
+   "path": "confidence_head.pairformer_stack.blocks.0.tri_mul_in",
+   "class": "TriangleMultiplicationIncoming",
+   "kind": "tri_mul_in",
+   "param_absmax": 6.2978527735142196e-37,
+   "n_params": 394240,
+   "probe_pass": true,
+   "probe_rows": [
+    {
+     "N": 64,
+     "out_shape": [
+      64,
+      64,
+      256
+     ],
+     "out_dtype": "torch.bfloat16",
+     "absmax": 0.0,
+     "all_zero": true,
+     "has_neg_zero": false,
+     "base_plus_out_bitwise_base": true
+    },
+    {
+     "N": 160,
+     "out_shape": [
+      160,
+      160,
+      256
+     ],
+     "out_dtype": "torch.bfloat16",
+     "absmax": 0.0,
+     "all_zero": true,
+     "has_neg_zero": false,
+     "base_plus_out_bitwise_base": true
+    }
+   ]
+  },
+  {
+   "path": "confidence_head.pairformer_stack.blocks.0.tri_mul_out",
+   "class": "TriangleMultiplicationOutgoing",
+   "kind": "tri_mul_out",
+   "param_absmax": 6.296508423819485e-37,
+   "n_params": 394240,
+   "probe_pass": true,
+   "probe_rows": [
+    {
+     "N": 64,
+     "out_shape": [
+      64,
+      64,
+      256
+     ],
+     "out_dtype": "torch.bfloat16",
+     "absmax": 0.0,
+     "all_zero": true,
+     "has_neg_zero": false,
+     "base_plus_out_bitwise_base": true
+    },
+    {
+     "N": 160,
+     "out_shape": [
+      160,
+      160,
+      256
+     ],
+     "out_dtype": "torch.bfloat16",
+     "absmax": 0.0,
+     "all_zero": true,
+     "has_neg_zero": false,
+     "base_plus_out_bitwise_base": true
+    }
+   ]
+  },
+  {
+   "path": "confidence_head.pairformer_stack.blocks.1.pair_transition",
+   "class": "Transition",
+   "kind": "pair_transition",
+   "param_absmax": 4.907297896359565e-37,
+   "n_params": 786944,
+   "probe_pass": true,
+   "probe_rows": [
+    {
+     "N": 64,
+     "out_shape": [
+      64,
+      64,
+      256
+     ],
+     "out_dtype": "torch.bfloat16",
+     "absmax": 0.0,
+     "all_zero": true,
+     "has_neg_zero": false,
+     "base_plus_out_bitwise_base": true
+    },
+    {
+     "N": 160,
+     "out_shape": [
+      160,
+      160,
+      256
+     ],
+     "out_dtype": "torch.bfloat16",
+     "absmax": 0.0,
+     "all_zero": true,
+     "has_neg_zero": false,
+     "base_plus_out_bitwise_base": true
+    }
+   ]
+  },
+  {
+   "path": "confidence_head.pairformer_stack.blocks.1.tri_att_end",
+   "class": "TriangleAttention",
+   "kind": "tri_att_end",
+   "param_absmax": 4.907297896359565e-37,
+   "n_params": 330240,
+   "probe_pass": true,
+   "probe_rows": [
+    {
+     "N": 64,
+     "out_shape": [
+      64,
+      64,
+      256
+     ],
+     "out_dtype": "torch.bfloat16",
+     "absmax": 0.0,
+     "all_zero": true,
+     "has_neg_zero": false,
+     "base_plus_out_bitwise_base": true
+    },
+    {
+     "N": 160,
+     "out_shape": [
+      160,
+      160,
+      256
+     ],
+     "out_dtype": "torch.bfloat16",
+     "absmax": 0.0,
+     "all_zero": true,
+     "has_neg_zero": false,
+     "base_plus_out_bitwise_base": true
+    }
+   ]
+  },
+  {
+   "path": "confidence_head.pairformer_stack.blocks.1.tri_att_start",
+   "class": "TriangleAttention",
+   "kind": "tri_att_start",
+   "param_absmax": 4.907297896359565e-37,
+   "n_params": 330240,
+   "probe_pass": true,
+   "probe_rows": [
+    {
+     "N": 64,
+     "out_shape": [
+      64,
+      64,
+      256
+     ],
+     "out_dtype": "torch.bfloat16",
+     "absmax": 0.0,
+     "all_zero": true,
+     "has_neg_zero": false,
+     "base_plus_out_bitwise_base": true
+    },
+    {
+     "N": 160,
+     "out_shape": [
+      160,
+      160,
+      256
+     ],
+     "out_dtype": "torch.bfloat16",
+     "absmax": 0.0,
+     "all_zero": true,
+     "has_neg_zero": false,
+     "base_plus_out_bitwise_base": true
+    }
+   ]
+  },
+  {
+   "path": "confidence_head.pairformer_stack.blocks.2.tri_att_end",
+   "class": "TriangleAttention",
+   "kind": "tri_att_end",
+   "param_absmax": 4.907297896359565e-37,
+   "n_params": 330240,
+   "probe_pass": true,
+   "probe_rows": [
+    {
+     "N": 64,
+     "out_shape": [
+      64,
+      64,
+      256
+     ],
+     "out_dtype": "torch.bfloat16",
+     "absmax": 0.0,
+     "all_zero": true,
+     "has_neg_zero": false,
+     "base_plus_out_bitwise_base": true
+    },
+    {
+     "N": 160,
+     "out_shape": [
+      160,
+      160,
+      256
+     ],
+     "out_dtype": "torch.bfloat16",
+     "absmax": 0.0,
+     "all_zero": true,
+     "has_neg_zero": false,
+     "base_plus_out_bitwise_base": true
+    }
+   ]
+  },
+  {
+   "path": "confidence_head.pairformer_stack.blocks.2.tri_att_start",
+   "class": "TriangleAttention",
+   "kind": "tri_att_start",
+   "param_absmax": 4.907297896359565e-37,
+   "n_params": 330240,
+   "probe_pass": true,
+   "probe_rows": [
+    {
+     "N": 64,
+     "out_shape": [
+      64,
+      64,
+      256
+     ],
+     "out_dtype": "torch.bfloat16",
+     "absmax": 0.0,
+     "all_zero": true,
+     "has_neg_zero": false,
+     "base_plus_out_bitwise_base": true
+    },
+    {
+     "N": 160,
+     "out_shape": [
+      160,
+      160,
+      256
+     ],
+     "out_dtype": "torch.bfloat16",
+     "absmax": 0.0,
+     "all_zero": true,
+     "has_neg_zero": false,
+     "base_plus_out_bitwise_base": true
+    }
+   ]
+  },
+  {
+   "path": "confidence_head.pairformer_stack.blocks.3.tri_att_end",
+   "class": "TriangleAttention",
+   "kind": "tri_att_end",
+   "param_absmax": 4.907297896359565e-37,
+   "n_params": 330240,
+   "probe_pass": true,
+   "probe_rows": [
+    {
+     "N": 64,
+     "out_shape": [
+      64,
+      64,
+      256
+     ],
+     "out_dtype": "torch.bfloat16",
+     "absmax": 0.0,
+     "all_zero": true,
+     "has_neg_zero": false,
+     "base_plus_out_bitwise_base": true
+    },
+    {
+     "N": 160,
+     "out_shape": [
+      160,
+      160,
+      256
+     ],
+     "out_dtype": "torch.bfloat16",
+     "absmax": 0.0,
+     "all_zero": true,
+     "has_neg_zero": false,
+     "base_plus_out_bitwise_base": true
+    }
+   ]
+  },
+  {
+   "path": "pairformer_stack.blocks.1.single_transition",
+   "class": "Transition",
+   "kind": "single_transition",
+   "param_absmax": 4.907297896359565e-37,
+   "n_params": 1770240,
+   "probe_pass": true,
+   "probe_rows": [
+    {
+     "N": 64,
+     "out_shape": [
+      64,
+      384
+     ],
+     "out_dtype": "torch.bfloat16",
+     "absmax": 0.0,
+     "all_zero": true,
+     "has_neg_zero": false,
+     "base_plus_out_bitwise_base": true
+    },
+    {
+     "N": 160,
+     "out_shape": [
+      160,
+      384
+     ],
+     "out_dtype": "torch.bfloat16",
+     "absmax": 0.0,
+     "all_zero": true,
+     "has_neg_zero": false,
+     "base_plus_out_bitwise_base": true
+    }
+   ]
+  },
+  {
+   "path": "pairformer_stack.blocks.11.single_transition",
+   "class": "Transition",
+   "kind": "single_transition",
+   "param_absmax": 4.907297896359565e-37,
+   "n_params": 1770240,
+   "probe_pass": true,
+   "probe_rows": [
+    {
+     "N": 64,
+     "out_shape": [
+      64,
+      384
+     ],
+     "out_dtype": "torch.bfloat16",
+     "absmax": 0.0,
+     "all_zero": true,
+     "has_neg_zero": false,
+     "base_plus_out_bitwise_base": true
+    },
+    {
+     "N": 160,
+     "out_shape": [
+      160,
+      384
+     ],
+     "out_dtype": "torch.bfloat16",
+     "absmax": 0.0,
+     "all_zero": true,
+     "has_neg_zero": false,
+     "base_plus_out_bitwise_base": true
+    }
+   ]
+  },
+  {
+   "path": "pairformer_stack.blocks.13.attention_pair_bias",
+   "class": "AttentionPairBias",
+   "kind": "attention_pair_bias",
+   "param_absmax": 4.907297896359565e-37,
+   "n_params": 743040,
+   "probe_pass": true,
+   "probe_rows": [
+    {
+     "N": 64,
+     "out_shape": [
+      64,
+      384
+     ],
+     "out_dtype": "torch.bfloat16",
+     "absmax": 0.0,
+     "all_zero": true,
+     "has_neg_zero": false,
+     "base_plus_out_bitwise_base": true
+    },
+    {
+     "N": 160,
+     "out_shape": [
+      160,
+      384
+     ],
+     "out_dtype": "torch.bfloat16",
+     "absmax": 0.0,
+     "all_zero": true,
+     "has_neg_zero": false,
+     "base_plus_out_bitwise_base": true
+    }
+   ]
+  },
+  {
+   "path": "pairformer_stack.blocks.13.single_transition",
+   "class": "Transition",
+   "kind": "single_transition",
+   "param_absmax": 3.0527424708877275e-35,
+   "n_params": 1770240,
+   "probe_pass": true,
+   "probe_rows": [
+    {
+     "N": 64,
+     "out_shape": [
+      64,
+      384
+     ],
+     "out_dtype": "torch.bfloat16",
+     "absmax": 0.0,
+     "all_zero": true,
+     "has_neg_zero": false,
+     "base_plus_out_bitwise_base": true
+    },
+    {
+     "N": 160,
+     "out_shape": [
+      160,
+      384
+     ],
+     "out_dtype": "torch.bfloat16",
+     "absmax": 0.0,
+     "all_zero": true,
+     "has_neg_zero": false,
+     "base_plus_out_bitwise_base": true
+    }
+   ]
+  },
+  {
+   "path": "pairformer_stack.blocks.18.attention_pair_bias",
+   "class": "AttentionPairBias",
+   "kind": "attention_pair_bias",
+   "param_absmax": 4.907297896359565e-37,
+   "n_params": 743040,
+   "probe_pass": true,
+   "probe_rows": [
+    {
+     "N": 64,
+     "out_shape": [
+      64,
+      384
+     ],
+     "out_dtype": "torch.bfloat16",
+     "absmax": 0.0,
+     "all_zero": true,
+     "has_neg_zero": false,
+     "base_plus_out_bitwise_base": true
+    },
+    {
+     "N": 160,
+     "out_shape": [
+      160,
+      384
+     ],
+     "out_dtype": "torch.bfloat16",
+     "absmax": 0.0,
+     "all_zero": true,
+     "has_neg_zero": false,
+     "base_plus_out_bitwise_base": true
+    }
+   ]
+  },
+  {
+   "path": "pairformer_stack.blocks.2.single_transition",
+   "class": "Transition",
+   "kind": "single_transition",
+   "param_absmax": 4.907297896359565e-37,
+   "n_params": 1770240,
+   "probe_pass": true,
+   "probe_rows": [
+    {
+     "N": 64,
+     "out_shape": [
+      64,
+      384
+     ],
+     "out_dtype": "torch.bfloat16",
+     "absmax": 0.0,
+     "all_zero": true,
+     "has_neg_zero": false,
+     "base_plus_out_bitwise_base": true
+    },
+    {
+     "N": 160,
+     "out_shape": [
+      160,
+      384
+     ],
+     "out_dtype": "torch.bfloat16",
+     "absmax": 0.0,
+     "all_zero": true,
+     "has_neg_zero": false,
+     "base_plus_out_bitwise_base": true
+    }
+   ]
+  },
+  {
+   "path": "pairformer_stack.blocks.29.attention_pair_bias",
+   "class": "AttentionPairBias",
+   "kind": "attention_pair_bias",
+   "param_absmax": 4.907297896359565e-37,
+   "n_params": 743040,
+   "probe_pass": true,
+   "probe_rows": [
+    {
+     "N": 64,
+     "out_shape": [
+      64,
+      384
+     ],
+     "out_dtype": "torch.bfloat16",
+     "absmax": 0.0,
+     "all_zero": true,
+     "has_neg_zero": false,
+     "base_plus_out_bitwise_base": true
+    },
+    {
+     "N": 160,
+     "out_shape": [
+      160,
+      384
+     ],
+     "out_dtype": "torch.bfloat16",
+     "absmax": 0.0,
+     "all_zero": true,
+     "has_neg_zero": false,
+     "base_plus_out_bitwise_base": true
+    }
+   ]
+  },
+  {
+   "path": "pairformer_stack.blocks.31.attention_pair_bias",
+   "class": "AttentionPairBias",
+   "kind": "attention_pair_bias",
+   "param_absmax": 4.907297896359565e-37,
+   "n_params": 743040,
+   "probe_pass": true,
+   "probe_rows": [
+    {
+     "N": 64,
+     "out_shape": [
+      64,
+      384
+     ],
+     "out_dtype": "torch.bfloat16",
+     "absmax": 0.0,
+     "all_zero": true,
+     "has_neg_zero": false,
+     "base_plus_out_bitwise_base": true
+    },
+    {
+     "N": 160,
+     "out_shape": [
+      160,
+      384
+     ],
+     "out_dtype": "torch.bfloat16",
+     "absmax": 0.0,
+     "all_zero": true,
+     "has_neg_zero": false,
+     "base_plus_out_bitwise_base": true
+    }
+   ]
+  },
+  {
+   "path": "pairformer_stack.blocks.32.single_transition",
+   "class": "Transition",
+   "kind": "single_transition",
+   "param_absmax": 4.907297896359565e-37,
+   "n_params": 1770240,
+   "probe_pass": true,
+   "probe_rows": [
+    {
+     "N": 64,
+     "out_shape": [
+      64,
+      384
+     ],
+     "out_dtype": "torch.bfloat16",
+     "absmax": 0.0,
+     "all_zero": true,
+     "has_neg_zero": false,
+     "base_plus_out_bitwise_base": true
+    },
+    {
+     "N": 160,
+     "out_shape": [
+      160,
+      384
+     ],
+     "out_dtype": "torch.bfloat16",
+     "absmax": 0.0,
+     "all_zero": true,
+     "has_neg_zero": false,
+     "base_plus_out_bitwise_base": true
+    }
+   ]
+  },
+  {
+   "path": "pairformer_stack.blocks.33.attention_pair_bias",
+   "class": "AttentionPairBias",
+   "kind": "attention_pair_bias",
+   "param_absmax": 4.907297896359565e-37,
+   "n_params": 743040,
+   "probe_pass": true,
+   "probe_rows": [
+    {
+     "N": 64,
+     "out_shape": [
+      64,
+      384
+     ],
+     "out_dtype": "torch.bfloat16",
+     "absmax": 0.0,
+     "all_zero": true,
+     "has_neg_zero": false,
+     "base_plus_out_bitwise_base": true
+    },
+    {
+     "N": 160,
+     "out_shape": [
+      160,
+      384
+     ],
+     "out_dtype": "torch.bfloat16",
+     "absmax": 0.0,
+     "all_zero": true,
+     "has_neg_zero": false,
+     "base_plus_out_bitwise_base": true
+    }
+   ]
+  },
+  {
+   "path": "pairformer_stack.blocks.33.single_transition",
+   "class": "Transition",
+   "kind": "single_transition",
+   "param_absmax": 4.907297896359565e-37,
+   "n_params": 1770240,
+   "probe_pass": true,
+   "probe_rows": [
+    {
+     "N": 64,
+     "out_shape": [
+      64,
+      384
+     ],
+     "out_dtype": "torch.bfloat16",
+     "absmax": 0.0,
+     "all_zero": true,
+     "has_neg_zero": false,
+     "base_plus_out_bitwise_base": true
+    },
+    {
+     "N": 160,
+     "out_shape": [
+      160,
+      384
+     ],
+     "out_dtype": "torch.bfloat16",
+     "absmax": 0.0,
+     "all_zero": true,
+     "has_neg_zero": false,
+     "base_plus_out_bitwise_base": true
+    }
+   ]
+  },
+  {
+   "path": "pairformer_stack.blocks.34.attention_pair_bias",
+   "class": "AttentionPairBias",
+   "kind": "attention_pair_bias",
+   "param_absmax": 4.907297896359565e-37,
+   "n_params": 743040,
+   "probe_pass": true,
+   "probe_rows": [
+    {
+     "N": 64,
+     "out_shape": [
+      64,
+      384
+     ],
+     "out_dtype": "torch.bfloat16",
+     "absmax": 0.0,
+     "all_zero": true,
+     "has_neg_zero": false,
+     "base_plus_out_bitwise_base": true
+    },
+    {
+     "N": 160,
+     "out_shape": [
+      160,
+      384
+     ],
+     "out_dtype": "torch.bfloat16",
+     "absmax": 0.0,
+     "all_zero": true,
+     "has_neg_zero": false,
+     "base_plus_out_bitwise_base": true
+    }
+   ]
+  },
+  {
+   "path": "pairformer_stack.blocks.34.single_transition",
+   "class": "Transition",
+   "kind": "single_transition",
+   "param_absmax": 4.907297896359565e-37,
+   "n_params": 1770240,
+   "probe_pass": true,
+   "probe_rows": [
+    {
+     "N": 64,
+     "out_shape": [
+      64,
+      384
+     ],
+     "out_dtype": "torch.bfloat16",
+     "absmax": 0.0,
+     "all_zero": true,
+     "has_neg_zero": false,
+     "base_plus_out_bitwise_base": true
+    },
+    {
+     "N": 160,
+     "out_shape": [
+      160,
+      384
+     ],
+     "out_dtype": "torch.bfloat16",
+     "absmax": 0.0,
+     "all_zero": true,
+     "has_neg_zero": false,
+     "base_plus_out_bitwise_base": true
+    }
+   ]
+  },
+  {
+   "path": "pairformer_stack.blocks.36.attention_pair_bias",
+   "class": "AttentionPairBias",
+   "kind": "attention_pair_bias",
+   "param_absmax": 4.907297896359565e-37,
+   "n_params": 743040,
+   "probe_pass": true,
+   "probe_rows": [
+    {
+     "N": 64,
+     "out_shape": [
+      64,
+      384
+     ],
+     "out_dtype": "torch.bfloat16",
+     "absmax": 0.0,
+     "all_zero": true,
+     "has_neg_zero": false,
+     "base_plus_out_bitwise_base": true
+    },
+    {
+     "N": 160,
+     "out_shape": [
+      160,
+      384
+     ],
+     "out_dtype": "torch.bfloat16",
+     "absmax": 0.0,
+     "all_zero": true,
+     "has_neg_zero": false,
+     "base_plus_out_bitwise_base": true
+    }
+   ]
+  },
+  {
+   "path": "pairformer_stack.blocks.36.single_transition",
+   "class": "Transition",
+   "kind": "single_transition",
+   "param_absmax": 6.225656979801188e-37,
+   "n_params": 1770240,
+   "probe_pass": true,
+   "probe_rows": [
+    {
+     "N": 64,
+     "out_shape": [
+      64,
+      384
+     ],
+     "out_dtype": "torch.bfloat16",
+     "absmax": 0.0,
+     "all_zero": true,
+     "has_neg_zero": false,
+     "base_plus_out_bitwise_base": true
+    },
+    {
+     "N": 160,
+     "out_shape": [
+      160,
+      384
+     ],
+     "out_dtype": "torch.bfloat16",
+     "absmax": 0.0,
+     "all_zero": true,
+     "has_neg_zero": false,
+     "base_plus_out_bitwise_base": true
+    }
+   ]
+  },
+  {
+   "path": "pairformer_stack.blocks.37.attention_pair_bias",
+   "class": "AttentionPairBias",
+   "kind": "attention_pair_bias",
+   "param_absmax": 4.907297896359565e-37,
+   "n_params": 743040,
+   "probe_pass": true,
+   "probe_rows": [
+    {
+     "N": 64,
+     "out_shape": [
+      64,
+      384
+     ],
+     "out_dtype": "torch.bfloat16",
+     "absmax": 0.0,
+     "all_zero": true,
+     "has_neg_zero": false,
+     "base_plus_out_bitwise_base": true
+    },
+    {
+     "N": 160,
+     "out_shape": [
+      160,
+      384
+     ],
+     "out_dtype": "torch.bfloat16",
+     "absmax": 0.0,
+     "all_zero": true,
+     "has_neg_zero": false,
+     "base_plus_out_bitwise_base": true
+    }
+   ]
+  },
+  {
+   "path": "pairformer_stack.blocks.37.single_transition",
+   "class": "Transition",
+   "kind": "single_transition",
+   "param_absmax": 6.303683071956828e-37,
+   "n_params": 1770240,
+   "probe_pass": true,
+   "probe_rows": [
+    {
+     "N": 64,
+     "out_shape": [
+      64,
+      384
+     ],
+     "out_dtype": "torch.bfloat16",
+     "absmax": 0.0,
+     "all_zero": true,
+     "has_neg_zero": false,
+     "base_plus_out_bitwise_base": true
+    },
+    {
+     "N": 160,
+     "out_shape": [
+      160,
+      384
+     ],
+     "out_dtype": "torch.bfloat16",
+     "absmax": 0.0,
+     "all_zero": true,
+     "has_neg_zero": false,
+     "base_plus_out_bitwise_base": true
+    }
+   ]
+  },
+  {
+   "path": "pairformer_stack.blocks.38.attention_pair_bias",
+   "class": "AttentionPairBias",
+   "kind": "attention_pair_bias",
+   "param_absmax": 4.907297896359565e-37,
+   "n_params": 743040,
+   "probe_pass": true,
+   "probe_rows": [
+    {
+     "N": 64,
+     "out_shape": [
+      64,
+      384
+     ],
+     "out_dtype": "torch.bfloat16",
+     "absmax": 0.0,
+     "all_zero": true,
+     "has_neg_zero": false,
+     "base_plus_out_bitwise_base": true
+    },
+    {
+     "N": 160,
+     "out_shape": [
+      160,
+      384
+     ],
+     "out_dtype": "torch.bfloat16",
+     "absmax": 0.0,
+     "all_zero": true,
+     "has_neg_zero": false,
+     "base_plus_out_bitwise_base": true
+    }
+   ]
+  },
+  {
+   "path": "pairformer_stack.blocks.39.single_transition",
+   "class": "Transition",
+   "kind": "single_transition",
+   "param_absmax": 4.907297896359565e-37,
+   "n_params": 1770240,
+   "probe_pass": true,
+   "probe_rows": [
+    {
+     "N": 64,
+     "out_shape": [
+      64,
+      384
+     ],
+     "out_dtype": "torch.bfloat16",
+     "absmax": 0.0,
+     "all_zero": true,
+     "has_neg_zero": false,
+     "base_plus_out_bitwise_base": true
+    },
+    {
+     "N": 160,
+     "out_shape": [
+      160,
+      384
+     ],
+     "out_dtype": "torch.bfloat16",
+     "absmax": 0.0,
+     "all_zero": true,
+     "has_neg_zero": false,
+     "base_plus_out_bitwise_base": true
+    }
+   ]
+  },
+  {
+   "path": "pairformer_stack.blocks.41.attention_pair_bias",
+   "class": "AttentionPairBias",
+   "kind": "attention_pair_bias",
+   "param_absmax": 4.907297896359565e-37,
+   "n_params": 743040,
+   "probe_pass": true,
+   "probe_rows": [
+    {
+     "N": 64,
+     "out_shape": [
+      64,
+      384
+     ],
+     "out_dtype": "torch.bfloat16",
+     "absmax": 0.0,
+     "all_zero": true,
+     "has_neg_zero": false,
+     "base_plus_out_bitwise_base": true
+    },
+    {
+     "N": 160,
+     "out_shape": [
+      160,
+      384
+     ],
+     "out_dtype": "torch.bfloat16",
+     "absmax": 0.0,
+     "all_zero": true,
+     "has_neg_zero": false,
+     "base_plus_out_bitwise_base": true
+    }
+   ]
+  },
+  {
+   "path": "pairformer_stack.blocks.41.single_transition",
+   "class": "Transition",
+   "kind": "single_transition",
+   "param_absmax": 4.907297896359565e-37,
+   "n_params": 1770240,
+   "probe_pass": true,
+   "probe_rows": [
+    {
+     "N": 64,
+     "out_shape": [
+      64,
+      384
+     ],
+     "out_dtype": "torch.bfloat16",
+     "absmax": 0.0,
+     "all_zero": true,
+     "has_neg_zero": false,
+     "base_plus_out_bitwise_base": true
+    },
+    {
+     "N": 160,
+     "out_shape": [
+      160,
+      384
+     ],
+     "out_dtype": "torch.bfloat16",
+     "absmax": 0.0,
+     "all_zero": true,
+     "has_neg_zero": false,
+     "base_plus_out_bitwise_base": true
+    }
+   ]
+  },
+  {
+   "path": "pairformer_stack.blocks.42.attention_pair_bias",
+   "class": "AttentionPairBias",
+   "kind": "attention_pair_bias",
+   "param_absmax": 4.907297896359565e-37,
+   "n_params": 743040,
+   "probe_pass": true,
+   "probe_rows": [
+    {
+     "N": 64,
+     "out_shape": [
+      64,
+      384
+     ],
+     "out_dtype": "torch.bfloat16",
+     "absmax": 0.0,
+     "all_zero": true,
+     "has_neg_zero": false,
+     "base_plus_out_bitwise_base": true
+    },
+    {
+     "N": 160,
+     "out_shape": [
+      160,
+      384
+     ],
+     "out_dtype": "torch.bfloat16",
+     "absmax": 0.0,
+     "all_zero": true,
+     "has_neg_zero": false,
+     "base_plus_out_bitwise_base": true
+    }
+   ]
+  },
+  {
+   "path": "pairformer_stack.blocks.42.single_transition",
+   "class": "Transition",
+   "kind": "single_transition",
+   "param_absmax": 4.907297896359565e-37,
+   "n_params": 1770240,
+   "probe_pass": true,
+   "probe_rows": [
+    {
+     "N": 64,
+     "out_shape": [
+      64,
+      384
+     ],
+     "out_dtype": "torch.bfloat16",
+     "absmax": 0.0,
+     "all_zero": true,
+     "has_neg_zero": false,
+     "base_plus_out_bitwise_base": true
+    },
+    {
+     "N": 160,
+     "out_shape": [
+      160,
+      384
+     ],
+     "out_dtype": "torch.bfloat16",
+     "absmax": 0.0,
+     "all_zero": true,
+     "has_neg_zero": false,
+     "base_plus_out_bitwise_base": true
+    }
+   ]
+  },
+  {
+   "path": "pairformer_stack.blocks.43.attention_pair_bias",
+   "class": "AttentionPairBias",
+   "kind": "attention_pair_bias",
+   "param_absmax": 4.907297896359565e-37,
+   "n_params": 743040,
+   "probe_pass": true,
+   "probe_rows": [
+    {
+     "N": 64,
+     "out_shape": [
+      64,
+      384
+     ],
+     "out_dtype": "torch.bfloat16",
+     "absmax": 0.0,
+     "all_zero": true,
+     "has_neg_zero": false,
+     "base_plus_out_bitwise_base": true
+    },
+    {
+     "N": 160,
+     "out_shape": [
+      160,
+      384
+     ],
+     "out_dtype": "torch.bfloat16",
+     "absmax": 0.0,
+     "all_zero": true,
+     "has_neg_zero": false,
+     "base_plus_out_bitwise_base": true
+    }
+   ]
+  },
+  {
+   "path": "pairformer_stack.blocks.44.attention_pair_bias",
+   "class": "AttentionPairBias",
+   "kind": "attention_pair_bias",
+   "param_absmax": 4.907297896359565e-37,
+   "n_params": 743040,
+   "probe_pass": true,
+   "probe_rows": [
+    {
+     "N": 64,
+     "out_shape": [
+      64,
+      384
+     ],
+     "out_dtype": "torch.bfloat16",
+     "absmax": 0.0,
+     "all_zero": true,
+     "has_neg_zero": false,
+     "base_plus_out_bitwise_base": true
+    },
+    {
+     "N": 160,
+     "out_shape": [
+      160,
+      384
+     ],
+     "out_dtype": "torch.bfloat16",
+     "absmax": 0.0,
+     "all_zero": true,
+     "has_neg_zero": false,
+     "base_plus_out_bitwise_base": true
+    }
+   ]
+  },
+  {
+   "path": "pairformer_stack.blocks.45.attention_pair_bias",
+   "class": "AttentionPairBias",
+   "kind": "attention_pair_bias",
+   "param_absmax": 4.907297896359565e-37,
+   "n_params": 743040,
+   "probe_pass": true,
+   "probe_rows": [
+    {
+     "N": 64,
+     "out_shape": [
+      64,
+      384
+     ],
+     "out_dtype": "torch.bfloat16",
+     "absmax": 0.0,
+     "all_zero": true,
+     "has_neg_zero": false,
+     "base_plus_out_bitwise_base": true
+    },
+    {
+     "N": 160,
+     "out_shape": [
+      160,
+      384
+     ],
+     "out_dtype": "torch.bfloat16",
+     "absmax": 0.0,
+     "all_zero": true,
+     "has_neg_zero": false,
+     "base_plus_out_bitwise_base": true
+    }
+   ]
+  },
+  {
+   "path": "pairformer_stack.blocks.45.single_transition",
+   "class": "Transition",
+   "kind": "single_transition",
+   "param_absmax": 5.706384646212846e-37,
+   "n_params": 1770240,
+   "probe_pass": true,
+   "probe_rows": [
+    {
+     "N": 64,
+     "out_shape": [
+      64,
+      384
+     ],
+     "out_dtype": "torch.bfloat16",
+     "absmax": 0.0,
+     "all_zero": true,
+     "has_neg_zero": false,
+     "base_plus_out_bitwise_base": true
+    },
+    {
+     "N": 160,
+     "out_shape": [
+      160,
+      384
+     ],
+     "out_dtype": "torch.bfloat16",
+     "absmax": 0.0,
+     "all_zero": true,
+     "has_neg_zero": false,
+     "base_plus_out_bitwise_base": true
+    }
+   ]
+  },
+  {
+   "path": "pairformer_stack.blocks.46.attention_pair_bias",
+   "class": "AttentionPairBias",
+   "kind": "attention_pair_bias",
+   "param_absmax": 4.907297896359565e-37,
+   "n_params": 743040,
+   "probe_pass": true,
+   "probe_rows": [
+    {
+     "N": 64,
+     "out_shape": [
+      64,
+      384
+     ],
+     "out_dtype": "torch.bfloat16",
+     "absmax": 0.0,
+     "all_zero": true,
+     "has_neg_zero": false,
+     "base_plus_out_bitwise_base": true
+    },
+    {
+     "N": 160,
+     "out_shape": [
+      160,
+      384
+     ],
+     "out_dtype": "torch.bfloat16",
+     "absmax": 0.0,
+     "all_zero": true,
+     "has_neg_zero": false,
+     "base_plus_out_bitwise_base": true
+    }
+   ]
+  },
+  {
+   "path": "pairformer_stack.blocks.47.attention_pair_bias",
+   "class": "AttentionPairBias",
+   "kind": "attention_pair_bias",
+   "param_absmax": 4.907297896359565e-37,
+   "n_params": 743040,
+   "probe_pass": true,
+   "probe_rows": [
+    {
+     "N": 64,
+     "out_shape": [
+      64,
+      384
+     ],
+     "out_dtype": "torch.bfloat16",
+     "absmax": 0.0,
+     "all_zero": true,
+     "has_neg_zero": false,
+     "base_plus_out_bitwise_base": true
+    },
+    {
+     "N": 160,
+     "out_shape": [
+      160,
+      384
+     ],
+     "out_dtype": "torch.bfloat16",
+     "absmax": 0.0,
+     "all_zero": true,
+     "has_neg_zero": false,
+     "base_plus_out_bitwise_base": true
+    }
+   ]
+  },
+  {
+   "path": "pairformer_stack.blocks.5.attention_pair_bias",
+   "class": "AttentionPairBias",
+   "kind": "attention_pair_bias",
+   "param_absmax": 4.907297896359565e-37,
+   "n_params": 743040,
+   "probe_pass": true,
+   "probe_rows": [
+    {
+     "N": 64,
+     "out_shape": [
+      64,
+      384
+     ],
+     "out_dtype": "torch.bfloat16",
+     "absmax": 0.0,
+     "all_zero": true,
+     "has_neg_zero": false,
+     "base_plus_out_bitwise_base": true
+    },
+    {
+     "N": 160,
+     "out_shape": [
+      160,
+      384
+     ],
+     "out_dtype": "torch.bfloat16",
+     "absmax": 0.0,
+     "all_zero": true,
+     "has_neg_zero": false,
+     "base_plus_out_bitwise_base": true
+    }
+   ]
+  },
+  {
+   "path": "pairformer_stack.blocks.9.attention_pair_bias",
+   "class": "AttentionPairBias",
+   "kind": "attention_pair_bias",
+   "param_absmax": 4.907297896359565e-37,
+   "n_params": 743040,
+   "probe_pass": true,
+   "probe_rows": [
+    {
+     "N": 64,
+     "out_shape": [
+      64,
+      384
+     ],
+     "out_dtype": "torch.bfloat16",
+     "absmax": 0.0,
+     "all_zero": true,
+     "has_neg_zero": false,
+     "base_plus_out_bitwise_base": true
+    },
+    {
+     "N": 160,
+     "out_shape": [
+      160,
+      384
+     ],
+     "out_dtype": "torch.bfloat16",
+     "absmax": 0.0,
+     "all_zero": true,
+     "has_neg_zero": false,
+     "base_plus_out_bitwise_base": true
+    }
+   ]
+  }
+ ],
+ "n_near_dead": 41,
+ "n_probe_pass": 41,
+ "seconds": 1.8,
+ "hook_selftest": [
+  {
+   "N": 356,
+   "key": "pf_c1_b0",
+   "n_skipped_modules": 41,
+   "blocks_tested": [
+    1,
+    2,
+    5,
+    9,
+    11,
+    13,
+    18,
+    29,
+    31,
+    32,
+    33,
+    34,
+    36,
+    37,
+    38,
+    39,
+    41,
+    42,
+    43,
+    44,
+    45,
+    46,
+    47
+   ],
+   "all_s_bitwise": true,
+   "all_z_bitwise": true,
+   "per_block": {
+    "1": [
+     true,
+     true
+    ],
+    "2": [
+     true,
+     true
+    ],
+    "5": [
+     true,
+     true
+    ],
+    "9": [
+     true,
+     true
+    ],
+    "11": [
+     true,
+     true
+    ],
+    "13": [
+     true,
+     true
+    ],
+    "18": [
+     true,
+     true
+    ],
+    "29": [
+     true,
+     true
+    ],
+    "31": [
+     true,
+     true
+    ],
+    "32": [
+     true,
+     true
+    ],
+    "33": [
+     true,
+     true
+    ],
+    "34": [
+     true,
+     true
+    ],
+    "36": [
+     true,
+     true
+    ],
+    "37": [
+     true,
+     true
+    ],
+    "38": [
+     true,
+     true
+    ],
+    "39": [
+     true,
+     true
+    ],
+    "41": [
+     true,
+     true
+    ],
+    "42": [
+     true,
+     true
+    ],
+    "43": [
+     true,
+     true
+    ],
+    "44": [
+     true,
+     true
+    ],
+    "45": [
+     true,
+     true
+    ],
+    "46": [
+     true,
+     true
+    ],
+    "47": [
+     true,
+     true
+    ]
+   }
+  },
+  {
+   "N": 356,
+   "key": "pf_c10_b47",
+   "n_skipped_modules": 41,
+   "blocks_tested": [
+    1,
+    2,
+    5,
+    9,
+    11,
+    13,
+    18,
+    29,
+    31,
+    32,
+    33,
+    34,
+    36,
+    37,
+    38,
+    39,
+    41,
+    42,
+    43,
+    44,
+    45,
+    46,
+    47
+   ],
+   "all_s_bitwise": true,
+   "all_z_bitwise": true,
+   "per_block": {
+    "1": [
+     true,
+     true
+    ],
+    "2": [
+     true,
+     true
+    ],
+    "5": [
+     true,
+     true
+    ],
+    "9": [
+     true,
+     true
+    ],
+    "11": [
+     true,
+     true
+    ],
+    "13": [
+     true,
+     true
+    ],
+    "18": [
+     true,
+     true
+    ],
+    "29": [
+     true,
+     true
+    ],
+    "31": [
+     true,
+     true
+    ],
+    "32": [
+     true,
+     true
+    ],
+    "33": [
+     true,
+     true
+    ],
+    "34": [
+     true,
+     true
+    ],
+    "36": [
+     true,
+     true
+    ],
+    "37": [
+     true,
+     true
+    ],
+    "38": [
+     true,
+     true
+    ],
+    "39": [
+     true,
+     true
+    ],
+    "41": [
+     true,
+     true
+    ],
+    "42": [
+     true,
+     true
+    ],
+    "43": [
+     true,
+     true
+    ],
+    "44": [
+     true,
+     true
+    ],
+    "45": [
+     true,
+     true
+    ],
+    "46": [
+     true,
+     true
+    ],
+    "47": [
+     true,
+     true
+    ]
+   }
+  },
+  {
+   "N": 705,
+   "key": "pf_c1_b0",
+   "n_skipped_modules": 41,
+   "blocks_tested": [
+    1,
+    2,
+    5,
+    9,
+    11,
+    13,
+    18,
+    29,
+    31,
+    32,
+    33,
+    34,
+    36,
+    37,
+    38,
+    39,
+    41,
+    42,
+    43,
+    44,
+    45,
+    46,
+    47
+   ],
+   "all_s_bitwise": true,
+   "all_z_bitwise": true,
+   "per_block": {
+    "1": [
+     true,
+     true
+    ],
+    "2": [
+     true,
+     true
+    ],
+    "5": [
+     true,
+     true
+    ],
+    "9": [
+     true,
+     true
+    ],
+    "11": [
+     true,
+     true
+    ],
+    "13": [
+     true,
+     true
+    ],
+    "18": [
+     true,
+     true
+    ],
+    "29": [
+     true,
+     true
+    ],
+    "31": [
+     true,
+     true
+    ],
+    "32": [
+     true,
+     true
+    ],
+    "33": [
+     true,
+     true
+    ],
+    "34": [
+     true,
+     true
+    ],
+    "36": [
+     true,
+     true
+    ],
+    "37": [
+     true,
+     true
+    ],
+    "38": [
+     true,
+     true
+    ],
+    "39": [
+     true,
+     true
+    ],
+    "41": [
+     true,
+     true
+    ],
+    "42": [
+     true,
+     true
+    ],
+    "43": [
+     true,
+     true
+    ],
+    "44": [
+     true,
+     true
+    ],
+    "45": [
+     true,
+     true
+    ],
+    "46": [
+     true,
+     true
+    ],
+    "47": [
+     true,
+     true
+    ]
+   }
+  },
+  {
+   "N": 705,
+   "key": "pf_c10_b47",
+   "n_skipped_modules": 41,
+   "blocks_tested": [
+    1,
+    2,
+    5,
+    9,
+    11,
+    13,
+    18,
+    29,
+    31,
+    32,
+    33,
+    34,
+    36,
+    37,
+    38,
+    39,
+    41,
+    42,
+    43,
+    44,
+    45,
+    46,
+    47
+   ],
+   "all_s_bitwise": true,
+   "all_z_bitwise": true,
+   "per_block": {
+    "1": [
+     true,
+     true
+    ],
+    "2": [
+     true,
+     true
+    ],
+    "5": [
+     true,
+     true
+    ],
+    "9": [
+     true,
+     true
+    ],
+    "11": [
+     true,
+     true
+    ],
+    "13": [
+     true,
+     true
+    ],
+    "18": [
+     true,
+     true
+    ],
+    "29": [
+     true,
+     true
+    ],
+    "31": [
+     true,
+     true
+    ],
+    "32": [
+     true,
+     true
+    ],
+    "33": [
+     true,
+     true
+    ],
+    "34": [
+     true,
+     true
+    ],
+    "36": [
+     true,
+     true
+    ],
+    "37": [
+     true,
+     true
+    ],
+    "38": [
+     true,
+     true
+    ],
+    "39": [
+     true,
+     true
+    ],
+    "41": [
+     true,
+     true
+    ],
+    "42": [
+     true,
+     true
+    ],
+    "43": [
+     true,
+     true
+    ],
+    "44": [
+     true,
+     true
+    ],
+    "45": [
+     true,
+     true
+    ],
+    "46": [
+     true,
+     true
+    ],
+    "47": [
+     true,
+     true
+    ]
+   }
+  },
+  {
+   "confidence_head": true,
+   "N": 160,
+   "blocks_tested": [
+    0,
+    1,
+    2,
+    3
+   ],
+   "all_s_bitwise": true,
+   "all_z_bitwise": true,
+   "per_block": {
+    "0": [
+     true,
+     true
+    ],
+    "1": [
+     true,
+     true
+    ],
+    "2": [
+     true,
+     true
+    ],
+    "3": [
+     true,
+     true
+    ]
+   }
+  },
+  {
+   "confidence_head": true,
+   "N": 356,
+   "blocks_tested": [
+    0,
+    1,
+    2,
+    3
+   ],
+   "all_s_bitwise": true,
+   "all_z_bitwise": true,
+   "per_block": {
+    "0": [
+     true,
+     true
+    ],
+    "1": [
+     true,
+     true
+    ],
+    "2": [
+     true,
+     true
+    ],
+    "3": [
+     true,
+     true
+    ]
+   }
+  }
+ ]
+}

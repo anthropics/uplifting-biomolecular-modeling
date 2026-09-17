@@ -1,0 +1,49 @@
+{
+ "ProteinDesignLab/caliby@41d31560c3c73d7980d94f40f3c852b90bfab5c0 (commit 2026-07-01 'Add caliby-distill checkpoints')": {
+  "spdx": "Apache-2.0",
+  "repo": "ProteinDesignLab/caliby",
+  "path": "LICENSE",
+  "ref": "41d31560c3c73d7980d94f40f3c852b90bfab5c0",
+  "blob_sha": "d645695673349e3947e8e5ae42332d0ac3164cd7",
+  "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+  "n_bytes": 11358,
+  "html_url": "https://github.com/ProteinDesignLab/caliby/blob/41d31560c3c73d7980d94f40f3c852b90bfab5c0/LICENSE",
+  "file": "ProteinDesignLab__caliby__LICENSE",
+  "note": "the 2 stock files (potts.py, atom_mpnn_denoiser.py) are byte-identical to GitHub at this commit (the add-on's stock/ copies too); PATCHED by patches/0002 and 0003, which dry-apply on the pristine files; the patched files ship in ../xattempt_addon/fast/ with the add-on's patches on top"
+ },
+ "richardshuai/atomworks-caliby@ea2c998a593af05a47dd972ad6e72b89f87d4e14 (atomworks-caliby v1.0.0, 2026-03-17)": {
+  "spdx": "BSD-3-Clause",
+  "repo": "richardshuai/atomworks-caliby",
+  "path": "LICENSE.md",
+  "ref": "ea2c998a593af05a47dd972ad6e72b89f87d4e14",
+  "blob_sha": "60e6d124060dcbe91bcc28039b5d33aa35a708a1",
+  "sha256": "34ab4f089ed0332b059b3783839e997d44adbe0cdbab9b0ebd142feff75d64eb",
+  "n_bytes": 1533,
+  "html_url": "https://github.com/richardshuai/atomworks-caliby/blob/ea2c998a593af05a47dd972ad6e72b89f87d4e14/LICENSE.md",
+  "file": "richardshuai__atomworks-caliby__ea2c998a__LICENSE.md",
+  "note": "dependency of caliby (pip pin `atomworks-caliby @ git+\u2026@ea2c998a`), unmodified; LICENSE.md byte-identical to RosettaCommons/atomworks' (same sha256 34ab4f08\u2026)"
+ },
+ "ProteinDesignLab/protpardelle-1c@7962da091a335251fa8e5ddef5d2c937fbd9d9ae": {
+  "spdx": "MIT",
+  "repo": "ProteinDesignLab/protpardelle-1c",
+  "path": "LICENSE",
+  "ref": "7962da091a335251fa8e5ddef5d2c937fbd9d9ae",
+  "blob_sha": "d2c71a59543cfbab39417a1a589c346e508e906c",
+  "sha256": "3012aecca74e85f5cbcb10350a98c25adcad0a3ff993b67b358c7e30b66a0a64",
+  "n_bytes": 1075,
+  "html_url": "https://github.com/ProteinDesignLab/protpardelle-1c/blob/7962da091a335251fa8e5ddef5d2c937fbd9d9ae/LICENSE",
+  "file": "ProteinDesignLab__protpardelle-1c__LICENSE",
+  "note": "conformer sampler for the e32 mode (pip pin `protpardelle @ git+\u2026@7962da09`), unmodified"
+ },
+ "pytorch/pytorch@v2.6.0 (torch 2.6.0+cu124)": {
+  "spdx": "BSD-3-Clause",
+  "repo": "pytorch/pytorch",
+  "path": "LICENSE",
+  "ref": "1eba9b3aa3c43f86f4a2c807ac8e12c4a7767340",
+  "blob_sha": "9315c4efb68a2a419904031f9657845f7f979baa",
+  "sha256": "47a26beb94e3f6b333a3677fc85d546f1fdfd2f0b3686c26d2fb5b10e0134165",
+  "n_bytes": 3384,
+  "html_url": "https://github.com/pytorch/pytorch/blob/1eba9b3aa3c43f86f4a2c807ac8e12c4a7767340/LICENSE",
+  "file": "pytorch__pytorch__v2.6.0__LICENSE"
+ }
+}

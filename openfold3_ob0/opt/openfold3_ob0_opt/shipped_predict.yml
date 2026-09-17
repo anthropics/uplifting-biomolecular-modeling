@@ -1,0 +1,10 @@
+# OpenFold3 0.5.0 at upstream's SHIPPED configuration: what `run_openfold predict` builds when it is given no --runner-yaml
+# (entry_points/validator.py InferenceExperimentConfig defaults: ModelUpdate(presets=["predict"]), nothing custom). On CUDA the eval kernel flags then
+# stay at their defaults (projects/of3_all_atom/config/model_config.py:114-120): use_triton_triangle_kernels TRUE (upstream's Triton triangle
+# kernels), use_cueq_triangle_kernels false, use_deepspeed_evo_attention false, use_lma false; tune_chunk_size true; the predict preset's
+# offload_inference; trainer precision = Lightning's default (32-true); --use_tf32 defaults true on the command line (torch matmul precision 'high').
+# This file states the preset explicitly and sets nothing else, so a run with it is byte-equivalent to a run without any runner yaml — modulo a user
+# default <OPENFOLD_CACHE>/runner.yml, which upstream merges under either (run_openfold.py:209-228; the stock proof names one when present).
+model_update:
+  presets:
+    - predict

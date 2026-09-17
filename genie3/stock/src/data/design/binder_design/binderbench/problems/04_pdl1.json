@@ -1,0 +1,52 @@
+{
+    "key": "04_pdl1",
+    "name": "PD-L1",
+    "target_pdb_filepath": "data/design/binder_design/binderbench/targets/pdb/04_pdl1.pdb",
+    "target_fasta_filepath": "data/design/binder_design/binderbench/targets/fasta/04_pdl1.fasta",
+    "target_msa_filepath": "data/design/binder_design/binderbench/targets/msa/04_pdl1.a3m",
+    "target_pdb_filepath_by_chain": [
+        "data/design/binder_design/binderbench/targets/pdb/04_pdl1-chain_B.pdb"
+    ],
+    "target_fasta_filepath_by_chain": [
+        "data/design/binder_design/binderbench/targets/fasta/04_pdl1-chain_B.fasta"
+    ],
+    "target_msa_filepath_by_chain": [
+        "data/design/binder_design/binderbench/targets/msa/04_pdl1-chain_B.a3m"
+    ],
+    "target_chain_and_residues": [
+        "B1-116"
+    ],
+    "target_interface_residues": {
+        "hotspot": [
+            "B40",
+            "B99",
+            "B107"
+        ],
+        "extended": [
+            "B38",
+            "B40",
+            "B45",
+            "B99",
+            "B105",
+            "B107",
+            "B108",
+            "B109"
+        ],
+        "common": [
+            "B38",
+            "B40",
+            "B99",
+            "B101",
+            "B105",
+            "B106",
+            "B107"
+        ]
+    },
+    "binder_min_length": 50,
+    "binder_max_length": 120,
+    "tag": [
+        "RFDiffusion",
+        "AlphaProteo"
+    ],
+    "pdb_id": "5O45"
+}

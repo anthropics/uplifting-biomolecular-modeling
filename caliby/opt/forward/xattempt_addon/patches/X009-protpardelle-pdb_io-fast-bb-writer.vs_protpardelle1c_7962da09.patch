@@ -1,0 +1,81 @@
+--- a/src/protpardelle/data/pdb_io.py
++++ b/src/protpardelle/data/pdb_io.py
+@@ -345,6 +345,66 @@
+     )
+ 
+ 
++def _x_pp_fastpdb_level() -> int:
++    """CALIBY_X_PP_FASTPDB (XATTEMPT L-I): 0/unset = stock per-atom .item()/float() loop; 1 = one host transfer + list formatting."""
++    import os as _os
++
++    try:
++        return int(_os.environ.get("CALIBY_X_PP_FASTPDB", "0"))
++    except ValueError:
++        return 0
++
++
++def _x_bb_coords_to_pdb_str_fast(bb_coords, atoms, aatype, residue_index, chain_index, chain_id_mapping) -> str | None:
++    """XATTEMPT add-on lever L-I: byte-identical replacement of the loop below for the common case (aatype, residue_index and
++    chain_index given, as protpardelle.sample.save_samples always does).  The stock loop performs ~6 single-element tensor
++    reads (.item()/float(); each a device->host sync when the feature tensors live on the GPU, as aatype/chain_index do in
++    save_samples) per ATOM line (~9 000 per 550-residue backbone, x31 conformers); here each tensor is moved to the host once
++    (.tolist()) and the lines are formatted with the identical f-string.  float(t[k]) of a float32 tensor element and
++    t.tolist()[k] are the same exact float32->float64 conversion, so every formatted field is identical.  Returns None (-> stock
++    loop) for inputs the fast path does not cover."""
++    if aatype is None or residue_index is None or chain_index is None:
++        return None
++    if bb_coords.dim() != 2 or bb_coords.shape[-1] != 3 or bb_coords.dtype != torch.float32:
++        return None
++    num_atoms = len(atoms)
++    n_flat = bb_coords.shape[0]
++    xyz = bb_coords.detach().cpu().tolist()
++    aat = aatype.detach().cpu().tolist() if torch.is_tensor(aatype) else [int(a) for a in aatype]
++    chi = chain_index.detach().long().cpu().tolist() if torch.is_tensor(chain_index) else [int(c) for c in chain_index]
++    rsi = residue_index.detach().long().cpu().tolist() if torch.is_tensor(residue_index) else [int(r) for r in residue_index]
++    if chain_id_mapping is None:
++        def _chain(ci):
++            if ci < PDB_MAX_CHAINS:
++                return PDB_CHAIN_IDS[ci]
++            raise ValueError(f"chain_idx {ci} exceeds max PDB chains {PDB_MAX_CHAINS}.")
++    else:
++        id_chain_mapping = {v: k for k, v in chain_id_mapping.items()}
++
++        def _chain(ci):
++            return id_chain_mapping.get(ci, "A")
++    occupancy = 1.0
++    temp_factor = 20.0
++    out: list[str] = []
++    for i in range(0, n_flat, num_atoms):
++        residx = i // num_atoms
++        res = residue_constants.restype_1to3[residue_constants.restypes[aat[residx]]]
++        chain_idx = chi[residx]
++        assert isinstance(chain_idx, int)
++        chain = _chain(chain_idx)
++        resnum = rsi[residx]
++        assert isinstance(resnum, int)
++        for j, atom in enumerate(atoms):
++            x, y, z = xyz[i + j]
++            elem = atom[0]
++            out.append(
++                f"{'ATOM':<6}{i + j + 1:>5} {atom:^4} {res:<3} {chain:>1}{resnum:>4}    "
++                f"{x:8.3f}{y:8.3f}{z:8.3f}{occupancy:6.2f}{temp_factor:6.2f}          "
++                f"{elem:>2}\n"
++            )
++    return "".join(out)
++
++
+ def bb_coords_to_pdb_str(
+     bb_coords: torch.Tensor,
+     atoms: tuple[str, ...] = ("N", "CA", "C", "O"),
+@@ -367,6 +427,11 @@
+         str: PDB string representation of the backbone coordinates.
+     """
+ 
++    if _x_pp_fastpdb_level() >= 1:
++        _fast = _x_bb_coords_to_pdb_str_fast(bb_coords, atoms, aatype, residue_index, chain_index, chain_id_mapping)
++        if _fast is not None:
++            return _fast
++
+     L = bb_coords.shape[0]
+     num_atoms = len(atoms)
+     pdb_str_list: list[str] = []

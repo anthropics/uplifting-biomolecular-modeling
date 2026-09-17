@@ -1,0 +1,16 @@
+{
+ "blk2_arch": [
+  "sm90",
+  "sm100",
+  "sm120",
+  "sm80",
+  "sm103"
+ ],
+ "blk2_triatt_stock_arch": [],
+ "blk2_triatt_min_tokens": {
+  "sm80": 400
+ },
+ "smalln_trimul_exact_below": {
+  "sm100": 576
+ }
+}

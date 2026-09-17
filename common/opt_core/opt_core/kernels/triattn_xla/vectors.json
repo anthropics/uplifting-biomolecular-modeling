@@ -1,0 +1,1822 @@
+{
+ "cases": {
+  "bf16_d16_n40_s512_pad": {
+   "inputs_sha256": {
+    "bias": "23fc20bca8da53e66de64111b7d4ed0606859e96fc33b7ee0616a9111b4acd1c",
+    "k": "7dc10d88fe7ede445a4be253819d7ab90dc5d9e881865c10f9ac65451c62633c",
+    "mask": "b8e504e5dfd6fcbfd1d67d93d119b19b5242daf257f6aad22fb451560ef993c2",
+    "q": "6a7b4e5d61e4cb2bf1c4d08158aab6c747a4c1c378a226c76d0e5dbb584f9f2f",
+    "v": "3570475bfab8af6539e40c559ef33a469ba0de22f36e29baf789b13928a03f56"
+   },
+   "meta": {
+    "B": 1,
+    "D": 16,
+    "H": 4,
+    "N": 40,
+    "S": 512,
+    "bias_kind": "bf16exact",
+    "dtype": "bf16",
+    "mask_kind": "pad",
+    "seed": 13
+   },
+   "rows": {
+    "cuda80_torch": {
+     "fallbacks": {
+      "copy": 0,
+      "fix_tiles": 0,
+      "general_rows": 17,
+      "list_rowgroups": 17,
+      "uniform_rows": 17
+     },
+     "kernel": "kernels/triattn/triattn_native generation 11, cuda_80 kernel directory (triattn_sm80), torch launch",
+     "lse_absmax": 18.1859130859375,
+     "lse_sha256": "8537ee82333903650f587373569c0fa184205b34a5e819f31dcf96659c6f0c72",
+     "maxabs_vs_fp32": 0.008409261703491211,
+     "maxabs_vs_k2b": 0.015625,
+     "out_same_with_and_without_lse": true,
+     "sample16": [
+      15753,
+      48702,
+      48702,
+      15774,
+      16037,
+      15519,
+      15775,
+      48323,
+      48669,
+      48625,
+      48740,
+      15968,
+      48728,
+      15743,
+      48401,
+      15472
+     ],
+     "sha256": "3636da706ba9bd7c6127d93381d31d8d7dd47172d71c66854294fd2c5eba67e7"
+    },
+    "k2b_torch": {
+     "k2b_version": "?",
+     "kernel": "fpf_triatt_k2b flash_triangle_attention (torch launch)",
+     "maxabs_vs_fp32": 0.007551431655883789,
+     "s": 0.008,
+     "sample16": [
+      15753,
+      48702,
+      48702,
+      15774,
+      16037,
+      15523,
+      15775,
+      48324,
+      48669,
+      48625,
+      48739,
+      15968,
+      48728,
+      15742,
+      48400,
+      15474
+     ],
+     "sha256": "2a7bca3d9ae613de861c70aae723bc0bdb507d71972497c82164723790f3a7d8"
+    },
+    "k2b_torch_sm80": {
+     "k2b_version": "?",
+     "kernel": "fpf_triatt_k2b flash_triangle_attention (torch launch)",
+     "maxabs_vs_fp32": 0.007551431655883789,
+     "s": 5.787,
+     "sample16": [
+      15753,
+      48702,
+      48702,
+      15774,
+      16037,
+      15523,
+      15775,
+      48324,
+      48669,
+      48625,
+      48739,
+      15968,
+      48728,
+      15742,
+      48400,
+      15474
+     ],
+     "sha256": "d459e47e544a1c06b7647292d5a0894b027c1f1e9d596f4b19cae3c5e57a7063"
+    }
+   }
+  },
+  "bf16_d16_s200_ragged": {
+   "inputs_sha256": {
+    "bias": "8b4d25f0c5cbf374f6813568d6367832aa1f8863da7fd999e658edf6d95ede14",
+    "k": "da36e59b7c99e52829bf8d860a8dfa21d06702b40604e3e84ac97eab66908a54",
+    "mask": "4ea716ab9f9f6c6344b1bd619d63e8f0427ef34f9c147a5850d2224442a197d7",
+    "q": "de015f8973026aca2a45882c07740c01974c8c081d63f0963a3c3d02d1452a1d",
+    "v": "9b138308873549805a63b05bd35bafae9e33c43f0a1851487f94e2071ba05242"
+   },
+   "meta": {
+    "B": 1,
+    "D": 16,
+    "H": 4,
+    "N": 200,
+    "S": 200,
+    "bias_kind": "bf16exact",
+    "dtype": "bf16",
+    "mask_kind": "ragged",
+    "seed": 5
+   },
+   "rows": {
+    "cuda80_torch": {
+     "fallbacks": {
+      "copy": 0,
+      "fix_tiles": 0,
+      "general_rows": 8,
+      "list_rowgroups": 8,
+      "uniform_rows": 8
+     },
+     "kernel": "kernels/triattn/triattn_native generation 11, cuda_80 kernel directory (triattn_sm80), torch launch",
+     "lse_absmax": 18.044464111328125,
+     "lse_sha256": "30f8bf591d3cf58395114290ac347c2eca88dd814287e52a08c52543c6478665",
+     "maxabs_vs_fp32": 0.010054826736450195,
+     "maxabs_vs_k2b": 0.015625,
+     "out_same_with_and_without_lse": true,
+     "sample16": [
+      15896,
+      16114,
+      48513,
+      48608,
+      48705,
+      16075,
+      15952,
+      48514,
+      48770,
+      15730,
+      48761,
+      48929,
+      16108,
+      16024,
+      48809,
+      48428
+     ],
+     "sha256": "fbadabd2ce656588d9434b7d11896868a6810911cb7b9ed14c2dd8b59d4ac308"
+    },
+    "k2b_torch": {
+     "k2b_version": "?",
+     "kernel": "fpf_triatt_k2b flash_triangle_attention (torch launch)",
+     "maxabs_vs_fp32": 0.007986307144165039,
+     "s": 0.009,
+     "sample16": [
+      15896,
+      16113,
+      48513,
+      48608,
+      48705,
+      16074,
+      15952,
+      48514,
+      48770,
+      15730,
+      48761,
+      48929,
+      16108,
+      16024,
+      48809,
+      48427
+     ],
+     "sha256": "e1850f671114a711785102bf1d20e8174c021a251ccd2725d80d0cb7e2716f44"
+    },
+    "k2b_torch_sm80": {
+     "k2b_version": "?",
+     "kernel": "fpf_triatt_k2b flash_triangle_attention (torch launch, sm_80)",
+     "maxabs_vs_fp32": 0.007986307144165039,
+     "s": 2.466,
+     "sample16": [
+      15896,
+      16113,
+      48513,
+      48608,
+      48705,
+      16074,
+      15952,
+      48514,
+      48770,
+      15730,
+      48761,
+      48929,
+      16108,
+      16024,
+      48809,
+      48427
+     ],
+     "sha256": "65a39b4a51b246677173de3211a673816f00bc0db9ab9f09a30feb694b541bf2"
+    }
+   }
+  },
+  "bf16_d32_b2_s150_ragged": {
+   "inputs_sha256": {
+    "bias": "b08dbe86eab8495384f9a4cf856292b2b679f3ef6ce2a64d1f4d0c66433f4786",
+    "k": "6f80cc6d1079ce0e8e8ecae897ff0249000d801486bbc31c2061151436a3b6b7",
+    "mask": "6e34aedaf1c917ecba0a27bb581f8defdb2d1fa10b379228066a0490682e96ab",
+    "q": "b26f66409c23c0cbbb12287a194c66706e136228c71e7cf7eb51a484e6bb194d",
+    "v": "df3b2ebf98fe003fdd7b5858f4c04fba0da02f51d3cc84334fa97db18aba2c00"
+   },
+   "meta": {
+    "B": 2,
+    "D": 32,
+    "H": 2,
+    "N": 150,
+    "S": 150,
+    "bias_kind": "bf16exact",
+    "dtype": "bf16",
+    "mask_kind": "ragged",
+    "seed": 6
+   },
+   "rows": {
+    "native_m1_torch": {
+     "fix_tiles": 0,
+     "kernel": "kernels/triattn/triattn_native generation 11, cuda_b kernel directory (triattn_m1), torch launch",
+     "maxabs_vs_fp32": 0.009872198104858398,
+     "maxabs_vs_k2b": 0.015625,
+     "sample16": [
+      48592,
+      48866,
+      15722,
+      15875,
+      48783,
+      15762,
+      16051,
+      16131,
+      15709,
+      48736,
+      48515,
+      48653,
+      15729,
+      15824,
+      48855,
+      15749
+     ],
+     "sha256": "83447c7e42eff131e9631c86091c823dfadbcecf76aaf398844c58f8b78461d8"
+    },
+    "native_routed_torch": {
+     "maxabs_vs_fp32": 0.008777856826782227,
+     "route": "k13",
+     "sha256": "0c72fd060505fcc2024751425c01d98aba03a177d19fa9cc860e04dc4ca9a756"
+    },
+    "cuda80_torch": {
+     "fallbacks": {
+      "copy": 0,
+      "fix_tiles": 0,
+      "general_rows": 14,
+      "list_rowgroups": 14,
+      "uniform_rows": 14
+     },
+     "kernel": "kernels/triattn/triattn_native generation 11, cuda_80 kernel directory (triattn_sm80), torch launch",
+     "lse_absmax": 17.453289031982422,
+     "lse_sha256": "564bd14634424872731679b4f1a68757336243e920f7417602af2de7cc7a44ff",
+     "maxabs_vs_fp32": 0.009872198104858398,
+     "maxabs_vs_k2b": 0.015625,
+     "out_same_with_and_without_lse": true,
+     "sample16": [
+      48592,
+      48866,
+      15722,
+      15875,
+      48783,
+      15762,
+      16051,
+      16131,
+      15709,
+      48736,
+      48515,
+      48653,
+      15729,
+      15824,
+      48855,
+      15749
+     ],
+     "sha256": "09b7237f6acf81741d0d9197e8930b1df757920fa4c150e774aa0e1ea83a97a1"
+    },
+    "cuda_torch": {
+     "kernel": "sm_90a CUDA kernel, torch binding (sealed prebuilt)",
+     "maxabs_vs_fp32": 0.009872198104858398,
+     "maxabs_vs_k2b": 0.015625,
+     "sample16": [
+      48592,
+      48866,
+      15722,
+      15875,
+      48783,
+      15762,
+      16051,
+      16131,
+      15709,
+      48736,
+      48515,
+      48653,
+      15729,
+      15824,
+      48855,
+      15749
+     ],
+     "sha256": "081c3fbb7570069484c504840d7eef3878647498c39b9c6f5375847cfb8906d6"
+    },
+    "k2b_torch": {
+     "k2b_version": "?",
+     "kernel": "fpf_triatt_k2b flash_triangle_attention (torch launch)",
+     "maxabs_vs_fp32": 0.008777856826782227,
+     "s": 0.011,
+     "sample16": [
+      48592,
+      48866,
+      15720,
+      15876,
+      48783,
+      15763,
+      16051,
+      16131,
+      15709,
+      48735,
+      48515,
+      48651,
+      15727,
+      15822,
+      48854,
+      15749
+     ],
+     "sha256": "837b4543feaacb4fd090f326ec782f6ebb48aaf322a762a0c9a7f3359f2f540d"
+    },
+    "k2b_torch_sm80": {
+     "k2b_version": "?",
+     "kernel": "fpf_triatt_k2b flash_triangle_attention (torch launch, sm_80)",
+     "maxabs_vs_fp32": 0.008777856826782227,
+     "s": 2.765,
+     "sample16": [
+      48592,
+      48866,
+      15720,
+      15876,
+      48783,
+      15763,
+      16051,
+      16131,
+      15709,
+      48735,
+      48515,
+      48651,
+      15727,
+      15822,
+      48854,
+      15749
+     ],
+     "sha256": "e1811c20cea1b565e3baa9aa40ea3aa79a7a7f40c728fe0dc0076a93ee801829"
+    }
+   }
+  },
+  "bf16_d32_n32_s1344_pad": {
+   "inputs_sha256": {
+    "bias": "0640516bc69f4eb0f905e8de8ddba0b63f8078705462e06870d555fb7f59aac5",
+    "k": "fc1b6318adfbbdff121cc6b814dd20cfe505ff65beac404d2c7b3d5707cbc0ec",
+    "mask": "e6ddd92a0a6c9920f98d99763ae643b1e5e9fa8b6704d9a8ae52fdcc3cc62c89",
+    "q": "41e9c7437e315fc373a5b634883d56b00c2877ea740d795b02a1c99faa6444b9",
+    "v": "09e508de0b2d3d455790c95ffb6ad8c9014339a8d1de10c72d5674c229a80ce9"
+   },
+   "meta": {
+    "B": 1,
+    "D": 32,
+    "H": 4,
+    "N": 32,
+    "S": 1344,
+    "bias_kind": "bf16exact",
+    "dtype": "bf16",
+    "mask_kind": "pad",
+    "seed": 12
+   },
+   "rows": {
+    "native_m1_torch": {
+     "fix_tiles": 0,
+     "kernel": "kernels/triattn/triattn_native generation 11, cuda_b kernel directory (triattn_m1), torch launch",
+     "maxabs_vs_fp32": 0.009521245956420898,
+     "maxabs_vs_k2b": 0.015625,
+     "sample16": [
+      15872,
+      15872,
+      15719,
+      48520,
+      48585,
+      15768,
+      48761,
+      15685,
+      48788,
+      15648,
+      15779,
+      15853,
+      15334,
+      48620,
+      48555,
+      15952
+     ],
+     "sha256": "513b4bece4e97354d0663f44730327b1eef1c7bcd6c0b57db4bafe0ba43ed3e3"
+    },
+    "native_routed_torch": {
+     "maxabs_vs_fp32": 0.009521245956420898,
+     "route": "cuda_b",
+     "sha256": "513b4bece4e97354d0663f44730327b1eef1c7bcd6c0b57db4bafe0ba43ed3e3"
+    },
+    "cuda80_torch": {
+     "fallbacks": {
+      "copy": 0,
+      "fix_tiles": 0,
+      "general_rows": 17,
+      "list_rowgroups": 17,
+      "uniform_rows": 17
+     },
+     "kernel": "kernels/triattn/triattn_native generation 11, cuda_80 kernel directory (triattn_sm80), torch launch",
+     "lse_absmax": 18.534515380859375,
+     "lse_sha256": "aa2d539f96fe7009d38743f6a15c84440679f99c651248a88ae0712ff74df5b1",
+     "maxabs_vs_fp32": 0.009521245956420898,
+     "maxabs_vs_k2b": 0.015625,
+     "out_same_with_and_without_lse": true,
+     "sample16": [
+      15872,
+      15872,
+      15719,
+      48520,
+      48585,
+      15768,
+      48761,
+      15685,
+      48788,
+      15648,
+      15779,
+      15853,
+      15334,
+      48620,
+      48555,
+      15952
+     ],
+     "sha256": "14780a78d8eddb21ef783bf1a829a6c4ed5fd7e2675d9dfef137e9e4b9fa37cc"
+    },
+    "cuda_torch": {
+     "kernel": "sm_90a CUDA kernel, torch binding (sealed prebuilt)",
+     "maxabs_vs_fp32": 0.009521245956420898,
+     "maxabs_vs_k2b": 0.015625,
+     "sample16": [
+      15872,
+      15872,
+      15719,
+      48520,
+      48585,
+      15768,
+      48761,
+      15685,
+      48788,
+      15648,
+      15779,
+      15853,
+      15334,
+      48620,
+      48555,
+      15952
+     ],
+     "sha256": "549b128981923cf0b4dbb44673fc241fabc5f925ec408d7477bf28ca00f7d45d"
+    },
+    "k2b_torch": {
+     "k2b_version": "?",
+     "kernel": "fpf_triatt_k2b flash_triangle_attention (torch launch)",
+     "maxabs_vs_fp32": 0.007802486419677734,
+     "s": 0.012,
+     "sample16": [
+      15872,
+      15873,
+      15719,
+      48520,
+      48585,
+      15768,
+      48762,
+      15688,
+      48788,
+      15648,
+      15780,
+      15853,
+      15326,
+      48621,
+      48555,
+      15953
+     ],
+     "sha256": "ee2b709b95bb4a47024c5b6e4fcc500a8c4c03335862a055d65fe2759848d9fa"
+    },
+    "k2b_torch_sm80": {
+     "k2b_version": "?",
+     "kernel": "fpf_triatt_k2b flash_triangle_attention (torch launch)",
+     "maxabs_vs_fp32": 0.007802486419677734,
+     "s": 0.045,
+     "sample16": [
+      15872,
+      15873,
+      15719,
+      48520,
+      48585,
+      15768,
+      48762,
+      15688,
+      48788,
+      15648,
+      15780,
+      15853,
+      15326,
+      48621,
+      48555,
+      15953
+     ],
+     "sha256": "bc3679361f42a64d745082adc28db702b5495cb228b52dc36ab910c10b3d129d"
+    }
+   }
+  },
+  "bf16_d32_n48_s768_nomask": {
+   "inputs_sha256": {
+    "bias": "89247770edeae26ea3176cb3eb79b976cdf7355fb72eff9ce8e32ae13af5666e",
+    "k": "7869b5c906fb0d2f8a71c4ff79f7926dd6ff7f6a16de43c18162a90c5447880c",
+    "mask": "none",
+    "q": "82f3c5bbeabd2d7c589fd13d4f8966df7fcdc89783958c129645371614719ce1",
+    "v": "91def3e3106b371bb8fb8f0deb8543fd36c8e965804f22afb40ce948816b233e"
+   },
+   "meta": {
+    "B": 1,
+    "D": 32,
+    "H": 4,
+    "N": 48,
+    "S": 768,
+    "bias_kind": "bf16exact",
+    "dtype": "bf16",
+    "mask_kind": "none",
+    "seed": 11
+   },
+   "rows": {
+    "native_m1_torch": {
+     "fix_tiles": 0,
+     "kernel": "kernels/triattn/triattn_native generation 11, cuda_b kernel directory (triattn_m1), torch launch",
+     "maxabs_vs_fp32": 0.009700775146484375,
+     "maxabs_vs_k2b": 0.015625,
+     "sample16": [
+      48771,
+      48135,
+      15847,
+      48319,
+      48224,
+      47651,
+      16003,
+      48601,
+      15690,
+      48189,
+      48644,
+      16011,
+      48451,
+      48584,
+      15969,
+      15880
+     ],
+     "sha256": "16ee316d1caf23f49eada9a04128d6f1caeec2b868259ea6af4665d487c300a9"
+    },
+    "native_routed_torch": {
+     "maxabs_vs_fp32": 0.009700775146484375,
+     "route": "cuda_b",
+     "sha256": "16ee316d1caf23f49eada9a04128d6f1caeec2b868259ea6af4665d487c300a9"
+    },
+    "cuda80_torch": {
+     "fallbacks": {
+      "copy": 0,
+      "fix_tiles": 0,
+      "general_rows": 17,
+      "list_rowgroups": 17,
+      "uniform_rows": 17
+     },
+     "kernel": "kernels/triattn/triattn_native generation 11, cuda_80 kernel directory (triattn_sm80), torch launch",
+     "lse_absmax": 18.548839569091797,
+     "lse_sha256": "92a019071f61316091c7ba78b9bb196a237626db93c4338f0fd9a4c0b581a336",
+     "maxabs_vs_fp32": 0.009700775146484375,
+     "maxabs_vs_k2b": 0.015625,
+     "out_same_with_and_without_lse": true,
+     "sample16": [
+      48771,
+      48135,
+      15847,
+      48319,
+      48224,
+      47651,
+      16003,
+      48601,
+      15690,
+      48189,
+      48644,
+      16011,
+      48451,
+      48584,
+      15969,
+      15880
+     ],
+     "sha256": "b9434668704845464f30f43966e4562a51d7fe11a8240e885fe1b102c54fa308"
+    },
+    "cuda_torch": {
+     "kernel": "sm_90a CUDA kernel, torch binding (sealed prebuilt)",
+     "maxabs_vs_fp32": 0.009700775146484375,
+     "maxabs_vs_k2b": 0.015625,
+     "sample16": [
+      48771,
+      48135,
+      15847,
+      48319,
+      48224,
+      47651,
+      16003,
+      48601,
+      15690,
+      48189,
+      48644,
+      16011,
+      48451,
+      48584,
+      15969,
+      15880
+     ],
+     "sha256": "9662fc25af92483a4a3666133aa8846fb25ced7afb072d6e79e6e9d308490ad7"
+    },
+    "k2b_torch": {
+     "k2b_version": "?",
+     "kernel": "fpf_triatt_k2b flash_triangle_attention (torch launch)",
+     "maxabs_vs_fp32": 0.0078089237213134766,
+     "s": 0.011,
+     "sample16": [
+      48771,
+      48131,
+      15848,
+      48317,
+      48220,
+      47559,
+      16003,
+      48600,
+      15689,
+      48185,
+      48644,
+      16011,
+      48453,
+      48584,
+      15969,
+      15880
+     ],
+     "sha256": "2a51b4b5ffddb49e265d703e69e712ce6c45c5e855c84e8ec2884c985841901e"
+    },
+    "k2b_torch_sm80": {
+     "k2b_version": "?",
+     "kernel": "fpf_triatt_k2b flash_triangle_attention (torch launch)",
+     "maxabs_vs_fp32": 0.0078089237213134766,
+     "s": 2.064,
+     "sample16": [
+      48771,
+      48131,
+      15848,
+      48317,
+      48220,
+      47559,
+      16003,
+      48600,
+      15689,
+      48185,
+      48644,
+      16011,
+      48453,
+      48584,
+      15969,
+      15880
+     ],
+     "sha256": "2d2d5c0bd8c1ad0e0b21663ccbb628630bac865f9467f141dccd1a3aece83e89"
+    }
+   }
+  },
+  "bf16_d32_n64_s640_ragged": {
+   "inputs_sha256": {
+    "bias": "89d1ce7c1f1b8e06421f99cfccb467ab85479484c92731a301f6608ab2b4d379",
+    "k": "e9eea60ae1ff6a0726fcee797ceb0a6302ba3c2cb61dd68ddc9fe66e58ad712c",
+    "mask": "538796999aa35a866609c0428ee94cc78958b622d6c77b838c5437d16e11ac3b",
+    "q": "88f7e2f72e7b904f59a92fc5f4427ab421a9ae9a9fd861db7791b92b3bba3bf5",
+    "v": "aa4e5a03043949fe75f61349a8c09c4a0c70472db8e44f7ea078d353d9398c9b"
+   },
+   "meta": {
+    "B": 1,
+    "D": 32,
+    "H": 2,
+    "N": 64,
+    "S": 640,
+    "bias_kind": "f32",
+    "dtype": "bf16",
+    "mask_kind": "ragged",
+    "seed": 10
+   },
+   "rows": {
+    "native_m1_torch": {
+     "fix_tiles": 0,
+     "kernel": "kernels/triattn/triattn_native generation 11, cuda_b kernel directory (triattn_m1), torch launch",
+     "maxabs_vs_fp32": 0.009096622467041016,
+     "maxabs_vs_k2b": 0.015625,
+     "sample16": [
+      48542,
+      48700,
+      15718,
+      15793,
+      48619,
+      48661,
+      48650,
+      48662,
+      15797,
+      15507,
+      15826,
+      48163,
+      48743,
+      15841,
+      48601,
+      48743
+     ],
+     "sha256": "c415894eee876bbd4ab74632659106f5164db33699aed3984da4f692e677873e"
+    },
+    "native_routed_torch": {
+     "maxabs_vs_fp32": 0.009096622467041016,
+     "route": "cuda_b",
+     "sha256": "c415894eee876bbd4ab74632659106f5164db33699aed3984da4f692e677873e"
+    },
+    "cuda80_torch": {
+     "fallbacks": {
+      "copy": 0,
+      "fix_tiles": 0,
+      "general_rows": 17,
+      "list_rowgroups": 17,
+      "uniform_rows": 17
+     },
+     "kernel": "kernels/triattn/triattn_native generation 11, cuda_80 kernel directory (triattn_sm80), torch launch",
+     "lse_absmax": 18.132198333740234,
+     "lse_sha256": "ec1597018e91b7bc2d9cead04ccf90b4f82474db83e72b1f65a7c5481780c444",
+     "maxabs_vs_fp32": 0.009096622467041016,
+     "maxabs_vs_k2b": 0.015625,
+     "out_same_with_and_without_lse": true,
+     "sample16": [
+      48542,
+      48700,
+      15718,
+      15793,
+      48619,
+      48661,
+      48650,
+      48662,
+      15797,
+      15507,
+      15826,
+      48163,
+      48743,
+      15841,
+      48601,
+      48743
+     ],
+     "sha256": "7a21896e11036e5d266743cd319b6fa8e210d890259df46d4b7d15e86a067897"
+    },
+    "cuda_torch": {
+     "kernel": "sm_90a CUDA kernel, torch binding (sealed prebuilt)",
+     "maxabs_vs_fp32": 0.009096622467041016,
+     "maxabs_vs_k2b": 0.015625,
+     "sample16": [
+      48542,
+      48700,
+      15718,
+      15793,
+      48619,
+      48661,
+      48650,
+      48662,
+      15797,
+      15507,
+      15826,
+      48163,
+      48743,
+      15841,
+      48601,
+      48743
+     ],
+     "sha256": "7f6a680d5aafe76f77d98eb94dd5d892d6e84343c58b75719266ed163e5a73cf"
+    },
+    "k2b_torch": {
+     "k2b_version": "?",
+     "kernel": "fpf_triatt_k2b flash_triangle_attention (torch launch)",
+     "maxabs_vs_fp32": 0.0077991485595703125,
+     "s": 0.005,
+     "sample16": [
+      48542,
+      48700,
+      15719,
+      15792,
+      48619,
+      48661,
+      48650,
+      48662,
+      15797,
+      15507,
+      15827,
+      48163,
+      48742,
+      15841,
+      48601,
+      48743
+     ],
+     "sha256": "3fec3dee7fb12fc12130bc96190584d15ba9d876b54333c2a41c27755e013da3"
+    },
+    "k2b_torch_sm80": {
+     "k2b_version": "?",
+     "kernel": "fpf_triatt_k2b flash_triangle_attention (torch launch)",
+     "maxabs_vs_fp32": 0.0077991485595703125,
+     "s": 0.019,
+     "sample16": [
+      48542,
+      48700,
+      15719,
+      15792,
+      48619,
+      48661,
+      48650,
+      48662,
+      15797,
+      15507,
+      15827,
+      48163,
+      48742,
+      15841,
+      48601,
+      48743
+     ],
+     "sha256": "0249170670b10df080b9665044dec18b7cfc611fbfae0ad4553a570a4961b8ea"
+    }
+   }
+  },
+  "bf16_d32_n96_s512_pad": {
+   "inputs_sha256": {
+    "bias": "5d32beadf1c321175520a0f19436105f0fd076f3a76fdb44322a140d6d000dba",
+    "k": "740efea84cc2cf3df189f164f66c7d0a9e205a268e9598d2c19fe5de58649687",
+    "mask": "dbda1e04ba9d4cda9cb0a96687da17e41a238e929293f780ede1d9e1eda51862",
+    "q": "ea0b4ba0fe468c7fb7ce9553baae979c3af7c19a6ec124fdb1384a0a44f888e0",
+    "v": "ceab5b2826a238f01a62898d94501aa7d139b0cf325bd7f99b24aabb40def314"
+   },
+   "meta": {
+    "B": 1,
+    "D": 32,
+    "H": 4,
+    "N": 96,
+    "S": 512,
+    "bias_kind": "bf16exact",
+    "dtype": "bf16",
+    "mask_kind": "pad",
+    "seed": 9
+   },
+   "rows": {
+    "native_m1_torch": {
+     "fix_tiles": 0,
+     "kernel": "kernels/triattn/triattn_native generation 11, cuda_b kernel directory (triattn_m1), torch launch",
+     "maxabs_vs_fp32": 0.010172367095947266,
+     "maxabs_vs_k2b": 0.015625,
+     "sample16": [
+      16019,
+      48240,
+      48596,
+      16021,
+      15745,
+      48644,
+      15588,
+      15709,
+      48280,
+      15829,
+      15889,
+      15892,
+      48560,
+      48666,
+      15647,
+      15755
+     ],
+     "sha256": "fadd9d0b54980a6218ef5273eea00262209511c18cba30e33d41d770fae15fdc"
+    },
+    "native_routed_torch": {
+     "maxabs_vs_fp32": 0.010172367095947266,
+     "route": "cuda_b",
+     "sha256": "fadd9d0b54980a6218ef5273eea00262209511c18cba30e33d41d770fae15fdc"
+    },
+    "cuda80_torch": {
+     "fallbacks": {
+      "copy": 0,
+      "fix_tiles": 0,
+      "general_rows": 14,
+      "list_rowgroups": 14,
+      "uniform_rows": 14
+     },
+     "kernel": "kernels/triattn/triattn_native generation 11, cuda_80 kernel directory (triattn_sm80), torch launch",
+     "lse_absmax": 18.39554214477539,
+     "lse_sha256": "3e873d94b827b59e066fc3adf811ab22c04236851700b601936fa5ef4abe8f85",
+     "maxabs_vs_fp32": 0.010172367095947266,
+     "maxabs_vs_k2b": 0.015625,
+     "out_same_with_and_without_lse": true,
+     "sample16": [
+      16019,
+      48240,
+      48596,
+      16021,
+      15745,
+      48644,
+      15588,
+      15709,
+      48280,
+      15829,
+      15889,
+      15892,
+      48560,
+      48666,
+      15647,
+      15755
+     ],
+     "sha256": "10d885bede9baa988838cc7f95e0c460851238aa27be926503ae7d95f70b2fc3"
+    },
+    "cuda_torch": {
+     "kernel": "sm_90a CUDA kernel, torch binding (sealed prebuilt)",
+     "maxabs_vs_fp32": 0.010172367095947266,
+     "maxabs_vs_k2b": 0.015625,
+     "sample16": [
+      16019,
+      48240,
+      48596,
+      16021,
+      15745,
+      48644,
+      15588,
+      15709,
+      48280,
+      15829,
+      15889,
+      15892,
+      48560,
+      48666,
+      15647,
+      15755
+     ],
+     "sha256": "c4ad6a8e989f94c16ec1aa4b4c19c45138afdb2f982fdc8ee23cbdf1c5cf27d1"
+    },
+    "k2b_torch": {
+     "k2b_version": "?",
+     "kernel": "fpf_triatt_k2b flash_triangle_attention (torch launch)",
+     "maxabs_vs_fp32": 0.007811069488525391,
+     "s": 0.023,
+     "sample16": [
+      16019,
+      48238,
+      48595,
+      16021,
+      15745,
+      48644,
+      15586,
+      15710,
+      48281,
+      15828,
+      15889,
+      15891,
+      48560,
+      48666,
+      15648,
+      15755
+     ],
+     "sha256": "b111f0928d867bbca7dd332020800fa4682020c20e3b4638894bb1779d50fe31"
+    },
+    "k2b_torch_sm80": {
+     "k2b_version": "?",
+     "kernel": "fpf_triatt_k2b flash_triangle_attention (torch launch)",
+     "maxabs_vs_fp32": 0.007811069488525391,
+     "s": 6.215,
+     "sample16": [
+      16019,
+      48238,
+      48595,
+      16021,
+      15745,
+      48644,
+      15586,
+      15710,
+      48281,
+      15828,
+      15889,
+      15891,
+      48560,
+      48666,
+      15648,
+      15755
+     ],
+     "sha256": "a26142245381f3a2538394d10c097acdef138210c50c5aa3ff7806a635e07525"
+    }
+   }
+  },
+  "bf16_d32_s200_ragged": {
+   "inputs_sha256": {
+    "bias": "99f10a42803d9312f09dfac04b45cc9f871c674a9823158268956ea8d13d4520",
+    "k": "7fb5a13de667133ac25096eaa5fe2fc7b16f227a18f3a1215e2b80bf0c2ac6c1",
+    "mask": "4ea716ab9f9f6c6344b1bd619d63e8f0427ef34f9c147a5850d2224442a197d7",
+    "q": "58b5b037b0d429d33b2ba1859dde813299ee5db8107609c025562de21b025e84",
+    "v": "406beb8bce28b07640d10a4995889a84a0646547c601257c42323e1f2077fedb"
+   },
+   "meta": {
+    "B": 1,
+    "D": 32,
+    "H": 4,
+    "N": 200,
+    "S": 200,
+    "bias_kind": "bf16exact",
+    "dtype": "bf16",
+    "mask_kind": "ragged",
+    "seed": 1
+   },
+   "rows": {
+    "native_m1_torch": {
+     "fix_tiles": 0,
+     "kernel": "kernels/triattn/triattn_native generation 11, cuda_b kernel directory (triattn_m1), torch launch",
+     "maxabs_vs_fp32": 0.01106882095336914,
+     "maxabs_vs_k2b": 0.015625,
+     "sample16": [
+      48688,
+      15965,
+      48878,
+      16052,
+      16029,
+      15528,
+      16038,
+      48370,
+      15921,
+      48445,
+      48877,
+      48580,
+      48359,
+      48720,
+      15683,
+      16079
+     ],
+     "sha256": "48a16f5948d92d0941c85ee3daee4e772f13b7d7e74ad6980130f03d9ba208b6"
+    },
+    "native_routed_torch": {
+     "maxabs_vs_fp32": 0.01106882095336914,
+     "route": "k13",
+     "sha256": "e086619bf55043bd5697a07b9fcdc2fc8b2314123300901318bab56f8c8b0c58"
+    },
+    "cuda80_torch": {
+     "fallbacks": {
+      "copy": 0,
+      "fix_tiles": 0,
+      "general_rows": 3,
+      "list_rowgroups": 3,
+      "uniform_rows": 3
+     },
+     "kernel": "kernels/triattn/triattn_native generation 11, cuda_80 kernel directory (triattn_sm80), torch launch",
+     "lse_absmax": 18.167648315429688,
+     "lse_sha256": "0dae82ac26630f7374320d559f935cf5754dd8710e60958e35aa9d546fa35928",
+     "maxabs_vs_fp32": 0.01106882095336914,
+     "maxabs_vs_k2b": 0.015625,
+     "out_same_with_and_without_lse": true,
+     "sample16": [
+      48688,
+      15965,
+      48878,
+      16052,
+      16029,
+      15528,
+      16038,
+      48370,
+      15921,
+      48445,
+      48877,
+      48580,
+      48359,
+      48720,
+      15683,
+      16079
+     ],
+     "sha256": "7dfa2415daba5ed3cec055c3d45e1541835bd938ab3e4d906a989dc607dc9ef4"
+    },
+    "cuda_torch": {
+     "kernel": "sm_90a CUDA kernel, torch binding (sealed prebuilt)",
+     "maxabs_vs_fp32": 0.01106882095336914,
+     "maxabs_vs_k2b": 0.015625,
+     "sample16": [
+      48688,
+      15965,
+      48878,
+      16052,
+      16029,
+      15528,
+      16038,
+      48370,
+      15921,
+      48445,
+      48877,
+      48580,
+      48359,
+      48720,
+      15683,
+      16079
+     ],
+     "sha256": "82d96322d964f16e9c0958e06d0f5c890dbbb16a14519c46cae8fc03862c9c6a"
+    },
+    "k2b_torch": {
+     "k2b_version": "?",
+     "kernel": "fpf_triatt_k2b flash_triangle_attention (torch launch)",
+     "maxabs_vs_fp32": 0.01106882095336914,
+     "s": 0.533,
+     "sample16": [
+      48688,
+      15965,
+      48878,
+      16052,
+      16029,
+      15528,
+      16038,
+      48370,
+      15921,
+      48445,
+      48877,
+      48580,
+      48359,
+      48720,
+      15683,
+      16079
+     ],
+     "sha256": "1245acc8e63a9b84884cc812317244ad15d968213f6435fa88219aa61f30a7e4"
+    },
+    "k2b_torch_sm80": {
+     "k2b_version": "?",
+     "kernel": "fpf_triatt_k2b flash_triangle_attention (torch launch, sm_80)",
+     "maxabs_vs_fp32": 0.01106882095336914,
+     "s": 5.919,
+     "sample16": [
+      48688,
+      15965,
+      48878,
+      16052,
+      16029,
+      15528,
+      16038,
+      48370,
+      15921,
+      48445,
+      48877,
+      48580,
+      48359,
+      48720,
+      15683,
+      16079
+     ],
+     "sha256": "41672619c205dd53abddb66b375e6237e323fd1ea7b3470ad6a86cfcaaa706bb"
+    }
+   }
+  },
+  "bf16_d32_s272_nomask": {
+   "inputs_sha256": {
+    "bias": "29840ee3b9ff9f9bb46a6e6007af822fec0449c051320a5259eb1562f89731ba",
+    "k": "f5e3f6e5826ce4b8f458b1de1b657064af73a5eceff99e2990db7500d693f16e",
+    "mask": "none",
+    "q": "1ec8dfab4b3713eb34647ab8280744092d2e777eb516ecfd94606bffa06d91d7",
+    "v": "643601cec29a4f36510a0c924ca032631c21ab68f0e473a24530b2863ed7fcb8"
+   },
+   "meta": {
+    "B": 1,
+    "D": 32,
+    "H": 2,
+    "N": 272,
+    "S": 272,
+    "bias_kind": "bf16exact",
+    "dtype": "bf16",
+    "mask_kind": "none",
+    "seed": 2
+   },
+   "rows": {
+    "native_m1_torch": {
+     "fix_tiles": 0,
+     "kernel": "kernels/triattn/triattn_native generation 11, cuda_b kernel directory (triattn_m1), torch launch",
+     "maxabs_vs_fp32": 0.009592294692993164,
+     "maxabs_vs_k2b": 0.015625,
+     "sample16": [
+      48761,
+      15524,
+      48944,
+      15633,
+      16072,
+      48578,
+      48655,
+      48475,
+      15869,
+      15713,
+      48602,
+      48621,
+      15995,
+      15801,
+      15848,
+      48402
+     ],
+     "sha256": "b7a8a2ad029ee676d7e5124579cfb5d9380a4d1cc4e897409dd116a75bf56aed"
+    },
+    "native_routed_torch": {
+     "maxabs_vs_fp32": 0.008014678955078125,
+     "route": "k13",
+     "sha256": "f4177affb008ce8621246773d16570cbf3dec88881afd75c5b1300eddd3d4320"
+    },
+    "cuda80_torch": {
+     "fallbacks": {
+      "copy": 0,
+      "fix_tiles": 0,
+      "general_rows": 3,
+      "list_rowgroups": 3,
+      "uniform_rows": 3
+     },
+     "kernel": "kernels/triattn/triattn_native generation 11, cuda_80 kernel directory (triattn_sm80), torch launch",
+     "lse_absmax": 17.72463607788086,
+     "lse_sha256": "6c5613b75c2f1ce2fd24fad262ad30d45658bc368fc316eefb122caf4860fffb",
+     "maxabs_vs_fp32": 0.009592294692993164,
+     "maxabs_vs_k2b": 0.015625,
+     "out_same_with_and_without_lse": true,
+     "sample16": [
+      48761,
+      15524,
+      48944,
+      15633,
+      16072,
+      48578,
+      48655,
+      48475,
+      15869,
+      15713,
+      48602,
+      48621,
+      15995,
+      15801,
+      15848,
+      48402
+     ],
+     "sha256": "cedf8d5898c34f8b60cd18fced6fa96bd1fd549265b95bac9225a28ebf5380e4"
+    },
+    "cuda_torch": {
+     "kernel": "sm_90a CUDA kernel, torch binding (sealed prebuilt)",
+     "maxabs_vs_fp32": 0.009592294692993164,
+     "maxabs_vs_k2b": 0.015625,
+     "sample16": [
+      48761,
+      15524,
+      48944,
+      15633,
+      16072,
+      48578,
+      48655,
+      48475,
+      15869,
+      15713,
+      48602,
+      48621,
+      15995,
+      15801,
+      15848,
+      48402
+     ],
+     "sha256": "c04f318f9f26386b44c5e95ba7ada02aad7528a3d51f6d4321e4f3250e6bb276"
+    },
+    "k2b_torch": {
+     "k2b_version": "?",
+     "kernel": "fpf_triatt_k2b flash_triangle_attention (torch launch)",
+     "maxabs_vs_fp32": 0.008014678955078125,
+     "s": 0.014,
+     "sample16": [
+      48761,
+      15524,
+      48943,
+      15633,
+      16072,
+      48578,
+      48655,
+      48475,
+      15869,
+      15714,
+      48603,
+      48621,
+      15995,
+      15802,
+      15848,
+      48403
+     ],
+     "sha256": "66e1836a4d7defafcbbb0b422b2ef533ab378dcad589a046aef226e8be56c850"
+    },
+    "k2b_torch_sm80": {
+     "k2b_version": "?",
+     "kernel": "fpf_triatt_k2b flash_triangle_attention (torch launch, sm_80)",
+     "maxabs_vs_fp32": 0.008014678955078125,
+     "s": 2.41,
+     "sample16": [
+      48761,
+      15524,
+      48943,
+      15633,
+      16072,
+      48578,
+      48655,
+      48475,
+      15869,
+      15714,
+      48603,
+      48621,
+      15995,
+      15802,
+      15848,
+      48403
+     ],
+     "sha256": "1456780ab7bf394deb323376ede174d189647ee439fc153a0b8a2a2050fc0372"
+    }
+   }
+  },
+  "bf16_d32_s272_pad": {
+   "inputs_sha256": {
+    "bias": "9e658dd18b61d8f001a93e94a2221031ac20b50193bad9898d0c137f130b8086",
+    "k": "96b5b4b6b886a57f7ae614d6419d6c28a28f86a68b379bccf592134de7685a79",
+    "mask": "56764a569fc97533bc8045829551a4f500f800a643de8f990aac2fe40d83d02c",
+    "q": "525610ca9118c2553b45702c218050e0f40b1eda94b2ef891ddab55c911d24e3",
+    "v": "39b1000bfc6b162af7993a41b7324335d82b1131f408fa888e46b758711a86ee"
+   },
+   "meta": {
+    "B": 1,
+    "D": 32,
+    "H": 4,
+    "N": 272,
+    "S": 272,
+    "bias_kind": "bf16exact",
+    "dtype": "bf16",
+    "mask_kind": "pad",
+    "seed": 4
+   },
+   "rows": {
+    "native_m1_torch": {
+     "fix_tiles": 0,
+     "kernel": "kernels/triattn/triattn_native generation 11, cuda_b kernel directory (triattn_m1), torch launch",
+     "maxabs_vs_fp32": 0.00970911979675293,
+     "maxabs_vs_k2b": 0.015625,
+     "sample16": [
+      48705,
+      15938,
+      16051,
+      48440,
+      48627,
+      15831,
+      15907,
+      15950,
+      48224,
+      16043,
+      15451,
+      15988,
+      15885,
+      15623,
+      15879,
+      48642
+     ],
+     "sha256": "1bebce5b30f68eb391f9ecb0870e353238b3d50d81b999e96f57665fb47d072c"
+    },
+    "native_routed_torch": {
+     "maxabs_vs_fp32": 0.00818324089050293,
+     "route": "k13",
+     "sha256": "4ebe95c0c4dfd6565f252108a8756101f27b43a57f784a8be36dd5db5be5dba0"
+    },
+    "cuda80_torch": {
+     "fallbacks": {
+      "copy": 0,
+      "fix_tiles": 0,
+      "general_rows": 6,
+      "list_rowgroups": 6,
+      "uniform_rows": 6
+     },
+     "kernel": "kernels/triattn/triattn_native generation 11, cuda_80 kernel directory (triattn_sm80), torch launch",
+     "lse_absmax": 18.147682189941406,
+     "lse_sha256": "e3179b6ccb9591f785015b7d07e356a02288206dffd5773b7885acf7709c55db",
+     "maxabs_vs_fp32": 0.00970911979675293,
+     "maxabs_vs_k2b": 0.015625,
+     "out_same_with_and_without_lse": true,
+     "sample16": [
+      48705,
+      15938,
+      16051,
+      48440,
+      48627,
+      15831,
+      15907,
+      15950,
+      48224,
+      16043,
+      15451,
+      15988,
+      15885,
+      15623,
+      15879,
+      48642
+     ],
+     "sha256": "b461e55318007d285dc91181f522426aeb70806227cc20d23ea7576a3a9b1702"
+    },
+    "cuda_torch": {
+     "kernel": "sm_90a CUDA kernel, torch binding (sealed prebuilt)",
+     "maxabs_vs_fp32": 0.00970911979675293,
+     "maxabs_vs_k2b": 0.015625,
+     "sample16": [
+      48705,
+      15938,
+      16051,
+      48440,
+      48627,
+      15831,
+      15907,
+      15950,
+      48224,
+      16043,
+      15451,
+      15988,
+      15885,
+      15623,
+      15879,
+      48642
+     ],
+     "sha256": "afb3f8ec09f24abff666f085a80a2c45df574398ea40f910d9eac71398e63db5"
+    },
+    "k2b_torch": {
+     "k2b_version": "?",
+     "kernel": "fpf_triatt_k2b flash_triangle_attention (torch launch)",
+     "maxabs_vs_fp32": 0.008077621459960938,
+     "s": 0.02,
+     "sample16": [
+      48705,
+      15938,
+      16051,
+      48441,
+      48624,
+      15831,
+      15907,
+      15950,
+      48220,
+      16043,
+      15457,
+      15988,
+      15885,
+      15623,
+      15879,
+      48642
+     ],
+     "sha256": "3ca01f9ef2d4f4da8fa6a4d5cb3bd9742b169033a129c8c72233de6cd24176ef"
+    },
+    "k2b_torch_sm80": {
+     "k2b_version": "?",
+     "kernel": "fpf_triatt_k2b flash_triangle_attention (torch launch, sm_80)",
+     "maxabs_vs_fp32": 0.008077621459960938,
+     "s": 6.251,
+     "sample16": [
+      48705,
+      15938,
+      16051,
+      48441,
+      48624,
+      15831,
+      15907,
+      15950,
+      48220,
+      16043,
+      15457,
+      15988,
+      15885,
+      15623,
+      15879,
+      48642
+     ],
+     "sha256": "c8fc536f7e754c849cd15a9d4fd2dab733a0e35e96877c50b5e0af658902e1f9"
+    }
+   }
+  },
+  "bf16_d32_s300_ragged": {
+   "inputs_sha256": {
+    "bias": "e30c3a0860ab3b19005ff61349677c2d9f75e869d02d3686f46f1cb653083a55",
+    "k": "99d0e59b2f5156921eacbe60c446927a08e9e79ba3336dbad0d796eb912dc4db",
+    "mask": "ddb515bdbecdb50c151ef192aa4c16c3be395f2b59d973e9235dc6fd9943e8f4",
+    "q": "d9922d18d4fd647c94fb26b0e22378765c52d1b26a3e2a63609d01ba69c2c6a4",
+    "v": "8955fc6ed1842063b9bf5feb4967f8a910b4c3556baccc830b39babae9f1403b"
+   },
+   "meta": {
+    "B": 1,
+    "D": 32,
+    "H": 2,
+    "N": 300,
+    "S": 300,
+    "bias_kind": "f32",
+    "dtype": "bf16",
+    "mask_kind": "ragged",
+    "seed": 3
+   },
+   "rows": {
+    "native_m1_torch": {
+     "fix_tiles": 0,
+     "kernel": "kernels/triattn/triattn_native generation 11, cuda_b kernel directory (triattn_m1), torch launch",
+     "maxabs_vs_fp32": 0.009939193725585938,
+     "maxabs_vs_k2b": 0.015625,
+     "sample16": [
+      15927,
+      48727,
+      15944,
+      15770,
+      48431,
+      48584,
+      15563,
+      15934,
+      48637,
+      15788,
+      48886,
+      48721,
+      48222,
+      48685,
+      48885,
+      48787
+     ],
+     "sha256": "16dff3ab3750a6e74532aaba7c2f08e5af7306d8a26f2f7d9bdd9aa0702a73f5"
+    },
+    "native_routed_torch": {
+     "maxabs_vs_fp32": 0.02973473072052002,
+     "route": "k13",
+     "sha256": "eea7245b85c37b7cb78fa60c904038c3068b002742226de35c630f404cef05c6"
+    },
+    "cuda80_torch": {
+     "fallbacks": {
+      "copy": 0,
+      "fix_tiles": 0,
+      "general_rows": 6,
+      "list_rowgroups": 6,
+      "uniform_rows": 6
+     },
+     "kernel": "kernels/triattn/triattn_native generation 11, cuda_80 kernel directory (triattn_sm80), torch launch",
+     "lse_absmax": 16.99858856201172,
+     "lse_sha256": "cacb0e62094cbcf49a80e5997c019a06257bce7084ef00aeb01f792c51206dd5",
+     "maxabs_vs_fp32": 0.009939193725585938,
+     "maxabs_vs_k2b": 0.015625,
+     "out_same_with_and_without_lse": true,
+     "sample16": [
+      15927,
+      48727,
+      15944,
+      15770,
+      48431,
+      48584,
+      15563,
+      15934,
+      48637,
+      15788,
+      48886,
+      48721,
+      48222,
+      48685,
+      48885,
+      48787
+     ],
+     "sha256": "8e156d360e9a83808863320fdee5dc6a4dc0be965e3417b3092964db6728d37f"
+    },
+    "cuda_torch": {
+     "kernel": "sm_90a CUDA kernel, torch binding (sealed prebuilt)",
+     "maxabs_vs_fp32": 0.009939193725585938,
+     "maxabs_vs_k2b": 0.015625,
+     "sample16": [
+      15927,
+      48727,
+      15944,
+      15770,
+      48431,
+      48584,
+      15563,
+      15934,
+      48637,
+      15788,
+      48886,
+      48721,
+      48222,
+      48685,
+      48885,
+      48787
+     ],
+     "sha256": "24824cd32f40bb565a356804e068dfd763aef722f4082e2cd62a6f067dbdbb6f"
+    },
+    "k2b_torch": {
+     "k2b_version": "?",
+     "kernel": "fpf_triatt_k2b flash_triangle_attention (torch launch)",
+     "maxabs_vs_fp32": 0.007920265197753906,
+     "s": 0.016,
+     "sample16": [
+      15927,
+      48726,
+      15944,
+      15771,
+      48432,
+      48582,
+      15556,
+      15934,
+      48637,
+      15789,
+      48885,
+      48721,
+      48207,
+      48686,
+      48885,
+      48787
+     ],
+     "sha256": "a272f7405dae0ab7e2436083cedc66d66ea963432c73b2c0a4032d6e4a886dc7"
+    },
+    "k2b_torch_sm80": {
+     "k2b_version": "?",
+     "kernel": "fpf_triatt_k2b flash_triangle_attention (torch launch, sm_80)",
+     "maxabs_vs_fp32": 0.007920265197753906,
+     "s": 6.583,
+     "sample16": [
+      15927,
+      48726,
+      15944,
+      15771,
+      48432,
+      48582,
+      15556,
+      15934,
+      48637,
+      15789,
+      48885,
+      48721,
+      48207,
+      48686,
+      48885,
+      48787
+     ],
+     "sha256": "0955b24a0d0ecbb0e2d013f9be0383eb5d28b72af993c007d275f5d092d041be"
+    }
+   }
+  },
+  "fp32_d16_s144_pad": {
+   "inputs_sha256": {
+    "bias": "4babfe65a791b31ad2a58e23be83e9d16644ca598aa7e318a6b9bf46dac5c0be",
+    "k": "d96e0c3f3f72eb0a65efc2e52ff80c6463757598d4ea81889129c98ecc057b73",
+    "mask": "baea900a45f0e093962e9ef966108bc453f071665279cdb835a0a129d618f9ea",
+    "q": "01c24ed4ba45d83c678c7b630f0fe2a5ecdeb87516d4ad2c0d6025379db22af5",
+    "v": "4205e0530861fd6bc7e495b08262558f22c712ed0b157985209ef92c074244e4"
+   },
+   "meta": {
+    "B": 1,
+    "D": 16,
+    "H": 4,
+    "N": 144,
+    "S": 144,
+    "bias_kind": "f32",
+    "dtype": "fp32",
+    "mask_kind": "pad",
+    "seed": 8
+   },
+   "rows": {
+    "k2b_torch": {
+     "k2b_version": "?",
+     "kernel": "fpf_triatt_k2b flash_triangle_attention (torch launch)",
+     "maxabs_vs_fp32": 0.004317760467529297,
+     "s": 0.01,
+     "sample16": [
+      -0.011030706577003002,
+      0.400187611579895,
+      0.0823981761932373,
+      -0.1586458683013916,
+      -0.6252119541168213,
+      0.11824372410774231,
+      0.7302420139312744,
+      -0.3426159918308258,
+      0.47390511631965637,
+      -0.65348881483078,
+      0.7095349431037903,
+      -0.18400587141513824,
+      -0.34683069586753845,
+      -0.33203256130218506,
+      -0.18584446609020233,
+      -0.18612711131572723
+     ],
+     "sha256": "93784aa6e7aa34238bef8e91d2973f324fdb252d04a7ccdce28d7d94dc9d94b3"
+    },
+    "k2b_torch_sm80": {
+     "k2b_version": "?",
+     "kernel": "fpf_triatt_k2b flash_triangle_attention (torch launch, sm_80)",
+     "maxabs_vs_fp32": 0.0043179988861083984,
+     "s": 2.561,
+     "sample16": [
+      -0.01103077083826065,
+      0.40018749237060547,
+      0.08239821344614029,
+      -0.15864579379558563,
+      -0.6252118349075317,
+      0.1182437613606453,
+      0.7302420139312744,
+      -0.3426159620285034,
+      0.4739050567150116,
+      -0.6534888744354248,
+      0.7095349431037903,
+      -0.18400584161281586,
+      -0.34683072566986084,
+      -0.3320326507091522,
+      -0.18584449589252472,
+      -0.18612705171108246
+     ],
+     "sha256": "6b948c698f5b5245f38c890670db28610a42f62d955ac702c73edb0538045606"
+    }
+   }
+  },
+  "fp32_d32_s200_ragged": {
+   "inputs_sha256": {
+    "bias": "6819f12a359ece1361f01b817df8699c2568b0cfb616cc1b29a7e43714a16346",
+    "k": "eb2ca0b164bd6913497b1857ca6b5434c68cc617ba7471157b7783ee850051eb",
+    "mask": "4ea716ab9f9f6c6344b1bd619d63e8f0427ef34f9c147a5850d2224442a197d7",
+    "q": "4e4c8f672a12db14fa765113a4561ad620f8e0279dfbccbe299d19ce695199ed",
+    "v": "6a9406438cc1921ac075cc595e886de4bb92f970bd10b5f15fcdd93299cc64a8"
+   },
+   "meta": {
+    "B": 1,
+    "D": 32,
+    "H": 4,
+    "N": 200,
+    "S": 200,
+    "bias_kind": "f32",
+    "dtype": "fp32",
+    "mask_kind": "ragged",
+    "seed": 7
+   },
+   "rows": {
+    "k2b_torch": {
+     "k2b_version": "?",
+     "kernel": "fpf_triatt_k2b flash_triangle_attention (torch launch)",
+     "maxabs_vs_fp32": 0.0039861202239990234,
+     "s": 0.028,
+     "sample16": [
+      0.2837907075881958,
+      0.028806189075112343,
+      0.01971597410738468,
+      -0.21611973643302917,
+      0.06515656411647797,
+      -0.1070212870836258,
+      -0.3353706896305084,
+      0.1945866346359253,
+      -0.13746829330921173,
+      0.08711353689432144,
+      -0.12529587745666504,
+      -0.13079191744327545,
+      -0.16282734274864197,
+      -0.6105794310569763,
+      0.30349746346473694,
+      -0.12435197085142136
+     ],
+     "sha256": "fb1d97102e4dfcb81255ebe60bd30648e0eb14da68bd438aeb21017b421a1da9"
+    },
+    "k2b_torch_sm80": {
+     "k2b_version": "?",
+     "kernel": "fpf_triatt_k2b flash_triangle_attention (torch launch, sm_80)",
+     "maxabs_vs_fp32": 0.003987550735473633,
+     "s": 3.126,
+     "sample16": [
+      0.283790647983551,
+      0.028806177899241447,
+      0.019716007634997368,
+      -0.21611963212490082,
+      0.06515654176473618,
+      -0.1070212870836258,
+      -0.3353706896305084,
+      0.1945865899324417,
+      -0.13746824860572815,
+      0.08711343258619308,
+      -0.1252957582473755,
+      -0.13079191744327545,
+      -0.16282737255096436,
+      -0.6105793118476868,
+      0.303497314453125,
+      -0.12435195595026016
+     ],
+     "sha256": "f8ee8d6e7a9a02063d84069f28634fe9b0213d888f0da7f0f50835526624b603"
+    }
+   }
+  }
+ },
+ "cuda_package": {
+  "loadcheck": {
+   "cases": {
+    "mask_B2_S150": true,
+    "nomask_S200": true,
+    "rows2to6_S260_prefix": true
+   },
+   "ok": true
+  },
+  "route": "prebuilt"
+ },
+ "generator": "opt_core.kernels.triattn_xla._vectors",
+ "schema": "triattn_xla/vectors/v1",
+ "stack": {
+  "cc": [
+   9,
+   0
+  ],
+  "device": "NVIDIA H100 80GB HBM3",
+  "torch": "2.13.0+cu130",
+  "triton": "3.7.1"
+ }
+}

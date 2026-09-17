@@ -1,0 +1,7 @@
+build/
+*.egg-info/
+dist/
+__pycache__/
+# fetched by `run.sh install` (stock/PINS.json upstream.bindcraft.fetched), never committed
+stock/src/bindcraft/functions/dssp
+stock/src/bindcraft/functions/dssp.part

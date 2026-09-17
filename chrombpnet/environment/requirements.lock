@@ -1,0 +1,129 @@
+# ChromBPNet optimization kit — the tested stack: `python -m pip freeze --all` of its interpreter, Ubuntu 20.04's Python 3.8.10 (/usr/bin/python3.8,
+# `python` on PATH) inside the tensorflow/tensorflow:2.8.2-gpu image (CUDA 11.2.2 / cuDNN 8.1.0.77 system libraries from NVIDIA's apt packages, gcc 9.4),
+# i.e. every distribution under /usr/local/lib/python3.8/dist-packages, less two things that are not lock lines: stock chrombpnet 1.0.1, which installs
+# from the source archive in chrombpnet/stock/ (kundajelab/chrombpnet @ eaa0fe58, --no-deps), and this kit (chrombpnet/opt), which installs editable on
+# top (`run.sh install`, README.md 'Setup'). Eleven modules the interpreter also sees come from Ubuntu packages of the base image, not pip, and are
+# therefore absent here: requests 2.22.0, urllib3 1.25.8, idna 2.8, chardet 3.0.4, certifi 2019.11.28, six 1.14.0, wheel 0.34.2, dbus-python, PyGObject,
+# python-apt, requests-unixsocket (/usr/lib/python3/dist-packages) — an environment built outside the image installs the first seven from PyPI at those
+# versions (STOCK.md 'Stack' gives the line; tensorflow imports six). tensorflow 2.8.0 loads CUDA 11.2, cuBLAS 11.4, cuFFT, cuRAND, cuSOLVER, cuSPARSE and
+# cuDNN 8.1 from the system libraries the base image installs (stock/check_pins.py fingerprints libcudart, libcublas and libcudnn); it carries SASS up to
+# sm_80 and PTX for compute_80, so on H100/H200 the driver compiles its kernels at first use (the config's driver-cache tarball, README.md 'Setup',
+# spares that). One lock per install root: this file is the interpreter's own environment (/usr/local); torch 2.4.1 / triton 3.0.0 for the kit's
+# H100/H200 forward live under the second root /opt/torch, off the default sys.path, which one freeze of this interpreter cannot express —
+# chrombpnet/environment/requirements-opt-torch.lock is that root's lock. The base interpreter's own pip (20.2.4) and setuptools (62.3.2) are
+# not this stack's: environment/Dockerfile installs this file's pip== and setuptools== lines first, then the whole file with --no-deps (setuptools 75.3.2
+# builds the five source-only distributions — deeplift, matplotlib-venn, modisco, pyfaidx, termcolor — and the kit's editable install).
+absl-py==1.0.0
+asttokens==3.0.2
+astunparse==1.6.3
+backcall==0.2.0
+blosc2==2.0.0
+cachetools==5.1.0
+cairocffi==1.7.1
+CairoSVG==2.7.1
+cffi==1.17.1
+cloudpickle==3.1.2
+contourpy==1.1.1
+cssselect2==0.7.0
+cycler==0.12.1
+Cython==3.2.9
+decorator==5.3.1
+deepdish==0.3.7
+deeplift==0.6.13.0
+defusedxml==0.7.1
+dm-tree==0.1.8
+executing==2.2.1
+flatbuffers==2.0
+fonttools==4.57.0
+gast==0.5.3
+google-auth==2.6.6
+google-auth-oauthlib==0.4.6
+google-pasta==0.2.0
+grpcio==1.46.3
+h5py==3.11.0
+hdf5plugin==5.1.0
+html5lib==1.1
+igraph==0.9.11
+imageio==2.35.1
+importlib-metadata==4.11.4
+importlib_resources==6.4.5
+ipython==8.12.3
+jedi==0.19.2
+joblib==1.4.2
+keras==2.8.0
+Keras-Preprocessing==1.1.2
+kiwisolver==1.4.7
+kundajelab-shap==1
+lazy_loader==0.4
+leidenalg==0.8.10
+libclang==14.0.1
+llvmlite==0.41.1
+logomaker==0.8.7
+Markdown==3.3.7
+matplotlib==3.7.5
+matplotlib-inline==0.1.7
+matplotlib-venn==0.11.6
+modisco==0.5.16.0
+modisco-lite==2.0.7
+msgpack==1.1.1
+networkx==3.1
+numba==0.58.1
+numexpr==2.8.6
+numpy==1.23.4
+oauthlib==3.2.0
+opt-einsum==3.3.0
+packaging==26.2
+pandas==2.0.3
+parso==0.8.7
+pexpect==4.9.0
+pickleshare==0.7.5
+pillow==10.4.0
+pip==25.0.1
+prompt_toolkit==3.0.52
+protobuf==3.20.0
+psutil==7.2.2
+ptyprocess==0.7.0
+pure_eval==0.2.3
+py-cpuinfo==9.0.0
+pyasn1==0.4.8
+pyasn1-modules==0.2.8
+pyBigWig==0.3.22
+pycparser==2.23
+pyfaidx==0.6.1
+Pygments==2.19.2
+pyparsing==3.1.4
+pyphen==0.16.0
+python-dateutil==2.9.0.post0
+pytz==2026.3.post1
+PyWavelets==1.4.1
+requests-oauthlib==1.3.1
+rsa==4.8
+scikit-image==0.21.0
+scikit-learn==1.3.2
+scipy==1.10.1
+setuptools==75.3.2
+stack-data==0.6.3
+tables==3.8.0
+tensorboard==2.8.0
+tensorboard-data-server==0.6.1
+tensorboard-plugin-wit==1.8.1
+tensorflow==2.8.0
+tensorflow-estimator==2.8.0
+tensorflow-io-gcs-filesystem==0.26.0
+tensorflow-probability==0.15.0
+termcolor==1.1.0
+texttable==1.7.0
+tf-estimator-nightly==2.8.0.dev2021122109
+threadpoolctl==3.5.0
+tifffile==2023.7.10
+tinycss2==1.4.0
+tqdm==4.48.2
+traitlets==5.14.3
+typing_extensions==4.2.0
+tzdata==2026.3
+wcwidth==0.8.2
+WeasyPrint==52.5
+webencodings==0.5.1
+Werkzeug==2.1.2
+wrapt==1.14.1
+zipp==3.8.0

@@ -1,0 +1,134 @@
+[
+ {
+  "id": "1BRS_barstar1_barnase1",
+  "sequences": [
+   {
+    "type": "protein",
+    "id": "A",
+    "sequence": "KKAVINGEQIRSISDLHQTLKKELALPEYYGENLDALWDALTGWVEYPLVLEWRQFEQSKQLTENGAESVLQVFREAKAEGADITIILS",
+    "msa": null
+   },
+   {
+    "type": "protein",
+    "id": "B",
+    "sequence": "AQVINTFDGVADYLQTYHKLPDNYITKSEAQALGWVASKGNLADVAPGKSIGGDIFSNREGKLPGKSGRTWREADINYTSGFRNSDRILYSSDWLIYKTTDHYQTFTKIR",
+    "msa": null
+   }
+  ],
+  "seeds": [
+   0,
+   1
+  ],
+  "num_diffusion_samples": 1
+ },
+ {
+  "id": "1BRS_barstar3_barnase4",
+  "sequences": [
+   {
+    "type": "protein",
+    "id": "A",
+    "sequence": "KKAVINGEQIRSISDLHQTLKKELALPEYYGENLDALWDALTGWVEYPLVLEWRQFEQSKQLTENGAESVLQVFREAKAEGADITIILS",
+    "msa": null
+   },
+   {
+    "type": "protein",
+    "id": "B",
+    "sequence": "KKAVINGEQIRSISDLHQTLKKELALPEYYGENLDALWDALTGWVEYPLVLEWRQFEQSKQLTENGAESVLQVFREAKAEGADITIILS",
+    "msa": null
+   },
+   {
+    "type": "protein",
+    "id": "C",
+    "sequence": "KKAVINGEQIRSISDLHQTLKKELALPEYYGENLDALWDALTGWVEYPLVLEWRQFEQSKQLTENGAESVLQVFREAKAEGADITIILS",
+    "msa": null
+   },
+   {
+    "type": "protein",
+    "id": "D",
+    "sequence": "AQVINTFDGVADYLQTYHKLPDNYITKSEAQALGWVASKGNLADVAPGKSIGGDIFSNREGKLPGKSGRTWREADINYTSGFRNSDRILYSSDWLIYKTTDHYQTFTKIR",
+    "msa": null
+   },
+   {
+    "type": "protein",
+    "id": "E",
+    "sequence": "AQVINTFDGVADYLQTYHKLPDNYITKSEAQALGWVASKGNLADVAPGKSIGGDIFSNREGKLPGKSGRTWREADINYTSGFRNSDRILYSSDWLIYKTTDHYQTFTKIR",
+    "msa": null
+   },
+   {
+    "type": "protein",
+    "id": "F",
+    "sequence": "AQVINTFDGVADYLQTYHKLPDNYITKSEAQALGWVASKGNLADVAPGKSIGGDIFSNREGKLPGKSGRTWREADINYTSGFRNSDRILYSSDWLIYKTTDHYQTFTKIR",
+    "msa": null
+   },
+   {
+    "type": "protein",
+    "id": "G",
+    "sequence": "AQVINTFDGVADYLQTYHKLPDNYITKSEAQALGWVASKGNLADVAPGKSIGGDIFSNREGKLPGKSGRTWREADINYTSGFRNSDRILYSSDWLIYKTTDHYQTFTKIR",
+    "msa": null
+   }
+  ],
+  "seeds": [
+   0,
+   1
+  ],
+  "num_diffusion_samples": 1
+ },
+ {
+  "id": "1BRS_barstar4_barnase4",
+  "sequences": [
+   {
+    "type": "protein",
+    "id": "A",
+    "sequence": "KKAVINGEQIRSISDLHQTLKKELALPEYYGENLDALWDALTGWVEYPLVLEWRQFEQSKQLTENGAESVLQVFREAKAEGADITIILS",
+    "msa": null
+   },
+   {
+    "type": "protein",
+    "id": "B",
+    "sequence": "KKAVINGEQIRSISDLHQTLKKELALPEYYGENLDALWDALTGWVEYPLVLEWRQFEQSKQLTENGAESVLQVFREAKAEGADITIILS",
+    "msa": null
+   },
+   {
+    "type": "protein",
+    "id": "C",
+    "sequence": "KKAVINGEQIRSISDLHQTLKKELALPEYYGENLDALWDALTGWVEYPLVLEWRQFEQSKQLTENGAESVLQVFREAKAEGADITIILS",
+    "msa": null
+   },
+   {
+    "type": "protein",
+    "id": "D",
+    "sequence": "KKAVINGEQIRSISDLHQTLKKELALPEYYGENLDALWDALTGWVEYPLVLEWRQFEQSKQLTENGAESVLQVFREAKAEGADITIILS",
+    "msa": null
+   },
+   {
+    "type": "protein",
+    "id": "E",
+    "sequence": "AQVINTFDGVADYLQTYHKLPDNYITKSEAQALGWVASKGNLADVAPGKSIGGDIFSNREGKLPGKSGRTWREADINYTSGFRNSDRILYSSDWLIYKTTDHYQTFTKIR",
+    "msa": null
+   },
+   {
+    "type": "protein",
+    "id": "F",
+    "sequence": "AQVINTFDGVADYLQTYHKLPDNYITKSEAQALGWVASKGNLADVAPGKSIGGDIFSNREGKLPGKSGRTWREADINYTSGFRNSDRILYSSDWLIYKTTDHYQTFTKIR",
+    "msa": null
+   },
+   {
+    "type": "protein",
+    "id": "G",
+    "sequence": "AQVINTFDGVADYLQTYHKLPDNYITKSEAQALGWVASKGNLADVAPGKSIGGDIFSNREGKLPGKSGRTWREADINYTSGFRNSDRILYSSDWLIYKTTDHYQTFTKIR",
+    "msa": null
+   },
+   {
+    "type": "protein",
+    "id": "H",
+    "sequence": "AQVINTFDGVADYLQTYHKLPDNYITKSEAQALGWVASKGNLADVAPGKSIGGDIFSNREGKLPGKSGRTWREADINYTSGFRNSDRILYSSDWLIYKTTDHYQTFTKIR",
+    "msa": null
+   }
+  ],
+  "seeds": [
+   0,
+   1
+  ],
+  "num_diffusion_samples": 1
+ }
+]

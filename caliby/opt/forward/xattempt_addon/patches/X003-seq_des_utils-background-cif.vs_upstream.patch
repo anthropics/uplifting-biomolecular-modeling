@@ -1,0 +1,70 @@
+--- a/caliby/eval/eval_utils/seq_des_utils.py
++++ b/caliby/eval/eval_utils/seq_des_utils.py
+@@ -31,6 +31,15 @@
+ from caliby.model.seq_denoiser.lit_sd_model import LitSeqDenoiser
+ from caliby.model.seq_denoiser.sd_model import SeqDenoiser
+ from caliby.weights import resolve_ckpt_path
++import caliby_opt.bg_writers as _x_bg  # XATTEMPT L-C / X003 / X011: the background CIF writers
++
++
++def _x_write_cifs(items):
++    """One background writer's chunk: [(path, AtomArray), ...] serialised and written -- the loop's own two statements. Module level so a
++    forked or spawned worker can name it; touches no CUDA state."""
++    for path, atom_array in items:
++        with open(path, "w") as f:
++            f.write(to_cif_string(atom_array, include_nan_coords=False))
+ 
+ _VALID_POS_CONSTRAINT_COLUMNS = [
+     "pdb_key",
+@@ -130,6 +139,15 @@
+         num_workers=sampling_cfg.num_workers,
+     )
+ 
++    # XATTEMPT add-on lever L-C / X003 (env CALIBY_X_BG_CIF = fork | thread) and X011 (env CALIBY_X_CIF_WORKERS = N): the output CIFs of
++    # each batch are serialised (to_cif_string) and written by N background workers of that mode while the GPU samples the next batch
++    # (caliby_opt.bg_writers over opt_core.host.outputs.AsyncWriter: a batch's files split into at most N chunks, at most 2N chunks
++    # outstanding, forked workers touch no CUDA state). Same to_cif_string() on the same AtomArray objects (created per sample, never
++    # mutated afterwards), same paths, same bytes; every write is joined before this function returns. A write that fails is named on
++    # stderr after the join ("[CALIBY_X_BG_CIF] ... failed") and raised: the process exits non-zero -- never a silent rewrite or a silent
++    # drop. Unset/0 = the stock synchronous writes in the loop below.
++    _x_writers = _x_bg.from_env(_x_write_cifs)
++
+     # Begin sampling.
+     pbar = tqdm(
+         total=len(pdb_paths),
+@@ -159,6 +177,7 @@
+         id_to_atom_arrays, id_to_aux = model.sample(batch, sampling_inputs=sampling_inputs)
+ 
+         # Save outputs.
++        _x_items = []
+         for example_id, atom_arrays in id_to_atom_arrays.items():
+             aux = id_to_aux[example_id]
+             sample_stems = [f"{example_id}_sample{si}" for si in range(len(atom_arrays))]
+@@ -167,8 +186,11 @@
+             for si, sample_stem in enumerate(sample_stems):
+                 out_file = f"{sample_out_dir}/{sample_stem}.cif"
+                 atom_array = atom_arrays[si]
+-                with open(out_file, "w") as f:
+-                    f.write(to_cif_string(atom_array, include_nan_coords=False))
++                if _x_writers is not None:
++                    _x_items.append((out_file, atom_array))  # XATTEMPT L-C: written in the background below
++                else:
++                    with open(out_file, "w") as f:
++                        f.write(to_cif_string(atom_array, include_nan_coords=False))
+ 
+                 outputs["example_id"].append(example_id)
+                 outputs["out_pdb"].append(out_file)
+@@ -181,9 +203,13 @@
+                 outputs["seq"].append(
+                     ":".join(info["processed_entity_canonical_sequence"] for info in chain_info.values())
+                 )
++        if _x_items:
++            _x_writers.submit_batch(_x_items)
+ 
+         pbar.update(B)
+     pbar.close()
++    if _x_writers is not None:
++        _x_writers.join()  # XATTEMPT L-C: every CIF on disk (or a named failure raised) before the caller's OUTPUTS_WRITTEN
+ 
+     return outputs
+ 

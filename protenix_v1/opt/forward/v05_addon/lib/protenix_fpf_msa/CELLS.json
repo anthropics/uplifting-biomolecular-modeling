@@ -1,0 +1,193 @@
+{
+ "schema": "fpf_cells/v1",
+ "stack": "H100 80GB HBM3 (cc 9.0), torch 2.13.0+cu130, triton 3.7.1, cuequivariance_torch 0.11.1; SMOKE (CUDA-graph replay interleaved, medians, SM 1980 MHz); sources: ptx2_pairbias_MICROBENCH.md (tools/bench_apb.py, bench_atom.py, bench_pf.py, tests/test_msa_triton.py)",
+ "units": "ms per call; tflops = useful FLOPs / time; errors = max_abs / rms_rel vs an fp64 evaluation on N(0,1) data unless noted",
+ "package": "protenix_fpf_msa",
+ "cells": [
+  {
+   "cc": "9.0",
+   "site": "OuterProductMean (whole module)",
+   "lever": "opm_fused",
+   "c_m": 128,
+   "c_hidden": 32,
+   "c_z": 256,
+   "N": 400,
+   "S_msa": 2048,
+   "chunk": null,
+   "dtype_in": "bf16 (autocast)",
+   "ms": 1.58,
+   "incumbent": {
+    "name": "stock module (LN + 2 Linears + cuBLAS einsum + permute copy + linear_out + /norm)",
+    "ms": 2.21
+   },
+   "err": "rms-rel vs fp64: stock 5.6e-3, fused 4.9e-3",
+   "note": "the cuBLAS einsum (~790 TF/s, 55-75% of the fused module) is untouched"
+  },
+  {
+   "cc": "9.0",
+   "site": "OuterProductMean (whole module)",
+   "lever": "opm_fused",
+   "c_m": 128,
+   "c_hidden": 32,
+   "c_z": 256,
+   "N": 800,
+   "S_msa": 3400,
+   "chunk": null,
+   "dtype_in": "bf16 (autocast)",
+   "ms": 7.6,
+   "incumbent": {
+    "name": "stock module (LN + 2 Linears + cuBLAS einsum + permute copy + linear_out + /norm)",
+    "ms": 10.13
+   },
+   "err": "rms-rel vs fp64: stock 6.1e-3, fused 5.4e-3",
+   "note": "the cuBLAS einsum (~790 TF/s, 55-75% of the fused module) is untouched"
+  },
+  {
+   "cc": "9.0",
+   "site": "OuterProductMean (whole module)",
+   "lever": "opm_fused",
+   "c_m": 128,
+   "c_hidden": 32,
+   "c_z": 256,
+   "N": 800,
+   "S_msa": 6695,
+   "chunk": null,
+   "dtype_in": "bf16 (autocast)",
+   "ms": 14.47,
+   "incumbent": {
+    "name": "stock module (LN + 2 Linears + cuBLAS einsum + permute copy + linear_out + /norm)",
+    "ms": 17.8
+   },
+   "err": "rms-rel vs fp64: stock 5.6e-3, fused 5.0e-3",
+   "note": "the cuBLAS einsum (~790 TF/s, 55-75% of the fused module) is untouched"
+  },
+  {
+   "cc": "9.0",
+   "site": "OuterProductMean (whole module)",
+   "lever": "opm_fused",
+   "c_m": 128,
+   "c_hidden": 32,
+   "c_z": 256,
+   "N": 1400,
+   "S_msa": 3300,
+   "chunk": 512,
+   "dtype_in": "bf16 (autocast)",
+   "ms": 24.1,
+   "incumbent": {
+    "name": "stock module (LN + 2 Linears + cuBLAS einsum + permute copy + linear_out + /norm)",
+    "ms": 29.88
+   },
+   "err": "rms-rel vs fp64: stock 5.7e-3, fused 5.1e-3",
+   "note": "the cuBLAS einsum (~790 TF/s, 55-75% of the fused module) is untouched"
+  },
+  {
+   "cc": "9.0",
+   "site": "OuterProductMean (whole module)",
+   "lever": "opm_fused",
+   "c_m": 128,
+   "c_hidden": 32,
+   "c_z": 256,
+   "N": 203,
+   "S_msa": 77,
+   "chunk": null,
+   "dtype_in": "bf16 (autocast)",
+   "ms": 0.49,
+   "incumbent": {
+    "name": "stock module (LN + 2 Linears + cuBLAS einsum + permute copy + linear_out + /norm)",
+    "ms": 0.6
+   },
+   "err": "rms-rel vs fp64: stock 5.7e-3, fused 5.2e-3",
+   "note": "the cuBLAS einsum (~790 TF/s, 55-75% of the fused module) is untouched"
+  },
+  {
+   "cc": "9.0",
+   "site": "MSAPairWeightedAveraging (whole module, one 2048-row chunk)",
+   "lever": "pwa_fused",
+   "c_m": 128,
+   "heads": 8,
+   "c": 8,
+   "c_z": 256,
+   "N": 400,
+   "S_msa": 2048,
+   "dtype_in": "bf16 (autocast)",
+   "ms": 0.71,
+   "incumbent": {
+    "name": "stock module",
+    "ms": 1.42
+   },
+   "err": "rms-rel vs fp64: stock 4.6e-3, fused 4.6e-3"
+  },
+  {
+   "cc": "9.0",
+   "site": "MSAPairWeightedAveraging (whole module, one 2048-row chunk)",
+   "lever": "pwa_fused",
+   "c_m": 128,
+   "heads": 8,
+   "c": 8,
+   "c_z": 256,
+   "N": 800,
+   "S_msa": 2048,
+   "dtype_in": "bf16 (autocast)",
+   "ms": 1.49,
+   "incumbent": {
+    "name": "stock module",
+    "ms": 2.74
+   },
+   "err": "rms-rel vs fp64: stock 4.9e-3, fused 4.7e-3"
+  },
+  {
+   "cc": "9.0",
+   "site": "MSAPairWeightedAveraging (whole module, one 2048-row chunk)",
+   "lever": "pwa_fused",
+   "c_m": 128,
+   "heads": 8,
+   "c": 8,
+   "c_z": 256,
+   "N": 800,
+   "S_msa": 551,
+   "dtype_in": "bf16 (autocast)",
+   "ms": 0.72,
+   "incumbent": {
+    "name": "stock module",
+    "ms": 1.28
+   },
+   "err": "rms-rel vs fp64: stock 4.8e-3, fused 4.5e-3"
+  },
+  {
+   "cc": "9.0",
+   "site": "MSAPairWeightedAveraging (whole module, one 2048-row chunk)",
+   "lever": "pwa_fused",
+   "c_m": 128,
+   "heads": 8,
+   "c": 8,
+   "c_z": 256,
+   "N": 1400,
+   "S_msa": 2048,
+   "dtype_in": "bf16 (autocast)",
+   "ms": 3.27,
+   "incumbent": {
+    "name": "stock module",
+    "ms": 5.69
+   },
+   "err": "rms-rel vs fp64: stock 4.6e-3, fused 4.3e-3"
+  },
+  {
+   "cc": "9.0",
+   "site": "MSAPairWeightedAveraging (whole module, one 2048-row chunk)",
+   "lever": "pwa_fused",
+   "c_m": 128,
+   "heads": 8,
+   "c": 8,
+   "c_z": 256,
+   "N": 203,
+   "S_msa": 77,
+   "dtype_in": "bf16 (autocast)",
+   "ms": 0.29,
+   "incumbent": {
+    "name": "stock module",
+    "ms": 0.46
+   },
+   "err": "rms-rel vs fp64: stock 5.4e-3, fused 5.1e-3"
+  }
+ ]
+}

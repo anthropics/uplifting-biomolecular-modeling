@@ -1,0 +1,2789 @@
+# Copyright 2026 AlQuraishi Laboratory
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+"""Preprocessing pipelines for template data ran before training/evaluation."""
+
+import logging
+import multiprocessing as mp
+import os
+import random
+import re
+import traceback
+from datetime import datetime
+from functools import wraps
+from pathlib import Path
+from typing import Annotated, Literal
+
+import numpy as np
+import pandas as pd
+from biotite.database import RequestError
+from biotite.database.rcsb import fetch
+from biotite.structure import AtomArray
+from biotite.structure.io import pdbx
+from biotite.structure.io.pdbx import CIFFile
+from func_timeout import func_timeout
+from func_timeout.exceptions import FunctionTimedOut
+from pydantic import (
+    BaseModel,
+    BeforeValidator,
+    model_validator,
+)
+from pydantic import ConfigDict as PydanticConfigDict
+from tqdm import tqdm
+
+from openfold3.core.config.config_utils import (
+    _convert_molecule_type,
+    _ensure_list,
+)
+from openfold3.core.data.io.dataset_cache import read_datacache, write_datacache_to_json
+from openfold3.core.data.io.s3 import open_local_or_s3
+from openfold3.core.data.io.sequence.template import (
+    A3mParser,
+    CifDirectParser,
+    TemplateData,
+    parse_entry_chain_id,
+    parse_hmmsearch_sto,
+    parse_template_alignment,
+)
+from openfold3.core.data.io.structure.atom_array import (
+    read_atomarray_from_npz,
+    write_atomarray_to_npz,
+)
+from openfold3.core.data.io.structure.cif import _load_ciffile, parse_mmcif
+from openfold3.core.data.primitives.caches.format import DatasetCache
+from openfold3.core.data.primitives.quality_control.logging_utils import (
+    PDB_ID,
+    TEMPLATE_PROCESS_LOGGER,
+    configure_template_logger,
+)
+from openfold3.core.data.primitives.sequence.hash import (
+    get_file_content_hash,
+    get_sequence_hash,
+)
+from openfold3.core.data.primitives.sequence.template import (
+    TemplateHitCollection,
+    _TemplateQueryEntry,
+    check_release_date_diff,
+    check_release_date_max,
+    check_sequence,
+    create_residue_idx_map,
+    match_query_chain_and_sequence,
+    match_template_chain_and_sequence,
+    parse_representatives,
+)
+from openfold3.core.data.primitives.structure.component import BiotiteCCDWrapper
+from openfold3.core.data.primitives.structure.metadata import (
+    get_asym_id_to_canonical_seq_dict,
+    get_cif_block,
+    get_release_date,
+)
+from openfold3.core.data.primitives.structure.template import (
+    TemplateCacheEntry,
+    clean_template_atom_array,
+)
+from openfold3.core.data.resources.residues import (
+    MoleculeType,
+)
+from openfold3.projects.of3_all_atom.config.inference_query_format import (
+    InferenceQuerySet,
+)
+
+logger = logging.getLogger(__name__)
+
+
+# TODO: rename variables to be PDB-agnostic
+# --- Template alignment preprocessing ---
+# Step 1/3: Create sequence cache for template structures
+def create_template_precache_entry_for_template(
+    template_pdb_id: str,
+    template_structures_directory: Path,
+    template_structures_filename: str,
+    template_precache_dir: Path,
+    template_file_format: str,
+) -> None:
+    """Creates a sequence cache for a template structure.
+
+    Args:
+        template_pdb_id (str):
+            The PDB ID of the template structure.
+        template_structures_directory (Path):
+            Path to the directory containing template structures in mmCIF format.
+        template_precache_dir (Path):
+            Path to directory where the sequence cache will be saved for the template.
+        template_file_format (str):
+            File format of the template structures.
+    """
+
+    template_process_logger = TEMPLATE_PROCESS_LOGGER.get()
+
+    try:
+        cif_file = _load_ciffile(
+            template_structures_directory
+            / (
+                template_structures_filename.format(pdb=template_pdb_id)
+                + f".{template_file_format}"
+            )
+        )
+        chain_id_seq_map = get_asym_id_to_canonical_seq_dict(cif_file)
+        release_date = get_release_date(get_cif_block(cif_file)).strftime("%Y-%m-%d")
+
+        template_precache = {
+            "release_date": release_date,
+            "chain_id_seq_map": chain_id_seq_map,
+        }
+
+        np.savez_compressed(
+            template_precache_dir / Path(f"{template_pdb_id}.npz"),
+            **template_precache,
+        )
+        template_process_logger.info(f"Sequence cache for {template_pdb_id} saved.")
+    except FileNotFoundError:
+        template_process_logger.info(
+            f"Template structure {template_pdb_id} not found in "
+            f"{template_structures_directory}. Skipping this template."
+        )
+        return
+
+
+class _OF3TemplatePreCacheConstructor:
+    def __init__(
+        self,
+        template_structures_directory,
+        template_structures_filename,
+        template_precache_dir,
+        template_file_format,
+        log_level,
+        log_to_file,
+        log_to_console,
+        log_dir,
+    ):
+        self.template_structures_directory = template_structures_directory
+        self.template_structures_filename = template_structures_filename
+        self.template_precache_dir = template_precache_dir
+        self.template_file_format = template_file_format
+        self.log_level = log_level
+        self.log_to_file = log_to_file
+        self.log_to_console = log_to_console
+        self.log_dir = log_dir
+
+    @wraps(create_template_precache_entry_for_template)
+    def __call__(self, template_pdb_id: str) -> None:
+        try:
+            # Create logger and set it as the context logger for the process
+            TEMPLATE_PROCESS_LOGGER.set(
+                configure_template_logger(
+                    log_level=self.log_level,
+                    log_to_file=self.log_to_file,
+                    log_to_console=self.log_to_console,
+                    log_dir=self.log_dir,
+                )
+            )
+            # Create sequence cache for template
+            create_template_precache_entry_for_template(
+                template_pdb_id=template_pdb_id,
+                template_structures_directory=self.template_structures_directory,
+                template_structures_filename=self.template_structures_filename,
+                template_precache_dir=self.template_precache_dir,
+                template_file_format=self.template_file_format,
+            )
+        except Exception as e:
+            TEMPLATE_PROCESS_LOGGER.get().info(
+                f"Failed to process template {template_pdb_id}:\n{e}\n"
+            )
+
+
+def create_template_precache_of3(
+    template_structures_directory: Path,
+    template_structures_filename: str,
+    template_precache_dir: Path,
+    template_file_format: str,
+    num_workers: int,
+    log_level: str,
+    log_to_file: bool,
+    log_to_console: bool,
+    log_dir: Path,
+):
+    """Creates the sequence cache for all template structures.
+
+    Args:
+        template_structures_directory (Path):
+            Path to the directory containing template structures in mmCIF format.
+        template_structure_filename (str):
+            Template structure filename with {pdb} placeholder.
+        output_directory (Path):
+            Path to directory where the sequence cache will be saved for the template.
+        template_file_format (str):
+            File format of the template structures.
+        num_workers (int):
+            Number of workers to use for multiprocessing.
+        log_level (str):
+            Log level for the logger.
+        log_to_file (bool):
+            Whether to log to file.
+        log_to_console (bool):
+            Whether to log to console.
+        log_dir (Path):
+            Directory where the log file will be saved.
+    """
+
+    # Get list of PDB IDs for which the precache is to be computed
+    pattern = template_structures_filename + f".{template_file_format}"
+    template_pdb_ids = [
+        m.group("pdb")
+        for f in template_structures_directory.glob(pattern.format(pdb="*"))
+        if (
+            m := re.compile(
+                re.escape(pattern).replace(r"\{pdb\}", r"(?P<pdb>[A-Za-z0-9]+)")
+            ).fullmatch(f.name)
+        )
+    ]
+
+    # Wrap to reuse constant args
+    wrapped_template_precache_constructor = _OF3TemplatePreCacheConstructor(
+        template_structures_directory,
+        template_structures_filename,
+        template_precache_dir,
+        template_file_format,
+        log_level,
+        log_to_file,
+        log_to_console,
+        log_dir,
+    )
+
+    # Compute precache
+    if num_workers > 1:
+        with mp.Pool(num_workers) as pool:
+            for _ in tqdm(
+                pool.imap_unordered(
+                    wrapped_template_precache_constructor,
+                    template_pdb_ids,
+                    chunksize=1,
+                ),
+                total=len(template_pdb_ids),
+                desc="1/3: Creating template sequence cache",
+            ):
+                pass
+    else:
+        for template_pdb_id in tqdm(
+            template_pdb_ids,
+            desc="1/3: Creating template sequence cache",
+        ):
+            wrapped_template_precache_constructor(template_pdb_id)
+
+
+# TODO: clean up this function!
+# Step 2/3: Create template cache for query chains
+def create_template_cache_entry_for_query(
+    query_pdb_chain_id: str,
+    rep_pdb_chain_id: str,
+    template_alignment_file: Path,
+    template_structures_directory: Path,
+    template_cache_directory: Path,
+    template_precache_directory: Path,
+    query_structures_directory: Path,
+    max_templates_construct: int,
+    query_structures_filename: str,
+    query_file_format: str,
+    s3_client_config: dict | None,
+    log_dir=Path,
+) -> None:
+    """Creates a json cache of filtered template hits for a query.
+
+    A query denotes a single protein chain for which template hits are to be filtered,
+    i.e. corresponding to a protein chain whose structure needs to be predicted during
+    training, evaluation or inference.
+
+    Note:
+    A template is skipped if:
+        - no CIF file is provided for the QUERY against which the template was
+            aligned; the PDB IDs of the QUERY need to match between the alignment and
+            the CIF file
+        - there is a mismatch between the author chain IDs for the QUERY against
+            which the template was aligned AND the sequence provided in the alignment
+            file cannot be remapped to an exact subsequence of any chains in the QUERY
+            CIF file
+        - no CIF file is provided for the TEMPLATE; the PDB IDs of the TEMPLATE need
+            to match between the alignment and the CIF file
+        - there is a mismatch between the author chain IDs for the TEMPLATE AND the
+            sequence provided in the alignment file cannot be remapped to an exact
+            subsequence of any chains in the TEMPLATE CIF file
+        - the sequence of the template does not pass the AF3 sequence filters
+
+    The template alignment is parsed from the directory indicated by the
+    representative ID of a query chain, whereas the query structure is parsed using the
+    PDB ID-chain pair of the query chain.
+
+    The cache contains the e-value and mapping from the query residues to the template
+    hit residues.
+
+    Args:
+        query_pdb_chain_id (str):
+            The PDB ID and chain ID of the query chain.
+        rep_pdb_chain_id (str):
+            The PDB ID and chain ID of the representative chain for the query chain.
+        template_alignment_file (Path):
+            Path to the template alignment stockholm file. Currently only the output of
+            hmmsearch is accepted.
+        template_structures_directory (Path):
+            Path to the directory containing template structures in mmCIF format. The
+            PDB IDs of the template CIF files need to match the PDB IDs in the alignment
+            file for a template to be used.
+        template_cache_directory (Path):
+            Path to directory where the template cache will be saved for the query.
+        query_structures_directory (Path):
+            Path to the directory containing query structures in mmCIF format. The PDB
+            IDs of the query CIF files need to match the PDB IDs for the query (1st row)
+            in the alignment file for it to have any templates.
+        max_templates_construct (int):
+            Maximum number of templates to keep per query chain during template cache
+            construction.
+        query_structures_filename (str):
+            Name of the query structure file within each query structure subdirectory.
+            Uses the the subdir name if set to "None".
+        query_file_format (str):
+            File format of the query structures.
+        s3_client_config (dict | None):
+            Configuration for the S3 client. Should contain the profile name for the S3
+            client.
+    """
+    template_process_logger = TEMPLATE_PROCESS_LOGGER.get()
+
+    data_log = {
+        "query_pdb_id": query_pdb_chain_id.split("_")[0],
+        "query_chain_id": query_pdb_chain_id.split("_")[1],
+        "can_load_aln_file": False,
+        "template_cache_already_computed": False,
+        "query_cif_or_fasta_exists": False,
+        "query_seq_match": False,
+        "n_total_templates_in_aln": 0,
+        "n_unique_templates_in_aln": 0,
+        "n_templates_pass_seq_filters": 0,
+        "n_templates_has_precache": 0,
+        "n_template_chain_match": 0,
+        "n_valid_templates_prefilter": 0,
+    }
+    if s3_client_config is not None:
+        profile = s3_client_config["profile"]
+    else:
+        profile = None
+
+    # Parse alignment
+    try:
+        with open_local_or_s3(template_alignment_file, profile=profile, mode="r") as f:
+            hits = parse_hmmsearch_sto(f.read())
+    except Exception as e:
+        template_process_logger.info(
+            f"Failed to parse alignment file {template_alignment_file}, skipping. Make"
+            " sure that an hmmsearch output globally aligned with hmmalign was "
+            f"provided. \nError: \n{e}\nTraceback: \n{traceback.format_exc()}"
+        )
+        data_log_to_tsv(
+            data_log,
+            log_dir / Path(f"data_log_{os.getpid()}.tsv"),
+        )
+        return
+    template_process_logger.info(f"Alignment file {template_alignment_file} parsed.")
+    data_log["can_load_aln_file"] = True
+
+    # Filter queries
+    query = hits[0]
+    query_pdb_id, query_chain_id = parse_entry_chain_id(query_pdb_chain_id)
+    query_pdb_id_t, query_chain_id_t = parse_entry_chain_id(query.name)
+    template_cache_path_rep = template_cache_directory / Path(f"{rep_pdb_chain_id}.npz")
+    if template_cache_path_rep.exists():
+        template_process_logger.info(
+            f"Template cache for {query.name} already exists. Skipping templates for "
+            "this structure."
+        )
+        data_log["template_cache_already_computed"] = True
+        data_log_to_tsv(
+            data_log,
+            log_dir / Path(f"data_log_{os.getpid()}.tsv"),
+        )
+        return
+    # 1. Parse fasta of the structure
+    # the query and all its templates are skipped if the structure identified by the PDB
+    # ID of the first hit in the alignments file is not provided in
+    # query_structures_directory
+    query_structures_filename = (
+        query_pdb_id
+        if (query_structures_filename == "None") | (query_structures_filename is None)
+        else query_structures_filename
+    )
+    qp = query_structures_directory / Path(
+        f"{query_pdb_id}/{query_structures_filename}.{query_file_format}"
+    )
+    # Currently only checking existence of local files
+    if (not str(qp).startswith("s3:/")) and (not (qp).exists()):
+        template_process_logger.info(
+            f"Query {query_structures_filename}.{query_file_format} not "
+            f"found in  {query_structures_directory}. Skipping templates for this "
+            "structure."
+        )
+        data_log_to_tsv(
+            data_log,
+            log_dir / Path(f"data_log_{os.getpid()}.tsv"),
+        )
+        return
+    data_log["query_cif_or_fasta_exists"] = True
+    # 2. Parse query chain and sequence
+    # the query and all its templates are skipped if its HMM sequence cannot be mapped
+    # exactly to a subsequence of the MATCHING chain in the CIF/PDB file provided in
+    # query_structures_directory (no chain/sequence remapping is done)
+    is_query_invalid, query_seq_full = match_query_chain_and_sequence(
+        query_structures_directory,
+        query,
+        query_pdb_id,
+        query_chain_id,
+        query_file_format,
+        query_structures_filename,
+        s3_profile=profile,
+    )
+    if is_query_invalid:
+        template_process_logger.info(
+            f"The query sequences in the structure (query {query_pdb_id} chain "
+            f"{query_chain_id}) and template alignment (query {query_pdb_id_t} chain "
+            f"{query_chain_id_t}) don't match. Skipping templates for this structure."
+        )
+        data_log_to_tsv(data_log, log_dir / Path(f"data_log_{os.getpid()}.tsv"))
+        return
+    else:
+        data_log["query_seq_match"] = True
+
+    # Filter template hits
+    data_log["n_total_templates_in_aln"] = len(hits)
+    data_log["n_unique_templates_in_aln"] = len(
+        set(hit.hit_sequence for hit in hits.values())
+    )
+    precache_missing = set()
+    template_hits_filtered = {}
+    for idx, hit in hits.items():
+        hit_pdb_id, hit_chain_id = hit.name.split("_")
+        try:
+            # Skip query
+            if idx == 0:
+                template_process_logger.info(f"Skipping query {hit_pdb_id}.")
+                continue
+            # Skip templates whose precache is missing
+            if hit_pdb_id in precache_missing:
+                continue
+
+            # 1. Apply sequence filters: AF3 SI Section 2.4
+            fails_sequence_filters, query_aln, hit_aln = check_sequence(
+                query=query, hit=hit
+            )
+            if fails_sequence_filters:
+                template_process_logger.info(
+                    f"Template {hit_pdb_id} sequence does not pass sequence"
+                    " filters. Skipping this template."
+                )
+                continue
+            else:
+                data_log["n_templates_pass_seq_filters"] += 1
+
+            # 2. Parse structure
+            # The template is skipped if the structure identified by the PDB ID of the
+            # corresponding hit in the alignment file is not provided in
+            # template_structures_path
+            precache_entry_path = template_precache_directory / Path(
+                f"{hit_pdb_id}.npz"
+            )
+            if precache_entry_path.exists():
+                with np.load(
+                    precache_entry_path, allow_pickle=True
+                ) as template_precache:
+                    chain_id_seq_map = template_precache["chain_id_seq_map"].item()
+                    release_date = template_precache["release_date"].item()
+
+                data_log["n_templates_has_precache"] += 1
+            else:
+                template_process_logger.info(
+                    f"Precache for template structure {hit_pdb_id} not found in "
+                    f"{template_precache_directory}. Skipping this template."
+                )
+                precache_missing.add(hit_pdb_id)
+                continue
+
+            # 3. Parse template chain and sequence
+            # the template is skipped if its HMM sequence cannot be mapped
+            # exactly to a subsequence of ANY chain in the CIF file provided in
+            # template_structures_path with a PDB ID matching the the hit's PDB ID
+            # in the alignment file
+            # !!! Note that the chain ID-sequence map for this step is derived from the
+            # unprocessed CIF file provided in the template_structures_directory
+            hit_chain_id_matched, hit_seq_full = match_template_chain_and_sequence(
+                chain_id_seq_map, hit
+            )
+            if hit_chain_id_matched is None:
+                template_process_logger.info(
+                    f"Could not match template {hit_pdb_id} chain {hit_chain_id} "
+                    f"sequence in {chain_id_seq_map}. Skipping this template."
+                )
+                continue
+            else:
+                data_log["n_template_chain_match"] += 1
+
+            # Create residue index map
+            idx_map = create_residue_idx_map(
+                query_aln.astype("U1"),
+                hit_aln.astype("U1"),
+                query_seq_full,
+                hit_seq_full,
+            )
+
+            # Store as filtered hit
+            # hmmsearch is sorted in descending e-value order so index is enough to sort
+            template_hits_filtered[f"{hit_pdb_id}_{hit_chain_id_matched}"] = {
+                "index": hit.index,
+                "release_date": release_date,
+                "idx_map": idx_map,
+            }
+
+            # Break if max templates reached
+            if len(template_hits_filtered) == max_templates_construct:
+                template_process_logger.info(
+                    f"Max number of templates ({max_templates_construct}) reached."
+                )
+                break
+        except Exception as e:
+            template_process_logger.info(
+                f"Failed to process template {hit_pdb_id} for query "
+                f"{query_pdb_id}_{query_chain_id}:\n{e}\nTraceback: \n"
+                f"{traceback.format_exc()}"
+            )
+            continue
+
+    # Save data log
+    data_log["n_valid_templates_prefilter"] = len(template_hits_filtered)
+    data_log_to_tsv(data_log, log_dir / Path(f"data_log_{os.getpid()}.tsv"))
+
+    # Save filtered hits to json using the representative ID
+    if len(template_hits_filtered) > 0:
+        np.savez_compressed(template_cache_path_rep, **template_hits_filtered)
+        template_process_logger.info(
+            f"Template cache for {query.name} saved with "
+            f"{len(template_hits_filtered)} valid hits."
+        )
+    else:
+        # TODO optimize to not recompute template empty template caches multiple times
+        template_process_logger.info(f"0 valid templates found for {query.name}.")
+
+
+class _OF3TemplateCacheConstructor:
+    def __init__(
+        self,
+        template_alignment_directory: Path,
+        template_alignment_filename: str,
+        template_structures_directory: Path,
+        template_cache_directory: Path,
+        template_precache_directory: Path,
+        query_structures_directory: Path,
+        max_templates_construct: int,
+        query_structures_filename: str,
+        query_file_format: str,
+        log_level: str,
+        log_to_file: bool,
+        log_to_console: bool,
+        log_dir: Path,
+        s3_client_config: dict | None,
+    ) -> None:
+        """Wrapper class for creating the template cache.
+
+        This wrapper around `create_template_cache_for_query` is needed for
+        multiprocessing, so that we can pass the constant arguments in a convenient way
+        catch any errors that would crash the workers, and change the function call to
+        accept a single Iterable.
+
+        The wrapper is written as a class object because multiprocessing doesn't support
+        decorator-like nested functions.
+
+        Attributes:
+            template_alignment_directory (Path):
+                Directory containing directories per query chain, with each subdirectory
+                  containing hhsearch alignments per chain.
+            template_alignment_filename (str):
+                Name of the hhsearch aligment file within each query chain subdirectory.
+                Needs to be identical for all query chains.
+            template_structures_directory (Path):
+                Directory containing the template CIF files.
+            template_cache_directory (Path):
+                Directory where template cache jsons per chain will be saved.
+            query_structures_directory (Path):
+                Directory containing the query CIF files.
+            max_templates_construct (int):
+                Maximum number of templates to keep per query chain during template
+                cache construction.
+            query_structures_filename (str):
+                Name of the query structure file within each query structure
+                subdirectory. Uses the the subdir name if set to "None".
+            query_file_format (str):
+                File format of the query structures.
+            log_level (str):
+                Log level for the logger.
+            log_to_file (bool):
+                Whether to log to file.
+            log_dir (Path):
+                Directory where the log file will be saved.
+            s3_client_config (dict | None):
+                Configuration for the S3 client.
+
+        """
+        self.template_alignment_directory = template_alignment_directory
+        self.template_alignment_filename = template_alignment_filename
+        self.template_structures_directory = template_structures_directory
+        self.template_cache_directory = template_cache_directory
+        self.template_precache_directory = template_precache_directory
+        self.query_structures_directory = query_structures_directory
+        self.max_templates_construct = max_templates_construct
+        self.query_structures_filename = query_structures_filename
+        self.query_file_format = query_file_format
+        self.log_level = log_level
+        self.log_to_file = log_to_file
+        self.log_to_console = log_to_console
+        self.log_dir = log_dir
+        self.s3_client_config = s3_client_config
+
+    @wraps(create_template_cache_entry_for_query)
+    def __call__(self, input: _TemplateQueryEntry) -> None:
+        try:
+            # Create logger and set it as the context logger for the process
+            TEMPLATE_PROCESS_LOGGER.set(
+                configure_template_logger(
+                    log_level=self.log_level,
+                    log_to_file=self.log_to_file,
+                    log_to_console=self.log_to_console,
+                    log_dir=self.log_dir,
+                )
+            )
+
+            # Parse query and representative IDs
+            query_pdb_chain_id, rep_pdb_chain_id = (
+                input.dated_query.query_pdb_chain_id,
+                input.rep_pdb_chain_id,
+            )
+            template_alignment_file = (
+                self.template_alignment_directory
+                / Path(rep_pdb_chain_id)
+                / self.template_alignment_filename
+            )
+            # Create template cache for query
+            create_template_cache_entry_for_query(
+                query_pdb_chain_id=query_pdb_chain_id,
+                rep_pdb_chain_id=rep_pdb_chain_id,
+                template_alignment_file=template_alignment_file,
+                template_structures_directory=self.template_structures_directory,
+                template_cache_directory=self.template_cache_directory,
+                template_precache_directory=self.template_precache_directory,
+                query_structures_directory=self.query_structures_directory,
+                max_templates_construct=self.max_templates_construct,
+                query_structures_filename=self.query_structures_filename,
+                query_file_format=self.query_file_format,
+                log_dir=self.log_dir,
+                s3_client_config=self.s3_client_config,
+            )
+        except Exception as e:
+            TEMPLATE_PROCESS_LOGGER.get().info(
+                f"Failed to process templates for query {query_pdb_chain_id}:\n{e}\n"
+            )
+
+
+def create_template_cache_of3(
+    dataset_cache_file: Path,
+    template_alignment_directory: Path,
+    template_alignment_filename: str,
+    template_structures_directory: Path,
+    template_cache_dir: Path,
+    template_precache_dir: Path,
+    query_structures_directory: Path,
+    max_templates_construct: int,
+    query_structures_filename: str,
+    query_file_format: str,
+    single_moltype: str | None,
+    num_workers: int,
+    log_level: str,
+    log_to_file: bool,
+    log_to_console: bool,
+    log_dir: Path,
+    s3_client_config: dict | None,
+) -> None:
+    """Creates the full template cache for all query chains.
+
+    Uses
+
+    Args:
+        dataset_cache_file (Path):
+            Path to the metadata cache json file.
+        template_alignment_directory (Path):
+            Directory containing directories per query chain, with each subdirectory
+            containing template alignments per chain.
+        template_alignment_filename (str):
+            Name of the template alignment file within each query chain subdirectory.
+            Needs to be identical for all query chains.
+        template_structures_directory (Path):
+            Directory containing the template structures in mmCIF format.
+        template_cache_directory (Path):
+            Directory where the template cache jsons per chain will be saved.
+        query_structures_directory (Path):
+            Directory containing the query structures in mmCIF format.
+        max_templates_construct (int):
+            Maximum number of templates to keep per query chain during template cache
+            construction.
+        query_structures_filename (str):
+            Name of the query structure file within each query structure subdirectory.
+            Uses the the subdir name if set to "None".
+        query_file_format (str):
+            File format of the query structures.
+        single_moltype (str | None):
+            Constant molecule type to use if the dataset contains only a single molecule
+            type and the dataset cache does not contain per-chain molecule type field.
+            If None, the molecule type is inferred from the dataset cache.
+        num_workers (int):
+            Number of workers to use for multiprocessing.
+        log_level (str):
+            Log level for the logger.
+        log_to_file (bool):
+            Whether to log to file.
+        log_to_console (bool):
+            Whether to log to console.
+        log_dir (Path):
+            Directory where the log file will be saved.
+        s3_client_config (dict | None):
+            Configuration for the S3 client.
+    """
+    # Parse list of chains from metadata cache
+    dataset_cache = read_datacache(dataset_cache_file)
+    template_query_iterator = parse_representatives(
+        dataset_cache, True, single_moltype
+    ).entries
+    # Create template cache for each query chain
+    wrapped_template_cache_constructor = _OF3TemplateCacheConstructor(
+        template_alignment_directory,
+        template_alignment_filename,
+        template_structures_directory,
+        template_cache_dir,
+        template_precache_dir,
+        query_structures_directory,
+        max_templates_construct,
+        query_structures_filename,
+        query_file_format,
+        log_level,
+        log_to_file,
+        log_to_console,
+        log_dir,
+        s3_client_config,
+    )
+    if num_workers > 1:
+        with mp.Pool(num_workers) as pool:
+            for _ in tqdm(
+                pool.imap_unordered(
+                    wrapped_template_cache_constructor,
+                    template_query_iterator,
+                    chunksize=1,
+                ),
+                total=len(template_query_iterator),
+                desc="2/3: Creating template cache",
+            ):
+                pass
+    else:
+        for input_data in tqdm(
+            template_query_iterator,
+            desc="2/3: Creating template cache",
+        ):
+            wrapped_template_cache_constructor(input_data)
+    # Collate data logs
+    collate_data_logs(
+        log_dir, template_cache_dir.parent, "full_data_log_constructed_cache.tsv"
+    )
+
+
+# Step 3/3: Filter template cache for query chains and add to dataset cache
+def filter_template_cache_entry_for_query(
+    input_data: _TemplateQueryEntry,
+    template_cache_dir: Path,
+    max_templates: int,
+    is_core_train: bool,
+    max_release_date: datetime | str | None,
+    min_release_date_diff: int | None,
+    log_dir: Path,
+) -> TemplateHitCollection:
+    """Filters the template cache for a query chain.
+
+    Note: returns an empty dict if template_cache_directory does not contain a json file
+    for the alignment representative of a query chain.
+
+    Args:
+        input_data (_TemplateQueryEntry):
+            Tuple containing the representative ID - query PDB - chain ID pair with
+            query release dates or the representative ID and a list of query PDB -
+            chain ID release date pairs.
+        template_cache_directory (Path):
+            Directory containing template cache jsons per chain.
+        max_templates (int):
+            Maximum number of templates to keep per query chain.
+        is_core_train (bool):
+            Whether the dataset is core train or not.
+        max_release_date (Optional[datetime], optional):
+            Maximum release date for templates. Defaults to None.
+        min_release_date_diff (Optional[int], optional):
+            Minimum release date difference for core train templates. Defaults to None.
+
+    Returns:
+        TemplateHitCollection:
+            Dict mapping a query PDB - chain ID pair to a list of valid template
+            representative IDs.
+    """
+    template_process_logger = TEMPLATE_PROCESS_LOGGER.get()
+
+    # Unpack input and format release dates
+    if is_core_train:
+        rep_id, (query_pdb_chain_id, query_release_date) = (
+            input_data.rep_pdb_chain_id,
+            (
+                input_data.dated_query.query_pdb_chain_id,
+                datetime.strptime(
+                    input_data.dated_query.query_release_date, "%Y-%m-%d"
+                ),
+            ),
+        )
+    else:
+        rep_id, query_pdb_chain_ids_release_dates = (
+            input_data.rep_pdb_chain_id,
+            input_data.dated_query,
+        )
+        query_pdb_chain_id = query_pdb_chain_ids_release_dates[0].query_pdb_chain_id
+        if isinstance(max_release_date, str):
+            max_release_date = datetime.strptime(max_release_date, "%Y-%m-%d")
+    data_log = {
+        "query_pdb_id": query_pdb_chain_id.split("_")[0],
+        "query_chain_id": query_pdb_chain_id.split("_")[1],
+        "can_load_template_cache": False,
+        "n_valid_templates_prefilter": 0,
+        "n_dropped_due_to_release_date": 0,
+        "n_valid_templates_postfilter": 0,
+    }
+
+    # Parse template cache of the representative if available
+    template_cache_file = template_cache_dir / Path(f"{rep_id}.npz")
+    if not template_cache_file.exists():
+        template_process_logger.info(
+            f"Template cache for representative {rep_id} not found. Returning no valid "
+            "templates."
+        )
+        data_log_to_tsv(data_log, log_dir / Path(f"data_log_{os.getpid()}.tsv"))
+        if is_core_train:
+            return TemplateHitCollection({tuple(query_pdb_chain_id.split("_")): []})
+        else:
+            return TemplateHitCollection(
+                {
+                    tuple(query_pdb_chain_id[0].split("_")): []
+                    for query_pdb_chain_id in query_pdb_chain_ids_release_dates
+                }
+            )
+
+    with np.load(template_cache_file, allow_pickle=True) as template_cache:
+        # Sort by index/e-value
+        unpacked_template_cache = {
+            key: value.item() for key, value in template_cache.items()
+        }
+
+    sorted_template_cache = sorted(
+        unpacked_template_cache.items(), key=lambda x: x[1]["index"]
+    )
+    ids_dates = [
+        (template_id, datetime.strptime(template_data["release_date"], "%Y-%m-%d"))
+        for template_id, template_data in sorted_template_cache
+    ]
+    data_log["n_valid_templates_prefilter"] = len(ids_dates)
+
+    # Filter templates
+    filtered_templates = []
+    for template_id, template_date in ids_dates:
+        # Apply release date filters
+        if is_core_train:
+            if not check_release_date_diff(
+                query_release_date=query_release_date,
+                template_release_date=template_date,
+                min_release_date_diff=min_release_date_diff,
+            ):
+                data_log["n_dropped_due_to_release_date"] += 1
+                continue
+        else:
+            if not check_release_date_max(
+                template_release_date=template_date, max_release_date=max_release_date
+            ):
+                data_log["n_dropped_due_to_release_date"] += 1
+                continue
+        # Add to list of filtered templates if pass
+        filtered_templates.append(template_id)
+        data_log["n_valid_templates_postfilter"] += 1
+
+        # Break if max templates reached
+        if len(filtered_templates) == max_templates:
+            break
+
+    data_log_to_tsv(data_log, log_dir / Path(f"data_log_{os.getpid()}.tsv"))
+    template_process_logger.info(
+        f"Successfully filtered {len(filtered_templates)} templates for "
+        f"{query_pdb_chain_id}."
+    )
+    if is_core_train:
+        return TemplateHitCollection(
+            {tuple(query_pdb_chain_id.split("_")): filtered_templates}
+        )
+    else:
+        return TemplateHitCollection(
+            {
+                tuple(query_pdb_chain_id[0].split("_")): filtered_templates
+                for query_pdb_chain_id in query_pdb_chain_ids_release_dates
+            }
+        )
+
+
+class _OF3TemplateCacheFilter:
+    def __init__(
+        self,
+        template_cache_dir: Path,
+        max_templates_filter: int,
+        is_core_train: bool,
+        max_release_date: datetime | None,
+        min_release_date_diff: int | None,
+        log_level: str,
+        log_to_file: bool,
+        log_to_console: bool,
+        log_dir: Path,
+    ) -> None:
+        """Wrapper class for filtering the template cache and updating the dataset cache
+
+        This wrapper around `filter_template_cache_for_query` is needed for
+        multiprocessing, so that we can pass the constant arguments in a convenient way
+        catch any errors that would crash the workers, and change the function call to
+        accept a single Iterable.
+
+        The wrapper is written as a class object because multiprocessing doesn't support
+        decorator-like nested functions.
+
+        Attributes:
+            template_cache_directory (Path):
+                Directory containing template cache jsons per chain.
+            max_templates_filter (int):
+                Maximum number of templates to keep per query chain.
+            is_core_train (bool):
+                Whether the dataset is core train or not.
+            max_release_date (datetime | None):
+                Maximum release date for templates.
+            min_release_date_diff (int | None):
+                Minimum release date difference for core train templates.
+            log_level (str):
+                Log level for the logger.
+            log_to_file (bool):
+                Whether to log to file.
+            log_to_console (bool):
+                Whether to log to console.
+            log_dir (Path):
+                Directory where the log file will be saved.
+
+        """
+        self.template_cache_dir = template_cache_dir
+        self.max_templates_filter = max_templates_filter
+        self.is_core_train = is_core_train
+        self.max_release_date = max_release_date
+        self.min_release_date_diff = min_release_date_diff
+        self.log_level = log_level
+        self.log_to_file = log_to_file
+        self.log_to_console = log_to_console
+        self.log_dir = log_dir
+
+    @wraps(filter_template_cache_entry_for_query)
+    def __call__(self, input: _TemplateQueryEntry) -> TemplateHitCollection:
+        try:
+            # Create logger and set it as the context logger for the process
+            TEMPLATE_PROCESS_LOGGER.set(
+                configure_template_logger(
+                    log_level=self.log_level,
+                    log_to_file=self.log_to_file,
+                    log_to_console=self.log_to_console,
+                    log_dir=self.log_dir,
+                )
+            )
+
+            # Filter templates for query
+            valid_templates = filter_template_cache_entry_for_query(
+                input,
+                self.template_cache_dir,
+                self.max_templates_filter,
+                self.is_core_train,
+                self.max_release_date,
+                self.min_release_date_diff,
+                self.log_dir,
+            )
+            return valid_templates
+        except Exception as e:
+            if self.is_core_train:
+                query_pdb_chain_id = input.dated_query.query_pdb_chain_id
+                TEMPLATE_PROCESS_LOGGER.get().info(
+                    f"Failed to filter templates for query {query_pdb_chain_id}: "
+                    f"\n{e}\n"
+                )
+                return {tuple(query_pdb_chain_id.split("_")): []}
+            else:
+                query_pdb_chain_ids = [
+                    query_pdb_chain_id.query_pdb_chain_id
+                    for query_pdb_chain_id in input.dated_query
+                ]
+                TEMPLATE_PROCESS_LOGGER.get().info(
+                    "Failed to filter templates for queries "
+                    f"{query_pdb_chain_ids}: "
+                    f"\n{e}\n"
+                )
+                return {
+                    tuple(query_pdb_chain_id.split("_")): []
+                    for query_pdb_chain_id in query_pdb_chain_ids
+                }
+
+
+def filter_template_cache_of3(
+    dataset_cache_file: Path,
+    updated_dataset_cache_file: Path,
+    template_cache_dir: Path,
+    max_templates_filter: int,
+    single_moltype: str | None,
+    is_core_train: bool,
+    num_workers: int,
+    log_level: str,
+    log_to_file: bool,
+    log_to_console: bool,
+    log_dir,
+    max_release_date: datetime | None = None,
+    min_release_date_diff: int | None = None,
+) -> None:
+    """Filters the template cache and updates the dataset cache with valid template IDs.
+
+    Args:
+        dataset_cache_file (Path):
+            Path to the dataset cache json file.
+        updated_dataset_cache_file (Path):
+            Path to the updated dataset cache json file containing valid template
+            representative IDs.
+        template_cache_directory (Path):
+            Path to the directory containing template cache jsons per chain.
+        max_templates_filter (int):
+            Maximum number of templates to keep per query chain.
+        single_moltype (str | None):
+            Constant molecule type to use if the dataset contains only a single molecule
+            type and the dataset cache does not contain per-chain molecule type field.
+            If None, the molecule type is inferred from the dataset cache.
+        is_core_train (bool):
+            Whether the dataset is core train or not.
+        num_workers (int):
+            Number of workers to use for multiprocessing.
+        log_level (str):
+            Log level for the logger.
+        log_to_file (bool):
+            Whether to log to file.
+        log_to_console (bool):
+            Whether to log to console.
+        log_dir (Path):
+            Directory where the log file will be saved.
+        max_release_date (datetime | None):
+            Maximum release date for templates. Defaults to None.
+        min_release_date_diff (int | None):
+            Minimum release date difference for core train templates. Defaults to None.
+    """
+
+    # Parse list of chains from metadata cache
+    dataset_cache = read_datacache(dataset_cache_file)
+    template_query_iterator = parse_representatives(
+        dataset_cache, is_core_train, single_moltype
+    ).entries
+    data_iterator_len = len(template_query_iterator)
+
+    # Filter template cache for each query chain
+    wrapped_template_cache_filter = _OF3TemplateCacheFilter(
+        template_cache_dir,
+        max_templates_filter,
+        is_core_train,
+        max_release_date,
+        min_release_date_diff,
+        log_level,
+        log_to_file,
+        log_to_console,
+        log_dir,
+    )
+    if num_workers > 1:
+        with mp.Pool(num_workers) as pool:
+            for _, valid_templates in tqdm(
+                enumerate(
+                    pool.imap_unordered(
+                        wrapped_template_cache_filter,
+                        template_query_iterator,
+                        chunksize=30,
+                    )
+                ),
+                total=data_iterator_len,
+                desc="3/3: Filtering template cache",
+            ):
+                # Update dataset cache with list of valid template representative IDs
+                for grp in valid_templates.items():
+                    try:
+                        (pdb_id, chain_id), valid_template_list = grp
+                        dataset_cache.structure_data[pdb_id].chains[
+                            chain_id
+                        ].template_ids = valid_template_list
+                    except Exception as e:
+                        print(f"Failed to update dataset cache for {grp}: \n{e}\n")
+
+                # if (idx + 1) % save_frequency == 0:
+                #     with open(updated_dataset_cache_file, "w") as f:
+                #         json.dump(dataset_cache, f, indent=4)
+    else:
+        for input_data in tqdm(
+            template_query_iterator,
+            total=data_iterator_len,
+            desc="3/3: Filtering template cache",
+        ):
+            valid_templates = wrapped_template_cache_filter(input_data)
+            # Update dataset cache with list of valid template representative IDs
+            for grp in valid_templates.items():
+                try:
+                    (pdb_id, chain_id), valid_template_list = grp
+                    dataset_cache.structure_data[pdb_id].chains[
+                        chain_id
+                    ].template_ids = valid_template_list
+                except Exception as e:
+                    print(f"Failed to update dataset cache for {grp}: \n{e}\n")
+
+    # Save final complete dataset cache
+    write_datacache_to_json(dataset_cache, updated_dataset_cache_file)
+
+    # Collate data logs
+    collate_data_logs(
+        log_dir, template_cache_dir.parent, "full_data_log_filtered_cache.tsv"
+    )
+
+
+def data_log_to_tsv(data_log: dict, tsv_file: Path) -> None:
+    """Writes the data log to a tsv file.
+
+    Args:
+        data_log (dict):
+            Dictionary containing the data log.
+        tsv_file (Path):
+            Path to the tsv file where the data log will be saved.
+    """
+    file_exists = tsv_file.exists()
+    with open(tsv_file, "a") as f:
+        data_string = ""
+        header_string = ""
+        for key, value in data_log.items():
+            header_string += f"{key}\t"
+            data_string += f"{value}\t"
+        # Remove final tab
+        header_string = header_string[:-1] + "\n"
+        data_string = data_string[:-1] + "\n"
+        if not file_exists:
+            f.write(header_string)
+        f.write(data_string)
+    return
+
+
+def collate_data_logs(log_dir, output_dir, fname):
+    files = [f for f in list(log_dir.glob("data_log_*")) if f.is_file()]
+    df_all = pd.DataFrame()
+    for f in files:
+        df_all = pd.concat(
+            [
+                df_all,
+                pd.read_csv(f, sep="\t", na_values=["NaN"]),
+            ]
+        )
+        f.unlink()
+    df_all.to_csv(output_dir / Path(f"{fname}"), sep="\t", index=False)
+
+
+# --- Template structure preprocessing ---
+# Step 1/1: Preprocess template structures
+def preprocess_template_structure_for_template_old(
+    template_pdb_id: str,
+    template_structures_directory: Path,
+    template_file_format: str,
+    template_structure_array_directory: Path,
+    ccd: CIFFile,
+    moltypes_included: np.ndarray[int],
+    log_dir: Path,
+):
+    """Preparse and process a template structure.
+
+    Args:
+        template_pdb_id (str):
+            PDB ID of the template structure.
+        template_structures_directory (Path):
+            Path to the directory containing template structures in mmCIF format.
+        template_file_format (str):
+            File format of the template structures.
+        template_structure_array_directory (Path):
+            Path to the directory where the template structure arrays will be saved.
+        ccd (CIFFile):
+            The Chemical Component Dictionary.
+        moltypes_included (np.ndarray[int]):
+            Array of molecule types to include in the template structure arrays.
+        log_dir (Path):
+            Directory where the log file are saved. This dir will also contain the per-
+            worker process logs for which samples have been successfully processed.
+    """
+    template_assembly_directory = template_structure_array_directory / Path(
+        f"{template_pdb_id}"
+    )
+
+    # Parse template structure
+    cif_file, atom_array_template_assembly = parse_mmcif(
+        template_structures_directory
+        / Path(f"{template_pdb_id}.{template_file_format}")
+    )
+
+    # Sanitize template structure
+    atom_array_template = clean_template_atom_array(
+        atom_array_template_assembly, cif_file, None, ccd
+    )
+
+    # Save template structure for each chain separately
+    # TODO: can switch back to atom_array_template.label_asym_id once the dummy chain ID
+    #  addition bug is resolved
+    chain_ids = np.unique(atom_array_template.chain_id)
+    chains_included = []
+    for chain_id in chain_ids:
+        # Find molecule type of chain and save if included
+        atom_array_chain = atom_array_template[atom_array_template.chain_id == chain_id]
+        chain_mol_type = np.array(list(set(atom_array_chain.molecule_type_id)))
+        if len(chain_mol_type) != 1:
+            raise ValueError(
+                f"Multiple molecule types found in chain {chain_id} of "
+                f"template {template_pdb_id}."
+            )
+        if np.isin(chain_mol_type, moltypes_included).all():
+            chains_included.append(chain_id)
+            write_atomarray_to_npz(
+                atom_array=atom_array_chain,
+                output_file=template_assembly_directory
+                / f"{template_pdb_id}_{chain_id}.npz",
+            )
+
+    # Log as completed
+    pid = os.getpid()
+    line = "{}\t{}\t{}\n".format(template_pdb_id, pid, ",".join(chains_included))
+    with open(log_dir / f"completed_{pid}.tsv", "a") as f:
+        f.write(line)
+
+
+class _OF3TemplateStructurePreprocessor:
+    def __init__(
+        self,
+        template_structures_directory: Path,
+        template_file_format: str,
+        template_structure_array_directory: Path,
+        ccd: CIFFile,
+        moltypes_included: np.ndarray[int],
+        log_level: str,
+        log_to_file: bool,
+        log_to_console: bool,
+        log_dir: Path,
+    ) -> None:
+        """Wrapper class for preprocessing template structures.
+
+        This wrapper around `preprocess_structure_for_template` is needed for
+        multiprocessing, so that we can pass the constant arguments in a convenient way
+        catch any errors that would crash the workers, and change the function call to
+        accept a single Iterable.
+
+        The wrapper is written as a class object because multiprocessing doesn't support
+        decorator-like nested functions.
+
+        Attributes:
+            template_structures_directory (Path):
+                Path to the directory containing template structures in mmCIF format.
+            template_file_format (str):
+                File format of the template structures.
+            template_structure_array_directory (Path):
+                Path to the directory where the template structure arrays will be saved.
+            ccd (CIFFile):
+                The parsed Chemical Component Dictionary.
+            moltypes_included (np.ndarray[int]):
+                Array of molecule types to include in the template structure arrays.
+            log_level (str):
+                Log level for the logger.
+            log_to_file (bool):
+                Whether to log to file.
+            log_to_console (bool):
+                Whether to log to console.
+            log_dir (Path):
+                Directory where the log file will be saved.
+        """
+        self.template_structures_directory = template_structures_directory
+        self.template_file_format = template_file_format
+        self.template_structure_array_directory = template_structure_array_directory
+        self.ccd = ccd
+        self.moltypes_included = moltypes_included
+        self.log_level = log_level
+        self.log_to_file = log_to_file
+        self.log_to_console = log_to_console
+        self.log_dir = log_dir
+
+    @wraps(preprocess_template_structure_for_template_old)
+    def __call__(self, template_pdb_id: str) -> None:
+        try:
+            # Create logger and set it as the context logger for the process
+            TEMPLATE_PROCESS_LOGGER.set(
+                configure_template_logger(
+                    log_level=self.log_level,
+                    log_to_file=self.log_to_file,
+                    log_to_console=self.log_to_console,
+                    log_dir=self.log_dir,
+                )
+            )
+            PDB_ID.set(template_pdb_id)
+            # Preprocess template structure
+            preprocess_template_structure_for_template_old(
+                template_pdb_id=template_pdb_id,
+                template_structures_directory=self.template_structures_directory,
+                template_file_format=self.template_file_format,
+                template_structure_array_directory=self.template_structure_array_directory,
+                ccd=self.ccd,
+                moltypes_included=self.moltypes_included,
+                log_dir=self.log_dir,
+            )
+            TEMPLATE_PROCESS_LOGGER.get().info(
+                f"Successfully preprocessed template structure {template_pdb_id}."
+            )
+        except Exception as e:
+            TEMPLATE_PROCESS_LOGGER.get().info(
+                "Failed to preprocess template structure "
+                f"{template_pdb_id}:"
+                f"\n\nException:\n{str(e)}"
+                f"\n\nType:\n{type(e).__name__}"
+                f"\n\nTraceback:\n{traceback.format_exc()}"
+            )
+
+
+def preprocess_template_structures(
+    template_structures_directory: Path,
+    template_file_format: str,
+    template_structure_array_directory: Path,
+    ccd_file: Path,
+    completed_entries_file: Path | None,
+    moltypes_included: str,
+    num_workers: int,
+    chunksize: int,
+    log_level: str,
+    log_to_file: bool,
+    log_to_console: bool,
+    log_dir: Path,
+) -> None:
+    """Preprocesses the template structures.
+
+    Args:
+        template_structures_directory (Path):
+            Path to the directory containing template structures.
+        template_file_format (str):
+            File format of the template structures.
+        template_structure_array_directory (Path):
+            Path to the directory where the template structure arrays will be saved.
+        ccd_file (Path):
+            Path to the Chemical Component Dictionary file.
+        completed_entries_file (Path | None):
+            Path to the file containing the list of completed entries.
+        moltypes_included (str):
+            Comma-separated str of molecule types to include in the template structure
+            arrays.
+        num_workers (int):
+            Number of workers to use for multiprocessing.
+        chunksize (int):
+            Number of tasks per worker.
+        log_level (str):
+            Log level for the logger.
+        log_to_file (bool):
+            Whether to log to file.
+        log_to_console (bool):
+            Whether to log to console.
+        log_dir (Path):
+            Directory where the log file will be saved.
+    """
+    if not log_dir.exists():
+        log_dir.mkdir(parents=True, exist_ok=True)
+
+    # Parse molecule types to include
+    moltypes_included = np.array(
+        [MoleculeType[t.strip().upper()] for t in moltypes_included.split(",")]
+    )
+
+    # Get list of unique template PDB IDs, create per-entry dirs
+    template_pdb_ids = []
+    for f in list(template_structures_directory.glob(f"*.{template_file_format}")):
+        template_pdb_ids.append(f.stem.split(".")[0])
+
+    # Make sure there is no bias in ordering which could potentially affect
+    # preprocessing times
+    random.shuffle(template_pdb_ids)
+    print(f"Found {len(template_pdb_ids)} template structures.")
+
+    # Subset the template PDB IDs to only those that have not been preprocessed
+    if completed_entries_file is not None:
+        completed_entries = pd.read_csv(completed_entries_file, sep="\t", header=0)
+        template_pdb_ids = list(
+            set(template_pdb_ids) - set(completed_entries["entry"].tolist())
+        )
+        print(f"Preprocessing {len(template_pdb_ids)} template structures.")
+
+    # Pre-create directories for template structure arrays, otherwise IO issues
+    for template_pdb_id in tqdm(
+        template_pdb_ids, desc="1/2: Creating directories", total=len(template_pdb_ids)
+    ):
+        template_assembly_dir = template_structure_array_directory / Path(
+            f"{template_pdb_id}"
+        )
+        template_assembly_dir.mkdir(parents=True, exist_ok=True)
+
+    # Parse the CCD
+    ccd = pdbx.CIFFile.read(ccd_file)
+
+    # Preprocess template structures
+    wrapped_template_structure_preprocessor = _OF3TemplateStructurePreprocessor(
+        template_structures_directory,
+        template_file_format,
+        template_structure_array_directory,
+        ccd,
+        moltypes_included,
+        log_level,
+        log_to_file,
+        log_to_console,
+        log_dir,
+    )
+    if num_workers > 1:
+        with mp.Pool(num_workers) as pool:
+            for _ in tqdm(
+                pool.imap_unordered(
+                    wrapped_template_structure_preprocessor,
+                    template_pdb_ids,
+                    chunksize=chunksize,
+                ),
+                total=len(template_pdb_ids),
+                desc="2/2: Preprocessing template structures",
+            ):
+                pass
+    else:
+        for template_pdb_id in tqdm(
+            template_pdb_ids,
+            desc="2/2: Preprocessing template structures",
+            total=len(template_pdb_ids),
+        ):
+            wrapped_template_structure_preprocessor(template_pdb_id)
+
+
+def build_template_cache_key(
+    *,
+    sequence: str,
+    aln_path: Path | None = None,
+    cif_paths: list[Path] | None = None,
+    cif_chain_ids: list[str | None] | None = None,
+) -> str | None:
+    """Builds the cache key identifying one chain's template preprocessing result.
+
+    A template cache entry is the answer to "which templates does *this sequence*
+    have, *from this source*". Keying on the sequence alone makes two queries that
+    share a sequence but declare different template sources collide, so the source is
+    part of the key.
+
+    The key is a filename-safe, human-readable composite that names each component
+    rather than folding everything into one opaque digest, e.g.::
+
+        seq-<sha256 of the sequence>.cif-<sha256 of the CIF contents + chain picks>
+        seq-<sha256 of the sequence>.aln-<sha256 of the alignment file contents>
+
+    Sources are hashed by *content*, so editing a template CIF or realigning without
+    renaming the file invalidates the entry instead of silently reusing it.
+
+    Args:
+        sequence (str):
+            The query chain sequence.
+        aln_path (Path | None):
+            Template alignment file, for alignment mode (e.g. the ColabFold .m8).
+        cif_paths (list[Path] | None):
+            Template CIF files, for CIF-direct mode.
+        cif_chain_ids (list[str | None] | None):
+            Per-CIF chain selection, positionally paired with `cif_paths`.
+
+    Returns:
+        str | None:
+            The cache key, or None if the chain declares no template source.
+    """
+    seq_part = f"seq-{get_sequence_hash(sequence)}"
+
+    if aln_path is not None:
+        return f"{seq_part}.aln-{get_file_content_hash(Path(aln_path))}"
+
+    if cif_paths:
+        # Pair each CIF with its chain pick *before* sorting: the chain IDs are
+        # positional, so sorting the paths alone would scramble the pairing.
+        chain_ids = cif_chain_ids or [None] * len(cif_paths)
+        pairs = sorted(
+            (str(path), chain_id)
+            for path, chain_id in zip(cif_paths, chain_ids, strict=True)
+        )
+        parts = []
+        for path, chain_id in pairs:
+            parts.extend((Path(path), chain_id))
+        return f"{seq_part}.cif-{get_file_content_hash(*parts)}"
+
+    return None
+
+
+# New template preprocessing pipelines
+# TODO: replace old versions from above with these new ones
+class TemplatePreprocessorInputTrain(BaseModel):
+    pass
+
+
+class TemplatePreprocessorInputInference(BaseModel):
+    aln_path: Path | None = None
+    query_seq_str: str
+    template_entry_chain_ids: list[str] | None = None
+    template_cif_paths: list[Path] | None = None
+    template_cif_chain_ids: list[str | None] | None = None
+
+    @property
+    def cache_key(self) -> str | None:
+        """The cache key for this input. See `build_template_cache_key`."""
+        return build_template_cache_key(
+            sequence=self.query_seq_str,
+            aln_path=self.aln_path,
+            cif_paths=self.template_cif_paths,
+            cif_chain_ids=self.template_cif_chain_ids,
+        )
+
+    @model_validator(mode="after")
+    def validate_inputs(self) -> "TemplatePreprocessorInputInference":
+        """Validate template input consistency."""
+        if self.aln_path is not None and self.template_cif_paths is not None:
+            raise ValueError(
+                "Cannot provide both 'aln_path' and 'template_cif_paths'. "
+                "Choose one mode: alignment-based or CIF-direct."
+            )
+
+        if self.template_cif_chain_ids is not None:
+            if self.template_cif_paths is None:
+                raise ValueError(
+                    "'template_cif_chain_ids' requires 'template_cif_paths'"
+                )
+            if len(self.template_cif_chain_ids) != len(self.template_cif_paths):
+                raise ValueError(
+                    f"Length mismatch: {len(self.template_cif_paths)} CIF files "
+                    f"but {len(self.template_cif_chain_ids)} chain IDs"
+                )
+
+        return self
+
+
+class TemplatePreprocessorSettings(BaseModel):
+    """Settings for template preprocessing.
+
+    See AF3 SI Section 2.4. for details on some of these settings.
+
+    Attributes:
+        mode (Literal["train", "inference"]):
+            Whether templates are preprocessed for training or inference.
+        moltypes (list[MoleculeType]):
+            List of molecule types to preprocess templates for.
+        max_sequences_parse (int):
+            Maximum number of align sequences to parse from the template alignments
+            before filtering.
+        max_seq_id (float | None):
+            Maximum allowed sequence identity of the template relative to the query for
+            the template to pass filtering.
+        min_align (float | None):
+            Minimum required alignment coverage of the the query by the template for it
+            to pass filtering.
+        min_len (int | None):
+            Minimum required number of aligned template residues for the template to
+            pass filtering.
+        max_release_date (str | None):
+            Maximum allowed release date of the template structure for it to pass
+            filtering.
+        min_release_date_diff (int | None):
+            Minimum number of days required between the query and template release dates
+            for the template to pass filtering. Equivalently, the minimum number of days
+            that a template structure needed to have been released before the query
+            structure it is provided for as a template.
+        max_templates (int):
+            Maximum number of valid templates to keep per query chain after filtering.
+        min_f_resolved (float):
+            Minimum fraction of resolved residues (n resolved / n total) needed for a
+            template to be considered valid. NOTE that this is only used if the template
+            structure arrays and template precache entries are computed separately from
+            the main template cache entries.
+        fetch_missing_template_structures (bool):
+            Whether to fetch missing template structures from the PDB. Requires internet
+            access.
+        create_precache (bool):
+            Whether to cache of the template structure data (release date and sequence
+            information) for template filtering.
+        preparse_structures (bool):
+            Whether to preparse the template structures into per-chain AtomArray .npz
+            files for faster subsequent online template processing.
+        n_processes (int):
+            Number of processes to use template preprocessing.
+        chunksize (int):
+            Number of tasks per worker in multiprocessing.
+        preprocess_timeout (int):
+                Maximum time in seconds allowed for preprocessing templates for a
+                single query chain. Defaults to 60.
+        structure_directory (DirectoryPath):
+            Directory containing raw template structures or where template structures
+            are to be downloaded.
+        structure_file_format (str):
+            File format of the template structures. One of "cif", "pdb".
+        precache_directory (DirectoryPath | None):
+            Directory containing precomputed template structure pre-caches or where new
+            ones are to be saved.
+        structure_array_directory (DirectoryPath | None):
+            Directory containing preparsed template structures or where new ones will be
+            saved.
+        cache_directory (DirectoryPath | None):
+            Directory containing template cache entry .npz files or where new ones will
+            be saved.
+        ccd_file_path (FilePath | None):
+            Path to the Chemical Component Dictionary file. Only required if
+            `preparse_structures` is True.
+    """
+
+    model_config = PydanticConfigDict(extra="forbid")
+    mode: Literal["train", "predict"] = "predict"
+    moltypes: Annotated[
+        list[MoleculeType],
+        BeforeValidator(lambda v: _convert_molecule_type(_ensure_list(v))),
+    ] = [MoleculeType.PROTEIN]
+    max_sequences_parse: int = 200
+    max_seq_id: float | None = None
+    min_align: float | None = None
+    min_len: int | None = None
+    max_release_date: datetime | None = None
+    min_release_date_diff: int | None = None
+    max_templates: int = 20
+    cif_direct_min_score: float = 0.1
+    min_f_resolved: float = 0.1
+
+    fetch_missing_structures: bool = True
+    create_precache: bool = False
+    preparse_structures: bool = False
+    create_logs: bool = False
+    n_processes: int = 1
+    chunksize: int = 1
+    preprocess_timeout: int = 60
+
+    structure_directory: Path | None = None
+    structure_file_format: str = "cif"
+    output_directory: Path | None = None
+
+    precache_directory: Path | None = None
+    structure_array_directory: Path | None = None
+    cache_directory: Path | None = None
+    log_directory: Path | None = None
+
+    ccd_file_path: Path | None = None
+
+    @model_validator(mode="after")
+    def _prepare_output_directories(self) -> "TemplatePreprocessorSettings":
+        # TODO: add .pdb support
+        if self.structure_file_format not in ["cif", "npz"]:
+            raise NotImplementedError(
+                f"structure_file_format {self.structure_file_format} was provided but "
+                "currently, only cif and npz file format is supported for template "
+                "structure preprocessing due to metadata requirements of the template "
+                "pipeline."
+            )
+
+        if self.output_directory is None:
+            from openfold3.core.data.tools.utils import get_of3_tmpdir
+
+            self.output_directory = get_of3_tmpdir("template_data")
+
+        base = self.output_directory
+
+        # only set these if the user did not give them explicitly
+        self.structure_directory = self.structure_directory or (
+            base / "template_structures"
+        )
+        self.cache_directory = self.cache_directory or (base / "template_cache")
+        if self.create_precache:
+            self.precache_directory = self.precache_directory or (
+                base / "template_precache"
+            )
+        if self.preparse_structures:
+            self.structure_array_directory = self.structure_array_directory or (
+                base / "template_structure_arrays"
+            )
+        if self.create_logs:
+            self.log_directory = self.log_directory or (base / "template_logs")
+
+        for d in (
+            base,
+            self.output_directory,
+            self.structure_directory,
+            self.cache_directory,
+            self.precache_directory,
+            self.structure_array_directory,
+            self.log_directory,
+        ):
+            if d is not None:
+                os.makedirs(d, exist_ok=True)
+
+        return self
+
+
+class TemplatePreprocessor:
+    """Template preprocessing pipeline for OF3.
+
+    Prepares template alignments before model training or inference by parsing and
+    filtering them down to the set of valid templates for each query chain. Optionally,
+    it can preparse template structures into per-chain AtomArray .npz files for
+    faster subsequent online template processing.
+    """
+
+    def __init__(
+        self,
+        input_set: DatasetCache | InferenceQuerySet,
+        config: TemplatePreprocessorSettings,
+    ) -> None:
+        self.input_set = input_set
+
+        self.moltypes = config.moltypes
+        self.max_sequences_parse = config.max_sequences_parse
+        self.max_seq_id = config.max_seq_id
+        self.min_align = config.min_align
+        self.min_len = config.min_len
+        self.max_release_date = config.max_release_date
+        self.min_release_date_diff = config.min_release_date_diff
+        self.max_templates = config.max_templates
+
+        self.cif_direct_min_score = config.cif_direct_min_score
+
+        self.fetch_missing_structures = config.fetch_missing_structures
+        self.create_precache = config.create_precache
+        self.preparse_structures = config.preparse_structures
+        self.create_logs = config.create_logs
+        self.n_processes = config.n_processes
+        self.chunksize = config.chunksize
+        self.preprocess_timeout = config.preprocess_timeout
+
+        self.structure_directory = config.structure_directory
+        self.structure_file_format = config.structure_file_format
+        self.precache_directory = config.precache_directory
+        self.structure_array_directory = config.structure_array_directory
+        self.cache_directory = config.cache_directory
+        self.log_directory = config.log_directory
+
+        # TODO: update with set_ccd biotite method instead
+        if config.ccd_file_path is not None:
+            self.ccd = pdbx.CIFFile.read(config.ccd_file_path)
+        else:
+            self.ccd = BiotiteCCDWrapper()
+
+        # Cache key -> input; replaced below by the parsers
+        self.inputs = {}
+        # Both replaced in __call__ by manager dicts; keyed by cache key, see
+        # `build_template_cache_key`
+        self.processed_cache_keys = {}
+        self.template_ids_by_cache_key = {}
+        if isinstance(input_set, DatasetCache):
+            self._parse_dataset_cache()
+        elif isinstance(input_set, InferenceQuerySet):
+            self._parse_inference_query_set()
+        else:
+            raise ValueError(
+                "Input set must be either DatasetCache or InferenceQuerySet"
+            )
+
+    def _parse_dataset_cache(self) -> None:
+        raise NotImplementedError
+
+    def _parse_inference_query_set(self) -> None:
+        inputs: dict[str, TemplatePreprocessorInputInference] = {}
+        for query_name, query in self.input_set.queries.items():
+            for chain in query.chains:
+                if chain.molecule_type not in self.moltypes:
+                    continue
+
+                # CASE 1: Alignment file mode
+                if chain.template_alignment_file_path is not None:
+                    template_input = TemplatePreprocessorInputInference(
+                        aln_path=Path(chain.template_alignment_file_path),
+                        query_seq_str=chain.sequence,
+                        template_entry_chain_ids=chain.template_entry_chain_ids,
+                        template_cif_paths=None,
+                    )
+
+                # CASE 2: CIF-direct mode
+                elif chain.template_cif_paths is not None:
+                    template_input = TemplatePreprocessorInputInference(
+                        aln_path=None,
+                        query_seq_str=chain.sequence,
+                        template_entry_chain_ids=None,
+                        template_cif_paths=chain.template_cif_paths,
+                        template_cif_chain_ids=chain.template_cif_chain_ids,
+                    )
+
+                else:
+                    print(
+                        f"Warning: No template data provided for chain "
+                        f"{chain.chain_ids} of query {query_name}, skipping..."
+                    )
+                    continue
+
+                # Chains collapse into one input only when both their sequence and
+                # their template source match, so first one wins per cache key
+                inputs.setdefault(template_input.cache_key, template_input)
+
+        self.inputs = inputs
+
+    def _update_dataset_cache(self) -> None:
+        raise NotImplementedError
+
+    def _update_inference_query_set(self) -> None:
+        for query_name, query in self.input_set.queries.items():
+            for idx, chain in enumerate(query.chains):
+                if chain.molecule_type not in self.moltypes:
+                    continue
+                # Must be derived from the chain's *declared* template source, before
+                # `template_alignment_file_path` is overwritten with the cache path
+                # below. A chain that declared no source has no key and is left alone,
+                # rather than inheriting the entry of another query that happens to
+                # share its sequence.
+                cache_key = build_template_cache_key(
+                    sequence=chain.sequence,
+                    aln_path=chain.template_alignment_file_path,
+                    cif_paths=chain.template_cif_paths,
+                    cif_chain_ids=chain.template_cif_chain_ids,
+                )
+                if cache_key is None:
+                    continue
+
+                # Add new npz file path to the chain
+                template_cache_entry_file = self.cache_directory / f"{cache_key}.npz"
+                # No templates for chains whose preprocessing fails
+                if template_cache_entry_file.exists():
+                    new_path = Path(template_cache_entry_file)
+                else:
+                    new_path = None
+                self.input_set.queries[query_name].chains[
+                    idx
+                ].template_alignment_file_path = new_path
+
+                # Add the template entry chain IDs to the chain
+                self.input_set.queries[query_name].chains[
+                    idx
+                ].template_entry_chain_ids = list(
+                    self.template_ids_by_cache_key.get(cache_key, [])
+                )
+
+    def __call__(self) -> None:
+        # Preprocess template alignments into template cache entries
+        if len(self.inputs) >= 1:
+            manager = mp.Manager()
+            self.processed_cache_keys = manager.dict()
+            self.template_ids_by_cache_key = manager.dict()
+            with mp.Pool(self.n_processes) as pool:
+                for _ in tqdm(
+                    pool.imap_unordered(
+                        self.preprocess_templates,
+                        # .values(): iterating the mapping itself would hand the
+                        # workers cache-key strings
+                        self.inputs.values(),
+                        chunksize=self.chunksize,
+                    ),
+                    total=len(self.inputs),
+                    desc="Preprocessing templates",
+                ):
+                    pass
+
+        else:
+            print("No chains with templates to preprocess.")
+            return
+
+        # Update the dataset cache/inference query set with the preprocessed template
+        # data
+        if isinstance(self.input_set, DatasetCache):
+            self._update_dataset_cache()
+        elif isinstance(self.input_set, InferenceQuerySet):
+            self._update_inference_query_set()
+
+    def _parse_templates_from_cif_files(
+        self,
+        input_data: TemplatePreprocessorInputInference,
+    ) -> dict[int, TemplateData]:
+        """Parse templates from CIF files in CIF-direct mode.
+
+        Args:
+            input_data: Input data containing CIF file paths
+
+        Returns:
+            Dictionary mapping indices to TemplateData objects
+        """
+        if self.create_logs:
+            worker_logger = logging.getLogger(f"template_preprocess_{os.getpid()}")
+            worker_logger.info(
+                "CIF-direct mode: "
+                f"Processing {len(input_data.template_cif_paths)} CIF files"
+            )
+
+        templates = {}
+        parser = CifDirectParser(
+            max_sequences=None,
+            min_score_threshold=self.cif_direct_min_score,
+        )
+
+        if self.create_logs:
+            worker_logger = logging.getLogger(f"template_preprocess_{os.getpid()}")
+            worker_logger.info(
+                f"Processing {len(input_data.template_cif_paths)} CIF files "
+                "in CIF-direct mode..."
+            )
+
+        for idx, cif_path in enumerate(input_data.template_cif_paths):
+            try:
+                if not cif_path.exists():
+                    if self.create_logs:
+                        worker_logger.warning(f"CIF file not found: {cif_path}")
+                    continue
+
+                entry_id = cif_path.stem
+
+                specified_chain_id = None
+                if input_data.template_cif_chain_ids is not None:
+                    specified_chain_id = input_data.template_cif_chain_ids[idx]
+
+                if self.precache_directory is not None:
+                    precache_file = self.precache_directory / f"{entry_id}.npz"
+                    if precache_file.exists():
+                        precache_entry = np.load(precache_file, allow_pickle=True)
+                        chain_id_seq_map = precache_entry["chain_id_seq_map"].item()
+                    else:
+                        cif_file = _load_ciffile(cif_path)
+                        chain_id_seq_map = get_asym_id_to_canonical_seq_dict(cif_file)
+                else:
+                    cif_file = _load_ciffile(cif_path)
+                    chain_id_seq_map = get_asym_id_to_canonical_seq_dict(cif_file)
+
+                cif_templates = parser(
+                    cif_file_path=cif_path,
+                    query_seq_str=input_data.query_seq_str,
+                    chain_id_seq_map=chain_id_seq_map,
+                    entry_id=entry_id,
+                    specified_chain_id=specified_chain_id,
+                )
+
+                if cif_templates:
+                    template = cif_templates[0]
+                    template = template._replace(index=idx, cif_path=cif_path)
+                    templates[idx] = template
+
+                    if self.create_logs:
+                        worker_logger.info(
+                            f"Selected chain {template.chain_id} from {entry_id} "
+                            f"(seq_id={template.seq_id:.3f}, "
+                            f"q_cov={template.q_cov:.3f})"
+                        )
+
+            except Exception as e:
+                if self.create_logs:
+                    worker_logger.warning(f"Failed to process CIF file {cif_path}: {e}")
+                continue
+
+        if templates:
+            templates_list = list(templates.values())
+            templates_list.sort(
+                key=lambda t: t.seq_id * (t.q_cov if t.q_cov is not None else 0.0),
+                reverse=True,
+            )
+            templates = {i: t._replace(index=i) for i, t in enumerate(templates_list)}
+
+            if self.create_logs:
+                worker_logger.info(f"Parsed {len(templates)} templates from CIF files")
+            for t in templates_list[:5]:
+                if self.create_logs:
+                    worker_logger.info(
+                        f"  - {t.entry_id}_{t.chain_id}: "
+                        f"seq_id={t.seq_id:.3f}, q_cov={t.q_cov:.3f}"
+                    )
+
+            if self.create_logs:
+                worker_logger.info(
+                    f"Parsed {len(templates)} templates from CIF files, "
+                    f"sorted by alignment quality"
+                )
+        else:
+            if self.create_logs:
+                worker_logger.info("No templates parsed from CIF files")
+
+        return templates
+
+    def preprocess_templates(
+        self,
+        input_data: TemplatePreprocessorInputTrain | TemplatePreprocessorInputInference,
+    ) -> None:
+        try:
+            func_timeout(
+                self.preprocess_timeout,
+                self._preprocess_templates_for_query,
+                args=(input_data,),
+            )
+        except FunctionTimedOut:
+            print(
+                f"\n Template preprocessing TIMED OUT after {self.preprocess_timeout}s "
+                f"for {input_data.aln_path}.\n"
+                f"Skipping templates for this query chain.\n"
+                f"Hint: increase the timeout with --preprocess-timeout <seconds>\n"
+            )
+        except Exception as e:
+            print(
+                f"Failed to preprocess template alignment "
+                f"{input_data.aln_path}:"
+                f"\n\nException:\n{str(e)}"
+                f"\n\nType:\n{type(e).__name__}"
+                f"\n\nTraceback:\n{traceback.format_exc()}"
+            )
+
+    def _preprocess_templates_for_query(
+        self,
+        input_data: TemplatePreprocessorInputTrain | TemplatePreprocessorInputInference,
+    ) -> None:
+        if self.create_logs:
+            worker_logger = logging.getLogger(f"template_preprocess_{os.getpid()}")
+            worker_logger.setLevel(logging.INFO)
+            handler = logging.FileHandler(self.log_directory / f"{os.getpid()}.log")
+            handler.setLevel(logging.INFO)
+            formatter = logging.Formatter("%(message)s")
+            handler.setFormatter(formatter)
+            if not worker_logger.hasHandlers():
+                worker_logger.addHandler(handler)
+            worker_logger.propagate = False
+
+        # preprocess templates for a single chain
+        # 1. Parse template alignment file or CIF files
+        if isinstance(input_data, TemplatePreprocessorInputInference):
+            if input_data.aln_path is not None:
+                if self.create_logs:
+                    worker_logger.info(
+                        f"Parsing template alignment {input_data.aln_path}..."
+                    )
+            elif input_data.template_cif_paths is not None:  # noqa: SIM102
+                if self.create_logs:
+                    worker_logger.info(
+                        f"Processing {len(input_data.template_cif_paths)} CIF files "
+                        "in CIF-direct mode..."
+                    )
+
+        # TODO: 2. if template entry and chain ID list provided in the IQS - skip some
+        # below:
+
+        # TODO: 3. TRAIN: match  query sequence in aln to query sequence in structure
+
+        # 4. Representative mapping For training - core weighted PDB set, need to index
+        # by entry ID, and cannot index by sequence hash due to the way filtering is
+        # done
+        cache_key = input_data.cache_key
+        # skip template preprocessing for chain if already done. Keyed on sequence +
+        # template source, so a second chain only short-circuits when it would produce
+        # exactly the same cache entry
+        if cache_key in self.processed_cache_keys:
+            return
+        self.processed_cache_keys[cache_key] = True
+        template_cache_entry_file = self.cache_directory / f"{cache_key}.npz"
+        cache_entry_available = template_cache_entry_file.exists()
+        if self.create_logs:
+            worker_logger.info(
+                f"Template cache entry {template_cache_entry_file} available:"
+                f" {cache_entry_available}"
+            )
+
+        # 5. Template consistency checks and filtering
+        if not cache_entry_available:  # !!! cannot do this for training!
+            if self.create_logs:
+                worker_logger.info(
+                    f"Creating new cache entry {template_cache_entry_file}."
+                )
+
+            # Parse templates based on mode
+            if isinstance(input_data, TemplatePreprocessorInputInference):
+                if input_data.aln_path is not None:
+                    templates = parse_template_alignment(
+                        input_data.aln_path,
+                        input_data.query_seq_str,
+                        self.max_sequences_parse,
+                    )
+                elif input_data.template_cif_paths is not None:
+                    templates = self._parse_templates_from_cif_files(input_data)
+                else:
+                    return
+            else:
+                templates = parse_template_alignment(
+                    input_data.aln_path,
+                    input_data.query_seq_str,
+                    self.max_sequences_parse,
+                )
+            if self.create_logs:
+                worker_logger.info(f"Parsed {len(templates)} templates...")
+            template_cache_entry = {}
+            template_ids = []
+            for _, template in templates.items():
+                # A. Sequence checks
+                if fails_template_sequence_checks(
+                    template, self.max_seq_id, self.min_align, self.min_len
+                ):
+                    if self.create_logs:
+                        worker_logger.info(
+                            f"{template.entry_id} {template.chain_id} does not pass"
+                            " sequence checks."
+                        )
+                    continue
+
+                # B. Get which files are available
+                template_structure_file = (
+                    self.structure_directory
+                    / f"{template.entry_id}.{self.structure_file_format}"
+                )
+                structure_available = template_structure_file.exists()
+                if self.precache_directory is not None:
+                    precache_entry_file = (
+                        self.precache_directory / f"{template.entry_id}.npz"
+                    )
+                    precache_entry_available = precache_entry_file.exists()
+                else:
+                    precache_entry_file = None
+                    precache_entry_available = False
+                if self.structure_array_directory is not None:
+                    template_structure_array_subdirectory = (
+                        self.structure_array_directory / template.entry_id
+                    )
+                    structure_arrays_available = (
+                        template_structure_array_subdirectory.exists()
+                        and any(template_structure_array_subdirectory.iterdir())
+                    )
+                else:
+                    template_structure_array_subdirectory = None
+                    structure_arrays_available = False
+                if self.create_logs:
+                    worker_logger.info(
+                        f"Data availability for {template.entry_id} "
+                        f"{template.chain_id}:\n"
+                        f"  Structure file: {structure_available} - "
+                        f"{template_structure_file}\n"
+                        f"  Precache entry: {precache_entry_available} - "
+                        f"{precache_entry_file}\n"
+                        f"  Structure arrays: {structure_arrays_available} - "
+                        f"{template_structure_array_subdirectory}"
+                    )
+
+                # C. Fetch template structure if needed
+                # We need
+                # - either the raw template structure
+                # - or the precache entry and the structure arrays both
+                if (not structure_available) & (not precache_entry_available):
+                    if not self.fetch_missing_structures:
+                        if self.create_logs:
+                            worker_logger.info(
+                                f"Template structure for {template.entry_id} is "
+                                "missing, but fetching is disabled. Please either "
+                                "provide the missing template structure or set "
+                                "`template_preprocessor_settings.fetch_missing_structures=True`.",
+                            )
+                        continue
+                    else:
+                        if self.create_logs:
+                            worker_logger.info(
+                                "Structure not available, fetching"
+                                f" {template.entry_id}."
+                            )
+                        try:
+                            fetch(
+                                pdb_ids=template.entry_id,
+                                format="cif",
+                                target_path=self.structure_directory,
+                            )
+                        except RequestError as _:
+                            msg = (
+                                f" {template.entry_id} is not a valid PDB ID."
+                                " Skipping this template."
+                            )
+                            if self.create_logs:
+                                worker_logger.info(msg)
+                            else:
+                                print(msg)
+                            continue
+
+                # D. Load template structure
+                # i. from precache if available
+                if precache_entry_available:
+                    if self.create_logs:
+                        worker_logger.info(
+                            f"Loading precache entry {precache_entry_file}."
+                        )
+
+                    with np.load(
+                        precache_entry_file, allow_pickle=True
+                    ) as precache_entry:
+                        chain_id_seq_map = precache_entry["chain_id_seq_map"].item()
+                        release_date = precache_entry["release_date"].item()
+
+                # ii. from raw structure if not precached
+                else:
+                    # Preprocess into per-chain arrays if prompted
+                    if self.preparse_structures & (not structure_arrays_available):
+                        if self.create_logs:
+                            worker_logger.info(
+                                f"Loading structure {template_structure_file} and"
+                                " preparsing."
+                            )
+                        cif_file, _ = preprocess_template_structure_for_template(
+                            template_structure_file,
+                            template_structure_array_subdirectory,
+                            self.ccd,
+                            self.moltypes,
+                        )
+                    else:
+                        if self.create_logs:
+                            worker_logger.info(
+                                f"Loading structure {template_structure_file}."
+                            )
+                        cif_file = _load_ciffile(template_structure_file)
+
+                    chain_id_seq_map = get_asym_id_to_canonical_seq_dict(cif_file)
+                    release_date = get_release_date(get_cif_block(cif_file)).strftime(
+                        "%Y-%m-%d"
+                    )
+
+                    if self.create_precache:
+                        if self.create_logs:
+                            worker_logger.info(
+                                f"Saving new precache entry {precache_entry_file}."
+                            )
+                        np.savez_compressed(
+                            precache_entry_file,
+                            **{
+                                "release_date": release_date,
+                                "chain_id_seq_map": chain_id_seq_map,
+                            },
+                        )
+
+                # E. Realign with the sequence from the template structure file if the
+                # template aligment did not contain the sequence.
+                if not all(
+                    [
+                        template.seq,
+                        template.query_aln_pos is not None,
+                        template.aln_pos is not None,
+                        template.q_cov,
+                    ]
+                ):
+                    if self.create_logs:
+                        worker_logger.info(
+                            "Residue-wise template alignment missing for"
+                            f" {template.entry_id} {template.chain_id}. Realigning."
+                        )
+                    template_sequence = chain_id_seq_map.get(template.chain_id)
+                    if template_sequence is None:
+                        # TODO: add warning - the chain ID from the alignment is not
+                        # present in the structure file
+                        continue
+                    parser = A3mParser(max_sequences=None)
+                    template = parser(
+                        f">query_X/1-{len(input_data.query_seq_str)}\n{input_data.query_seq_str}\n>{template.entry_id}_{template.chain_id}/{1}-{len(template_sequence)}\n{template_sequence}\n",
+                        input_data.query_seq_str,
+                        realign=True,
+                    )[1]
+
+                # F. Apply release date checks
+                if not isinstance(release_date, datetime):
+                    release_date = datetime.strptime(release_date, "%Y-%m-%d")
+                if fails_template_release_date_checks(
+                    template_release_date=release_date,
+                    query_release_date=None,  # TODO: add for training logic
+                    max_template_release_date=self.max_release_date,
+                    min_release_date_diff=self.min_release_date_diff,
+                ):
+                    if self.create_logs:
+                        worker_logger.info(
+                            f"{template.entry_id} {template.chain_id} does not pass"
+                            " release date checks."
+                        )
+                    continue
+
+                # G. Match template sequence from alignment to template sequence in
+                # structure and attempt to remap chain ID if needed
+                chain_id_matched = match_template_seq_from_aln_to_struc(
+                    template, chain_id_seq_map
+                )
+                if chain_id_matched is None:
+                    if self.create_logs:
+                        worker_logger.info(
+                            f"{template.entry_id} {template.chain_id} sequence could"
+                            " not be matched between alignment and structure."
+                        )
+                    continue
+
+                # H. Add to cache entry
+                idx_map = template.build_residue_idx_map()
+                if idx_map.shape[0] == 0:
+                    if self.create_logs:
+                        worker_logger.info(
+                            f"{template.entry_id} {template.chain_id} has no aligned"
+                            " residue pairs."
+                        )
+                    continue
+                # `cif_path` is only set in CIF-direct mode and is dropped by `to_dict`
+                # when absent
+                cache_entry = TemplateCacheEntry(
+                    index=template.index,
+                    release_date=release_date,
+                    idx_map=idx_map,
+                    cif_path=template.cif_path,
+                )
+                template_cache_entry[f"{template.entry_id}_{chain_id_matched}"] = (
+                    cache_entry.to_dict()
+                )
+                template_ids.append(f"{template.entry_id}_{chain_id_matched}")
+                if self.create_logs:
+                    worker_logger.info(
+                        f"{template.entry_id} {template.chain_id} added to cache."
+                    )
+
+                # I. Break if max templates reached
+                if len(template_cache_entry) == self.max_templates:
+                    break
+
+            # 6. Save template cache entry and update shared dict of template IDs
+            if len(template_cache_entry) > 0:
+                if self.create_logs:
+                    worker_logger.info(f"Found {len(template_cache_entry)} hits.")
+                np.savez_compressed(template_cache_entry_file, **template_cache_entry)
+                self.template_ids_by_cache_key[cache_key] = template_ids
+            else:
+                if self.create_logs:
+                    worker_logger.info("Found no hits.")
+
+        # Load the existing template cache entry if available to add the processed
+        # template ids into the shared template_ids_by_cache_key and then input set
+        else:
+            if self.create_logs:
+                worker_logger.info(
+                    f"Loading existing cache entry {template_cache_entry_file}."
+                )
+            if cache_key in self.template_ids_by_cache_key:
+                return
+
+            with np.load(
+                template_cache_entry_file, allow_pickle=True
+            ) as template_cache_npz:
+                template_cache_entry = {
+                    key: value.item() for key, value in template_cache_npz.items()
+                }
+
+            self.template_ids_by_cache_key[cache_key] = list(
+                template_cache_entry.keys()
+            )
+            if self.create_logs:
+                worker_logger.info(f"Found {template_cache_entry.keys()} hits.")
+
+
+class TemplatePrecachePreprocessor:
+    """Preprocessing pipeline for extracting template structure metadata."""
+
+    def __init__(
+        self,
+        config: TemplatePreprocessorSettings,
+    ) -> None:
+        self.moltypes = config.moltypes
+        self.n_processes = config.n_processes
+        self.chunksize = config.chunksize
+        self.preprocess_timeout = config.preprocess_timeout
+
+        self.structure_directory = config.structure_directory
+        self.structure_file_format = config.structure_file_format
+        self.structure_array_directory = config.structure_array_directory
+        self.precache_directory = config.precache_directory
+        self.min_f_resolved = config.min_f_resolved
+
+        # Get list of template entry IDs
+        self.template_entry_ids = [
+            f.stem
+            for f in list(
+                self.structure_directory.glob(f"*.{self.structure_file_format}")
+            )
+        ]
+
+        if not self.template_entry_ids:
+            print(
+                f"No template structure files found in {self.structure_directory} "
+                f"with format {self.structure_file_format}"
+            )
+            return
+
+        print(f"Found {len(self.template_entry_ids)} template structures to process.")
+
+        if self.structure_array_directory is not None:
+            print(
+                "Filtering based on precomputed structure arrays at "
+                f"{self.structure_array_directory}."
+            )
+        else:
+            print("No structure array directory provided. No additional filtering.")
+
+    def __call__(self) -> None:
+        with mp.Pool(self.n_processes) as pool:
+            for _ in tqdm(
+                pool.imap_unordered(
+                    self._preprocess_template_precache_entry,
+                    self.template_entry_ids,
+                    chunksize=self.chunksize,
+                ),
+                total=len(self.template_entry_ids),
+                desc="Preprocessing template structures into precache entries",
+            ):
+                pass
+
+    def _preprocess_template_precache_entry(
+        self,
+        template_entry_id: str,
+    ) -> None:
+        """Create a precache entry for a single template structure.
+
+        Args:
+            template_entry_id (str):
+                Entry ID of the template structure, typically, PDB ID.
+        """
+        try:
+            precache_entry_file = self.precache_directory / f"{template_entry_id}.npz"
+            if precache_entry_file.exists():
+                print(f"Precache entry {template_entry_id} already exists, skipping.")
+                return
+
+            cif_file = _load_ciffile(
+                self.structure_directory
+                / f"{template_entry_id}.{self.structure_file_format}"
+            )
+            chain_id_seq_map = get_asym_id_to_canonical_seq_dict(cif_file)
+            release_date = get_release_date(get_cif_block(cif_file)).strftime(
+                "%Y-%m-%d"
+            )
+
+            if self.structure_array_directory is not None:
+                chain_id_to_mol_type_path = (
+                    self.structure_array_directory
+                    / f"{template_entry_id}/chain_id_to_moltype.npz"
+                )
+                # If no chain-id -> moltype map = no template structure for any chains
+                # in the complex
+                if not chain_id_to_mol_type_path.exists():
+                    print(
+                        f"No chain ID - moltype map for {template_entry_id}. Skipping."
+                    )
+                    return
+                else:
+                    chain_id_to_mol_type = np.load(
+                        chain_id_to_mol_type_path, allow_pickle=True
+                    )["chain_id_to_mol_type"].item()
+
+                drop_chains = []
+                for chain_id in chain_id_seq_map:
+                    chain_mol_type = (
+                        MoleculeType(chain_id_to_mol_type[chain_id])
+                        if chain_id in chain_id_to_mol_type
+                        else None
+                    )
+                    # Skip chains with missing moltypes or ones we don't need to
+                    # precache data for
+                    if chain_mol_type is None or chain_mol_type not in self.moltypes:
+                        continue
+                    else:
+                        structure_array_path = (
+                            self.structure_array_directory
+                            / template_entry_id
+                            / f"{template_entry_id}_{chain_id}.npz"
+                        )
+                    # Skip precache computation if a chain is missing
+                    if not structure_array_path.exists():
+                        raise FileNotFoundError(
+                            f"Structure array missing for entry {template_entry_id}"
+                            f" chain {chain_id}"
+                        )
+                    else:
+                        structure_array = read_atomarray_from_npz(structure_array_path)
+
+                        # Check that backbone and pseudo-beta atoms are present in at
+                        # least the prespecified fraction of residues
+                        is_n = structure_array.atom_name == "N"
+                        is_ca = structure_array.atom_name == "CA"
+                        is_c = structure_array.atom_name == "C"
+
+                        is_gly = structure_array.res_name == "GLY"
+                        is_cb = structure_array.atom_name == "CB"
+                        is_pseudo_beta_atom = (is_gly & is_ca) | (~is_gly & is_cb)
+
+                        enough_resolved = True
+                        for mask, mask_name in zip(
+                            [is_n, is_ca, is_c, is_pseudo_beta_atom],
+                            ["backbone N", "backbone CA", "backbone C", "pseudo beta"],
+                            strict=True,
+                        ):
+                            f_resolved = np.sum(
+                                structure_array[mask].occupancy > 0
+                            ) / np.clip(np.sum(mask), 1, None)
+
+                            if f_resolved <= self.min_f_resolved:
+                                enough_resolved = False
+                                print(
+                                    f"Not enough resolved {mask_name} atoms in entry"
+                                    f" {template_entry_id} chain {chain_id}: "
+                                    f"{f_resolved} <= {self.min_f_resolved}. Skipping"
+                                    " this template chain."
+                                )
+                                break
+                        if not enough_resolved:
+                            drop_chains.append(chain_id)
+
+                for chain_id in drop_chains:
+                    del chain_id_seq_map[chain_id]
+
+            if len(chain_id_seq_map) == 0:
+                print(
+                    f"No chains passing filtering for precache entry "
+                    f"{template_entry_id}. Skipping."
+                )
+                return
+            else:
+                # Save precache if all checks pass
+                np.savez_compressed(
+                    precache_entry_file,
+                    **{
+                        "release_date": release_date,
+                        "chain_id_seq_map": chain_id_seq_map,
+                    },
+                )
+        except Exception as e:
+            print(
+                f"Failed to create template precache entry "
+                f"{template_entry_id}:"
+                f"\n\nException:\n{str(e)}"
+                f"\n\nType:\n{type(e).__name__}"
+                f"\n\nTraceback:\n{traceback.format_exc()}"
+            )
+
+
+class TemplateStructurePreprocessor:
+    """Preprocessing pipeline for template structures.
+
+    Pre-parses and cleans up structure files for downstream template processing.
+    Saves per-chain AtomArray .npz files for each template structure.
+    """
+
+    def __init__(self, config: TemplatePreprocessorSettings) -> None:
+        self.moltypes = config.moltypes
+
+        self.n_processes = config.n_processes
+        self.chunksize = config.chunksize
+
+        self.structure_directory = config.structure_directory
+        self.structure_file_format = config.structure_file_format
+        self.structure_array_directory = config.structure_array_directory
+
+        if config.ccd_file_path is not None:
+            self.ccd = pdbx.CIFFile.read(config.ccd_file_path)
+        else:
+            self.ccd = BiotiteCCDWrapper()
+
+        self.template_entry_ids = [
+            f.stem
+            for f in list(
+                self.structure_directory.glob(f"*.{self.structure_file_format}")
+            )
+        ]
+
+        if not self.template_entry_ids:
+            print(
+                f"No template structure files found in {self.structure_directory} "
+                f"with format {self.structure_file_format}"
+            )
+            return
+
+        print(f"Found {len(self.template_entry_ids)} template structures to process.")
+
+    def __call__(self) -> None:
+        with mp.Pool(self.n_processes) as pool:
+            for _ in tqdm(
+                pool.imap_unordered(
+                    self._preprocess_template_structure_for_template,
+                    self.template_entry_ids,
+                    chunksize=self.chunksize,
+                ),
+                total=len(self.template_entry_ids),
+                desc="Preprocessing template structures into structure arrays",
+            ):
+                pass
+
+    def _preprocess_template_structure_for_template(
+        self,
+        template_entry_id: str,
+    ) -> None:
+        try:
+            preprocess_template_structure_for_template(
+                self.structure_directory
+                / f"{template_entry_id}.{self.structure_file_format}",
+                self.structure_array_directory / f"{template_entry_id}",
+                self.ccd,
+                self.moltypes,
+            )
+        except Exception as e:
+            print(
+                f"Failed to preprocess template structure "
+                f"{template_entry_id}:"
+                f"\n\nException:\n{str(e)}"
+                f"\n\nType:\n{type(e).__name__}"
+                f"\n\nTraceback:\n{traceback.format_exc()}"
+            )
+
+
+def fails_template_sequence_checks(
+    template: TemplateData,
+    max_seq_id: float | None,
+    min_align: float | None,
+    min_len: int | None,
+) -> bool:
+    """True if fails to pass thresholds on seq_id, sequence length, and coverage."""
+    fails = False
+    if max_seq_id is not None:
+        fails |= template.seq_id > max_seq_id
+    if min_align is not None:
+        fails |= template.q_cov < min_align
+    if min_len is not None and template.seq is not None:
+        fails |= len(template.seq) < min_len
+    return fails
+
+
+def fails_template_release_date_checks(
+    template_release_date: datetime,
+    query_release_date: datetime | None,
+    max_template_release_date: datetime | None,
+    min_release_date_diff: int | None,
+) -> bool:
+    """True if release date does not meet max date or date difference criteria."""
+    fails = False
+    if min_release_date_diff is not None:
+        if query_release_date is None:
+            raise ValueError(
+                "Query release date not provided but needed if min_release_date_diff "
+                "is specified."
+            )
+        fails |= (
+            query_release_date - template_release_date
+        ).days < min_release_date_diff
+
+    if max_template_release_date is not None:
+        fails |= template_release_date >= max_template_release_date
+
+    return fails
+
+
+def remap_template_chain_id(
+    original_chain_id: str,
+    seq_from_aln: str,
+    chain_id_seq_map: dict[str, str],
+) -> str | None:
+    chain_id_matched = None
+    for k, v in chain_id_seq_map.items():
+        # Skip the original hit chain
+        if k == original_chain_id:
+            continue
+        # Remap hit chain ID if found in another chain
+        if seq_from_aln in v:
+            chain_id_matched = k
+            break
+
+    return chain_id_matched
+
+
+def match_template_seq_from_aln_to_struc(
+    template: TemplateData, chain_id_seq_map: dict[str, str]
+) -> str | None:
+    seq_from_struc = chain_id_seq_map.get(template.chain_id)
+
+    # A) If chain ID not in CIF file, attempt to find sequence in other chains
+    if seq_from_struc is None:  # noqa: SIM114 will add different logs
+        chain_id_matched = remap_template_chain_id(
+            original_chain_id=template.chain_id,
+            seq_from_aln=template.seq,
+            chain_id_seq_map=chain_id_seq_map,
+        )
+    # B) If chain ID is in CIF file but HMM sequence does not match CIF sequence,
+    # attempt to find in other chains
+    elif (seq_from_struc is not None) & (template.seq not in seq_from_struc):
+        chain_id_matched = remap_template_chain_id(
+            original_chain_id=template.chain_id,
+            seq_from_aln=template.seq,
+            chain_id_seq_map=chain_id_seq_map,
+        )
+    # C) If HMM sequence matches CIF sequence, use original chain ID
+    else:
+        chain_id_matched = template.chain_id
+
+    return chain_id_matched
+
+
+def preprocess_template_structure_for_template(
+    template_structure_file: Path,
+    template_structure_array_subdirectory: Path,
+    ccd: CIFFile,
+    moltypes: np.ndarray[int],
+) -> tuple[CIFFile, AtomArray]:
+    """Preparse and process a template structure."""
+    # Parse template structure
+    cif_file, atom_array = parse_mmcif(template_structure_file)
+
+    # Sanitize template structure
+    atom_array = clean_template_atom_array(atom_array, cif_file, None, ccd)
+
+    # Save template structure for each chain separately
+    chain_ids = np.unique(atom_array.chain_id)
+    chain_id_to_mol_type = {}
+    for chain_id in chain_ids:
+        # Find molecule type of chain and save if included
+        atom_array_chain = atom_array[atom_array.chain_id == chain_id]
+        chain_mol_type = list(set(atom_array_chain.molecule_type_id))
+        if len(chain_mol_type) > 1:
+            raise ValueError(
+                f"Multiple molecule types found in chain {chain_id} of "
+                f"template {template_structure_file.stem}."
+            )
+        chain_mol_type = chain_mol_type[0]
+        if chain_mol_type in moltypes:
+            chain_id_to_mol_type[chain_id] = chain_mol_type
+            if not template_structure_array_subdirectory.exists():
+                os.makedirs(template_structure_array_subdirectory)
+            write_atomarray_to_npz(
+                atom_array=atom_array_chain,
+                output_file=template_structure_array_subdirectory
+                / f"{template_structure_file.stem}_{chain_id}.npz",
+            )
+
+    if len(chain_id_to_mol_type) > 0:
+        np.savez_compressed(
+            template_structure_array_subdirectory / "chain_id_to_moltype.npz",
+            **{"chain_id_to_mol_type": chain_id_to_mol_type},
+        )
+    return cif_file, atom_array

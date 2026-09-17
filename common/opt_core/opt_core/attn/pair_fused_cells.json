@@ -1,0 +1,3007 @@
+{
+ "schema": "opt_core.attn.pair_fused cell table v1. rows[]: impl (fpf|lnl) x piece (prologue|epilogue|transition|ln_linear|gate_transpose|fused_transition) x key (prologue (C,H,D); epilogue (C_out,H,D); transition/fused_transition (C, n*C hidden); ln_linear (C,); gate_transpose (H*D,)) x cc ('M.m' compute capability) x triton ('M.m' or '*' = any) -> variant (which carried kernel serves: fpf prologue v3 | prologue_v4 (fpf_glue_v2) | mkpf_f1 (fpf_mkpf, ln='fused' only; cfg carries ln_arith + fma_flags) | v3_fp32z (v3 kernel, fp32 pair tensor, LN in-kernel); epilogue v2 | epilogue_v3 (fpf_glue_v2); transition v2_fold (fpf_transition_v2: row mask + residual folded in the kernel, in place allowed; served only for a caller that names it: transition(..., variants=('v2_fold', 'v1'))) | v1 | v1_fp32x (fp32 input) | transition_v3 (fpf_glue_v2)); PF.tri_attn_block/transition(variant=None|'<name>'|{piece: name}) pins a variant ('no-cell:variant:<name>' when it has no servable row) + cfg (the pinned launch configuration passed to the kernel) + status (certified = served; candidate = served only under OPT_CORE_PF_ALLOW_CANDIDATE=1, i.e. qualification jobs) + evidence (what qualified it: the kit's own check of the carried bytes or a core coverage run). Resolution: exact (cc,triton) rows before (cc,'*') rows; first matching row in file order wins. named_off[]: impl x piece x key ('*' = any) x cc ('*' = any) [x variant] -> the keys the measured compositions run with the lever OFF (no measured cell there; 'off' = not-measured | slower, 'evidence' says who meets it): resolution answers them 'no-cell:...+off(<off>)' and the caller's stock statements serve them by name; a candidate row not admitted is the named-off entry of its own key (its 'off' field, default not-measured). Any OTHER key without a servable row is UNKNOWN and engages the lever's SAFE settings for the capability (opt_core.kernels.safe_settings) or an lnl piece's default settings, named once per process; 'no-cell:...' alone remains where no safe settings admit the shape. dtype served: bf16 activations everywhere (fp32 LN statistics in-kernel).",
+ "version": 1,
+ "rows": [
+  {
+   "id": "r01",
+   "impl": "fpf",
+   "piece": "prologue",
+   "key": [
+    256,
+    8,
+    32
+   ],
+   "cc": "9.0",
+   "triton": "3.7",
+   "variant": "mkpf_f1",
+   "cfg": {
+    "BI": 8,
+    "BJ": 16,
+    "num_warps": 8,
+    "num_stages": 2,
+    "BN": 64,
+    "NUM_STAGES_W": 3,
+    "WS": 0,
+    "GROUP_I": 0,
+    "ln_arith": "welford",
+    "fma_flags": [
+     1,
+     1,
+     1
+    ]
+   },
+   "status": "certified",
+   "evidence": "fpf_mkpf MKPF_CELLS.json v0.3 entry sm90_t37: EXACT cert a3ad854c; class EXACT (torch.equal vs the pinned statement, cert a3ad854c)",
+   "note": "ln='fused' calls (both nodes); 'welford' arith = bit-emulation of the fast_layernorm CUDA kernel (exact vs a stock that uses fast_layernorm; tier-2 LN otherwise)"
+  },
+  {
+   "id": "r02",
+   "impl": "fpf",
+   "piece": "prologue",
+   "key": [
+    256,
+    8,
+    32
+   ],
+   "cc": "9.0",
+   "triton": "3.3",
+   "variant": "mkpf_f1",
+   "cfg": {
+    "BI": 8,
+    "BJ": 16,
+    "num_warps": 8,
+    "num_stages": 2,
+    "BN": 64,
+    "NUM_STAGES_W": 3,
+    "WS": 0,
+    "GROUP_I": 0,
+    "ln_arith": "fused",
+    "fma_flags": [
+     1,
+     1,
+     1
+    ]
+   },
+   "status": "candidate",
+   "evidence": "fpf_mkpf MKPF_CELLS.json v0.3 entry sm90_t33 (op-level bitwise record); sweep candidate {16,8,8w,1st,BN128,NSW2} pending a cross-size check; class TIER-2 (two-pass LN; welford emulation does not compile in bounded time on triton 3.3.1)"
+  },
+  {
+   "id": "r03",
+   "impl": "fpf",
+   "piece": "prologue",
+   "key": [
+    256,
+    8,
+    32
+   ],
+   "cc": "9.0",
+   "triton": "3.7",
+   "variant": "prologue_v4",
+   "cfg": {
+    "BI": 8,
+    "BJ": 16,
+    "num_warps": 8,
+    "num_stages": 2,
+    "BN": 64,
+    "NUM_STAGES_W": 3,
+    "WS": 1,
+    "GLOOP": 1
+   },
+   "status": "certified",
+   "evidence": "fpf_glue_v2 GLUE_CELLS.json v2.2 bitwise_vs_shipped=true (torch.equal vs the v3/v2/v1 kernels on real dumps 356..1493, H100)",
+   "note": "served for ln='stock' (x_ln given in the attention frame; either node \u2014 the kernel is node-agnostic, bitwise == v3 per the GLUE certificate); ln='fused' calls take mkpf_f1 / v3"
+  },
+  {
+   "id": "r04",
+   "impl": "fpf",
+   "piece": "prologue",
+   "key": [
+    256,
+    8,
+    32
+   ],
+   "cc": "9.0",
+   "triton": "3.3",
+   "variant": "prologue_v4",
+   "cfg": {
+    "BI": 8,
+    "BJ": 16,
+    "num_warps": 8,
+    "num_stages": 2,
+    "BN": 64,
+    "NUM_STAGES_W": 3,
+    "WS": 0,
+    "GLOOP": 1
+   },
+   "status": "certified",
+   "evidence": "fpf_glue_v2 GLUE_CELLS.json v2.2 bitwise_vs_shipped=true (torch.equal vs the v3/v2/v1 kernels on real dumps 356..1493, H100)",
+   "note": "served for ln='stock' (x_ln given in the attention frame; either node \u2014 the kernel is node-agnostic, bitwise == v3 per the GLUE certificate); ln='fused' calls take mkpf_f1 / v3"
+  },
+  {
+   "id": "r05",
+   "impl": "fpf",
+   "piece": "prologue",
+   "key": [
+    256,
+    8,
+    32
+   ],
+   "cc": "9.0",
+   "triton": "*",
+   "variant": "v3",
+   "cfg": {
+    "BI": 8,
+    "BJ": 16,
+    "num_warps": 8,
+    "num_stages": 2
+   },
+   "status": "certified",
+   "evidence": "the carried bytes are bitwise equal to the stock statements on real activation dumps (H100)"
+  },
+  {
+   "id": "r06",
+   "impl": "fpf",
+   "piece": "prologue",
+   "key": [
+    64,
+    2,
+    32
+   ],
+   "cc": "9.0",
+   "triton": "*",
+   "variant": "v3",
+   "cfg": {
+    "BI": 8,
+    "BJ": 16,
+    "num_warps": 4,
+    "num_stages": 2
+   },
+   "status": "candidate",
+   "evidence": "prologue PINNED_CONFIG (64,64,'H100'): marked as checked in round 2 by the kit's comment but absent from its pinned set"
+  },
+  {
+   "id": "r07",
+   "impl": "fpf",
+   "piece": "prologue",
+   "key": [
+    128,
+    4,
+    32
+   ],
+   "cc": "9.0",
+   "triton": "*",
+   "variant": "v3",
+   "cfg": {
+    "BI": 8,
+    "BJ": 16,
+    "num_warps": 8,
+    "num_stages": 2
+   },
+   "status": "certified",
+   "evidence": "H100 qualification runs on both stacks, torch 2.13 / triton 3.7 and torch 2.7 / triton 3.3 (served 20/20 per stack, rel_rms within the stock-bf16 class, self-det, cross-box bitwise)"
+  },
+  {
+   "id": "r08",
+   "impl": "fpf",
+   "piece": "prologue",
+   "key": [
+    256,
+    4,
+    64
+   ],
+   "cc": "9.0",
+   "triton": "*",
+   "variant": "v3",
+   "cfg": {
+    "BI": 8,
+    "BJ": 16,
+    "num_warps": 8,
+    "num_stages": 2
+   },
+   "status": "candidate",
+   "evidence": "none: candidate cell (no certificate)"
+  },
+  {
+   "id": "r09",
+   "impl": "fpf",
+   "piece": "prologue",
+   "key": [
+    64,
+    4,
+    16
+   ],
+   "cc": "9.0",
+   "triton": "*",
+   "variant": "v3",
+   "cfg": {
+    "BI": 8,
+    "BJ": 16,
+    "num_warps": 4,
+    "num_stages": 2
+   },
+   "status": "certified",
+   "evidence": "H100 qualification 2026-09-10 (NVIDIA H100 80GB HBM3 (cc 9.0), torch 2.10.0+cu128 / triton 3.6.0): PF.tri_attn_block driving this row against the stock TemplatePairBlock triangle-attention statements under bf16 autocast on REAL template pair-stack activations of OF3 0.4.x predictions (four-chain queries at 800 and 1,400 tokens, the trained block-0 weights), start + end node, masked: error vs an fp32 reference 0.45-1.22x the stock bf16 statements' own (the class of this kernel's other rows); tile sweep at N = 800 / 1,400 / 2,000: this configuration = the former candidate cfg (the grid moves it < 1 %; the flash core is 95 % of the call); in-model on the OF3 0.4.x kit's fast line the template PairBlock 41.4 -> 26.1 ms per call at 1,400 tokens, 20.5 -> 9.4 at 800, 95.0 -> 61.8 at 2,000 with its triangle attention and transition on the cells (TriMul on cuEquivariance); end to end the kit's exact line stays byte-equal to stock and its fast line serves every template pass of untemplated (empty-slot) and templated (T = 4) queries with this row"
+  },
+  {
+   "id": "r10",
+   "impl": "fpf",
+   "piece": "prologue",
+   "key": [
+    64,
+    4,
+    64
+   ],
+   "cc": "9.0",
+   "triton": "*",
+   "variant": "v3",
+   "cfg": {
+    "BI": 8,
+    "BJ": 16,
+    "num_warps": 4,
+    "num_stages": 2
+   },
+   "status": "candidate",
+   "evidence": "none: candidate cell (no certificate)"
+  },
+  {
+   "id": "r11",
+   "impl": "fpf",
+   "piece": "prologue",
+   "key": [
+    64,
+    4,
+    32
+   ],
+   "cc": "9.0",
+   "triton": "*",
+   "variant": "v3",
+   "cfg": {
+    "BI": 8,
+    "BJ": 16,
+    "num_warps": 4,
+    "num_stages": 2
+   },
+   "status": "certified",
+   "evidence": "H100 qualification 2026-09-11 (NVIDIA H100 80GB HBM3 (cc 9.0), torch 2.13.0+cu130 / triton 3.7.1; PF.tri_attn_block with this row under OPT_CORE_PF_ALLOW_CANDIDATE=1 against PF's own torch statements (impl='torch') and an fp64 evaluation of them): 24 identity cases (N 200 / 256 / 384 / 512 / 768 / 1024; starting + ending node; masked (7-key tail + 3 masked rows) + unmasked; ln fused + stock): fp64-error ratio fused-block / torch-bf16-statements 1.21-1.24 under ln='fused' and 1.05-1.06 under ln='stock' (unmasked cases, N <= 384; the (128,4,32) class is 1.10 -- at c=64 the in-kernel LayerNorm's bf16 rounding weighs one rounding more; abs rel-RMS vs fp64 0.0062-0.0064 fused vs 0.0050-0.0053 torch), max |fpf - torch| <= 0.0156 (fused) / 0.0078 (stock) bf16 at every N, masked cases at the same fpf-vs-torch distance as unmasked (rel 0.0073 / 0.0031), self-det 3/3 every case; whole block fused / torch ms: N=512s 1.12 / 2.14, N=768s 2.79 / 5.20, N=1024s 5.69 / 10.03, N=1024e 6.20 / 10.75 (x1.7-1.9); end to end in the template pairformer's kit: det-1 byte-identical 30 / 30 identity canaries + 10 / 10 at 400 tokens under the candidate switch, inside that engine's identity band (prologue v3 BI 8 / BJ 16 / 4 warps / 2 stages with the epilogue row r21 behind the flash_triattn core)"
+  },
+  {
+   "id": "r12",
+   "impl": "fpf",
+   "piece": "prologue",
+   "key": [
+    128,
+    8,
+    32
+   ],
+   "cc": "9.0",
+   "triton": "*",
+   "variant": "v3",
+   "cfg": {
+    "BI": 8,
+    "BJ": 16,
+    "num_warps": 8,
+    "num_stages": 2
+   },
+   "status": "candidate",
+   "evidence": "spare variant (H=8)"
+  },
+  {
+   "id": "r13",
+   "impl": "fpf",
+   "piece": "epilogue",
+   "key": [
+    256,
+    8,
+    32
+   ],
+   "cc": "9.0",
+   "triton": "3.7",
+   "variant": "epilogue_v3",
+   "cfg": {
+    "BI": 16,
+    "BJ": 8,
+    "num_warps": 8,
+    "num_stages": 1,
+    "KC": 64,
+    "NUM_STAGES_K": 3,
+    "WS": 0
+   },
+   "status": "certified",
+   "evidence": "fpf_glue_v2 GLUE_CELLS.json v2.2 bitwise_vs_shipped=true (torch.equal vs the v3/v2/v1 kernels on real dumps 356..1493, H100)",
+   "note": "o_layout 'ihjd' only; else the v2 row"
+  },
+  {
+   "id": "r14",
+   "impl": "fpf",
+   "piece": "epilogue",
+   "key": [
+    256,
+    8,
+    32
+   ],
+   "cc": "9.0",
+   "triton": "3.3",
+   "variant": "epilogue_v3",
+   "cfg": {
+    "BI": 16,
+    "BJ": 8,
+    "num_warps": 8,
+    "num_stages": 1,
+    "KC": 64,
+    "NUM_STAGES_K": 3,
+    "WS": 0
+   },
+   "status": "certified",
+   "evidence": "fpf_glue_v2 GLUE_CELLS.json v2.2 bitwise_vs_shipped=true (torch.equal vs the v3/v2/v1 kernels on real dumps 356..1493, H100)",
+   "note": "o_layout 'ihjd' only; else the v2 row"
+  },
+  {
+   "id": "r15",
+   "impl": "fpf",
+   "piece": "epilogue",
+   "key": [
+    256,
+    8,
+    32
+   ],
+   "cc": "9.0",
+   "triton": "*",
+   "variant": "v2",
+   "cfg": {
+    "KVER": 2,
+    "BI": 16,
+    "BJ": 8,
+    "num_warps": 8,
+    "num_stages": 1,
+    "EXP": "libdevice"
+   },
+   "status": "certified",
+   "evidence": "the carried bytes are bitwise equal to the stock statements on real activation dumps (H100)"
+  },
+  {
+   "id": "r16",
+   "impl": "fpf",
+   "piece": "epilogue",
+   "key": [
+    128,
+    4,
+    32
+   ],
+   "cc": "9.0",
+   "triton": "*",
+   "variant": "v2",
+   "cfg": {
+    "KVER": 2,
+    "BI": 16,
+    "BJ": 8,
+    "num_warps": 4,
+    "num_stages": 1,
+    "EXP": "libdevice"
+   },
+   "status": "certified",
+   "evidence": "H100 qualification runs on both stacks, torch 2.13 / triton 3.7 and torch 2.7 / triton 3.3 (served 20/20 per stack, rel_rms within the stock-bf16 class, self-det, cross-box bitwise)"
+  },
+  {
+   "id": "r17",
+   "impl": "fpf",
+   "piece": "epilogue",
+   "key": [
+    64,
+    2,
+    32
+   ],
+   "cc": "9.0",
+   "triton": "*",
+   "variant": "v2",
+   "cfg": {
+    "KVER": 2,
+    "BI": 16,
+    "BJ": 8,
+    "num_warps": 4,
+    "num_stages": 1,
+    "EXP": "libdevice"
+   },
+   "status": "candidate",
+   "evidence": "epilogue CANDIDATE_CONFIG_UNVERIFIED in the kit"
+  },
+  {
+   "id": "r18",
+   "impl": "fpf",
+   "piece": "epilogue",
+   "key": [
+    64,
+    4,
+    16
+   ],
+   "cc": "9.0",
+   "triton": "*",
+   "variant": "v2",
+   "cfg": {
+    "KVER": 2,
+    "BI": 16,
+    "BJ": 8,
+    "num_warps": 4,
+    "num_stages": 1,
+    "EXP": "libdevice"
+   },
+   "status": "certified",
+   "evidence": "H100 qualification 2026-09-10 (NVIDIA H100 80GB HBM3 (cc 9.0), torch 2.10.0+cu128 / triton 3.6.0): PF.tri_attn_block driving this row against the stock TemplatePairBlock triangle-attention statements under bf16 autocast on REAL template pair-stack activations of OF3 0.4.x predictions (four-chain queries at 800 and 1,400 tokens, the trained block-0 weights), start + end node, masked: error vs an fp32 reference 0.45-1.22x the stock bf16 statements' own (the class of this kernel's other rows); tile sweep at N = 800 / 1,400 / 2,000: this configuration = the former candidate cfg (the grid moves it < 1 %; the flash core is 95 % of the call); in-model on the OF3 0.4.x kit's fast line the template PairBlock 41.4 -> 26.1 ms per call at 1,400 tokens, 20.5 -> 9.4 at 800, 95.0 -> 61.8 at 2,000 with its triangle attention and transition on the cells (TriMul on cuEquivariance); end to end the kit's exact line stays byte-equal to stock and its fast line serves every template pass of untemplated (empty-slot) and templated (T = 4) queries with this row"
+  },
+  {
+   "id": "r19",
+   "impl": "fpf",
+   "piece": "epilogue",
+   "key": [
+    256,
+    4,
+    64
+   ],
+   "cc": "9.0",
+   "triton": "*",
+   "variant": "v2",
+   "cfg": {
+    "KVER": 2,
+    "BI": 16,
+    "BJ": 8,
+    "num_warps": 8,
+    "num_stages": 1,
+    "EXP": "libdevice"
+   },
+   "status": "candidate",
+   "evidence": "none: candidate cell (no certificate)"
+  },
+  {
+   "id": "r20",
+   "impl": "fpf",
+   "piece": "epilogue",
+   "key": [
+    64,
+    4,
+    64
+   ],
+   "cc": "9.0",
+   "triton": "*",
+   "variant": "v2",
+   "cfg": {
+    "KVER": 2,
+    "BI": 16,
+    "BJ": 8,
+    "num_warps": 4,
+    "num_stages": 1,
+    "EXP": "libdevice"
+   },
+   "status": "candidate",
+   "evidence": "none: candidate cell (no certificate)"
+  },
+  {
+   "id": "r21",
+   "impl": "fpf",
+   "piece": "epilogue",
+   "key": [
+    64,
+    4,
+    32
+   ],
+   "cc": "9.0",
+   "triton": "*",
+   "variant": "v2",
+   "cfg": {
+    "KVER": 2,
+    "BI": 16,
+    "BJ": 8,
+    "num_warps": 4,
+    "num_stages": 1,
+    "EXP": "libdevice"
+   },
+   "status": "certified",
+   "evidence": "H100 qualification 2026-09-11 (NVIDIA H100 80GB HBM3 (cc 9.0), torch 2.13.0+cu130 / triton 3.7.1; PF.tri_attn_block with this row under OPT_CORE_PF_ALLOW_CANDIDATE=1 against PF's own torch statements (impl='torch') and an fp64 evaluation of them): 24 identity cases (N 200 / 256 / 384 / 512 / 768 / 1024; starting + ending node; masked (7-key tail + 3 masked rows) + unmasked; ln fused + stock): fp64-error ratio fused-block / torch-bf16-statements 1.21-1.24 under ln='fused' and 1.05-1.06 under ln='stock' (unmasked cases, N <= 384; the (128,4,32) class is 1.10 -- at c=64 the in-kernel LayerNorm's bf16 rounding weighs one rounding more; abs rel-RMS vs fp64 0.0062-0.0064 fused vs 0.0050-0.0053 torch), max |fpf - torch| <= 0.0156 (fused) / 0.0078 (stock) bf16 at every N, masked cases at the same fpf-vs-torch distance as unmasked (rel 0.0073 / 0.0031), self-det 3/3 every case; whole block fused / torch ms: N=512s 1.12 / 2.14, N=768s 2.79 / 5.20, N=1024s 5.69 / 10.03, N=1024e 6.20 / 10.75 (x1.7-1.9); end to end in the template pairformer's kit: det-1 byte-identical 30 / 30 identity canaries + 10 / 10 at 400 tokens under the candidate switch, inside that engine's identity band (epilogue v2 KVER 2 BI 16 / BJ 8 / 4 warps / 1 stage / libdevice exp, behind the prologue row r11 + flash_triattn core: the block numbers above are this pair)"
+  },
+  {
+   "id": "r22",
+   "impl": "fpf",
+   "piece": "epilogue",
+   "key": [
+    128,
+    8,
+    32
+   ],
+   "cc": "9.0",
+   "triton": "*",
+   "variant": "v2",
+   "cfg": {
+    "KVER": 2,
+    "BI": 16,
+    "BJ": 8,
+    "num_warps": 8,
+    "num_stages": 1,
+    "EXP": "libdevice"
+   },
+   "status": "candidate",
+   "evidence": "spare variant (H=8)"
+  },
+  {
+   "id": "r23",
+   "impl": "fpf",
+   "piece": "transition",
+   "key": [
+    256,
+    1024
+   ],
+   "cc": "9.0",
+   "triton": "*",
+   "variant": "v1",
+   "cfg": {
+    "BM": 128,
+    "BH": 32,
+    "num_warps": 8,
+    "num_stages": 3,
+    "IL": 0
+   },
+   "status": "certified",
+   "evidence": "the carried bytes are bitwise equal to the stock statements on real activation dumps (H100)"
+  },
+  {
+   "id": "r24",
+   "impl": "fpf",
+   "piece": "transition",
+   "key": [
+    128,
+    512
+   ],
+   "cc": "9.0",
+   "triton": "*",
+   "variant": "v1",
+   "cfg": {
+    "BM": 128,
+    "BH": 64,
+    "num_warps": 8,
+    "num_stages": 2,
+    "IL": 0
+   },
+   "status": "certified",
+   "evidence": "the carried bytes are bitwise equal to the stock statements on real activation dumps (H100)"
+  },
+  {
+   "id": "r25",
+   "impl": "fpf",
+   "piece": "transition",
+   "key": [
+    384,
+    1536
+   ],
+   "cc": "9.0",
+   "triton": "*",
+   "variant": "v1",
+   "cfg": {
+    "BM": 16,
+    "BH": 64,
+    "num_warps": 4,
+    "num_stages": 2,
+    "IL": 0
+   },
+   "status": "certified",
+   "evidence": "the carried bytes are bitwise equal to the stock statements on real activation dumps (H100)"
+  },
+  {
+   "id": "r26",
+   "impl": "fpf",
+   "piece": "transition",
+   "key": [
+    64,
+    128
+   ],
+   "cc": "9.0",
+   "triton": "*",
+   "variant": "v1",
+   "cfg": {
+    "BM": 128,
+    "BH": 128,
+    "num_warps": 8,
+    "num_stages": 1,
+    "IL": 0
+   },
+   "status": "certified",
+   "evidence": "H100 qualification 2026-09-11 (NVIDIA H100 80GB HBM3 (cc 9.0), torch 2.13.0+cu130 / triton 3.7.1; PF.transition impl='fpf' with this row under OPT_CORE_PF_ALLOW_CANDIDATE=1): N 200 / 256 / 384 / 512 / 768 / 1024 on [1, N, N, 64] bf16: under ln='stock' BITWISE == the torch bf16 statements (LayerNorm -> Linear a|b -> silu(a)*b -> Linear out) at every N (fp64-error ratio 1.000); under ln='fused' ratio 1.13 (rel-RMS vs fp64 0.00525 vs 0.00464; max |diff| 0.047-0.055 bf16 = 3 x 2^-6: the in-kernel LayerNorm at c=64), self-det 3/3; fused / statements ms: N=512 0.189 / 0.263, N=768 0.305 / 0.532, N=1024 0.491 / 0.929 (x1.4-1.9; below N 384 the statements are as fast); end to end in the template pairformer's kit: det-1 byte-identical identity canaries under the candidate switch"
+  },
+  {
+   "id": "r27",
+   "impl": "fpf",
+   "piece": "transition",
+   "key": [
+    64,
+    256
+   ],
+   "cc": "9.0",
+   "triton": "*",
+   "variant": "v1",
+   "cfg": {
+    "BM": 128,
+    "BH": 128,
+    "num_warps": 8,
+    "num_stages": 1,
+    "IL": 0
+   },
+   "status": "candidate",
+   "evidence": "transition CANDIDATE_CONFIGS_UNVERIFIED (c=64 n=4)"
+  },
+  {
+   "id": "r28",
+   "impl": "fpf",
+   "piece": "transition",
+   "key": [
+    128,
+    256
+   ],
+   "cc": "9.0",
+   "triton": "*",
+   "variant": "v1",
+   "cfg": {
+    "BM": 128,
+    "BH": 64,
+    "num_warps": 8,
+    "num_stages": 2,
+    "IL": 0
+   },
+   "status": "certified",
+   "evidence": "H100 sweep 2026-09-06 (H100 80GB HBM3 (cc 9.0), torch 2.10.0+cu128 / triton 3.6.0; PF.transition with this cfg served as a candidate row): fp64-error ratio 1.0000 vs the torch LN/Linear/SiLU/Linear statements and BITWISE == those statements under ln='stock' (N 200/256), 3-launch self-det, ln fused+stock; N=512/1024/2048: 0.23/0.85/3.29 ms vs 1.02/3.92/15.58 ms for the torch statements (x4.5-4.7); the same sweep tool measures the certified r24 (128,512) in the same class on the same box; sweep run h100-r28r29-1 (2026-09-06)"
+  },
+  {
+   "id": "r29",
+   "impl": "fpf",
+   "piece": "transition",
+   "key": [
+    256,
+    512
+   ],
+   "cc": "9.0",
+   "triton": "*",
+   "variant": "v1",
+   "cfg": {
+    "BM": 128,
+    "BH": 32,
+    "num_warps": 8,
+    "num_stages": 3,
+    "IL": 0
+   },
+   "status": "certified",
+   "evidence": "H100 sweep 2026-09-06 (H100 80GB HBM3 (cc 9.0), torch 2.10.0+cu128 / triton 3.6.0; PF.transition with this cfg served as a candidate row): fp64-error ratio 1.0000 vs the torch LN/Linear/SiLU/Linear statements and BITWISE == those statements under ln='stock' (N 200/256), 3-launch self-det, ln fused+stock; N=512/1024/2048: 0.66/2.51/9.62 ms vs 1.67/6.51/26.06 ms for the torch statements (x2.5-2.7); the same sweep tool measures the certified r24 (128,512) in the same class on the same box; sweep run h100-r28r29-1 (2026-09-06)"
+  },
+  {
+   "id": "r30",
+   "impl": "lnl",
+   "piece": "ln_linear",
+   "key": [
+    64
+   ],
+   "cc": "9.0",
+   "triton": "*",
+   "variant": "ln_linear",
+   "cfg": {},
+   "status": "certified",
+   "evidence": "the carried bytes are bitwise equal to the stock statements on real activation dumps (H100)",
+   "note": "cfg = the carried lnl_fused.tiles_by_arch.json (the pinned triton.autotune configs keyed by arch)"
+  },
+  {
+   "id": "r31",
+   "impl": "lnl",
+   "piece": "fused_transition",
+   "key": [
+    64,
+    256
+   ],
+   "cc": "9.0",
+   "triton": "*",
+   "variant": "fused_transition",
+   "cfg": {},
+   "status": "certified",
+   "evidence": "the carried bytes are bitwise equal to the stock statements on real activation dumps (H100)"
+  },
+  {
+   "id": "r32",
+   "impl": "lnl",
+   "piece": "ln_linear",
+   "key": [
+    128
+   ],
+   "cc": "9.0",
+   "triton": "*",
+   "variant": "ln_linear",
+   "cfg": {},
+   "status": "certified",
+   "evidence": "the carried bytes are bitwise equal to the stock statements on real activation dumps (H100)",
+   "note": "cfg = the carried lnl_fused.tiles_by_arch.json (the pinned triton.autotune configs keyed by arch)"
+  },
+  {
+   "id": "r33",
+   "impl": "lnl",
+   "piece": "fused_transition",
+   "key": [
+    128,
+    512
+   ],
+   "cc": "9.0",
+   "triton": "*",
+   "variant": "fused_transition",
+   "cfg": {},
+   "status": "certified",
+   "evidence": "the carried bytes are bitwise equal to the stock statements on real activation dumps (H100)"
+  },
+  {
+   "id": "r34",
+   "impl": "lnl",
+   "piece": "fused_transition",
+   "key": [
+    64,
+    128
+   ],
+   "cc": "9.0",
+   "triton": "*",
+   "variant": "fused_transition",
+   "cfg": {},
+   "status": "certified",
+   "evidence": "H100 qualification 2026-09-11 (NVIDIA H100 80GB HBM3 (cc 9.0), torch 2.13.0+cu130 / triton 3.7.1; PF.transition impl='lnl' under OPT_CORE_PF_ALLOW_CANDIDATE=1): N 200-1024 on [1, N, N, 64] bf16: fp64-error ratio 1.0000 vs the torch bf16 statements (max |diff| 0.0156-0.0234 bf16 on 284-12,628 of 2.6M-67M elements; not bitwise -- the kernel's own statement order, as the (64,256) row), 3-launch self-det; lnl / statements ms: N=512 0.167 / 0.263, N=1024 0.383 / 0.929 (x1.6-2.4); tiles: the kernel's autotuner at warm-up"
+  },
+  {
+   "id": "r35",
+   "impl": "lnl",
+   "piece": "gate_transpose",
+   "key": [
+    128
+   ],
+   "cc": "9.0",
+   "triton": "*",
+   "variant": "gate_transpose",
+   "cfg": {},
+   "status": "certified",
+   "evidence": "the carried bytes are bitwise equal to the stock statements on real activation dumps (H100)"
+  },
+  {
+   "id": "r36",
+   "impl": "lnl",
+   "piece": "gate_transpose",
+   "key": [
+    64
+   ],
+   "cc": "9.0",
+   "triton": "*",
+   "variant": "gate_transpose",
+   "cfg": {},
+   "status": "candidate",
+   "evidence": "kernel generic in H*D; uncertified"
+  },
+  {
+   "id": "r37",
+   "impl": "lnl",
+   "piece": "gate_transpose",
+   "key": [
+    256
+   ],
+   "cc": "9.0",
+   "triton": "*",
+   "variant": "gate_transpose",
+   "cfg": {},
+   "status": "candidate",
+   "evidence": "kernel generic in H*D; uncertified"
+  },
+  {
+   "id": "r38",
+   "impl": "fpf",
+   "piece": "transition",
+   "key": [
+    384,
+    768
+   ],
+   "cc": "9.0",
+   "triton": "*",
+   "variant": "v1",
+   "cfg": {
+    "BM": 16,
+    "BH": 64,
+    "num_warps": 4,
+    "num_stages": 2,
+    "IL": 0
+   },
+   "status": "candidate",
+   "evidence": "none: candidate cell (no certificate)",
+   "note": "H100 qualification runs: 9/10 served; on 9.0|3.3 0.81-1.00x the plain-torch bf16 speed (a MEMORY cell there: peak 1.4 GiB vs 24.4 GiB @1400), on 9.0|3.7 1.05-1.20x; the N=1400 row is measured in an isolated unit (allocator accumulation)"
+  },
+  {
+   "id": "r39",
+   "impl": "fpf",
+   "piece": "prologue",
+   "key": [
+    256,
+    8,
+    32
+   ],
+   "cc": "9.0",
+   "triton": "*",
+   "variant": "v3_fp32z",
+   "cfg": {
+    "BI": 8,
+    "BJ": 16,
+    "num_warps": 8,
+    "num_stages": 2
+   },
+   "status": "candidate",
+   "evidence": "fp32 pair tensor + LN in-kernel (pair_fused._launch_fpf_prologue_fp32z, LN_MODE=1): uncertified: no fp32-z qualification rows yet"
+  },
+  {
+   "id": "r40",
+   "impl": "fpf",
+   "piece": "prologue",
+   "key": [
+    64,
+    2,
+    32
+   ],
+   "cc": "9.0",
+   "triton": "*",
+   "variant": "v3_fp32z",
+   "cfg": {
+    "BI": 8,
+    "BJ": 16,
+    "num_warps": 4,
+    "num_stages": 2
+   },
+   "status": "candidate",
+   "evidence": "fp32 pair tensor + LN in-kernel (pair_fused._launch_fpf_prologue_fp32z, LN_MODE=1): uncertified: no fp32-z qualification rows yet"
+  },
+  {
+   "id": "r41",
+   "impl": "fpf",
+   "piece": "prologue",
+   "key": [
+    128,
+    4,
+    32
+   ],
+   "cc": "9.0",
+   "triton": "*",
+   "variant": "v3_fp32z",
+   "cfg": {
+    "BI": 8,
+    "BJ": 16,
+    "num_warps": 8,
+    "num_stages": 2
+   },
+   "status": "candidate",
+   "evidence": "fp32 pair tensor + LN in-kernel (pair_fused._launch_fpf_prologue_fp32z, LN_MODE=1): uncertified: no fp32-z qualification rows yet"
+  },
+  {
+   "id": "r42",
+   "impl": "fpf",
+   "piece": "prologue",
+   "key": [
+    256,
+    4,
+    64
+   ],
+   "cc": "9.0",
+   "triton": "*",
+   "variant": "v3_fp32z",
+   "cfg": {
+    "BI": 8,
+    "BJ": 16,
+    "num_warps": 8,
+    "num_stages": 2
+   },
+   "status": "candidate",
+   "evidence": "fp32 pair tensor + LN in-kernel (pair_fused._launch_fpf_prologue_fp32z, LN_MODE=1): uncertified: no fp32-z qualification rows yet"
+  },
+  {
+   "id": "r43",
+   "impl": "fpf",
+   "piece": "prologue",
+   "key": [
+    64,
+    4,
+    16
+   ],
+   "cc": "9.0",
+   "triton": "*",
+   "variant": "v3_fp32z",
+   "cfg": {
+    "BI": 8,
+    "BJ": 16,
+    "num_warps": 4,
+    "num_stages": 2
+   },
+   "status": "candidate",
+   "evidence": "fp32 pair tensor + LN in-kernel (pair_fused._launch_fpf_prologue_fp32z, LN_MODE=1): uncertified: no fp32-z qualification rows yet"
+  },
+  {
+   "id": "r44",
+   "impl": "fpf",
+   "piece": "prologue",
+   "key": [
+    64,
+    4,
+    64
+   ],
+   "cc": "9.0",
+   "triton": "*",
+   "variant": "v3_fp32z",
+   "cfg": {
+    "BI": 8,
+    "BJ": 16,
+    "num_warps": 4,
+    "num_stages": 2
+   },
+   "status": "candidate",
+   "evidence": "fp32 pair tensor + LN in-kernel (pair_fused._launch_fpf_prologue_fp32z, LN_MODE=1): uncertified: no fp32-z qualification rows yet"
+  },
+  {
+   "id": "r45",
+   "impl": "fpf",
+   "piece": "prologue",
+   "key": [
+    64,
+    4,
+    32
+   ],
+   "cc": "9.0",
+   "triton": "*",
+   "variant": "v3_fp32z",
+   "cfg": {
+    "BI": 8,
+    "BJ": 16,
+    "num_warps": 4,
+    "num_stages": 2
+   },
+   "status": "candidate",
+   "evidence": "fp32 pair tensor + LN in-kernel (pair_fused._launch_fpf_prologue_fp32z, LN_MODE=1): uncertified: no fp32-z qualification rows yet"
+  },
+  {
+   "id": "r46",
+   "impl": "fpf",
+   "piece": "prologue",
+   "key": [
+    128,
+    8,
+    32
+   ],
+   "cc": "9.0",
+   "triton": "*",
+   "variant": "v3_fp32z",
+   "cfg": {
+    "BI": 8,
+    "BJ": 16,
+    "num_warps": 8,
+    "num_stages": 2
+   },
+   "status": "candidate",
+   "evidence": "fp32 pair tensor + LN in-kernel (pair_fused._launch_fpf_prologue_fp32z, LN_MODE=1): uncertified: no fp32-z qualification rows yet"
+  },
+  {
+   "id": "r47",
+   "impl": "fpf",
+   "piece": "transition",
+   "key": [
+    256,
+    1024
+   ],
+   "cc": "9.0",
+   "triton": "*",
+   "variant": "v1_fp32x",
+   "cfg": {
+    "BM": 128,
+    "BH": 32,
+    "num_warps": 8,
+    "num_stages": 3,
+    "IL": 0
+   },
+   "status": "candidate",
+   "evidence": "fp32 input + LN in-kernel (pair_fused._launch_fpf_transition on an fp32 pointer): uncertified: no fp32-input qualification rows yet"
+  },
+  {
+   "id": "r48",
+   "impl": "fpf",
+   "piece": "transition",
+   "key": [
+    128,
+    512
+   ],
+   "cc": "9.0",
+   "triton": "*",
+   "variant": "v1_fp32x",
+   "cfg": {
+    "BM": 128,
+    "BH": 64,
+    "num_warps": 8,
+    "num_stages": 2,
+    "IL": 0
+   },
+   "status": "candidate",
+   "evidence": "fp32 input + LN in-kernel (pair_fused._launch_fpf_transition on an fp32 pointer): uncertified: no fp32-input qualification rows yet"
+  },
+  {
+   "id": "r49",
+   "impl": "fpf",
+   "piece": "transition",
+   "key": [
+    384,
+    1536
+   ],
+   "cc": "9.0",
+   "triton": "*",
+   "variant": "v1_fp32x",
+   "cfg": {
+    "BM": 16,
+    "BH": 64,
+    "num_warps": 4,
+    "num_stages": 2,
+    "IL": 0
+   },
+   "status": "candidate",
+   "evidence": "fp32 input + LN in-kernel (pair_fused._launch_fpf_transition on an fp32 pointer): uncertified: no fp32-input qualification rows yet"
+  },
+  {
+   "id": "r50",
+   "impl": "fpf",
+   "piece": "transition",
+   "key": [
+    64,
+    128
+   ],
+   "cc": "9.0",
+   "triton": "*",
+   "variant": "v1_fp32x",
+   "cfg": {
+    "BM": 128,
+    "BH": 128,
+    "num_warps": 8,
+    "num_stages": 1,
+    "IL": 0
+   },
+   "status": "candidate",
+   "evidence": "fp32 input + LN in-kernel (pair_fused._launch_fpf_transition on an fp32 pointer): uncertified: no fp32-input qualification rows yet"
+  },
+  {
+   "id": "r51",
+   "impl": "fpf",
+   "piece": "transition",
+   "key": [
+    64,
+    256
+   ],
+   "cc": "9.0",
+   "triton": "*",
+   "variant": "v1_fp32x",
+   "cfg": {
+    "BM": 128,
+    "BH": 128,
+    "num_warps": 8,
+    "num_stages": 1,
+    "IL": 0
+   },
+   "status": "candidate",
+   "evidence": "fp32 input + LN in-kernel (pair_fused._launch_fpf_transition on an fp32 pointer): uncertified: no fp32-input qualification rows yet"
+  },
+  {
+   "id": "r52",
+   "impl": "fpf",
+   "piece": "transition",
+   "key": [
+    128,
+    256
+   ],
+   "cc": "9.0",
+   "triton": "*",
+   "variant": "v1_fp32x",
+   "cfg": {
+    "BM": 128,
+    "BH": 64,
+    "num_warps": 8,
+    "num_stages": 2,
+    "IL": 0
+   },
+   "status": "candidate",
+   "evidence": "fp32 input + LN in-kernel (pair_fused._launch_fpf_transition on an fp32 pointer): uncertified: no fp32-input qualification rows yet"
+  },
+  {
+   "id": "r53",
+   "impl": "fpf",
+   "piece": "transition",
+   "key": [
+    256,
+    512
+   ],
+   "cc": "9.0",
+   "triton": "*",
+   "variant": "v1_fp32x",
+   "cfg": {
+    "BM": 128,
+    "BH": 32,
+    "num_warps": 8,
+    "num_stages": 3,
+    "IL": 0
+   },
+   "status": "candidate",
+   "evidence": "fp32 input + LN in-kernel (pair_fused._launch_fpf_transition on an fp32 pointer): uncertified: no fp32-input qualification rows yet"
+  },
+  {
+   "id": "r54",
+   "impl": "fpf",
+   "piece": "transition",
+   "key": [
+    384,
+    768
+   ],
+   "cc": "9.0",
+   "triton": "*",
+   "variant": "v1_fp32x",
+   "cfg": {
+    "BM": 16,
+    "BH": 64,
+    "num_warps": 4,
+    "num_stages": 2,
+    "IL": 0
+   },
+   "status": "candidate",
+   "evidence": "fp32 input + LN in-kernel (pair_fused._launch_fpf_transition on an fp32 pointer): uncertified: no fp32-input qualification rows yet",
+   "note": "H100 qualification runs: 9/10 served; on 9.0|3.3 0.81-1.00x the plain-torch bf16 speed (a MEMORY cell there: peak 1.4 GiB vs 24.4 GiB @1400), on 9.0|3.7 1.05-1.20x; the N=1400 row is measured in an isolated unit (allocator accumulation)"
+  },
+  {
+   "id": "r55",
+   "impl": "fpf",
+   "piece": "prologue",
+   "key": [
+    128,
+    4,
+    32
+   ],
+   "cc": "8.0",
+   "triton": "*",
+   "variant": "v3",
+   "cfg": {
+    "BI": 16,
+    "BJ": 8,
+    "num_warps": 4,
+    "num_stages": 2
+   },
+   "status": "certified",
+   "evidence": "A100 sweep 2026-09-06 (A100-SXM4-80GB (cc 8.0, smem opt-in 166,912 B), torch 2.10.0+cu128 / triton 3.6.0; tool drives PF.tri_attn_block with candidate rows under OPT_CORE_PF_ALLOW_CANDIDATE=1): 54-cfg grid, 51 pass; this cfg: fp64-error ratio fused/torch-bf16-statements 1.0977 (same class as the 9.0 rows of this kernel on the same synthetic inputs (H100 calibration run h100-cal-1: r07/r16 ratio 1.097, pieces q,k,v,bias bitwise == the torch statements, g (gate-bias bf16 add) and the epilogue tier-2)), 3-launch self-det, ln fused+stock, start+end, masked; prologue N=1024s 1.77 vs 5.05 ms and N=512s 0.47 vs 1.29 ms vs the torch statements (x2.9); sweep run tri-full-1 (2026-09-06)"
+  },
+  {
+   "id": "r56",
+   "impl": "fpf",
+   "piece": "epilogue",
+   "key": [
+    128,
+    4,
+    32
+   ],
+   "cc": "8.0",
+   "triton": "*",
+   "variant": "v2",
+   "cfg": {
+    "KVER": 2,
+    "BI": 8,
+    "BJ": 4,
+    "num_warps": 4,
+    "num_stages": 1,
+    "EXP": "libdevice"
+   },
+   "status": "candidate",
+   "evidence": "A100 sweep 2026-09-06 (A100-SXM4-80GB (cc 8.0, smem opt-in 166,912 B), torch 2.10.0+cu128 / triton 3.6.0): 36-cfg grid, 36 pass; this cfg: block ratio 1.0977 (same class as the 9.0 rows of this kernel on the same synthetic inputs (H100 calibration run h100-cal-1: r07/r16 ratio 1.097, pieces q,k,v,bias bitwise == the torch statements, g (gate-bias bf16 add) and the epilogue tier-2)), self-det; epilogue N=1024s 2.04 vs 5.65 ms and N=512s 0.53 vs 1.46 ms vs the torch statements (x2.8); whole block (the 8.0 prologue v3 row + flash_triattn core + this) N=1024s 12.59 vs 19.63 ms; sweep run tri-full-1 (2026-09-06) || DEMOTED (measured slower than the unfused statements on cc 8.0, torch 2.13.0+cu130 / triton 3.7.1, A100-SXM4-80GB, same process, 2 warm-up + 7 timed ABBA): impl lnl (gate_transpose row + one cuBLAS GEMM + add) beats this row in all 8 forms (o_layout ihjd|ijhd x starting|ending x block|op mode) at N 256/448/832/1216/2048 \u2014 ms fpf/lnl e.g. ihjd block starting 0.474/0.316 @256, 0.844/0.555 @448, 1.872/1.081 @832, 3.783/2.158 @1216, 8.821/5.597 @2048 (x1.50-1.75); ijhd block 1.09-1.44x; op modes 1.36-2.43x; plain torch statements slower than this row (x0.35-0.94); lnl == torch statements bitwise, this row differs from them by bf16 rounding (not bitwise). Candidate now: serves only under the candidate switch; the key is named off (slower) -> the lnl statements piece by name"
+  },
+  {
+   "id": "r57",
+   "impl": "fpf",
+   "piece": "transition",
+   "key": [
+    128,
+    512
+   ],
+   "cc": "8.0",
+   "triton": "*",
+   "variant": "v1",
+   "cfg": {
+    "BM": 128,
+    "BH": 32,
+    "num_warps": 4,
+    "num_stages": 2,
+    "IL": 0
+   },
+   "status": "certified",
+   "evidence": "A100 sweep 2026-09-06 (A100-SXM4-80GB (cc 8.0, smem opt-in 166,912 B), torch 2.10.0+cu128 / triton 3.6.0; PF.transition with candidate rows): 72-cfg grid, 64 fit sm_80 shared memory; this cfg: fp64-error ratio 1.0000 vs the torch LN/Linear/SiLU/Linear statements and BITWISE == those statements under ln='stock' (N 200/256; the 9.0 row r24 is bitwise on H100 on the same inputs), self-det, ln fused+stock; N=1024s 2.41 vs 9.94 ms and N=512s 0.76 vs 2.83 ms vs the torch statements (x4.1); sweep run tr-full-1 (2026-09-06)"
+  },
+  {
+   "id": "r58",
+   "impl": "fpf",
+   "piece": "transition",
+   "key": [
+    384,
+    1536
+   ],
+   "cc": "8.0",
+   "triton": "*",
+   "variant": "v1",
+   "cfg": {
+    "BM": 64,
+    "BH": 32,
+    "num_warps": 8,
+    "num_stages": 1,
+    "IL": 0
+   },
+   "status": "candidate",
+   "evidence": "A100 sweep 2026-09-06 (A100-SXM4-80GB (cc 8.0, smem opt-in 166,912 B), torch 2.10.0+cu128 / triton 3.6.0): identity holds (ratio 1.0000; bitwise == the torch statements under ln='stock'; self-det) but the v1 kernel pads C=384 to 512 columns and only small tiles fit sm_80's 163 KB (the 9.0 cfg needs 215,040 B): fastest fitting cfg N=1024s 53.79 vs 31.92 ms = SLOWER than the torch statements (x0.59) \u2014 candidate (opt-in); the 9.0 row r25 is also slower than the torch statements on H100 (37.9 vs 14.8 ms @1024, h100-cal-1); sweep run tr-full-1 (2026-09-06)",
+   "off": "slower"
+  },
+  {
+   "id": "r59",
+   "impl": "fpf",
+   "piece": "transition",
+   "key": [
+    128,
+    256
+   ],
+   "cc": "8.0",
+   "triton": "*",
+   "variant": "v1",
+   "cfg": {
+    "BM": 128,
+    "BH": 32,
+    "num_warps": 4,
+    "num_stages": 2,
+    "IL": 0
+   },
+   "status": "certified",
+   "evidence": "A100 sweep 2026-09-06 (A100-SXM4-80GB (cc 8.0, smem opt-in 166,912 B), torch 2.10.0+cu128 / triton 3.6.0; PF.transition with candidate rows): 72-cfg grid, 64 fit sm_80; this cfg: fp64-error ratio 1.0000 vs the torch LN/Linear/SiLU/Linear statements and BITWISE == those statements under ln='stock' (N 200/256), self-det, ln fused+stock; N=1024s 1.44 vs 6.98 ms and N=512s 0.38 vs 1.82 ms vs the torch statements; sweep run tr-p1-1 (2026-09-06)"
+  },
+  {
+   "id": "r60",
+   "impl": "fpf",
+   "piece": "transition",
+   "key": [
+    256,
+    512
+   ],
+   "cc": "8.0",
+   "triton": "*",
+   "variant": "v1",
+   "cfg": {
+    "BM": 128,
+    "BH": 64,
+    "num_warps": 8,
+    "num_stages": 1,
+    "IL": 0
+   },
+   "status": "certified",
+   "evidence": "A100 sweep 2026-09-06 (A100-SXM4-80GB (cc 8.0, smem opt-in 166,912 B), torch 2.10.0+cu128 / triton 3.6.0; PF.transition with candidate rows): 72-cfg grid, 42 fit sm_80; this cfg: fp64-error ratio 1.0000 vs the torch LN/Linear/SiLU/Linear statements and BITWISE == those statements under ln='stock' (N 200/256), self-det, ln fused+stock; N=1024s 6.02 vs 11.95 ms and N=512s 1.67 vs 3.21 ms vs the torch statements; sweep run tr-p1-1 (2026-09-06)"
+  },
+  {
+   "id": "r61",
+   "impl": "fpf",
+   "piece": "transition",
+   "key": [
+    256,
+    1024
+   ],
+   "cc": "8.0",
+   "triton": "*",
+   "variant": "v1",
+   "cfg": {
+    "BM": 128,
+    "BH": 64,
+    "num_warps": 8,
+    "num_stages": 1,
+    "IL": 0
+   },
+   "status": "certified",
+   "evidence": "A100 sweep 2026-09-06 (A100-SXM4-80GB (cc 8.0, smem opt-in 166,912 B), torch 2.10.0+cu128 / triton 3.6.0; PF.transition with candidate rows): 72-cfg grid, 42 fit sm_80 (the 9.0 cfg of r23 needs 172,032 B); this cfg: fp64-error ratio 1.0000 vs the torch LN/Linear/SiLU/Linear statements and BITWISE == those statements under ln='stock' (N 200/256), self-det, ln fused+stock; N=1024s 11.28 vs 18.76 ms and N=512s 3.12 vs 4.74 ms vs the torch statements; sweep run tr-p1-1 (2026-09-06)"
+  },
+  {
+   "id": "r62",
+   "impl": "fpf",
+   "piece": "transition",
+   "key": [
+    256,
+    1024
+   ],
+   "cc": "8.0",
+   "triton": "*",
+   "variant": "transition_v3",
+   "cfg": {
+    "BM": 128,
+    "BH": 64,
+    "KC": 64,
+    "NUM_STAGES_K": 1,
+    "WS": 0,
+    "IL": 0,
+    "num_warps": 8,
+    "num_stages": 1
+   },
+   "status": "certified",
+   "evidence": "A100 sweep 2026-09-06 (A100 80GB PCIe (cc 8.0), torch 2.10.0+cu128 / triton 3.6.0; PF.transition ln='stock' with candidate rows): fpf_glue_v2 transition_v3 (K-chunked, WS=0: no warp specialisation on sm_80), 96-cfg grid, 88 fit; this cfg: fp64-error ratio 1.0000 and BITWISE == the torch LN/Linear/SiLU/Linear statements (N 200/256), self-det; N=1024s 11.83 vs 16.16 ms and N=512s 2.90 vs 4.07 ms vs the torch statements on the same PCIe card (v1's best there 18.82 ms @1024); sweep run p2-v3-1 (2026-09-06)"
+  },
+  {
+   "id": "r63",
+   "impl": "fpf",
+   "piece": "prologue",
+   "key": [
+    64,
+    4,
+    16
+   ],
+   "cc": "8.0",
+   "triton": "*",
+   "variant": "v3",
+   "cfg": {
+    "BI": 4,
+    "BJ": 32,
+    "num_warps": 4,
+    "num_stages": 3
+   },
+   "status": "certified",
+   "evidence": "A100 sweep 2026-09-06 (A100-SXM4-80GB (cc 8.0), torch 2.10.0+cu128 / triton 3.6.0; PF.tri_attn_block with candidate rows): the template pair stack's shape; 54-cfg grid, 54 pass; this cfg: fp64-error ratio 1.0864 (the class of this kernel's 9.0 rows: q,k,v,bias bitwise == the torch statements, g tier-2), self-det, ln fused+stock, start+end, masked; prologue N=1024s 0.75 vs 3.45 ms and N=512s 0.24 vs 1.06 ms vs the torch statements (x4.6); (9.0 carries r09 as a candidate: on H100 this shape is a per-call route); sweep run tri-64x4x16-1 (2026-09-06)"
+  },
+  {
+   "id": "r64",
+   "impl": "fpf",
+   "piece": "epilogue",
+   "key": [
+    64,
+    4,
+    16
+   ],
+   "cc": "8.0",
+   "triton": "*",
+   "variant": "v2",
+   "cfg": {
+    "KVER": 2,
+    "BI": 8,
+    "BJ": 8,
+    "num_warps": 4,
+    "num_stages": 2,
+    "EXP": "libdevice"
+   },
+   "status": "certified",
+   "evidence": "A100 sweep 2026-09-06 (A100-SXM4-80GB (cc 8.0), torch 2.10.0+cu128 / triton 3.6.0): 36-cfg grid, 36 pass; this cfg: block ratio 1.0864, self-det; epilogue N=1024s 0.57 vs 2.80 ms and N=512s 0.16 vs 0.75 ms vs the torch statements (x4.9); whole block (r63 + flash_triattn core + this) N=1024s 7.74 vs 13.16 ms; sweep run tri-64x4x16-1 (2026-09-06)"
+  },
+  {
+   "id": "r65",
+   "impl": "lnl",
+   "piece": "ln_linear",
+   "key": [
+    64
+   ],
+   "cc": "8.0",
+   "triton": "*",
+   "variant": "ln_linear",
+   "cfg": {},
+   "status": "certified",
+   "evidence": "A100 sweep 2026-09-06 (A100-SXM4-80GB (cc 8.0), torch 2.10.0+cu128 / triton 3.6.0; PF.tri_attn_block impl='lnl' with candidate rows, tri-attention 64x2x32): fp64-error ratio of the whole block (ln_linear + gate_transpose + flash_triattn core + epilogue statements) vs the torch statements 0.99993-1.00004 (N 200/256, start+end), 3-launch self-det; block N=512 1.04 vs 2.25 ms, N=1024 6.01 vs 10.73 ms vs the torch statements; tiles: the kernel's autotuner at warm-up (lnl_fused.tiles_by_arch.json carries no 8.0 key here; an 8.0 tile row, when carried, fixes them); sweep run lnl-pieces-1 (2026-09-06)"
+  },
+  {
+   "id": "r66",
+   "impl": "lnl",
+   "piece": "fused_transition",
+   "key": [
+    64,
+    256
+   ],
+   "cc": "8.0",
+   "triton": "*",
+   "variant": "fused_transition",
+   "cfg": {},
+   "status": "certified",
+   "evidence": "A100 sweep 2026-09-06 (A100-SXM4-80GB (cc 8.0), torch 2.10.0+cu128 / triton 3.6.0; PF.transition impl='lnl' with candidate rows): fp64-error ratio 1.00001-1.00002 vs the torch LN/Linear/SiLU/Linear statements (max |diff| 0.015625 in bf16; not bitwise \u2014 the kernel's own statement order), 3-launch self-det; N=512 0.22 vs 1.48 ms, N=1024 0.83 vs 5.72 ms vs the torch statements; tiles: the kernel's autotuner at warm-up (lnl_fused.tiles_by_arch.json carries no 8.0 key here; an 8.0 tile row, when carried, fixes them); sweep run lnl-pieces-1 (2026-09-06)"
+  },
+  {
+   "id": "r67",
+   "impl": "lnl",
+   "piece": "ln_linear",
+   "key": [
+    128
+   ],
+   "cc": "8.0",
+   "triton": "*",
+   "variant": "ln_linear",
+   "cfg": {},
+   "status": "certified",
+   "evidence": "A100 sweep 2026-09-06 (A100-SXM4-80GB (cc 8.0), torch 2.10.0+cu128 / triton 3.6.0; PF.tri_attn_block impl='lnl' with candidate rows, tri-attention 128x4x32): fp64-error ratio of the whole block (ln_linear + gate_transpose + flash_triattn core + epilogue statements) vs the torch statements 0.99994-1.00007 (N 200/256, start+end), 3-launch self-det; block N=512 2.52 vs 4.59 ms, N=1024 12.32 vs 19.65 ms vs the torch statements; tiles: the kernel's autotuner at warm-up (lnl_fused.tiles_by_arch.json carries no 8.0 key here; an 8.0 tile row, when carried, fixes them); sweep run lnl-pieces-1 (2026-09-06)"
+  },
+  {
+   "id": "r68",
+   "impl": "lnl",
+   "piece": "fused_transition",
+   "key": [
+    128,
+    512
+   ],
+   "cc": "8.0",
+   "triton": "*",
+   "variant": "fused_transition",
+   "cfg": {},
+   "status": "certified",
+   "evidence": "A100 sweep 2026-09-06 (A100-SXM4-80GB (cc 8.0), torch 2.10.0+cu128 / triton 3.6.0; PF.transition impl='lnl' with candidate rows): fp64-error ratio 1.00000-1.00000 vs the torch LN/Linear/SiLU/Linear statements (max |diff| 0.015625 in bf16; not bitwise \u2014 the kernel's own statement order), 3-launch self-det; N=512 0.75 vs 2.52 ms, N=1024 3.13 vs 9.93 ms vs the torch statements; tiles: the kernel's autotuner at warm-up (lnl_fused.tiles_by_arch.json carries no 8.0 key here; an 8.0 tile row, when carried, fixes them); sweep run lnl-pieces-1 (2026-09-06)"
+  },
+  {
+   "id": "r69",
+   "impl": "lnl",
+   "piece": "fused_transition",
+   "key": [
+    64,
+    128
+   ],
+   "cc": "8.0",
+   "triton": "*",
+   "variant": "fused_transition",
+   "cfg": {},
+   "status": "certified",
+   "evidence": "A100 sweep 2026-09-06 (A100-SXM4-80GB (cc 8.0), torch 2.10.0+cu128 / triton 3.6.0; PF.transition impl='lnl' with candidate rows): fp64-error ratio 0.99999-1.00001 vs the torch LN/Linear/SiLU/Linear statements (max |diff| 0.015625 in bf16; not bitwise \u2014 the kernel's own statement order), 3-launch self-det; N=512 0.17 vs 1.30 ms, N=1024 0.51 vs 4.25 ms vs the torch statements; tiles: the kernel's autotuner at warm-up (lnl_fused.tiles_by_arch.json carries no 8.0 key here; an 8.0 tile row, when carried, fixes them); sweep run lnl-pieces-1 (2026-09-06)"
+  },
+  {
+   "id": "r70",
+   "impl": "lnl",
+   "piece": "gate_transpose",
+   "key": [
+    128
+   ],
+   "cc": "8.0",
+   "triton": "*",
+   "variant": "gate_transpose",
+   "cfg": {},
+   "status": "certified",
+   "evidence": "A100 sweep 2026-09-06 (A100-SXM4-80GB (cc 8.0), torch 2.10.0+cu128 / triton 3.6.0; PF.tri_attn_block impl='lnl' with candidate rows, tri-attention 128x4x32): fp64-error ratio of the whole block (ln_linear + gate_transpose + flash_triattn core + epilogue statements) vs the torch statements 0.99994-1.00007 (N 200/256, start+end), 3-launch self-det; block N=512 2.52 vs 4.59 ms, N=1024 12.32 vs 19.65 ms vs the torch statements; tiles: the kernel's autotuner at warm-up (lnl_fused.tiles_by_arch.json carries no 8.0 key here; an 8.0 tile row, when carried, fixes them); sweep run lnl-pieces-1 (2026-09-06)"
+  },
+  {
+   "id": "r71",
+   "impl": "lnl",
+   "piece": "gate_transpose",
+   "key": [
+    64
+   ],
+   "cc": "8.0",
+   "triton": "*",
+   "variant": "gate_transpose",
+   "cfg": {},
+   "status": "certified",
+   "evidence": "A100 sweep 2026-09-06 (A100-SXM4-80GB (cc 8.0), torch 2.10.0+cu128 / triton 3.6.0; PF.tri_attn_block impl='lnl' with candidate rows, tri-attention 64x2x32): fp64-error ratio of the whole block (ln_linear + gate_transpose + flash_triattn core + epilogue statements) vs the torch statements 0.99993-1.00004 (N 200/256, start+end), 3-launch self-det; block N=512 1.04 vs 2.25 ms, N=1024 6.01 vs 10.73 ms vs the torch statements; tiles: the kernel's autotuner at warm-up (lnl_fused.tiles_by_arch.json carries no 8.0 key here; an 8.0 tile row, when carried, fixes them); sweep run lnl-pieces-1 (2026-09-06)"
+  },
+  {
+   "id": "r72",
+   "impl": "fpf",
+   "piece": "prologue",
+   "key": [
+    128,
+    4,
+    32
+   ],
+   "cc": "10.0",
+   "triton": "*",
+   "variant": "v3",
+   "cfg": {
+    "BI": 4,
+    "BJ": 32,
+    "num_warps": 4,
+    "num_stages": 3
+   },
+   "status": "certified",
+   "evidence": "cross-card settings sweep 2026-09-07 (NVIDIA B200 (cc 10.0), torch 2.10.0+cu128 / triton 3.6.0 (ptxas-blackwell 12.9); the pair_fused settings sweep driving PF.tri_attn_block with candidate rows under OPT_CORE_PF_ALLOW_CANDIDATE=1): 54-cfg BI x BJ x warps x stages grid (6 cells BI 16 x BJ 32 do not build on sm_100/sm_103: triton OutOfResources, tensor memory 768 > 512); this cfg: 16 identity cases (N=[200, 256]; start+end node, masked+unmasked, ln fused+stock) rel_rms vs fp64 <= 0.00446 (torch-bf16 statements <= 0.00406; worst ratio 1.100, bar 1.12), self-det 3/3 every case, smem None B; timing fused/torch ms: N=512s pro 0.210/0.642 epi 0.146/0.608 core 0.491 blk 0.851/1.781 ms; N=512e pro 0.210/0.737 epi 0.146/0.608 core 0.677 blk 1.039/2.082 ms; N=1024s pro 0.796/2.488 epi 0.558/2.307 core 3.558 blk 4.923/8.454 ms; N=1024e pro 0.800/2.860 epi 0.558/2.307 core 4.904 blk 6.270/10.285 ms; N=2048s pro 3.097/9.838 epi 2.182/9.093 core 27.575 blk 32.870/46.818 ms; N=2048e pro 3.114/11.308 epi 2.182/9.091 core 37.444 blk 42.749/58.598 ms (same class as the 9.0 rows of this kernel on the same synthetic inputs (H100 calibration run h100-cal-1: r07/r16 ratio 1.097; A100 r55 1.0977): pieces q,k,v,bias bitwise == the torch statements under ln=stock, g (gate-bias bf16 add) and the epilogue tier-2; the bar was set to 1.12 because this card's torch-statement reference lands at rel_rms 0.00406 vs H100's, putting the identical-class block ratio at 1.1001)"
+  },
+  {
+   "id": "r73",
+   "impl": "fpf",
+   "piece": "epilogue",
+   "key": [
+    128,
+    4,
+    32
+   ],
+   "cc": "10.0",
+   "triton": "*",
+   "variant": "v2",
+   "cfg": {
+    "KVER": 2,
+    "BI": 8,
+    "BJ": 16,
+    "num_warps": 8,
+    "num_stages": 2,
+    "EXP": "libdevice"
+   },
+   "status": "certified",
+   "evidence": "cross-card settings sweep 2026-09-07 (NVIDIA B200 (cc 10.0), torch 2.10.0+cu128 / triton 3.6.0 (ptxas-blackwell 12.9); the pair_fused settings sweep driving PF.tri_attn_block with candidate rows under OPT_CORE_PF_ALLOW_CANDIDATE=1): 36-cfg grid; this cfg: 16 identity cases (N=[200, 256]; start+end node, masked+unmasked, ln fused+stock) rel_rms vs fp64 <= 0.00446 (torch-bf16 statements <= 0.00406; worst ratio 1.100, bar 1.12), self-det 3/3 every case, smem None B; timing fused/torch ms: N=512s pro 0.210/0.642 epi 0.146/0.608 core 0.491 blk 0.851/1.781 ms; N=512e pro 0.210/0.737 epi 0.146/0.608 core 0.677 blk 1.039/2.082 ms; N=1024s pro 0.796/2.488 epi 0.558/2.307 core 3.558 blk 4.923/8.454 ms; N=1024e pro 0.800/2.860 epi 0.558/2.307 core 4.904 blk 6.270/10.285 ms; N=2048s pro 3.097/9.838 epi 2.182/9.093 core 27.575 blk 32.870/46.818 ms; N=2048e pro 3.114/11.308 epi 2.182/9.091 core 37.444 blk 42.749/58.598 ms (same class as the 9.0 rows (whole-block ratio, the prologue winner above in front of it))"
+  },
+  {
+   "id": "r74",
+   "impl": "fpf",
+   "piece": "transition",
+   "key": [
+    128,
+    512
+   ],
+   "cc": "10.0",
+   "triton": "*",
+   "variant": "v1",
+   "cfg": {
+    "BM": 128,
+    "BH": 32,
+    "num_warps": 8,
+    "num_stages": 3,
+    "IL": 0
+   },
+   "status": "certified",
+   "evidence": "cross-card settings sweep 2026-09-07 (NVIDIA B200 (cc 10.0), torch 2.10.0+cu128 / triton 3.6.0 (ptxas-blackwell 12.9); the pair_fused settings sweep driving PF.transition with candidate rows under OPT_CORE_PF_ALLOW_CANDIDATE=1): 72-cfg grid; this cfg: 4 identity cases (N=[200, 256]; ln fused+stock) rel_rms vs fp64 <= 0.00461 (torch-bf16 statements <= 0.00461; worst ratio 1.000, bar 1.1), self-det 3/3 every case, smem None B; timing fused/torch ms: N=512 0.230/0.936 ms; N=1024 0.872/3.580 ms; N=2048 3.423/14.153 ms (bitwise == the torch statements under ln=stock (ratio 1.000); ln=fused within 2^-6 max-abs)"
+  },
+  {
+   "id": "r75",
+   "impl": "fpf",
+   "piece": "prologue",
+   "key": [
+    64,
+    4,
+    16
+   ],
+   "cc": "10.0",
+   "triton": "*",
+   "variant": "v3",
+   "cfg": {
+    "BI": 4,
+    "BJ": 32,
+    "num_warps": 8,
+    "num_stages": 1
+   },
+   "status": "certified",
+   "evidence": "cross-card settings sweep 2026-09-07 (NVIDIA B200 (cc 10.0), torch 2.10.0+cu128 / triton 3.6.0 (ptxas-blackwell 12.9); the pair_fused settings sweep driving PF.tri_attn_block with candidate rows under OPT_CORE_PF_ALLOW_CANDIDATE=1): 54-cfg BI x BJ x warps x stages grid (6 cells BI 16 x BJ 32 do not build on sm_100/sm_103: triton OutOfResources, tensor memory 768 > 512); this cfg: 16 identity cases (N=[200, 256]; start+end node, masked+unmasked, ln fused+stock) rel_rms vs fp64 <= 0.00465 (torch-bf16 statements <= 0.00432; worst ratio 1.086, bar 1.12), self-det 3/3 every case, smem None B; timing fused/torch ms: N=512s pro 0.179/0.538 epi 0.118/0.316 core 0.460 blk 0.623/1.342 ms; N=512e pro 0.179/0.587 epi 0.122/0.316 core 0.607 blk 0.775/1.567 ms; N=1024s pro 0.341/2.098 epi 0.269/1.177 core 3.336 blk 3.947/6.747 ms; N=1024e pro 0.341/2.289 epi 0.269/1.177 core 4.461 blk 5.074/8.202 ms; N=2048s pro 1.310/8.311 epi 1.038/4.558 core 25.889 blk 28.241/39.544 ms; N=2048e pro 1.316/9.056 epi 1.038/4.559 core 34.192 blk 36.550/49.660 ms (same class as the 9.0 rows of this kernel on the same synthetic inputs (H100 calibration run h100-cal-1: r07/r16 ratio 1.097; A100 r55 1.0977): pieces q,k,v,bias bitwise == the torch statements under ln=stock, g (gate-bias bf16 add) and the epilogue tier-2; the bar was set to 1.12 because this card's torch-statement reference lands at rel_rms 0.00406 vs H100's, putting the identical-class block ratio at 1.1001)"
+  },
+  {
+   "id": "r76",
+   "impl": "fpf",
+   "piece": "epilogue",
+   "key": [
+    64,
+    4,
+    16
+   ],
+   "cc": "10.0",
+   "triton": "*",
+   "variant": "v2",
+   "cfg": {
+    "KVER": 2,
+    "BI": 16,
+    "BJ": 8,
+    "num_warps": 4,
+    "num_stages": 1,
+    "EXP": "libdevice"
+   },
+   "status": "certified",
+   "evidence": "cross-card settings sweep 2026-09-07 (NVIDIA B200 (cc 10.0), torch 2.10.0+cu128 / triton 3.6.0 (ptxas-blackwell 12.9); the pair_fused settings sweep driving PF.tri_attn_block with candidate rows under OPT_CORE_PF_ALLOW_CANDIDATE=1): 36-cfg grid; this cfg: 16 identity cases (N=[200, 256]; start+end node, masked+unmasked, ln fused+stock) rel_rms vs fp64 <= 0.00465 (torch-bf16 statements <= 0.00432; worst ratio 1.086, bar 1.12), self-det 3/3 every case, smem None B; timing fused/torch ms: N=512s pro 0.179/0.538 epi 0.118/0.316 core 0.460 blk 0.623/1.342 ms; N=512e pro 0.179/0.587 epi 0.122/0.316 core 0.607 blk 0.775/1.567 ms; N=1024s pro 0.341/2.098 epi 0.269/1.177 core 3.336 blk 3.947/6.747 ms; N=1024e pro 0.341/2.289 epi 0.269/1.177 core 4.461 blk 5.074/8.202 ms; N=2048s pro 1.310/8.311 epi 1.038/4.558 core 25.889 blk 28.241/39.544 ms; N=2048e pro 1.316/9.056 epi 1.038/4.559 core 34.192 blk 36.550/49.660 ms (same class as the 9.0 rows (whole-block ratio, the prologue winner above in front of it))"
+  },
+  {
+   "id": "r77",
+   "impl": "fpf",
+   "piece": "prologue",
+   "key": [
+    128,
+    4,
+    32
+   ],
+   "cc": "10.0",
+   "triton": "*",
+   "variant": "v3_fp32z",
+   "cfg": {
+    "BI": 4,
+    "BJ": 32,
+    "num_warps": 4,
+    "num_stages": 3
+   },
+   "status": "candidate",
+   "evidence": "cross-card settings sweep 2026-09-07 (NVIDIA B200 (cc 10.0), torch 2.10.0+cu128 / triton 3.6.0): 8 identity cases (N=[200, 256]; start+end node, masked+unmasked, ln fused+stock) rel_rms vs fp64 <= 0.00446 (torch-bf16 statements <= 0.00406; worst ratio 1.101, bar 1.12), self-det 3/3 every case, smem 32776 B; timing fused/torch ms:  (fp32 pair tensor + LN in-kernel; candidate like its 9.0 row); candidate like its 9.0 row (no kit line reads this variant)"
+  },
+  {
+   "id": "r78",
+   "impl": "fpf",
+   "piece": "transition",
+   "key": [
+    128,
+    512
+   ],
+   "cc": "10.0",
+   "triton": "*",
+   "variant": "v1_fp32x",
+   "cfg": {
+    "BM": 128,
+    "BH": 32,
+    "num_warps": 8,
+    "num_stages": 3,
+    "IL": 0
+   },
+   "status": "candidate",
+   "evidence": "cross-card settings sweep 2026-09-07 (NVIDIA B200 (cc 10.0), torch 2.10.0+cu128 / triton 3.6.0): 2 identity cases (N=[200, 256]; ln fused+stock) rel_rms vs fp64 <= 0.00462 (torch-bf16 statements <= 0.00462; worst ratio 1.000, bar 1.1), self-det 3/3 every case, smem 106544 B; timing fused/torch ms:  (fp32 input + LN in-kernel; candidate like its 9.0 row); candidate like its 9.0 row (no kit line reads this variant)"
+  },
+  {
+   "id": "r79",
+   "impl": "fpf",
+   "piece": "prologue",
+   "key": [
+    64,
+    4,
+    16
+   ],
+   "cc": "10.0",
+   "triton": "*",
+   "variant": "v3_fp32z",
+   "cfg": {
+    "BI": 4,
+    "BJ": 32,
+    "num_warps": 8,
+    "num_stages": 1
+   },
+   "status": "candidate",
+   "evidence": "cross-card settings sweep 2026-09-07 (NVIDIA B200 (cc 10.0), torch 2.10.0+cu128 / triton 3.6.0): 8 identity cases (N=[200, 256]; start+end node, masked+unmasked, ln fused+stock) rel_rms vs fp64 <= 0.00465 (torch-bf16 statements <= 0.00432; worst ratio 1.086, bar 1.12), self-det 3/3 every case, smem 8200 B; timing fused/torch ms:  (fp32 pair tensor + LN in-kernel; candidate like its 9.0 row); candidate like its 9.0 row (no kit line reads this variant)"
+  },
+  {
+   "id": "r80",
+   "impl": "fpf",
+   "piece": "prologue",
+   "key": [
+    128,
+    4,
+    32
+   ],
+   "cc": "10.3",
+   "triton": "*",
+   "variant": "v3",
+   "cfg": {
+    "BI": 4,
+    "BJ": 32,
+    "num_warps": 4,
+    "num_stages": 1
+   },
+   "status": "certified",
+   "evidence": "cross-card settings sweep 2026-09-07 (NVIDIA B300 SXM6 AC (cc 10.3), torch 2.10.0+cu128 / triton 3.6.0 (ptxas-blackwell 12.9); the pair_fused settings sweep driving PF.tri_attn_block with candidate rows under OPT_CORE_PF_ALLOW_CANDIDATE=1): 54-cfg BI x BJ x warps x stages grid (6 cells BI 16 x BJ 32 do not build on sm_100/sm_103: triton OutOfResources, tensor memory 768 > 512); this cfg: 16 identity cases (N=[200, 256]; start+end node, masked+unmasked, ln fused+stock) rel_rms vs fp64 <= 0.00446 (torch-bf16 statements <= 0.00406; worst ratio 1.100, bar 1.12), self-det 3/3 every case, smem None B; timing fused/torch ms: N=512s pro 0.202/0.624 epi 0.144/0.592 core 0.470 blk 0.816/1.713 ms; N=512e pro 0.202/0.714 epi 0.144/0.593 core 0.644 blk 0.993/1.998 ms; N=1024s pro 0.765/2.406 epi 0.540/2.233 core 3.400 blk 4.704/8.122 ms; N=1024e pro 0.767/2.762 epi 0.540/2.233 core 4.669 blk 5.979/9.861 ms; N=2048s pro 2.980/9.522 epi 2.106/8.793 core 26.325 blk 31.413/45.011 ms; N=2048e pro 2.993/10.931 epi 2.106/8.792 core 35.606 blk 40.707/55.898 ms (same class as the 9.0 rows of this kernel on the same synthetic inputs (H100 calibration run h100-cal-1: r07/r16 ratio 1.097; A100 r55 1.0977): pieces q,k,v,bias bitwise == the torch statements under ln=stock, g (gate-bias bf16 add) and the epilogue tier-2; the bar was set to 1.12 because this card's torch-statement reference lands at rel_rms 0.00406 vs H100's, putting the identical-class block ratio at 1.1001)"
+  },
+  {
+   "id": "r81",
+   "impl": "fpf",
+   "piece": "epilogue",
+   "key": [
+    128,
+    4,
+    32
+   ],
+   "cc": "10.3",
+   "triton": "*",
+   "variant": "v2",
+   "cfg": {
+    "KVER": 2,
+    "BI": 16,
+    "BJ": 8,
+    "num_warps": 8,
+    "num_stages": 2,
+    "EXP": "libdevice"
+   },
+   "status": "certified",
+   "evidence": "cross-card settings sweep 2026-09-07 (NVIDIA B300 SXM6 AC (cc 10.3), torch 2.10.0+cu128 / triton 3.6.0 (ptxas-blackwell 12.9); the pair_fused settings sweep driving PF.tri_attn_block with candidate rows under OPT_CORE_PF_ALLOW_CANDIDATE=1): 36-cfg grid; this cfg: 16 identity cases (N=[200, 256]; start+end node, masked+unmasked, ln fused+stock) rel_rms vs fp64 <= 0.00446 (torch-bf16 statements <= 0.00406; worst ratio 1.100, bar 1.12), self-det 3/3 every case, smem None B; timing fused/torch ms: N=512s pro 0.202/0.624 epi 0.144/0.592 core 0.470 blk 0.816/1.713 ms; N=512e pro 0.202/0.714 epi 0.144/0.593 core 0.644 blk 0.993/1.998 ms; N=1024s pro 0.765/2.406 epi 0.540/2.233 core 3.400 blk 4.704/8.122 ms; N=1024e pro 0.767/2.762 epi 0.540/2.233 core 4.669 blk 5.979/9.861 ms; N=2048s pro 2.980/9.522 epi 2.106/8.793 core 26.325 blk 31.413/45.011 ms; N=2048e pro 2.993/10.931 epi 2.106/8.792 core 35.606 blk 40.707/55.898 ms (same class as the 9.0 rows (whole-block ratio, the prologue winner above in front of it))"
+  },
+  {
+   "id": "r82",
+   "impl": "fpf",
+   "piece": "transition",
+   "key": [
+    128,
+    512
+   ],
+   "cc": "10.3",
+   "triton": "*",
+   "variant": "v1",
+   "cfg": {
+    "BM": 128,
+    "BH": 32,
+    "num_warps": 8,
+    "num_stages": 2,
+    "IL": 0
+   },
+   "status": "certified",
+   "evidence": "cross-card settings sweep 2026-09-07 (NVIDIA B300 SXM6 AC (cc 10.3), torch 2.10.0+cu128 / triton 3.6.0 (ptxas-blackwell 12.9); the pair_fused settings sweep driving PF.transition with candidate rows under OPT_CORE_PF_ALLOW_CANDIDATE=1): 72-cfg grid; this cfg: 4 identity cases (N=[200, 256]; ln fused+stock) rel_rms vs fp64 <= 0.00461 (torch-bf16 statements <= 0.00461; worst ratio 1.000, bar 1.1), self-det 3/3 every case, smem None B; timing fused/torch ms: N=512 0.228/0.911 ms; N=1024 0.867/3.478 ms; N=2048 3.406/13.746 ms (bitwise == the torch statements under ln=stock (ratio 1.000); ln=fused within 2^-6 max-abs)"
+  },
+  {
+   "id": "r83",
+   "impl": "fpf",
+   "piece": "prologue",
+   "key": [
+    64,
+    4,
+    16
+   ],
+   "cc": "10.3",
+   "triton": "*",
+   "variant": "v3",
+   "cfg": {
+    "BI": 4,
+    "BJ": 32,
+    "num_warps": 8,
+    "num_stages": 2
+   },
+   "status": "certified",
+   "evidence": "cross-card settings sweep 2026-09-07 (NVIDIA B300 SXM6 AC (cc 10.3), torch 2.10.0+cu128 / triton 3.6.0 (ptxas-blackwell 12.9); the pair_fused settings sweep driving PF.tri_attn_block with candidate rows under OPT_CORE_PF_ALLOW_CANDIDATE=1): 54-cfg BI x BJ x warps x stages grid (6 cells BI 16 x BJ 32 do not build on sm_100/sm_103: triton OutOfResources, tensor memory 768 > 512); this cfg: 16 identity cases (N=[200, 256]; start+end node, masked+unmasked, ln fused+stock) rel_rms vs fp64 <= 0.00465 (torch-bf16 statements <= 0.00432; worst ratio 1.086, bar 1.12), self-det 3/3 every case, smem None B; timing fused/torch ms: N=512s pro 0.151/0.523 epi 0.097/0.308 core 0.439 blk 0.597/1.294 ms; N=512e pro 0.147/0.570 epi 0.099/0.308 core 0.569 blk 0.730/1.494 ms; N=1024s pro 0.327/2.041 epi 0.262/1.142 core 3.182 blk 3.770/6.481 ms; N=1024e pro 0.327/2.219 epi 0.262/1.142 core 4.170 blk 4.761/7.783 ms; N=2048s pro 1.252/8.079 epi 1.010/4.411 core 24.672 blk 26.936/37.956 ms; N=2048e pro 1.257/8.788 epi 1.010/4.411 core 32.085 blk 34.353/46.970 ms (same class as the 9.0 rows of this kernel on the same synthetic inputs (H100 calibration run h100-cal-1: r07/r16 ratio 1.097; A100 r55 1.0977): pieces q,k,v,bias bitwise == the torch statements under ln=stock, g (gate-bias bf16 add) and the epilogue tier-2; the bar was set to 1.12 because this card's torch-statement reference lands at rel_rms 0.00406 vs H100's, putting the identical-class block ratio at 1.1001)"
+  },
+  {
+   "id": "r84",
+   "impl": "fpf",
+   "piece": "epilogue",
+   "key": [
+    64,
+    4,
+    16
+   ],
+   "cc": "10.3",
+   "triton": "*",
+   "variant": "v2",
+   "cfg": {
+    "KVER": 2,
+    "BI": 32,
+    "BJ": 4,
+    "num_warps": 4,
+    "num_stages": 2,
+    "EXP": "libdevice"
+   },
+   "status": "certified",
+   "evidence": "cross-card settings sweep 2026-09-07 (NVIDIA B300 SXM6 AC (cc 10.3), torch 2.10.0+cu128 / triton 3.6.0 (ptxas-blackwell 12.9); the pair_fused settings sweep driving PF.tri_attn_block with candidate rows under OPT_CORE_PF_ALLOW_CANDIDATE=1): 36-cfg grid; this cfg: 16 identity cases (N=[200, 256]; start+end node, masked+unmasked, ln fused+stock) rel_rms vs fp64 <= 0.00465 (torch-bf16 statements <= 0.00432; worst ratio 1.086, bar 1.12), self-det 3/3 every case, smem None B; timing fused/torch ms: N=512s pro 0.151/0.523 epi 0.097/0.308 core 0.439 blk 0.597/1.294 ms; N=512e pro 0.147/0.570 epi 0.099/0.308 core 0.569 blk 0.730/1.494 ms; N=1024s pro 0.327/2.041 epi 0.262/1.142 core 3.182 blk 3.770/6.481 ms; N=1024e pro 0.327/2.219 epi 0.262/1.142 core 4.170 blk 4.761/7.783 ms; N=2048s pro 1.252/8.079 epi 1.010/4.411 core 24.672 blk 26.936/37.956 ms; N=2048e pro 1.257/8.788 epi 1.010/4.411 core 32.085 blk 34.353/46.970 ms (same class as the 9.0 rows (whole-block ratio, the prologue winner above in front of it))"
+  },
+  {
+   "id": "r85",
+   "impl": "fpf",
+   "piece": "prologue",
+   "key": [
+    128,
+    4,
+    32
+   ],
+   "cc": "10.3",
+   "triton": "*",
+   "variant": "v3_fp32z",
+   "cfg": {
+    "BI": 4,
+    "BJ": 32,
+    "num_warps": 4,
+    "num_stages": 1
+   },
+   "status": "candidate",
+   "evidence": "cross-card settings sweep 2026-09-07 (NVIDIA B300 SXM6 AC (cc 10.3), torch 2.10.0+cu128 / triton 3.6.0): 8 identity cases (N=[200, 256]; start+end node, masked+unmasked, ln fused+stock) rel_rms vs fp64 <= 0.00446 (torch-bf16 statements <= 0.00406; worst ratio 1.101, bar 1.12), self-det 3/3 every case, smem 32776 B; timing fused/torch ms:  (fp32 pair tensor + LN in-kernel; candidate like its 9.0 row); candidate like its 9.0 row (no kit line reads this variant)"
+  },
+  {
+   "id": "r86",
+   "impl": "fpf",
+   "piece": "transition",
+   "key": [
+    128,
+    512
+   ],
+   "cc": "10.3",
+   "triton": "*",
+   "variant": "v1_fp32x",
+   "cfg": {
+    "BM": 128,
+    "BH": 32,
+    "num_warps": 8,
+    "num_stages": 2,
+    "IL": 0
+   },
+   "status": "candidate",
+   "evidence": "cross-card settings sweep 2026-09-07 (NVIDIA B300 SXM6 AC (cc 10.3), torch 2.10.0+cu128 / triton 3.6.0): 2 identity cases (N=[200, 256]; ln fused+stock) rel_rms vs fp64 <= 0.00462 (torch-bf16 statements <= 0.00462; worst ratio 1.000, bar 1.1), self-det 3/3 every case, smem 81968 B; timing fused/torch ms:  (fp32 input + LN in-kernel; candidate like its 9.0 row); candidate like its 9.0 row (no kit line reads this variant)"
+  },
+  {
+   "id": "r87",
+   "impl": "fpf",
+   "piece": "prologue",
+   "key": [
+    64,
+    4,
+    16
+   ],
+   "cc": "10.3",
+   "triton": "*",
+   "variant": "v3_fp32z",
+   "cfg": {
+    "BI": 4,
+    "BJ": 32,
+    "num_warps": 8,
+    "num_stages": 2
+   },
+   "status": "candidate",
+   "evidence": "cross-card settings sweep 2026-09-07 (NVIDIA B300 SXM6 AC (cc 10.3), torch 2.10.0+cu128 / triton 3.6.0): 8 identity cases (N=[200, 256]; start+end node, masked+unmasked, ln fused+stock) rel_rms vs fp64 <= 0.00465 (torch-bf16 statements <= 0.00432; worst ratio 1.086, bar 1.12), self-det 3/3 every case, smem 8200 B; timing fused/torch ms:  (fp32 pair tensor + LN in-kernel; candidate like its 9.0 row); candidate like its 9.0 row (no kit line reads this variant)"
+  },
+  {
+   "id": "r88",
+   "impl": "fpf",
+   "piece": "transition",
+   "key": [
+    128,
+    512
+   ],
+   "cc": "9.0",
+   "triton": "*",
+   "variant": "v2_fold",
+   "cfg": {
+    "BM": 64,
+    "BH": 64,
+    "num_warps": 4,
+    "num_stages": 2,
+    "IL": 1
+   },
+   "status": "certified",
+   "evidence": "AF3 trunk qualification 2026-09-11 (H100 80GB HBM3 (cc 9.0), torch 2.10.0+cu128 / triton 3.6.0; the kernel's own sm_90 settings): on real 800- and 2 000-token pair-transition activations and random rows the caller-level result x + mask*T(x) is within one bf16 ulp of the engine's LN/Linear/SiLU-mul/Linear/mul/add statements on <= 2e-3 of the elements, at the same float64 distance as those statements; structure panel PASS in an AF3 kit's fast-line full compound",
+   "note": "AF3 pair transition (c_z=128, n=4): mask + residual folded, written in place by the kits' PairBlock cell"
+  },
+  {
+   "id": "r89",
+   "impl": "fpf",
+   "piece": "transition",
+   "key": [
+    64,
+    128
+   ],
+   "cc": "9.0",
+   "triton": "*",
+   "variant": "v2_fold",
+   "cfg": {
+    "BM": 64,
+    "BH": 32,
+    "num_warps": 4,
+    "num_stages": 3,
+    "IL": 0
+   },
+   "status": "certified",
+   "evidence": "AF3 trunk qualification 2026-09-11 (H100 80GB HBM3 (cc 9.0), torch 2.10.0+cu128 / triton 3.6.0; the kernel's own sm_90 settings): on real 800- and 2 000-token pair-transition activations and random rows the caller-level result x + mask*T(x) is within one bf16 ulp of the engine's LN/Linear/SiLU-mul/Linear/mul/add statements on <= 2e-3 of the elements, at the same float64 distance as those statements; structure panel PASS in an AF3 kit's fast-line full compound",
+   "note": "template pair transition (c=64, n=2)"
+  },
+  {
+   "id": "r90",
+   "impl": "fpf",
+   "piece": "transition",
+   "key": [
+    64,
+    256
+   ],
+   "cc": "9.0",
+   "triton": "*",
+   "variant": "v2_fold",
+   "cfg": {
+    "BM": 64,
+    "BH": 64,
+    "num_warps": 4,
+    "num_stages": 2,
+    "IL": 0
+   },
+   "status": "certified",
+   "evidence": "AF3 trunk qualification 2026-09-11 (H100 80GB HBM3 (cc 9.0), torch 2.10.0+cu128 / triton 3.6.0; the kernel's own sm_90 settings): on real 800- and 2 000-token pair-transition activations and random rows the caller-level result x + mask*T(x) is within one bf16 ulp of the engine's LN/Linear/SiLU-mul/Linear/mul/add statements on <= 2e-3 of the elements, at the same float64 distance as those statements; structure panel PASS in an AF3 kit's fast-line full compound",
+   "note": "MSA transition (c_m=64, n=4)"
+  },
+  {
+   "id": "r91",
+   "impl": "fpf",
+   "piece": "prologue",
+   "key": [
+    64,
+    4,
+    32
+   ],
+   "cc": "8.0",
+   "triton": "*",
+   "variant": "v3",
+   "cfg": {
+    "BI": 8,
+    "BJ": 16,
+    "num_warps": 4,
+    "num_stages": 2
+   },
+   "status": "certified",
+   "evidence": "A100 qualification 2026-09-11 (NVIDIA A100-SXM4-80GB (cc 8.0), torch 2.13.0+cu130 / triton 3.7.1; PF.tri_attn_block with this row under OPT_CORE_PF_ALLOW_CANDIDATE=1 against PF's own torch statements and an fp64 evaluation of them): 24 identity cases (N 200 / 256 / 384 / 512 / 768 / 1024; starting + ending node; masked + unmasked; ln fused + stock): fp64-error ratio fused-block / torch-bf16-statements 1.21-1.22 under ln='fused' and 1.05 under ln='stock' (unmasked, N <= 256; the same class as this key's 9.0 rows r11 / r21 on the same inputs), max |fpf - torch| <= 0.0156 (fused) / 0.0078 (stock) bf16 at every N, self-det 3/3 every case; whole block fused / torch ms: N=512s 2.18 / 3.74, N=768s 5.41 / 9.13, N=1024s 11.00 / 17.85, N=1024e 18.95 / 26.21 (x1.4-1.7); the settings are the 9.0 rows' (BI 8 / BJ 16 prologue, BI 16 / BJ 8 epilogue: inside sm_80 shared memory, no retune measured) (prologue v3, with the epilogue row r92 behind the flash_triattn core)",
+   "note": "template pairformer (c=64, 4x32)"
+  },
+  {
+   "id": "r92",
+   "impl": "fpf",
+   "piece": "epilogue",
+   "key": [
+    64,
+    4,
+    32
+   ],
+   "cc": "8.0",
+   "triton": "*",
+   "variant": "v2",
+   "cfg": {
+    "KVER": 2,
+    "BI": 16,
+    "BJ": 8,
+    "num_warps": 4,
+    "num_stages": 1,
+    "EXP": "libdevice"
+   },
+   "status": "certified",
+   "evidence": "A100 qualification 2026-09-11 (NVIDIA A100-SXM4-80GB (cc 8.0), torch 2.13.0+cu130 / triton 3.7.1; PF.tri_attn_block with this row under OPT_CORE_PF_ALLOW_CANDIDATE=1 against PF's own torch statements and an fp64 evaluation of them): 24 identity cases (N 200 / 256 / 384 / 512 / 768 / 1024; starting + ending node; masked + unmasked; ln fused + stock): fp64-error ratio fused-block / torch-bf16-statements 1.21-1.22 under ln='fused' and 1.05 under ln='stock' (unmasked, N <= 256; the same class as this key's 9.0 rows r11 / r21 on the same inputs), max |fpf - torch| <= 0.0156 (fused) / 0.0078 (stock) bf16 at every N, self-det 3/3 every case; whole block fused / torch ms: N=512s 2.18 / 3.74, N=768s 5.41 / 9.13, N=1024s 11.00 / 17.85, N=1024e 18.95 / 26.21 (x1.4-1.7); the settings are the 9.0 rows' (BI 8 / BJ 16 prologue, BI 16 / BJ 8 epilogue: inside sm_80 shared memory, no retune measured) (epilogue v2, behind the prologue row r91 + flash_triattn core: the block numbers above are this pair)",
+   "note": "template pairformer (c=64, 4x32)"
+  },
+  {
+   "id": "r93",
+   "impl": "fpf",
+   "piece": "transition",
+   "key": [
+    64,
+    128
+   ],
+   "cc": "8.0",
+   "triton": "*",
+   "variant": "v1",
+   "cfg": {
+    "BM": 128,
+    "BH": 128,
+    "num_warps": 8,
+    "num_stages": 1,
+    "IL": 0
+   },
+   "status": "certified",
+   "evidence": "A100 qualification 2026-09-11 (NVIDIA A100-SXM4-80GB (cc 8.0), torch 2.13.0+cu130 / triton 3.7.1; PF.transition impl='fpf' with this row under OPT_CORE_PF_ALLOW_CANDIDATE=1): N 200-1024 on [1, N, N, 64] bf16: under ln='stock' BITWISE == the torch bf16 statements at every N (ratio 1.000); under ln='fused' ratio 1.13 (max |diff| 0.047-0.055 bf16; the same class as the 9.0 row r26 on the same inputs), self-det 3/3; fused / statements ms: N=512 0.375 / 0.505, N=768 0.603 / 0.992, N=1024 0.908 / 1.692 (x1.3-1.9; below N 384 the statements are as fast); the settings are the 9.0 row's (BM 128 / BH 128 / 8 warps / 1 stage: inside sm_80 shared memory)",
+   "note": "template pair transition (c=64, n=2)"
+  },
+  {
+   "id": "r94",
+   "impl": "fpf",
+   "piece": "prologue",
+   "key": [
+    256,
+    8,
+    32
+   ],
+   "cc": "10.0",
+   "triton": "*",
+   "variant": "v3",
+   "cfg": {
+    "BI": 16,
+    "BJ": 16,
+    "num_warps": 8,
+    "num_stages": 2
+   },
+   "status": "candidate",
+   "evidence": "the carried fpf_triatt_pro v3 prologue's PINNED_CONFIG cell ((256, 256, 'sm100')) the donor kit shipped for this card since kit releases 0.3.4x (bitwise to the stock statements within the block statement, det byte-identical end to end) || RACED 2026-09-12 on NVIDIA B200 (cc 10.0, torch 2.13.0+cu130 / triton 3.7.1, opt_core 0.5.149.0 tree; op-level: this row under OPT_CORE_PF_ALLOW_CANDIDATE=1 vs the stock statements (torch) of the prologue piece, key (256,8,32), bf16, both ending nodes, CUDA-event median of 20 calls after 3 warm-ups, one process): this cfg vs statements ms N=400 0.305 vs 0.127; N=400(end) 0.306 vs 0.128; N=800 0.905 vs 0.410; N=800(end) 0.905 vs 0.411; N=1200 1.991 vs 0.919; N=1200(end) 2.036 vs 0.920; N=1536 3.173 vs 1.511; N=1536(end) 3.275 vs 1.508; N=2048 5.553 vs 2.688; N=2048(end) 5.547 vs 2.685; torch.equal vs the statements TRUE (max-abs 0) at every N; statements/row = x0.42..x0.48 -> STAYS CANDIDATE: bitwise but SLOWER than the statements at every N on this capability (the fused prologue at c_z 256 loses to the statements here, as the cc-8.0 safe-settings record found for c_z 256); not admitted without the candidate switch",
+   "provenance": "lifted verbatim from the donor kit (the c_z-256, 8-head x 32 pairformer kit)'s CELLS.json prologue pin (256, 256, 'sm100') (FPF-Blackwell 2fc6f8e6 cell sweep; kit releases 0.3.4x B200/B300/RTX-PRO-6000/A100 rows, det byte-identical within the block statement on those cards); not yet re-measured for this table"
+  },
+  {
+   "id": "r95",
+   "impl": "fpf",
+   "piece": "prologue",
+   "key": [
+    256,
+    8,
+    32
+   ],
+   "cc": "12.0",
+   "triton": "*",
+   "variant": "v3",
+   "cfg": {
+    "BI": 4,
+    "BJ": 16,
+    "num_warps": 4,
+    "num_stages": 2
+   },
+   "status": "candidate",
+   "evidence": "the carried fpf_triatt_pro v3 prologue's PINNED_CONFIG cell ((256, 256, 'sm120')) the donor kit shipped for this card since kit releases 0.3.4x (bitwise to the stock statements within the block statement, det byte-identical end to end) || HELD AS CANDIDATE (opt-in under the candidate switch OPT_CORE_PF_ALLOW_CANDIDATE=1, e.g. by the kit that shipped the cell) until the same-box race against the certified rows / the stock statements on this capability is run here: a row added from a kit's own cell table does not change what the tier words serve on the certified capabilities (the land decisions stay as certified; on cc 8.0 the safe-settings record measures c_z 256 slower than stock) (not raced here: no such part in this pass; stays candidate)",
+   "provenance": "lifted verbatim from the donor kit (the c_z-256, 8-head x 32 pairformer kit)'s CELLS.json prologue pin (256, 256, 'sm120') (FPF-Blackwell 2fc6f8e6 cell sweep; kit releases 0.3.4x B200/B300/RTX-PRO-6000/A100 rows, det byte-identical within the block statement on those cards); not yet re-measured for this table"
+  },
+  {
+   "id": "r96",
+   "impl": "fpf",
+   "piece": "prologue",
+   "key": [
+    256,
+    8,
+    32
+   ],
+   "cc": "10.3",
+   "triton": "*",
+   "variant": "v3",
+   "cfg": {
+    "BI": 16,
+    "BJ": 16,
+    "num_warps": 8,
+    "num_stages": 1
+   },
+   "status": "candidate",
+   "evidence": "the carried fpf_triatt_pro v3 prologue's PINNED_CONFIG cell ((256, 256, 'sm103')) the donor kit shipped for this card since kit releases 0.3.4x (bitwise to the stock statements within the block statement, det byte-identical end to end) || RACED 2026-09-12 on NVIDIA B300 SXM6 AC (cc 10.3, torch 2.13.0+cu130 / triton 3.7.1, opt_core 0.5.149.0 tree; op-level: this row under OPT_CORE_PF_ALLOW_CANDIDATE=1 vs the stock statements (torch) of the prologue piece, key (256,8,32), bf16, both ending nodes, CUDA-event median of 20 calls after 3 warm-ups, one process): this cfg vs statements ms N=400 0.391 vs 0.152; N=400(end) 0.386 vs 0.152; N=800 0.964 vs 0.418; N=800(end) 0.969 vs 0.427; N=1200 2.051 vs 0.869; N=1200(end) 2.002 vs 0.874; N=1536 3.114 vs 1.394; N=1536(end) 3.143 vs 1.398; N=2048 5.379 vs 2.545; N=2048(end) 5.369 vs 2.462; torch.equal vs the statements TRUE (max-abs 0) at every N; statements/row = x0.39..x0.47 -> STAYS CANDIDATE: bitwise but SLOWER than the statements at every N on this capability (the fused prologue at c_z 256 loses to the statements here, as the cc-8.0 safe-settings record found for c_z 256); not admitted without the candidate switch",
+   "provenance": "lifted verbatim from the donor kit (the c_z-256, 8-head x 32 pairformer kit)'s CELLS.json prologue pin (256, 256, 'sm103') (FPF-Blackwell 2fc6f8e6 cell sweep; kit releases 0.3.4x B200/B300/RTX-PRO-6000/A100 rows, det byte-identical within the block statement on those cards); not yet re-measured for this table"
+  },
+  {
+   "id": "r97",
+   "impl": "fpf",
+   "piece": "epilogue",
+   "key": [
+    256,
+    8,
+    32
+   ],
+   "cc": "10.0",
+   "triton": "*",
+   "variant": "v2",
+   "cfg": {
+    "KVER": 2,
+    "BI": 8,
+    "BJ": 16,
+    "num_warps": 8,
+    "num_stages": 1,
+    "EXP": "libdevice"
+   },
+   "status": "certified",
+   "evidence": "the carried fpf_triatt_epi v2 epilogue's PINNED_CONFIG cell ((256, 8, 32, 'sm100')) the donor kit shipped for this card (bitwise within the block statement) || RACED 2026-09-12 on NVIDIA B200 (cc 10.0, torch 2.13.0+cu130 / triton 3.7.1, opt_core 0.5.149.0 tree; op-level: this row under OPT_CORE_PF_ALLOW_CANDIDATE=1 vs the stock statements (torch) of the epilogue piece, key (256,8,32), bf16, both ending nodes, CUDA-event median of 20 calls after 3 warm-ups, one process): this cfg vs statements ms N=400 0.176 vs 0.727; N=400(end) 0.174 vs 0.728; N=800 0.557 vs 2.788; N=800(end) 0.557 vs 2.786; N=1200 1.186 vs 6.220; N=1200(end) 1.188 vs 6.219; N=1536 1.782 vs 10.203; N=1536(end) 1.780 vs 10.203; N=2048 3.124 vs 18.046; N=2048(end) 3.128 vs 18.044; torch.equal vs the statements TRUE (max-abs 0) at every N; statements/row = x4.14..x5.78 -> CERTIFIED (bitwise and x4.1-5.8 faster than the statements on this capability)",
+   "provenance": "lifted verbatim from the donor kit (the c_z-256, 8-head x 32 pairformer kit)'s CELLS.json epilogue pin (256, 8, 32, 'sm100') (FPF-Blackwell 2fc6f8e6 cell sweep; kit releases 0.3.4x B200/B300/RTX-PRO-6000/A100 rows, det byte-identical within the block statement on those cards); not yet re-measured for this table"
+  },
+  {
+   "id": "r98",
+   "impl": "fpf",
+   "piece": "epilogue",
+   "key": [
+    256,
+    8,
+    32
+   ],
+   "cc": "12.0",
+   "triton": "*",
+   "variant": "v2",
+   "cfg": {
+    "KVER": 1,
+    "BI": 8,
+    "BJ": 4,
+    "num_warps": 4,
+    "num_stages": 1,
+    "EXP": "libdevice"
+   },
+   "status": "candidate",
+   "evidence": "the carried fpf_triatt_epi v2 epilogue's PINNED_CONFIG cell ((256, 8, 32, 'sm120')) the donor kit shipped for this card (bitwise within the block statement) || HELD AS CANDIDATE (opt-in under the candidate switch OPT_CORE_PF_ALLOW_CANDIDATE=1, e.g. by the kit that shipped the cell) until the same-box race against the certified rows / the stock statements on this capability is run here: a row added from a kit's own cell table does not change what the tier words serve on the certified capabilities (the land decisions stay as certified; on cc 8.0 the safe-settings record measures c_z 256 slower than stock) (not raced here: no such part in this pass; stays candidate)",
+   "provenance": "lifted verbatim from the donor kit (the c_z-256, 8-head x 32 pairformer kit)'s CELLS.json epilogue pin (256, 8, 32, 'sm120') (FPF-Blackwell 2fc6f8e6 cell sweep; kit releases 0.3.4x B200/B300/RTX-PRO-6000/A100 rows, det byte-identical within the block statement on those cards); not yet re-measured for this table"
+  },
+  {
+   "id": "r99",
+   "impl": "fpf",
+   "piece": "epilogue",
+   "key": [
+    256,
+    8,
+    32
+   ],
+   "cc": "10.3",
+   "triton": "*",
+   "variant": "v2",
+   "cfg": {
+    "KVER": 2,
+    "BI": 8,
+    "BJ": 16,
+    "num_warps": 8,
+    "num_stages": 1,
+    "EXP": "libdevice"
+   },
+   "status": "certified",
+   "evidence": "the carried fpf_triatt_epi v2 epilogue's PINNED_CONFIG cell ((256, 8, 32, 'sm103')) the donor kit shipped for this card (bitwise within the block statement) || RACED 2026-09-12 on NVIDIA B300 SXM6 AC (cc 10.3, torch 2.13.0+cu130 / triton 3.7.1, opt_core 0.5.149.0 tree; op-level: this row under OPT_CORE_PF_ALLOW_CANDIDATE=1 vs the stock statements (torch) of the epilogue piece, key (256,8,32), bf16, both ending nodes, CUDA-event median of 20 calls after 3 warm-ups, one process): this cfg vs statements ms N=400 0.226 vs 0.727; N=400(end) 0.226 vs 0.726; N=800 0.596 vs 2.761; N=800(end) 0.607 vs 2.756; N=1200 1.217 vs 6.131; N=1200(end) 1.220 vs 6.134; N=1536 1.785 vs 10.054; N=1536(end) 1.782 vs 10.052; N=2048 3.083 vs 17.755; N=2048(end) 3.086 vs 17.761; torch.equal vs the statements TRUE (max-abs 0) at every N; statements/row = x3.21..x5.76 -> CERTIFIED (bitwise and x3.2-5.8 faster than the statements on this capability)",
+   "provenance": "lifted verbatim from the donor kit (the c_z-256, 8-head x 32 pairformer kit)'s CELLS.json epilogue pin (256, 8, 32, 'sm103') (FPF-Blackwell 2fc6f8e6 cell sweep; kit releases 0.3.4x B200/B300/RTX-PRO-6000/A100 rows, det byte-identical within the block statement on those cards); not yet re-measured for this table"
+  },
+  {
+   "id": "r100",
+   "impl": "fpf",
+   "piece": "epilogue",
+   "key": [
+    256,
+    8,
+    32
+   ],
+   "cc": "8.0",
+   "triton": "*",
+   "variant": "v2",
+   "cfg": {
+    "KVER": 2,
+    "BI": 16,
+    "BJ": 8,
+    "num_warps": 8,
+    "num_stages": 1,
+    "EXP": "libdevice"
+   },
+   "status": "candidate",
+   "evidence": "the carried fpf_triatt_epi v2 epilogue's PINNED_CONFIG cell ((256, 8, 32, 'sm80')) the donor kit shipped for this card (bitwise within the block statement) || HELD AS CANDIDATE (opt-in under the candidate switch OPT_CORE_PF_ALLOW_CANDIDATE=1, e.g. by the kit that shipped the cell) until the same-box race against the certified rows / the stock statements on this capability is run here: a row added from a kit's own cell table does not change what the tier words serve on the certified capabilities (the land decisions stay as certified; on cc 8.0 the safe-settings record measures c_z 256 slower than stock) [card: the cc 8.0 part is the A100 (sm_80) the kit's cell names] || RACED here (NVIDIA A100-SXM4-80GB (cc 8.0), torch 2.13.0+cu130 / triton 3.7.1, table 0.5.148.3; op-level ABBA (2 warm-up + 5 timed rounds interleaved, CUDA events), bf16, key 256x8x32, pair N 400 / 800 / 1200, TF32 off), STAYS CANDIDATE: the v2 epilogue at c 256 on this capability is x0.129 / x0.129 / x0.128 vs the plain statements (15.4 vs 1.99, 55.0 vs 7.08, 123.0 vs 15.75 ms) \u2014 the measured-slower class the safe-settings record names; epilogue_v3 (r103) serves this key",
+   "provenance": "lifted verbatim from the donor kit (the c_z-256, 8-head x 32 pairformer kit)'s CELLS.json epilogue pin (256, 8, 32, 'sm80') (FPF-Blackwell 2fc6f8e6 cell sweep; kit releases 0.3.4x B200/B300/RTX-PRO-6000/A100 rows, det byte-identical within the block statement on those cards); not yet re-measured for this table"
+  },
+  {
+   "id": "r101",
+   "impl": "fpf",
+   "piece": "prologue",
+   "key": [
+    256,
+    8,
+    32
+   ],
+   "cc": "9.0",
+   "triton": "3.7",
+   "variant": "v3",
+   "cfg": {
+    "BI": 16,
+    "BJ": 16,
+    "num_warps": 8,
+    "num_stages": 1
+   },
+   "status": "candidate",
+   "evidence": "the kit's CELLS.json by_triton[3.7] overlay of the v3 prologue cell ((256, 256, 'H100')): triton 3.7 per-call finding (two images of that triton line), det byte-identical || HELD AS CANDIDATE (opt-in under the candidate switch OPT_CORE_PF_ALLOW_CANDIDATE=1, e.g. by the kit that shipped the cell) until the same-box race against the certified rows / the stock statements on this capability is run here: a row added from a kit's own cell table does not change what the tier words serve on the certified capabilities (the land decisions stay as certified; on cc 8.0 the safe-settings record measures c_z 256 slower than stock) (not raced here: no such part in this pass; stays candidate)",
+   "provenance": "lifted verbatim from the donor kit (the c_z-256, 8-head x 32 pairformer kit)'s CELLS.json by_triton[3.7].prologue pin (256, 256, 'H100') (FPF-Blackwell 2fc6f8e6 cell sweep; kit releases 0.3.4x B200/B300/RTX-PRO-6000/A100 rows, det byte-identical within the block statement on those cards); not yet re-measured for this table"
+  },
+  {
+   "id": "r102",
+   "impl": "fpf",
+   "piece": "prologue",
+   "key": [
+    256,
+    8,
+    32
+   ],
+   "cc": "8.0",
+   "triton": "3.7",
+   "variant": "prologue_v4",
+   "cfg": {
+    "BI": 8,
+    "BJ": 8,
+    "num_warps": 8,
+    "num_stages": 1,
+    "BN": 64,
+    "NUM_STAGES_W": 2,
+    "WS": 0,
+    "GLOOP": 1
+   },
+   "status": "candidate",
+   "evidence": "fpf_glue_v2 GLUE_CELLS.json v2.2 entry sm80_t37 (prologue_v4 BN=64, 2-stage W pipeline, no warp_specialize: within sm_80's 164 KB shared memory): EXACT within the composed block statement from CELLS.json blk2_triatt_min_tokens up: --det 1 predictions byte-identical to --mode off at 400 and 956 tokens with MK-PF F1 as the statement's prologue (below the floor the unit runs the stock tri-attention statement by name) || HELD AS CANDIDATE (opt-in under the candidate switch OPT_CORE_PF_ALLOW_CANDIDATE=1, e.g. by the kit that shipped the cell) until the same-box race against the certified rows / the stock statements on this capability is run here: a row added from a kit's own cell table does not change what the tier words serve on the certified capabilities (the land decisions stay as certified; on cc 8.0 the safe-settings record measures c_z 256 slower than stock) [card: the cc 8.0 part is the A100 (sm_80) the kit's cell names] || RACED here (NVIDIA A100-SXM4-80GB (cc 8.0), torch 2.13.0+cu130 / triton 3.7.1, table 0.5.148.3; op-level ABBA (2 warm-up + 5 timed rounds interleaved, CUDA events), bf16, key 256x8x32, pair N 400 / 800 / 1200, TF32 off), STAYS CANDIDATE: prologue piece in the ln='stock' form (x_ln given) is SLOWER than the plain statements: x0.688 / x0.694 / x0.707 at N 400 / 800 / 1200 (1.14 vs 0.78, 3.39 vs 2.35, 7.55 vs 5.34 ms) and takes more memory (396 / 1584 / 3561 MiB vs 320 / 1279 / 2878); the whole block in that form (this prologue + epilogue_v3) is nevertheless x1.22-1.27 faster than the statements block because of the epilogue \u2014 a caller that wants that composition opts in through the candidate switch; numerics bf16 tolerance vs the statements (max-abs 3.1e-2, rel-RMS 2.7e-3)",
+   "provenance": "lifted verbatim from the donor kit (the c_z-256, 8-head x 32 pairformer kit)'s former sm80 cell tables (kit release 0.3.43, A1 A100 pass: NVIDIA A100-SXM4-80GB cc 8.0, torch 2.13.0+cu130 / triton 3.7.1 / cuequivariance 0.11.1; --det 1 predictions byte-identical to --mode off end to end at 400 and 956 tokens inside the composed block statement); not yet re-measured for this table"
+  },
+  {
+   "id": "r103",
+   "impl": "fpf",
+   "piece": "epilogue",
+   "key": [
+    256,
+    8,
+    32
+   ],
+   "cc": "8.0",
+   "triton": "3.7",
+   "variant": "epilogue_v3",
+   "cfg": {
+    "BI": 16,
+    "BJ": 8,
+    "num_warps": 8,
+    "num_stages": 1,
+    "KC": 32,
+    "NUM_STAGES_K": 2,
+    "WS": 0
+   },
+   "status": "certified",
+   "evidence": "fpf_glue_v2 GLUE_CELLS.json v2.2 entry sm80_t37 (epilogue_v3 K-chunk loop KC=32, 2-stage): EXACT within the composed block statement from CELLS.json blk2_triatt_min_tokens up: --det 1 predictions byte-identical to --mode off at 400 and 956 tokens with MK-PF F1 as the statement's prologue (below the floor the unit runs the stock tri-attention statement by name) || RACED AND CERTIFIED here (NVIDIA A100-SXM4-80GB (cc 8.0), torch 2.13.0+cu130 / triton 3.7.1, table 0.5.148.3; op-level ABBA (2 warm-up + 5 timed rounds interleaved, CUDA events), bf16, key 256x8x32, pair N 400 / 800 / 1200, TF32 off): epilogue piece (o in the core's ihjd layout, op mode) vs the plain statements (lnl gate_transpose is named off not-measured at c 256 on this capability): x2.256 / x2.854 / x2.926 at N 400 / 800 / 1200 (0.88 vs 1.99, 2.48 vs 7.08, 5.38 vs 15.75 ms; no IQR overlap), peak 156 / 626 / 1407 MiB vs 547 / 2192 / 4922; numerics class here = bf16 tolerance vs the statements (max-abs 7.8e-3-1.6e-2, rel-RMS 2.8e-3); the older v2 epilogue at this key on this capability is x0.13 (the safe-settings record's 'c_z above 128 slower than stock' is that kernel, not this one)",
+   "provenance": "lifted verbatim from the donor kit (the c_z-256, 8-head x 32 pairformer kit)'s former sm80 cell tables (kit release 0.3.43, A1 A100 pass: NVIDIA A100-SXM4-80GB cc 8.0, torch 2.13.0+cu130 / triton 3.7.1 / cuequivariance 0.11.1; --det 1 predictions byte-identical to --mode off end to end at 400 and 956 tokens inside the composed block statement); not yet re-measured for this table"
+  },
+  {
+   "id": "r104",
+   "impl": "fpf",
+   "piece": "prologue",
+   "key": [
+    256,
+    8,
+    32
+   ],
+   "cc": "8.0",
+   "triton": "3.7",
+   "variant": "mkpf_f1",
+   "cfg": {
+    "BI": 8,
+    "BJ": 8,
+    "num_warps": 8,
+    "num_stages": 1,
+    "BN": 64,
+    "NUM_STAGES_W": 2,
+    "WS": 0,
+    "GROUP_I": 0,
+    "ln_arith": "welford",
+    "fma_flags": [
+     1,
+     1,
+     1
+    ]
+   },
+   "status": "certified",
+   "evidence": "fpf_mkpf MKPF_CELLS.json v0.3 entry sm80_t37: EXACT (--det 1 predictions byte-identical to --mode off end to end at 400 and 956 tokens on A100-SXM4-80GB, torch 2.13 / triton 3.7.1, inside the composed block statement from CELLS.json blk2_triatt_min_tokens up) || RACED AND CERTIFIED here (NVIDIA A100-SXM4-80GB (cc 8.0), torch 2.13.0+cu130 / triton 3.7.1, table 0.5.148.3; op-level ABBA (2 warm-up + 5 timed rounds interleaved, CUDA events), bf16, key 256x8x32, pair N 400 / 800 / 1200, TF32 off): prologue piece, LN in-kernel form (ln='fused'), vs the plain statements an engine's stock block runs (the lnl pieces are named off not-measured at c_z 256 on this capability): x1.235 / x1.348 / x1.375 at N 400 / 800 / 1200 (1.35 vs 1.66, 4.03 vs 5.43, 8.85 vs 12.16 ms; IQRs <= 0.04 ms, no overlap), peak 396 / 1585 / 3561 MiB vs 554 / 2219 / 4988; numerics class here = bf16 tolerance vs the statements (max-abs 3.1e-2, rel-RMS 3.6e-3; the kit's byte claim is against its own composed statement under its det settings, not re-checked here); whole block (this prologue + epilogue_v3 + flash core) x1.36-1.45 vs the statements block in the same form",
+   "provenance": "lifted verbatim from the donor kit (the c_z-256, 8-head x 32 pairformer kit)'s former sm80 cell tables (kit release 0.3.43, A1 A100 pass: NVIDIA A100-SXM4-80GB cc 8.0, torch 2.13.0+cu130 / triton 3.7.1 / cuequivariance 0.11.1; --det 1 predictions byte-identical to --mode off end to end at 400 and 956 tokens inside the composed block statement); not yet re-measured for this table"
+  },
+  {
+   "id": "r105",
+   "impl": "fpf",
+   "piece": "transition",
+   "key": [
+    64,
+    256
+   ],
+   "cc": "8.0",
+   "triton": "*",
+   "variant": "v1",
+   "cfg": {
+    "BM": 128,
+    "BH": 128,
+    "num_warps": 8,
+    "num_stages": 1,
+    "IL": 0
+   },
+   "status": "certified",
+   "evidence": "No-regression audit (NVIDIA A100-SXM4-40GB (cc 8.0), torch 2.10.0+cu128 / triton 3.6.0): data-only row, settings INHERITED from the 8.0 [64,128] row r93 / the 9.0 v1 rows (BM 128 / BH 128 / 8 warps / 1 stage: inside sm_80 shared memory); no settings sweep of this key on 8.0 (the 9.0 v1 [64,256] row r27 is a candidate; 9.0 / 10.x serve this key through v2_fold r90 by per-key inheritance, which 8.0 cannot take: it is the lowest measured column). Basis: the old head cda988f8a5ed (opt_core 0.5.18.20, the AF3-reimplementation kit 0.8.13.10) served this shape with fpf v1 on that card in the audit's paired run (box-1, the AF3-reimplementation kit's fast mode, exact_ladder_v4 n0400_43ls__0w+__1: census `LEVER name=pair_transition state=on served=427 fallback=0 impl=fpf`, rc 0, structures 10/10) while the release tip (opt_core 0.5.161.0 and 0.5.166.0 alike) steps aside by name (`fallback:no-cell:fpf:transition:64x256:8.0|3.6+off(not-measured)=25`): the no-regression rule (old served a kernel -> new must); the confirming run on box-1 followed",
+   "provenance": "inherited:8.0:r93+9.0:v1 settings; noreg-cards (the AF3-reimplementation kit's A100-40GB no-regression note)",
+   "note": "MSA-module pair-stack transition (c=64, n=4)"
+  }
+ ],
+ "named_off": [
+  {
+   "id": "off01",
+   "impl": "lnl",
+   "piece": "*",
+   "key": "*",
+   "cc": "10.0",
+   "off": "not-measured",
+   "evidence": "no lnl row on cc 10.0: the measured B200 arms of the lnl callers (the gated-flash / tensor-trunk modes) run the stock statements for every lnl piece there; engaging owes a measurement (R4 measured-off)"
+  },
+  {
+   "id": "off02",
+   "impl": "lnl",
+   "piece": "*",
+   "key": "*",
+   "cc": "10.3",
+   "off": "not-measured",
+   "evidence": "no lnl row on cc 10.3: the measured B300 arms of the lnl callers (the gated-flash / tensor-trunk modes) run the stock statements for every lnl piece there; engaging owes a measurement (R4 measured-off)"
+  },
+  {
+   "id": "off03",
+   "impl": "fpf",
+   "piece": "prologue",
+   "variant": "v3_fp32z",
+   "key": "*",
+   "cc": "*",
+   "off": "not-measured",
+   "evidence": "fp32 pair tensor with ln='fused' (v3 kernel, LN_MODE=1): candidate rows only (no fp32 qualification rows yet); every certified fp32-trunk arm runs the stock prologue statements"
+  },
+  {
+   "id": "off04",
+   "impl": "fpf",
+   "piece": "transition",
+   "variant": "v1_fp32x",
+   "key": "*",
+   "cc": "*",
+   "off": "not-measured",
+   "evidence": "fp32 transition input with ln='fused' (v1 kernel on an fp32 pointer): candidate rows only (no fp32 qualification rows yet); every certified fp32-trunk arm runs the stock transition statements"
+  },
+  {
+   "id": "off05",
+   "impl": "fpf",
+   "piece": "epilogue",
+   "key": [
+    64,
+    2,
+    32
+   ],
+   "cc": "10.0",
+   "off": "not-measured",
+   "evidence": "template pair stack (c=64, 2x32): no certified cell on cc 10.0 (B200); certified arms meeting it there run the stock statements today; engaging the SAFE settings owes a measurement (R4 measured-off)"
+  },
+  {
+   "id": "off06",
+   "impl": "fpf",
+   "piece": "epilogue",
+   "key": [
+    64,
+    4,
+    32
+   ],
+   "cc": "10.0",
+   "off": "not-measured",
+   "evidence": "template pairformer (c=64, 4x32): no certified cell on cc 10.0 (B200); certified arms meeting it there run the stock statements today; engaging the SAFE settings owes a measurement (R4 measured-off)"
+  },
+  {
+   "id": "off07",
+   "impl": "fpf",
+   "piece": "epilogue",
+   "key": [
+    64,
+    4,
+    64
+   ],
+   "cc": "10.0",
+   "off": "not-measured",
+   "evidence": "c=64 4x64 pair stack: no certified cell on cc 10.0 (B200); certified arms meeting it there run the stock statements today; engaging the SAFE settings owes a measurement (R4 measured-off)"
+  },
+  {
+   "id": "off08",
+   "impl": "fpf",
+   "piece": "epilogue",
+   "key": [
+    128,
+    8,
+    32
+   ],
+   "cc": "10.0",
+   "off": "not-measured",
+   "evidence": "spare 8-head variant (c_z=128, 8x32): no certified cell on cc 10.0 (B200); certified arms meeting it there run the stock statements today; engaging the SAFE settings owes a measurement (R4 measured-off)"
+  },
+  {
+   "id": "off09",
+   "impl": "fpf",
+   "piece": "epilogue",
+   "key": [
+    256,
+    4,
+    64
+   ],
+   "cc": "10.0",
+   "off": "not-measured",
+   "evidence": "c_z=256 4x64 pair stack: no certified cell on cc 10.0 (B200); certified arms meeting it there run the stock statements today; engaging the SAFE settings owes a measurement (R4 measured-off)"
+  },
+  {
+   "id": "off10",
+   "impl": "fpf",
+   "piece": "epilogue",
+   "key": [
+    256,
+    8,
+    32
+   ],
+   "cc": "10.0",
+   "off": "not-measured",
+   "evidence": "c_z=256 trunk (8x32): no certified cell on cc 10.0 (B200); certified arms meeting it there run the stock statements today; engaging the SAFE settings owes a measurement (R4 measured-off)"
+  },
+  {
+   "id": "off11",
+   "impl": "fpf",
+   "piece": "prologue",
+   "key": [
+    64,
+    2,
+    32
+   ],
+   "cc": "10.0",
+   "off": "not-measured",
+   "evidence": "template pair stack (c=64, 2x32): no certified cell on cc 10.0 (B200); certified arms meeting it there run the stock statements today; engaging the SAFE settings owes a measurement (R4 measured-off)"
+  },
+  {
+   "id": "off12",
+   "impl": "fpf",
+   "piece": "prologue",
+   "key": [
+    64,
+    4,
+    32
+   ],
+   "cc": "10.0",
+   "off": "not-measured",
+   "evidence": "template pairformer (c=64, 4x32): no certified cell on cc 10.0 (B200); certified arms meeting it there run the stock statements today; engaging the SAFE settings owes a measurement (R4 measured-off)"
+  },
+  {
+   "id": "off13",
+   "impl": "fpf",
+   "piece": "prologue",
+   "key": [
+    64,
+    4,
+    64
+   ],
+   "cc": "10.0",
+   "off": "not-measured",
+   "evidence": "c=64 4x64 pair stack: no certified cell on cc 10.0 (B200); certified arms meeting it there run the stock statements today; engaging the SAFE settings owes a measurement (R4 measured-off)"
+  },
+  {
+   "id": "off14",
+   "impl": "fpf",
+   "piece": "prologue",
+   "key": [
+    128,
+    8,
+    32
+   ],
+   "cc": "10.0",
+   "off": "not-measured",
+   "evidence": "spare 8-head variant (c_z=128, 8x32): no certified cell on cc 10.0 (B200); certified arms meeting it there run the stock statements today; engaging the SAFE settings owes a measurement (R4 measured-off)"
+  },
+  {
+   "id": "off15",
+   "impl": "fpf",
+   "piece": "prologue",
+   "key": [
+    256,
+    4,
+    64
+   ],
+   "cc": "10.0",
+   "off": "not-measured",
+   "evidence": "c_z=256 4x64 pair stack: no certified cell on cc 10.0 (B200); certified arms meeting it there run the stock statements today; engaging the SAFE settings owes a measurement (R4 measured-off)"
+  },
+  {
+   "id": "off16",
+   "impl": "fpf",
+   "piece": "prologue",
+   "key": [
+    256,
+    8,
+    32
+   ],
+   "cc": "10.0",
+   "off": "not-measured",
+   "evidence": "c_z=256 trunk (8x32): no certified cell on cc 10.0 (B200); certified arms meeting it there run the stock statements today; engaging the SAFE settings owes a measurement (R4 measured-off)"
+  },
+  {
+   "id": "off17",
+   "impl": "fpf",
+   "piece": "transition",
+   "key": [
+    64,
+    128
+   ],
+   "cc": "10.0",
+   "off": "not-measured",
+   "evidence": "template pair transition (c=64, n=2): no certified cell on cc 10.0 (B200); certified arms meeting it there run the stock statements today; engaging the SAFE settings owes a measurement (R4 measured-off)"
+  },
+  {
+   "id": "off18",
+   "impl": "fpf",
+   "piece": "transition",
+   "key": [
+    64,
+    256
+   ],
+   "cc": "10.0",
+   "off": "not-measured",
+   "evidence": "c=64 n=4 transition (template pairformer class): no certified cell on cc 10.0 (B200); certified arms meeting it there run the stock statements today; engaging the SAFE settings owes a measurement (R4 measured-off)"
+  },
+  {
+   "id": "off19",
+   "impl": "fpf",
+   "piece": "transition",
+   "key": [
+    128,
+    256
+   ],
+   "cc": "10.0",
+   "off": "not-measured",
+   "evidence": "c=128 n=2 transition: no certified cell on cc 10.0 (B200); certified arms meeting it there run the stock statements today; engaging the SAFE settings owes a measurement (R4 measured-off)"
+  },
+  {
+   "id": "off20",
+   "impl": "fpf",
+   "piece": "transition",
+   "key": [
+    256,
+    512
+   ],
+   "cc": "10.0",
+   "off": "not-measured",
+   "evidence": "c=256 n=2 transition: no certified cell on cc 10.0 (B200); certified arms meeting it there run the stock statements today; engaging the SAFE settings owes a measurement (R4 measured-off)"
+  },
+  {
+   "id": "off21",
+   "impl": "fpf",
+   "piece": "transition",
+   "key": [
+    256,
+    1024
+   ],
+   "cc": "10.0",
+   "off": "not-measured",
+   "evidence": "c=256 n=4 transition: no certified cell on cc 10.0 (B200); certified arms meeting it there run the stock statements today; engaging the SAFE settings owes a measurement (R4 measured-off)"
+  },
+  {
+   "id": "off22",
+   "impl": "fpf",
+   "piece": "transition",
+   "key": [
+    384,
+    768
+   ],
+   "cc": "10.0",
+   "off": "not-measured",
+   "evidence": "c=384 n=2 transition (memory cell): no certified cell on cc 10.0 (B200); certified arms meeting it there run the stock statements today; engaging the SAFE settings owes a measurement (R4 measured-off)"
+  },
+  {
+   "id": "off23",
+   "impl": "fpf",
+   "piece": "transition",
+   "key": [
+    384,
+    1536
+   ],
+   "cc": "10.0",
+   "off": "not-measured",
+   "evidence": "c_s=384 single transition: no certified cell on cc 10.0 (B200); certified arms meeting it there run the stock statements today; engaging the SAFE settings owes a measurement (R4 measured-off)"
+  },
+  {
+   "id": "off24",
+   "impl": "fpf",
+   "piece": "epilogue",
+   "key": [
+    64,
+    2,
+    32
+   ],
+   "cc": "10.3",
+   "off": "not-measured",
+   "evidence": "template pair stack (c=64, 2x32): no certified cell on cc 10.3 (B300); certified arms meeting it there run the stock statements today; engaging the SAFE settings owes a measurement (R4 measured-off)"
+  },
+  {
+   "id": "off25",
+   "impl": "fpf",
+   "piece": "epilogue",
+   "key": [
+    64,
+    4,
+    32
+   ],
+   "cc": "10.3",
+   "off": "not-measured",
+   "evidence": "template pairformer (c=64, 4x32): no certified cell on cc 10.3 (B300); certified arms meeting it there run the stock statements today; engaging the SAFE settings owes a measurement (R4 measured-off)"
+  },
+  {
+   "id": "off26",
+   "impl": "fpf",
+   "piece": "epilogue",
+   "key": [
+    64,
+    4,
+    64
+   ],
+   "cc": "10.3",
+   "off": "not-measured",
+   "evidence": "c=64 4x64 pair stack: no certified cell on cc 10.3 (B300); certified arms meeting it there run the stock statements today; engaging the SAFE settings owes a measurement (R4 measured-off)"
+  },
+  {
+   "id": "off27",
+   "impl": "fpf",
+   "piece": "epilogue",
+   "key": [
+    128,
+    8,
+    32
+   ],
+   "cc": "10.3",
+   "off": "not-measured",
+   "evidence": "spare 8-head variant (c_z=128, 8x32): no certified cell on cc 10.3 (B300); certified arms meeting it there run the stock statements today; engaging the SAFE settings owes a measurement (R4 measured-off)"
+  },
+  {
+   "id": "off28",
+   "impl": "fpf",
+   "piece": "epilogue",
+   "key": [
+    256,
+    4,
+    64
+   ],
+   "cc": "10.3",
+   "off": "not-measured",
+   "evidence": "c_z=256 4x64 pair stack: no certified cell on cc 10.3 (B300); certified arms meeting it there run the stock statements today; engaging the SAFE settings owes a measurement (R4 measured-off)"
+  },
+  {
+   "id": "off29",
+   "impl": "fpf",
+   "piece": "epilogue",
+   "key": [
+    256,
+    8,
+    32
+   ],
+   "cc": "10.3",
+   "off": "not-measured",
+   "evidence": "c_z=256 trunk (8x32): no certified cell on cc 10.3 (B300); certified arms meeting it there run the stock statements today; engaging the SAFE settings owes a measurement (R4 measured-off)"
+  },
+  {
+   "id": "off30",
+   "impl": "fpf",
+   "piece": "prologue",
+   "key": [
+    64,
+    2,
+    32
+   ],
+   "cc": "10.3",
+   "off": "not-measured",
+   "evidence": "template pair stack (c=64, 2x32): no certified cell on cc 10.3 (B300); certified arms meeting it there run the stock statements today; engaging the SAFE settings owes a measurement (R4 measured-off)"
+  },
+  {
+   "id": "off31",
+   "impl": "fpf",
+   "piece": "prologue",
+   "key": [
+    64,
+    4,
+    32
+   ],
+   "cc": "10.3",
+   "off": "not-measured",
+   "evidence": "template pairformer (c=64, 4x32): no certified cell on cc 10.3 (B300); certified arms meeting it there run the stock statements today; engaging the SAFE settings owes a measurement (R4 measured-off)"
+  },
+  {
+   "id": "off32",
+   "impl": "fpf",
+   "piece": "prologue",
+   "key": [
+    64,
+    4,
+    64
+   ],
+   "cc": "10.3",
+   "off": "not-measured",
+   "evidence": "c=64 4x64 pair stack: no certified cell on cc 10.3 (B300); certified arms meeting it there run the stock statements today; engaging the SAFE settings owes a measurement (R4 measured-off)"
+  },
+  {
+   "id": "off33",
+   "impl": "fpf",
+   "piece": "prologue",
+   "key": [
+    128,
+    8,
+    32
+   ],
+   "cc": "10.3",
+   "off": "not-measured",
+   "evidence": "spare 8-head variant (c_z=128, 8x32): no certified cell on cc 10.3 (B300); certified arms meeting it there run the stock statements today; engaging the SAFE settings owes a measurement (R4 measured-off)"
+  },
+  {
+   "id": "off34",
+   "impl": "fpf",
+   "piece": "prologue",
+   "key": [
+    256,
+    4,
+    64
+   ],
+   "cc": "10.3",
+   "off": "not-measured",
+   "evidence": "c_z=256 4x64 pair stack: no certified cell on cc 10.3 (B300); certified arms meeting it there run the stock statements today; engaging the SAFE settings owes a measurement (R4 measured-off)"
+  },
+  {
+   "id": "off35",
+   "impl": "fpf",
+   "piece": "prologue",
+   "key": [
+    256,
+    8,
+    32
+   ],
+   "cc": "10.3",
+   "off": "not-measured",
+   "evidence": "c_z=256 trunk (8x32): no certified cell on cc 10.3 (B300); certified arms meeting it there run the stock statements today; engaging the SAFE settings owes a measurement (R4 measured-off)"
+  },
+  {
+   "id": "off36",
+   "impl": "fpf",
+   "piece": "transition",
+   "key": [
+    64,
+    128
+   ],
+   "cc": "10.3",
+   "off": "not-measured",
+   "evidence": "template pair transition (c=64, n=2): no certified cell on cc 10.3 (B300); certified arms meeting it there run the stock statements today; engaging the SAFE settings owes a measurement (R4 measured-off)"
+  },
+  {
+   "id": "off37",
+   "impl": "fpf",
+   "piece": "transition",
+   "key": [
+    64,
+    256
+   ],
+   "cc": "10.3",
+   "off": "not-measured",
+   "evidence": "c=64 n=4 transition (template pairformer class): no certified cell on cc 10.3 (B300); certified arms meeting it there run the stock statements today; engaging the SAFE settings owes a measurement (R4 measured-off)"
+  },
+  {
+   "id": "off38",
+   "impl": "fpf",
+   "piece": "transition",
+   "key": [
+    128,
+    256
+   ],
+   "cc": "10.3",
+   "off": "not-measured",
+   "evidence": "c=128 n=2 transition: no certified cell on cc 10.3 (B300); certified arms meeting it there run the stock statements today; engaging the SAFE settings owes a measurement (R4 measured-off)"
+  },
+  {
+   "id": "off39",
+   "impl": "fpf",
+   "piece": "transition",
+   "key": [
+    256,
+    512
+   ],
+   "cc": "10.3",
+   "off": "not-measured",
+   "evidence": "c=256 n=2 transition: no certified cell on cc 10.3 (B300); certified arms meeting it there run the stock statements today; engaging the SAFE settings owes a measurement (R4 measured-off)"
+  },
+  {
+   "id": "off40",
+   "impl": "fpf",
+   "piece": "transition",
+   "key": [
+    256,
+    1024
+   ],
+   "cc": "10.3",
+   "off": "not-measured",
+   "evidence": "c=256 n=4 transition: no certified cell on cc 10.3 (B300); certified arms meeting it there run the stock statements today; engaging the SAFE settings owes a measurement (R4 measured-off)"
+  },
+  {
+   "id": "off41",
+   "impl": "fpf",
+   "piece": "transition",
+   "key": [
+    384,
+    768
+   ],
+   "cc": "10.3",
+   "off": "not-measured",
+   "evidence": "c=384 n=2 transition (memory cell): no certified cell on cc 10.3 (B300); certified arms meeting it there run the stock statements today; engaging the SAFE settings owes a measurement (R4 measured-off)"
+  },
+  {
+   "id": "off42",
+   "impl": "fpf",
+   "piece": "transition",
+   "key": [
+    384,
+    1536
+   ],
+   "cc": "10.3",
+   "off": "not-measured",
+   "evidence": "c_s=384 single transition: no certified cell on cc 10.3 (B300); certified arms meeting it there run the stock statements today; engaging the SAFE settings owes a measurement (R4 measured-off)"
+  },
+  {
+   "id": "off43",
+   "impl": "fpf",
+   "piece": "epilogue",
+   "key": [
+    64,
+    2,
+    32
+   ],
+   "cc": "8.0",
+   "off": "not-measured",
+   "evidence": "template pair stack (c=64, 2x32): no certified cell on cc 8.0 (A100); certified arms meeting it there run the stock statements today; engaging the SAFE settings owes a measurement (R4 measured-off)"
+  },
+  {
+   "id": "off45",
+   "impl": "fpf",
+   "piece": "epilogue",
+   "key": [
+    64,
+    4,
+    64
+   ],
+   "cc": "8.0",
+   "off": "not-measured",
+   "evidence": "c=64 4x64 pair stack: no certified cell on cc 8.0 (A100); certified arms meeting it there run the stock statements today; engaging the SAFE settings owes a measurement (R4 measured-off)"
+  },
+  {
+   "id": "off46",
+   "impl": "fpf",
+   "piece": "epilogue",
+   "key": [
+    128,
+    8,
+    32
+   ],
+   "cc": "8.0",
+   "off": "not-measured",
+   "evidence": "spare 8-head variant (c_z=128, 8x32): no certified cell on cc 8.0 (A100); certified arms meeting it there run the stock statements today; engaging the SAFE settings owes a measurement (R4 measured-off)"
+  },
+  {
+   "id": "off47",
+   "impl": "fpf",
+   "piece": "prologue",
+   "key": [
+    64,
+    2,
+    32
+   ],
+   "cc": "8.0",
+   "off": "not-measured",
+   "evidence": "template pair stack (c=64, 2x32): no certified cell on cc 8.0 (A100); certified arms meeting it there run the stock statements today; engaging the SAFE settings owes a measurement (R4 measured-off)"
+  },
+  {
+   "id": "off49",
+   "impl": "fpf",
+   "piece": "prologue",
+   "key": [
+    64,
+    4,
+    64
+   ],
+   "cc": "8.0",
+   "off": "not-measured",
+   "evidence": "c=64 4x64 pair stack: no certified cell on cc 8.0 (A100); certified arms meeting it there run the stock statements today; engaging the SAFE settings owes a measurement (R4 measured-off)"
+  },
+  {
+   "id": "off50",
+   "impl": "fpf",
+   "piece": "prologue",
+   "key": [
+    128,
+    8,
+    32
+   ],
+   "cc": "8.0",
+   "off": "not-measured",
+   "evidence": "spare 8-head variant (c_z=128, 8x32): no certified cell on cc 8.0 (A100); certified arms meeting it there run the stock statements today; engaging the SAFE settings owes a measurement (R4 measured-off)"
+  },
+  {
+   "id": "off51",
+   "impl": "fpf",
+   "piece": "prologue",
+   "key": [
+    256,
+    4,
+    64
+   ],
+   "cc": "8.0",
+   "off": "not-measured",
+   "evidence": "c_z=256 4x64 pair stack: no certified cell on cc 8.0 (A100); certified arms meeting it there run the stock statements today; engaging the SAFE settings owes a measurement (R4 measured-off)"
+  },
+  {
+   "id": "off52",
+   "impl": "fpf",
+   "piece": "prologue",
+   "key": [
+    256,
+    8,
+    32
+   ],
+   "cc": "8.0",
+   "off": "not-measured",
+   "evidence": "c_z=256 trunk (8x32): no certified cell on cc 8.0 (A100); certified arms meeting it there run the stock statements today; engaging the SAFE settings owes a measurement (R4 measured-off)"
+  },
+  {
+   "id": "off54",
+   "impl": "fpf",
+   "piece": "transition",
+   "key": [
+    64,
+    256
+   ],
+   "cc": "8.0",
+   "off": "not-measured",
+   "evidence": "c=64 n=4 transition (template pairformer class): no certified cell on cc 8.0 (A100); certified arms meeting it there run the stock statements today; engaging the SAFE settings owes a measurement (R4 measured-off)"
+  },
+  {
+   "id": "off55",
+   "impl": "fpf",
+   "piece": "transition",
+   "key": [
+    384,
+    768
+   ],
+   "cc": "8.0",
+   "off": "not-measured",
+   "evidence": "c=384 n=2 transition (memory cell): no certified cell on cc 8.0 (A100); certified arms meeting it there run the stock statements today; engaging the SAFE settings owes a measurement (R4 measured-off)"
+  },
+  {
+   "id": "off56",
+   "impl": "lnl",
+   "piece": "gate_transpose",
+   "key": [
+    256
+   ],
+   "cc": "8.0",
+   "off": "not-measured",
+   "evidence": "lnl gate kernel at H*D=256 (spare): no certified cell on cc 8.0 (A100); certified arms meeting it there run the stock statements today; engaging the SAFE settings owes a measurement (R4 measured-off)"
+  },
+  {
+   "id": "off57",
+   "impl": "fpf",
+   "piece": "transition",
+   "key": [
+    768,
+    1536
+   ],
+   "cc": "9.0",
+   "off": "slower",
+   "evidence": "token-width transition (c=768, n=2), bf16, cc 9.0 (NVIDIA H100 80GB HBM3; torch 2.11.0 / triton 3.6.0, spot-checked on torch 2.13.0 / triton 3.7.1): the torch bf16 statements (LayerNorm + Linear a|b + silu(a)*b + Linear out, cuBLAS) take 0.096 / 0.117 / 0.391 ms at M = 1024 / 4096 / 16384 rows (0.060 / 0.083 / 0.276 without the LayerNorm); the fpf v1 kernel's FASTEST configuration that fits shared memory at this width (BM 16, BH 32, 4 warps, 2 stages, IL 1; 12 of 72 swept fit -- BH >= 64 is out of resources at c=768) takes 0.185 / 0.360 / 1.334 ms (x0.52 / x0.33 / x0.29; bitwise == the statements under ln='stock', fp64-error ratio 1.14 under ln='fused'); the lever's safe settings (BM 16, BH 32, 4 warps, 1 stage) take 0.397 / 0.834 / 3.215 ms (x0.24 / x0.14 / x0.12). No configuration engages: the statements serve this key BY NAME (no safe-settings engagement)"
+  },
+  {
+   "id": "off58",
+   "impl": "fpf",
+   "piece": "transition",
+   "key": [
+    768,
+    1536
+   ],
+   "cc": "8.0",
+   "off": "slower",
+   "evidence": "token-width transition (c=768, n=2), bf16, cc 8.0 (NVIDIA A100-SXM4-80GB; torch 2.13.0 / triton 3.7.1): the torch bf16 statements (LayerNorm + Linear a|b + silu(a)*b + Linear out) take 0.265 / 0.368 / 1.023 ms at M = 1024 / 4096 / 16384 rows; only 4 of the 72 swept fpf v1 configurations fit sm_80 shared memory at this width (BM 16, BH 32, 1 stage); the fastest (8 warps, IL 1) takes 0.611 / 1.743 / 5.736 ms (x0.43 / x0.21 / x0.18; bitwise == the statements under ln='stock', fp64-error ratio 1.14 under ln='fused') and the lever's safe settings (4 warps, IL 0) 4.68 / 14.59 / 52.44 ms (x0.06 / x0.02 / x0.02). No configuration engages: the statements serve this key BY NAME"
+  },
+  {
+   "id": "off59",
+   "impl": "fpf",
+   "piece": "epilogue",
+   "key": [
+    128,
+    4,
+    32
+   ],
+   "cc": "8.0",
+   "off": "slower",
+   "evidence": "cc 8.0 (A100-SXM4-80GB, torch 2.13.0+cu130 / triton 3.7.1): the fused epilogue row (v2 BI8 BJ4 w4 s1, formerly certified r56) measured x1.09-2.43 SLOWER than the lnl statements (gate_transpose + cuBLAS GEMM + add) in every form at N 256-2048; the block and the op serve the lnl piece by name here"
+  }
+ ],
+ "engage": {
+  "schema": "engage/v1: where the fused triangle-attention surround steps aside to the engine's own block BY CELL -- rows keyed (cc, dtype, head_dim, heads, variant) with a keys condition; applies=default rows bind every caller (announced as default flips), applies=opt_in rows bind callers passing engage_cells=True (an engine that measured its own block faster there)",
+  "rows": [
+   {
+    "id": "e01",
+    "cc": "9.0",
+    "dtype": "bf16",
+    "head_dim": 32,
+    "heads": 4,
+    "variant": "*",
+    "keys_min_exclusive": 256,
+    "keys_max_exclusive": 512,
+    "applies": "opt_in",
+    "reason": "stock_block(256<keys<512)",
+    "source": "kit table: the fused surround (LN + projections + core + gate + output) measured slower than that engine's stock block for 256 < keys < 512 in-model on cc 9.0 (s/item); the block's own same-process numbers at this class (whole fused block, flash core, vs its torch statements: 0.41 vs 0.50 ms at 256 keys, faster at 512) do not time the engine's block, so the row is opt-in, not a default"
+   },
+   {
+    "id": "e02",
+    "cc": "8.0",
+    "dtype": "bf16",
+    "head_dim": "*",
+    "heads": "*",
+    "variant": "exact",
+    "keys_max_exclusive": 1026,
+    "applies": "default",
+    "reason": "stock_block(exact:keys<1026)",
+    "source": "kit table (per-card row floor): the exact-class surround is slower than the stock block below 1026 keys on cc 8.0; at and above it the exact rows serve"
+   }
+  ]
+ },
+ "exact_rows": {
+  "rule": "the EXACT construction (impl fpf, ln='stock': the caller's LayerNorm output projected in ONE summation order) equals the stock Linear layers' cuBLAS bf16 GEMMs bit for bit only where cuBLAS keeps that order on the card. Per compute capability: below pieces.<piece>.min_rows rows cuBLAS takes another order; every call of max_rows rows and more is worked in pieces of piece_rows rows, the full pieces keeping the served order and the remainder piece (rows mod piece_rows) served only within [min_remainder, piece_rows - top_margin]. Calls outside are refused BY NAME before any launch (Unsupported 'exact-rows:below_min_rows' | 'exact-rows:above_max_rows'; attn.pair_fused.exact_rows_word); the caller's stock statement answers them. ln='fused' (tolerance class) is never affected; a card absent here keeps one order at every row count (cc 9.0: bitwise 20..2048 tokens in kernels/transition's exact vouch). pieces: 'transition' = the fused pair transition (measured at (C, hidden) = (128, 512) and (64, 128)); 'prologue' = the fused triangle-attention block, prologue q|k|v|g|bias + epilogue W_o projections (measured at (C, H, D) = (128, 4, 32)). rows = the call's leading dimensions flattened (a pair call [B, N, N, C] is B*N*N rows; an N-token input's pair stack runs at N*N rows). The rule applies on every stack of the card until a stack records its own band (refusing is byte-safe; the lower remainder margin is the smallest remainder MEASURED identical, remainders 8,209..161,423 unmeasured).",
+  "words": {
+   "below": "below_min_rows",
+   "above": "above_max_rows"
+  },
+  "cards": {
+   "8.0": {
+    "piece_rows": 1048576,
+    "max_rows": 1048544,
+    "min_remainder": 161424,
+    "top_margin": 8192,
+    "pieces": {
+     "transition": {
+      "min_rows": 4096
+     },
+     "prologue": {
+      "min_rows": 5857
+     }
+    },
+    "measured_on": [
+     "A100:torch2.13.0+cu130/3.7.1/cueq0.11.1"
+    ],
+    "evidence": "A100-SXM4-80GB (cc 8.0), torch 2.13.0+cu130 / triton 3.7.1 / cuequivariance 0.11.1, an AF3-family engine's full inference under --det 1 (seed 101, 5 samples: every output CIF + summary-confidence JSON sha256-compared against the same box's stock run), box-2, 2026-09-11/12 (that engine's kit carried these numbers as a kit-side card table since its 0.2.7 / 0.2.30 / 0.2.32; moved here unchanged). transition (128,512) + block (128,4,32) BOTH served: byte-identical 10/10 at remainders 161,424 (1,100 tokens), 278,528 (1,152), 391,424 (1,200), 589,824 (1,280), 747,024 (1,340: a real multimer input), 1,039,449 (1,445) and 262,144 rows (1,536 tokens, two full pieces), and below max_rows on every measured real input (20..1,023 tokens; block from 5,857 rows = 77 tokens, transition from 4,096 rows = 64 tokens: at 400 / 1,024 / 2,304 rows (20 / 32 / 48 tokens) the transition kernels are NOT bitwise on any measured A100 stack -- kernels/transition coverage exact_vouch_sizes -- and the block's 128->128 projections take other orders in bands below 5,857 rows (1,681-3,249 and 5,776 rows measured)); NOT identical: the transition served alone at remainder 2,049 (1,025 tokens, 0/10), both served at remainder 8,208 (1,028 tokens, 0/10; the (64,128) template-stack transition is the measured carrier there), whereas the block served alone at remainder 2,049 IS identical (10/10) -- the rule keeps one conservative lower margin for both pieces. Speed of serving the admitted remainders (exact mode, 1,200 tokens, ABBA, det 0): forward 75.36 -> 66.33 s (-12.0 %), peak allocated 30.79 -> 30.83 GiB."
+   }
+  }
+ },
+ "compositions": {
+  "schema": "compositions/v1: where the fused block serves a PIECE through the plain statements BY CELL because that piece's fused rows lost their race on this (cc, dtype, key, LN form) while the other piece's fused row won -- rows keyed (cc, dtype, key [C,H,D], ln 'stock'|'fused'|'*') naming the piece ('prologue') and the serving impl ('torch'); applies=default binds every caller of impl 'fpf' (announced as default flips); counted on the LEVER line as pieces=prologue=fpf>torch(compose:<id>)@<key>",
+  "rows": [
+   {
+    "id": "c01",
+    "cc": "8.0",
+    "dtype": "bf16",
+    "key": [
+     256,
+     8,
+     32
+    ],
+    "ln": "stock",
+    "piece": "prologue",
+    "impl": "torch",
+    "applies": "candidate",
+    "reason": "prologue_v4 (the only x_ln-form fused prologue row here, r102) raced x0.688 / 0.694 / 0.707 vs the plain statements at pair N 400 / 800 / 1200 with more memory, while the fused epilogue_v3 (r103) raced x2.256 / 2.854 / 2.926: the statements prologue + the fused epilogue is the fastest servable block in this form (pieces 0.78 + 0.88 ms at N 400 vs 3.98 ms for the statements block; A100-SXM4-80GB, torch 2.13.0+cu130 / triton 3.7.1)",
+    "held": "the composed BLOCK itself (statements prologue + fused epilogue_v3) was not raced against the statements block in one process; the piece races (prologue statements x1/0.69 fused, epilogue_v3 x2.3-2.9) and the raced fused-prologue blocks do not stand in for it -- re-lands as default after a block-level race or an engine's in-model A/B"
+   }
+  ]
+ }
+}

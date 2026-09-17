@@ -1,0 +1,270 @@
+{
+ "DEFAULT_MODE_RULE": "no --mode = fast, on every route (design, the served line --pack K); --mode or RFDIFFUSION1_OPT names another",
+ "NOT_SERVED": {
+  "off": "--pack has no stock row: the stock command line is one process per invocation (stock/src/scripts/run_inference.py), no resident worker to pack; run --mode off without --pack"
+ },
+ "NUMERICS": {
+  "exact": {
+   "autocast": null,
+   "cudnn_tf32": false,
+   "matmul": "highest",
+   "matmul_tf32": false,
+   "policy": "fp32_strict",
+   "set_by": "opt/forward/fast_inference/drivers/rfd_bench.py:45-46 (--tf32 0, the driver's default: both TF32 flags off; float32 matmul precision and autocast at torch's defaults, highest / none)"
+  },
+  "fast": {
+   "autocast": null,
+   "cudnn_tf32": true,
+   "matmul": "highest",
+   "matmul_tf32": true,
+   "policy": "tf32",
+   "set_by": "opt/forward/fast_inference/drivers/rfd_bench.py:45-46 under lever TF32's switch --tf32 1 (both TF32 flags on; float32 matmul precision and autocast at torch's defaults); the SE(3) add-on's Triton dots stay at input_precision=ieee (rfd_se3fast/kernels.py: tl.dot input_precision ieee)"
+  },
+  "off": {
+   "policy": "untouched"
+  }
+ },
+ "default": "fast",
+ "default_served": "fast",
+ "exact/defaults": {
+  "attach": "driver",
+  "driver_chain": [
+   [
+    "fast_inference",
+    "drivers/rfd_bench.py"
+   ]
+  ],
+  "env": {
+   "RFD_PDBIO": "1"
+  },
+  "flags": [
+   "--fastpath",
+   "chain_breaks,full_graph,rbf,msa_index",
+   "--prep",
+   "1",
+   "--einsum-route",
+   "1",
+   "--fullgraph",
+   "1"
+  ],
+  "levers": [
+   "U1",
+   "C1",
+   "P",
+   "E_einsum",
+   "W1",
+   "IO1"
+  ],
+  "mode": "exact",
+  "note": "the base kit's exact levers C1 + P + E_einsum with its whole-forward CUDA graph W1 (one captured graph per forward phase) on the resident driver alone",
+  "served": false,
+  "settings": {
+   "compose_overrides": [
+    "inference.write_trajectory=True",
+    "inference.cautious=True",
+    "inference.deterministic=False"
+   ],
+   "driver_flags": [
+    "--no-traj",
+    "0"
+   ],
+   "stock_overrides": []
+  },
+  "tier": 1
+ },
+ "exact/no-traj-not-cautious": {
+  "attach": "driver",
+  "driver_chain": [
+   [
+    "fast_inference",
+    "drivers/rfd_bench.py"
+   ]
+  ],
+  "env": {
+   "RFD_PDBIO": "1"
+  },
+  "flags": [
+   "--fastpath",
+   "chain_breaks,full_graph,rbf,msa_index",
+   "--prep",
+   "1",
+   "--einsum-route",
+   "1",
+   "--fullgraph",
+   "1"
+  ],
+  "levers": [
+   "U1",
+   "C1",
+   "P",
+   "E_einsum",
+   "W1",
+   "IO1"
+  ],
+  "mode": "exact",
+  "note": "the base kit's exact levers C1 + P + E_einsum with its whole-forward CUDA graph W1 (one captured graph per forward phase) on the resident driver alone",
+  "served": false,
+  "settings": {
+   "compose_overrides": [
+    "inference.write_trajectory=False",
+    "inference.cautious=False",
+    "inference.deterministic=False"
+   ],
+   "driver_flags": [
+    "--no-traj",
+    "1"
+   ],
+   "stock_overrides": [
+    "inference.write_trajectory=False",
+    "inference.cautious=False"
+   ]
+  },
+  "tier": 1
+ },
+ "fast/defaults": {
+  "attach": "driver",
+  "driver_chain": [
+   [
+    "fast_inference",
+    "drivers/rfd_bench.py"
+   ]
+  ],
+  "env": {
+   "RFD_PDBIO": "1",
+   "RFD_SE3FAST": "t2"
+  },
+  "flags": [
+   "--fastpath",
+   "chain_breaks,full_graph,rbf,msa_index",
+   "--prep",
+   "1",
+   "--einsum-route",
+   "1",
+   "--fullgraph",
+   "1",
+   "--triton-ln",
+   "1",
+   "--tf32",
+   "1"
+  ],
+  "levers": [
+   "U1",
+   "C1",
+   "P",
+   "E_einsum",
+   "W1",
+   "IO1",
+   "T2",
+   "K2",
+   "TF32"
+  ],
+  "mode": "fast",
+  "note": "exact's line + RFD_SE3FAST=t2 (the SE(3) add-on's dense Triton layer, armed in the driver process by driver_run.py) + --triton-ln 1 (K2, Triton row LayerNorm) + --tf32 1 (TF32 tensor-core GEMMs)",
+  "served": false,
+  "settings": {
+   "compose_overrides": [
+    "inference.write_trajectory=True",
+    "inference.cautious=True",
+    "inference.deterministic=False"
+   ],
+   "driver_flags": [
+    "--no-traj",
+    "0"
+   ],
+   "stock_overrides": []
+  },
+  "tier": 2
+ },
+ "fast/no-traj-not-cautious": {
+  "attach": "driver",
+  "driver_chain": [
+   [
+    "fast_inference",
+    "drivers/rfd_bench.py"
+   ]
+  ],
+  "env": {
+   "RFD_PDBIO": "1",
+   "RFD_SE3FAST": "t2"
+  },
+  "flags": [
+   "--fastpath",
+   "chain_breaks,full_graph,rbf,msa_index",
+   "--prep",
+   "1",
+   "--einsum-route",
+   "1",
+   "--fullgraph",
+   "1",
+   "--triton-ln",
+   "1",
+   "--tf32",
+   "1"
+  ],
+  "levers": [
+   "U1",
+   "C1",
+   "P",
+   "E_einsum",
+   "W1",
+   "IO1",
+   "T2",
+   "K2",
+   "TF32"
+  ],
+  "mode": "fast",
+  "note": "exact's line + RFD_SE3FAST=t2 (the SE(3) add-on's dense Triton layer, armed in the driver process by driver_run.py) + --triton-ln 1 (K2, Triton row LayerNorm) + --tf32 1 (TF32 tensor-core GEMMs)",
+  "served": false,
+  "settings": {
+   "compose_overrides": [
+    "inference.write_trajectory=False",
+    "inference.cautious=False",
+    "inference.deterministic=False"
+   ],
+   "driver_flags": [
+    "--no-traj",
+    "1"
+   ],
+   "stock_overrides": [
+    "inference.write_trajectory=False",
+    "inference.cautious=False"
+   ]
+  },
+  "tier": 2
+ },
+ "off/defaults": {
+  "attach": "stock-cli",
+  "driver_chain": [],
+  "env": {},
+  "flags": [],
+  "levers": [],
+  "mode": "off",
+  "note": "python -s $RFD_ROOT/scripts/run_inference.py <overrides> per case (stock_cli.py)",
+  "served": false,
+  "settings": {
+   "compose_overrides": [],
+   "driver_flags": [],
+   "stock_overrides": []
+  },
+  "tier": null
+ },
+ "off/no-traj-not-cautious": {
+  "attach": "stock-cli",
+  "driver_chain": [],
+  "env": {},
+  "flags": [],
+  "levers": [],
+  "mode": "off",
+  "note": "python -s $RFD_ROOT/scripts/run_inference.py <overrides> per case (stock_cli.py)",
+  "served": false,
+  "settings": {
+   "compose_overrides": [],
+   "driver_flags": [],
+   "stock_overrides": [
+    "inference.write_trajectory=False",
+    "inference.cautious=False"
+   ]
+  },
+  "tier": null
+ }
+}

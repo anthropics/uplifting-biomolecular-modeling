@@ -1,0 +1,43 @@
+# mosaic_opt — explicit interface to the mosaic (Boltz-2/joltz binder hallucination) inference optimizations.
+# Install = the shared core, then this package, both editable: `pip install -e common/opt_core -e mosaic/opt` ([tool.opt_core] below pins the
+# core by path and minimum version; the core pin gate, mosaic_opt/_core_gate.py = the core's kit template, is statement one of every
+# entry and refuses by name with exit 3 on an absent or older core before anything of the core is imported (a newer core passes)). The kit code it wraps
+# lives in the package directory (tools/, mosaic_fast/ — found by its tools/public_design_run.py) and is resolved from the package
+# location, and the install must stay editable: the core pin gate reads [tool.opt_core] from this file, above the package (a regular wheel
+# install refuses every entry with core_pin_unreadable, exit 3); MOSAIC_OPT_KIT / MOSAIC_OPT_HOME locate the kit files and the tree, never the pin. No install-time dependency on the
+# upstream packages (mosaic / joltz / boltz: stock/PINS.json) or on jax: their versions are checked at activation. The build backend is
+# the core's kit template (setuptools plus one step that ships mosaic_opt_autoload.pth at the wheel root, which is what makes
+# `MOSAIC_OPT=exact` activate without code changes: mosaic_opt/_autoload.py; the .pth text is generated, `python _build_backend.py
+# mosaic_opt MOSAIC_OPT mosaic-opt`, and the backend refuses to build with any other text).
+[build-system]
+requires = ["setuptools>=64", "wheel"]
+build-backend = "_build_backend"
+backend-path = ["."]
+
+[project]
+name = "mosaic_opt"
+dynamic = ["version"]
+description = "mosaic (Boltz-2/joltz binder hallucination) inference optimizations: modes fast/exact/big/off, the kit's activation rows, lazy autoload, activation report"
+requires-python = ">=3.10"
+classifiers = ["Private :: Do Not Upload"]        # not for PyPI: uploads carrying this classifier are rejected
+dependencies = []
+
+[project.optional-dependencies]
+test = ["pytest", "setuptools>=64"]                                  # the package's CPU tests (standard library otherwise); setuptools: the tests exec opt/_build_backend.py (the build requirement, same floor as [build-system])
+
+[project.scripts]
+mosaic-opt = "mosaic_opt.__main__:main"           # `mosaic-opt design|check|warm ...` == `python -m mosaic_opt ...`
+
+# the shared core this kit runs on (re-pinned with every core landing): mosaic_opt.core_gate compares this floor version against the __version__ of
+# the opt_core the interpreter would import (never a manifest). The header line below is exactly `[tool.opt_core]` and the two pin lines carry no
+# comment (the gate's no-tomllib reader; mosaic_opt/tests/test_core_adoption.py reads the table both ways).
+[tool.opt_core]
+path = "../../common/opt_core"
+version = "0.5.125.1"
+
+[tool.setuptools]
+packages = ["mosaic_opt", "mosaic_opt.tests"]
+include-package-data = false
+
+[tool.setuptools.dynamic]
+version = {attr = "mosaic_opt.__version__"}

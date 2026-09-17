@@ -1,0 +1,30 @@
+{
+ "files": [
+  {
+   "file": "5o45.cif",
+   "entry": "5O45",
+   "url": "https://files.rcsb.org/download/5O45.cif",
+   "bytes": 498156,
+   "title": "Structure of human PD-L1 in complex with inhibitor",
+   "initial_deposition": "2017-05-26"
+  },
+  {
+   "file": "1tnf.cif",
+   "entry": "1TNF",
+   "url": "https://files.rcsb.org/download/1TNF.cif",
+   "bytes": 383234,
+   "title": "THE STRUCTURE OF TUMOR NECROSIS FACTOR-ALPHA AT 2.6 ANGSTROMS RESOLUTION. IMPLICATIONS FOR RECEPTOR ",
+   "initial_deposition": "1989-08-25"
+  },
+  {
+   "file": "3di3.cif",
+   "entry": "3DI3",
+   "url": "https://files.rcsb.org/download/3DI3.cif",
+   "bytes": 312813,
+   "title": "Crystal structure of the complex of human interleukin-7 with glycosylated human interleukin-7 recept",
+   "initial_deposition": "2008-06-19"
+  }
+ ],
+ "archive": "wwPDB / RCSB PDB (https://www.rcsb.org)",
+ "licence": "PDB archive data are free of all copyright restrictions (CC0 1.0)"
+}

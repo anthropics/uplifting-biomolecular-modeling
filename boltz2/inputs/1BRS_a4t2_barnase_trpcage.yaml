@@ -1,0 +1,14 @@
+# PDB 1BRS barnase (chains A-D; 110 aa) x4 + the Trp-cage mini-protein (PDB 1L2Y; chains E, F; 20 aa) x2, single-sequence mode: 4*110 + 2*20 = 480 tokens
+# = 30*16 — the N = 0 (mod 16) integer-specialization class INSIDE the 300-511-token window the K2B flash triangle attention serves on `fast` / `big`
+# (the 398-token input beside it is that window's N != 0 class). The `warm` verb's third input: no kernel class these sizes meet compiles
+# at first use after `warm`.
+version: 1
+sequences:
+  - protein:
+      id: [A, B, C, D]
+      sequence: AQVINTFDGVADYLQTYHKLPDNYITKSEAQALGWVASKGNLADVAPGKSIGGDIFSNREGKLPGKSGRTWREADINYTSGFRNSDRILYSSDWLIYKTTDHYQTFTKIR
+      msa: empty
+  - protein:
+      id: [E, F]
+      sequence: NLYIQWLKDGGPSSGRPPPS
+      msa: empty

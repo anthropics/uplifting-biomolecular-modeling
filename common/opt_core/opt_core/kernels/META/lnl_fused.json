@@ -1,0 +1,21 @@
+{
+ "exports": {
+  "PF_LNL_TILES": {
+   "param": "tiles",
+   "path": true,
+   "required": false,
+   "what": "the per-arch tile table the module reads at import (the pinned triton.autotune configs); default = the core's carried kernels/lnl_fused.tiles_by_arch.json beside the module; an override path for a caller that pins a different table (opt_core.attn.pair_fused exports the carried path explicitly)"
+  }
+ },
+ "kind": "module",
+ "license": "in-house Triton/Gluon kernels (no third-party kernel bytes); tile table carried beside the module as lnl_fused.tiles_by_arch.json",
+ "mechanism": "pair.transition_swiglu (fused_transition), attn.ln_projection_prologue (ln_linear), attn.gate_epilogue (gate_transpose)",
+ "name": "lnl_fused",
+ "not_carried": {
+  "adapter and measurement programs": "the engine adapter and the measurement programs written around the kernels (engine wiring, not kernels)"
+ },
+ "runtime_imports": [],
+ "runtime_imports_note": "",
+ "served_note": "fused_transition(x, ln_w, ln_b, W1, W2, W3, eps, residual): C in {64,128} (gl.static_assert), hidden = W1 rows, chunked on-chip; ln_linear(x, ln_w, ln_b, W[NOUT,C], eps, write_y, transpose): C in {64,128}, NOUT constexpr; gate_transpose(o[B,L,L,C], g_src[..,GS] at column offset, transpose): bf16(sigmoid(g)*o) with transposed row order",
+ "version": "lnl_fused (LN+Linear fused pair kernels v3: fused_transition, ln_linear + gate_transpose; Gluon/Triton, sm90 tiles)"
+}

@@ -1,0 +1,11 @@
+OF3 trunk-kernels add-on — inference-speed add-on for OpenFold3.
+Third-party attributions. Portions derive from OpenFold3 (github.com/aqlaboratory/openfold-3, Copyright AlQuraishi Laboratory, Apache License 2.0):
+OpenFold3's licence text is carried beside this file as OPENFOLD3_LICENSE.
+
+This add-on contains:
+  * of3t_hook/of3t_levers.py, of3t_paircache.py, sitecustomize.py.
+    of3t_paircache.py re-states a few lines of OpenFold3's DiffusionConditioning._embed_trunk_inputs / AttentionPairBias._prep_bias /
+    DiffusionAttentionPairBias._prep_bias (Copyright 2026 AlQuraishi Laboratory, Apache-2.0) for the non-cached half of those functions; marked in the source.
+Third-party software USED (not redistributed): OpenFold3 (Apache-2.0), PyTorch (BSD-3), Triton (MIT), NVIDIA cuEquivariance (its own licence;
+installed by the user), DeepSpeed (Apache-2.0).
+The kit-level notices file is openfold3_ob0/THIRD_PARTY_NOTICES.md; licence texts are also under openfold3_ob0/third_party_licenses/.

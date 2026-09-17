@@ -1,0 +1,16 @@
+# OpenFold3 0.4.1 at upstream's SHIPPED kernel configuration (DS4Sci evoformer attention ON, as `run_openfold predict` runs with no
+# --runner-yaml; opt/openfold3_opt/shipped_predict.yml) with the chunk plan PINNED through stock's own settings: chunk_size 16 and the
+# chunk-size tuner OFF. The big lines restate stock at stock's chunk boundaries and need a fixed plan: under the tuner (shipped_predict.yml)
+# upstream picks chunk None for inputs that fit, the O1 PairBlock lever meets no chunked path, and the line's fail-closed carry names the
+# fallback and exits PARTIAL (rc 3). This file is the big lines' configuration on the shipped attention kernel (the memory rows against
+# the shipped stock); stock_predict_c16.yml is the same plan with DS4Sci off (the equality runs against `exact`).
+model_update:
+  presets: [predict]
+  custom:
+    settings:
+      memory:
+        eval:
+          chunk_size: 16
+    architecture:
+      pairformer:
+        tune_chunk_size: false

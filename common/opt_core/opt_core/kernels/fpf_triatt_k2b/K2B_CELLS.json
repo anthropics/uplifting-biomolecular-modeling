@@ -1,0 +1,674 @@
+{
+ "schema": "k2b_cells/v2: resolve by COMPUTE CAPABILITY first (by_cc), device-name substring only as secondary (by_name); unknown cc -> K2B package default. Needs the cc-aware loader (k2b_loader_cc.patch applied to fpf_triatt_k2b/triatt_k2b.py, or cells/k2b_cells.py::resolve); an UNPATCHED K2B v1.1 loader still works through the v1-compat top-level name keys below (name match only). Enable: export PF_TRIATTN_TABLE=<this file>.",
+ "by_cc": {
+  "10.0": "sm100",
+  "10.3": "sm103",
+  "12.0": "sm120",
+  "9.0": "sm90",
+  "8.0": "sm80"
+ },
+ "by_name": {
+  "B200": "sm100",
+  "B300": "sm103",
+  "RTX PRO 6000": "sm120",
+  "H100": "sm90",
+  "H200": "sm90",
+  "A100": "sm80"
+ },
+ "entries": {
+  "sm100": {
+   "status": "checked: NVIDIA B200 (cc 10.0), triton 3.6.0 and 3.7.1; 80/80 torch.equal vs default",
+   "device_names_seen": [
+    "NVIDIA B200"
+   ],
+   "bf16": {
+    "32": [
+     [
+      1073741824,
+      {
+       "BLOCK_M": 64,
+       "BLOCK_N": 32,
+       "ROWS": 2,
+       "num_warps": 4,
+       "num_stages": 3,
+       "ORDER": 0,
+       "MAXNREG": 128
+      }
+     ]
+    ]
+   }
+  },
+  "sm103": {
+   "status": "checked: NVIDIA B300 SXM6 AC (cc 10.3), torch 2.10.0+cu128 / triton 3.6.0 (its bundled ptxas-blackwell assembles sm_103): 64/64 torch.equal vs the package default (D=32 bf16, H 4/8, N 256/356/546/705/813/1493/1775/2560, block-0-like and late-block-like synthetic pair inputs, unmasked and 10 %-masked with one fully-masked row) and run-to-run 5/5; interleaved 5-round timing vs the package default (MAXNREG 144 on this triton) x1.021-1.063 at every N x H measured (256..2560), never slower; the sm100 cell (3 stages, MAXNREG 128) is also torch.equal here but x0.966-0.988 at ragged N (356/546/813/1493/1775) and x1.088-1.093 at N 1024/2048/2560, so B300 takes 2 stages; 192-cell grid: 0 build failures, 24 cells bitwise == default (the 64|128 x 32 x 2-row tile family), none faster than this one at every size; measured 2026-09-07",
+   "device_names_seen": [
+    "NVIDIA B300 SXM6 AC"
+   ],
+   "bf16": {
+    "32": [
+     [
+      1073741824,
+      {
+       "BLOCK_M": 64,
+       "BLOCK_N": 32,
+       "ROWS": 2,
+       "num_warps": 4,
+       "num_stages": 2,
+       "ORDER": 0,
+       "MAXNREG": 128
+      }
+     ]
+    ]
+   }
+  },
+  "sm120": {
+   "status": "checked: NVIDIA RTX PRO 6000 Blackwell Server Edition (cc 12.0), triton 3.6.0; 16/16 torch.equal vs default",
+   "device_names_seen": [
+    "NVIDIA RTX PRO 6000 Blackwell Server Edition"
+   ],
+   "bf16": {
+    "32": [
+     [
+      1073741824,
+      {
+       "BLOCK_M": 64,
+       "BLOCK_N": 32,
+       "ROWS": 2,
+       "num_warps": 4,
+       "num_stages": 3,
+       "ORDER": 0
+      }
+     ]
+    ]
+   }
+  },
+  "sm90": {
+   "status": "checked: NVIDIA H100 80GB HBM3 (cc 9.0), torch 2.7.1 / triton 3.3.1: torch.equal vs the served default (MAXNREG 144 on triton 3.3.1) AND r2r at 12/12 points (start b0c1 + end b47c10; 356/546/705/813/1493/1775; real dumps H=8 D=32), x1.114-1.153 per call, ratio_rms vs fp64 unchanged, 380-config sweep found nothing better; on the pinned v0.5.1rc2 bytes: CLI DET T*(MAXNREG 128) == T*(144) 12/12 @356/705 + r2r 12/12, same-box bracket @705 x5 trunk x1.038 / per prediction x1.026; in-model @1493 x1.038 per prediction. On triton >= 3.7 the package default is already MAXNREG 128 (identical config -> no change there). H200 (cc 9.0, GH100) inherits by cc.",
+   "device_names_seen": [
+    "NVIDIA H100 80GB HBM3"
+   ],
+   "bf16": {
+    "32": [
+     [
+      1073741824,
+      {
+       "BLOCK_M": 64,
+       "BLOCK_N": 32,
+       "ROWS": 2,
+       "num_warps": 4,
+       "num_stages": 3,
+       "ORDER": 0,
+       "MAXNREG": 128
+      }
+     ]
+    ]
+   }
+  },
+  "sm80": {
+   "status": "verified: NVIDIA A100 80GB PCIe (cc 8.0), torch 2.13.0+cu130 / triton 3.7.1; no bitwise-equal candidate >= 3 % faster than the package default (best x0.985); entry pins the default's own values; torch.equal vs the package default at 7/7 confirm points x top candidates + 6/6 battery points (masked+unmasked, H=4/12, N 256..2560), r2r 5/5; err vs fp64 ratio to torch-bf16 math worst rms 0.999; A100 sweep 2026-09-06 (synthetic inputs, D=32 bf16)",
+   "device_names_seen": [
+    "NVIDIA A100 80GB PCIe"
+   ],
+   "bf16": {
+    "32": [
+     [
+      1073741824,
+      {
+       "BLOCK_M": 64,
+       "BLOCK_N": 32,
+       "ROWS": 2,
+       "num_warps": 4,
+       "num_stages": 3,
+       "ORDER": 0,
+       "MAXNREG": 128
+      }
+     ]
+    ]
+   }
+  }
+ },
+ "B200": {
+  "bf16": {
+   "32": [
+    [
+     1073741824,
+     {
+      "BLOCK_M": 64,
+      "BLOCK_N": 32,
+      "ROWS": 2,
+      "num_warps": 4,
+      "num_stages": 3,
+      "ORDER": 0,
+      "MAXNREG": 128
+     }
+    ]
+   ]
+  }
+ },
+ "B300": {
+  "bf16": {
+   "32": [
+    [
+     1073741824,
+     {
+      "BLOCK_M": 64,
+      "BLOCK_N": 32,
+      "ROWS": 2,
+      "num_warps": 4,
+      "num_stages": 2,
+      "ORDER": 0,
+      "MAXNREG": 128
+     }
+    ]
+   ]
+  }
+ },
+ "RTX PRO 6000": {
+  "bf16": {
+   "32": [
+    [
+     1073741824,
+     {
+      "BLOCK_M": 64,
+      "BLOCK_N": 32,
+      "ROWS": 2,
+      "num_warps": 4,
+      "num_stages": 3,
+      "ORDER": 0
+     }
+    ]
+   ]
+  }
+ },
+ "__doc__": {
+  "what": "Per-arch launch cells for the FlashPairformer K2B v1.1 flash triangle-attention kernel (third_party/fpf_triatt_k2b/triatt_k2b.py), in K2B's own PF_TRIATTN_TABLE format: top-level key = substring of torch.cuda.get_device_name(0); value = {dtype: {head_dim: [[max_seq, cfg], ...]}}. Enable with: export PF_TRIATTN_TABLE=<path to this file> (no code change; K2B prints nothing extra; check fpf_triatt_k2b.K2B._PF_TABLE_KEY / pick_config()). Devices without an entry (H100 sm_90, A100, L40S ...) keep the package default (64x32, ROWS 2, 4 warps, 3 stages, MAXNREG 128 on triton>=3.7 else 144). Every entry below is OUTPUT-BITWISE-IDENTICAL to the package default on that device, so K2B v1.1's Tier-2 label and certificates apply unchanged.",
+  "sm_100 (NVIDIA B200)": {
+   "entry": {
+    "BLOCK_M": 64,
+    "BLOCK_N": 32,
+    "ROWS": 2,
+    "num_warps": 4,
+    "num_stages": 3,
+    "ORDER": 0,
+    "MAXNREG": 128
+   },
+   "rule": "default tile, MAXNREG=128 on EVERY triton version (K2B's built-in rule resolves 144 on triton<3.7, which costs x1.13-1.14 on sm_100 at every size)",
+   "evidence": "B200 180GB, synthetic model-like inputs (bf16 q/k/v, bf16-exact permuted fp32 bias), CUDA-event median of 20, in-run cuEq 0.11.1 (cudnn sm80 FMHA path). 40 rows per stack = N {356,546,705,813} x H {8,4} x MAXNREG {uncapped,96,112,128,144}: ALL rows torch.equal vs MAXNREG=144 AND vs uncapped, r2r bitwise; 128 is the fastest cap in 15/16 (N,H) cells per image (356 H=8 on t3.6.0: 112 by 0.4 us); x(128 over 144) = 1.121-1.143, x(128 over uncapped) = 1.126-1.144, x(128 over cuEq) = 2.17-2.46. Mechanism check through PF_TRIATTN_TABLE on triton 3.6.0: pick_config -> MAXNREG 128, table output bitwise == explicit-128 == explicit-144, 2.154 vs 2.453 ms @705 H=8.",
+   "grid": {
+    "torch 2.11.0+cu128 / triton 3.6.0": {
+     "all_rows_bitwise_vs_144_and_uncapped_and_r2r": true,
+     "n_rows": 40,
+     "table": [
+      {
+       "N": 356,
+       "H": 8,
+       "ms_128": 0.3521,
+       "ms_144": 0.3983,
+       "ms_uncapped": 0.4028,
+       "x_128_over_144": 1.131,
+       "x_128_over_uncapped": 1.144,
+       "cueq_ms": 0.7754,
+       "x_128_over_cueq": 2.202
+      },
+      {
+       "N": 356,
+       "H": 4,
+       "ms_128": 0.1985,
+       "ms_144": 0.2249,
+       "ms_uncapped": 0.2237,
+       "x_128_over_144": 1.133,
+       "x_128_over_uncapped": 1.127,
+       "cueq_ms": 0.4291,
+       "x_128_over_cueq": 2.162
+      },
+      {
+       "N": 546,
+       "H": 8,
+       "ms_128": 1.0072,
+       "ms_144": 1.151,
+       "ms_uncapped": 1.1506,
+       "x_128_over_144": 1.143,
+       "x_128_over_uncapped": 1.142,
+       "cueq_ms": 2.3844,
+       "x_128_over_cueq": 2.367
+      },
+      {
+       "N": 546,
+       "H": 4,
+       "ms_128": 0.5339,
+       "ms_144": 0.6078,
+       "ms_uncapped": 0.6063,
+       "x_128_over_144": 1.139,
+       "x_128_over_uncapped": 1.136,
+       "cueq_ms": 1.2404,
+       "x_128_over_cueq": 2.323
+      },
+      {
+       "N": 705,
+       "H": 8,
+       "ms_128": 2.119,
+       "ms_144": 2.4174,
+       "ms_uncapped": 2.4153,
+       "x_128_over_144": 1.141,
+       "x_128_over_uncapped": 1.14,
+       "cueq_ms": 5.1501,
+       "x_128_over_cueq": 2.43
+      },
+      {
+       "N": 705,
+       "H": 4,
+       "ms_128": 1.08,
+       "ms_144": 1.2281,
+       "ms_uncapped": 1.2284,
+       "x_128_over_144": 1.137,
+       "x_128_over_uncapped": 1.137,
+       "cueq_ms": 2.6261,
+       "x_128_over_cueq": 2.431
+      },
+      {
+       "N": 813,
+       "H": 8,
+       "ms_128": 2.9425,
+       "ms_144": 3.352,
+       "ms_uncapped": 3.3527,
+       "x_128_over_144": 1.139,
+       "x_128_over_uncapped": 1.139,
+       "cueq_ms": 7.2432,
+       "x_128_over_cueq": 2.462
+      },
+      {
+       "N": 813,
+       "H": 4,
+       "ms_128": 1.4917,
+       "ms_144": 1.698,
+       "ms_uncapped": 1.6984,
+       "x_128_over_144": 1.138,
+       "x_128_over_uncapped": 1.139,
+       "cueq_ms": 3.6704,
+       "x_128_over_cueq": 2.461
+      }
+     ]
+    },
+    "torch 2.13.0+cu129 / triton 3.7.1": {
+     "all_rows_bitwise_vs_144_and_uncapped_and_r2r": true,
+     "n_rows": 40,
+     "table": [
+      {
+       "N": 356,
+       "H": 8,
+       "ms_128": 0.3475,
+       "ms_144": 0.3942,
+       "ms_uncapped": 0.3973,
+       "x_128_over_144": 1.134,
+       "x_128_over_uncapped": 1.143,
+       "cueq_ms": 0.7708,
+       "x_128_over_cueq": 2.218
+      },
+      {
+       "N": 356,
+       "H": 4,
+       "ms_128": 0.1956,
+       "ms_144": 0.2193,
+       "ms_uncapped": 0.2203,
+       "x_128_over_144": 1.121,
+       "x_128_over_uncapped": 1.126,
+       "cueq_ms": 0.421,
+       "x_128_over_cueq": 2.152
+      },
+      {
+       "N": 546,
+       "H": 8,
+       "ms_128": 1.0107,
+       "ms_144": 1.148,
+       "ms_uncapped": 1.1534,
+       "x_128_over_144": 1.136,
+       "x_128_over_uncapped": 1.141,
+       "cueq_ms": 2.3837,
+       "x_128_over_cueq": 2.359
+      },
+      {
+       "N": 546,
+       "H": 4,
+       "ms_128": 0.5325,
+       "ms_144": 0.6035,
+       "ms_uncapped": 0.6039,
+       "x_128_over_144": 1.133,
+       "x_128_over_uncapped": 1.134,
+       "cueq_ms": 1.2329,
+       "x_128_over_cueq": 2.315
+      },
+      {
+       "N": 705,
+       "H": 8,
+       "ms_128": 2.1372,
+       "ms_144": 2.4259,
+       "ms_uncapped": 2.4321,
+       "x_128_over_144": 1.135,
+       "x_128_over_uncapped": 1.138,
+       "cueq_ms": 5.1446,
+       "x_128_over_cueq": 2.407
+      },
+      {
+       "N": 705,
+       "H": 4,
+       "ms_128": 1.0924,
+       "ms_144": 1.2375,
+       "ms_uncapped": 1.2402,
+       "x_128_over_144": 1.133,
+       "x_128_over_uncapped": 1.135,
+       "cueq_ms": 2.6168,
+       "x_128_over_cueq": 2.395
+      },
+      {
+       "N": 813,
+       "H": 8,
+       "ms_128": 2.9763,
+       "ms_144": 3.3664,
+       "ms_uncapped": 3.3914,
+       "x_128_over_144": 1.131,
+       "x_128_over_uncapped": 1.139,
+       "cueq_ms": 7.2373,
+       "x_128_over_cueq": 2.432
+      },
+      {
+       "N": 813,
+       "H": 4,
+       "ms_128": 1.5124,
+       "ms_144": 1.7139,
+       "ms_uncapped": 1.717,
+       "x_128_over_144": 1.133,
+       "x_128_over_uncapped": 1.135,
+       "cueq_ms": 3.6646,
+       "x_128_over_cueq": 2.423
+      }
+     ]
+    }
+   }
+  },
+  "sm_103 (NVIDIA B300)": "checked on NVIDIA B300 SXM6 AC (cc 10.3, torch 2.10 / triton 3.6.0): entry sm103 = the 64x32, 2-row, 4-warp tile at 2 stages with MAXNREG 128 — torch.equal to the package default at 64/64 battery points, x1.02-1.06 over it at N 256..2560 (the 3-stage sm100 cell is slower than the default at ragged N on this card).",
+  "sm_120 (NVIDIA RTX PRO 6000 Blackwell Server Edition)": {
+   "entry": {
+    "BLOCK_M": 64,
+    "BLOCK_N": 32,
+    "ROWS": 2,
+    "num_warps": 4,
+    "num_stages": 3,
+    "ORDER": 0,
+    "MAXNREG": "absent = uncapped"
+   },
+   "source": "torch 2.11.0+cu128, triton 3.6.0, cuEq 0.11.1",
+   "why": "same tile as the package default with the register cap REMOVED (MAXNREG=0/None): bitwise-identical output to the default (torch.equal) on 16/16 module cells (356/546/705/813 x b0/b47 x start/end), r2r 16/16, same-class vs fp64 (ratio_max 0.988-1.000); faster than the default at EVERY size: x1.06 @356, x1.07-1.13 @546, x1.03-1.05 @705, x1.10 @813 (kernel); vs cuEq cudnn_sm80 x1.53/1.73-1.81/1.60-1.64/1.91-1.93",
+   "evidence": {
+    "bitwise_vs_default": "16/16",
+    "r2r": "16/16",
+    "same_class_ratio_max_range": [
+     0.988,
+     1.0
+    ],
+    "timing_ms_tile_vs_default_vs_cueq": [
+     {
+      "N": 356,
+      "cell": "pf_c10_b47",
+      "tile_ms": 0.3306,
+      "default_ms": 0.3514,
+      "cueq_ms": 0.5074,
+      "tile_over_default": 1.063
+     },
+     {
+      "N": 356,
+      "cell": "pf_c1_b0",
+      "tile_ms": 0.3312,
+      "default_ms": 0.3518,
+      "cueq_ms": 0.5062,
+      "tile_over_default": 1.062
+     },
+     {
+      "N": 546,
+      "cell": "pf_c10_b47",
+      "tile_ms": 0.9539,
+      "default_ms": 1.0247,
+      "cueq_ms": 1.6486,
+      "tile_over_default": 1.074
+     },
+     {
+      "N": 546,
+      "cell": "pf_c1_b0",
+      "tile_ms": 0.9126,
+      "default_ms": 1.0279,
+      "cueq_ms": 1.6553,
+      "tile_over_default": 1.126
+     },
+     {
+      "N": 705,
+      "cell": "pf_c10_b47",
+      "tile_ms": 2.167,
+      "default_ms": 2.2384,
+      "cueq_ms": 3.5619,
+      "tile_over_default": 1.033
+     },
+     {
+      "N": 705,
+      "cell": "pf_c1_b0",
+      "tile_ms": 2.1225,
+      "default_ms": 2.2371,
+      "cueq_ms": 3.405,
+      "tile_over_default": 1.054
+     },
+     {
+      "N": 813,
+      "cell": "pf_c10_b47",
+      "tile_ms": 2.6116,
+      "default_ms": 2.8785,
+      "cueq_ms": 4.9928,
+      "tile_over_default": 1.102
+     },
+     {
+      "N": 813,
+      "cell": "pf_c1_b0",
+      "tile_ms": 2.5853,
+      "default_ms": 2.8493,
+      "cueq_ms": 4.9893,
+      "tile_over_default": 1.102
+     }
+    ]
+   },
+   "rejected_alternatives": [
+    {
+     "cfg": {
+      "BLOCK_M": 128,
+      "BLOCK_N": 32,
+      "ROWS": 2,
+      "num_warps": 8,
+      "num_stages": 2,
+      "MAXNREG": 128
+     },
+     "why_rejected": "fastest in the 705-only sweep (2.074 vs 2.240 ms, bitwise vs default) but SLOWER than the default at 546 (x0.68-0.71) and 813 (x0.97); size-dependent -> not a table entry unless the table is keyed by N",
+     "evidence": {
+      "bitwise_vs_default": "16/16",
+      "r2r": "16/16",
+      "same_class_ratio_max_range": [
+       0.988,
+       1.0
+      ],
+      "timing_ms_tile_vs_default_vs_cueq": [
+       {
+        "N": 356,
+        "cell": "pf_c10_b47",
+        "tile_ms": 0.349,
+        "default_ms": 0.3514,
+        "cueq_ms": 0.5074,
+        "tile_over_default": 1.007
+       },
+       {
+        "N": 356,
+        "cell": "pf_c1_b0",
+        "tile_ms": 0.3499,
+        "default_ms": 0.3518,
+        "cueq_ms": 0.5062,
+        "tile_over_default": 1.005
+       },
+       {
+        "N": 546,
+        "cell": "pf_c10_b47",
+        "tile_ms": 1.5105,
+        "default_ms": 1.0247,
+        "cueq_ms": 1.6486,
+        "tile_over_default": 0.678
+       },
+       {
+        "N": 546,
+        "cell": "pf_c1_b0",
+        "tile_ms": 1.4498,
+        "default_ms": 1.0279,
+        "cueq_ms": 1.6553,
+        "tile_over_default": 0.709
+       },
+       {
+        "N": 705,
+        "cell": "pf_c10_b47",
+        "tile_ms": 2.0671,
+        "default_ms": 2.2384,
+        "cueq_ms": 3.5619,
+        "tile_over_default": 1.083
+       },
+       {
+        "N": 705,
+        "cell": "pf_c1_b0",
+        "tile_ms": 1.9713,
+        "default_ms": 2.2371,
+        "cueq_ms": 3.405,
+        "tile_over_default": 1.135
+       },
+       {
+        "N": 813,
+        "cell": "pf_c10_b47",
+        "tile_ms": 2.9542,
+        "default_ms": 2.8785,
+        "cueq_ms": 4.9928,
+        "tile_over_default": 0.974
+       },
+       {
+        "N": 813,
+        "cell": "pf_c1_b0",
+        "tile_ms": 2.9504,
+        "default_ms": 2.8493,
+        "cueq_ms": 4.9893,
+        "tile_over_default": 0.966
+       }
+      ]
+     }
+    },
+    {
+     "cfg": {
+      "BLOCK_M": 128,
+      "BLOCK_N": 32,
+      "ROWS": 2,
+      "num_warps": 4,
+      "num_stages": 2,
+      "MAXNREG": 0
+     },
+     "why_rejected": "same pattern: x1.08 @705 but x0.68-0.71 @546, x0.96 @813",
+     "evidence": {
+      "bitwise_vs_default": "16/16",
+      "r2r": "16/16",
+      "same_class_ratio_max_range": [
+       0.988,
+       1.0
+      ],
+      "timing_ms_tile_vs_default_vs_cueq": [
+       {
+        "N": 356,
+        "cell": "pf_c10_b47",
+        "tile_ms": 0.3482,
+        "default_ms": 0.3514,
+        "cueq_ms": 0.5074,
+        "tile_over_default": 1.009
+       },
+       {
+        "N": 356,
+        "cell": "pf_c1_b0",
+        "tile_ms": 0.3485,
+        "default_ms": 0.3518,
+        "cueq_ms": 0.5062,
+        "tile_over_default": 1.009
+       },
+       {
+        "N": 546,
+        "cell": "pf_c10_b47",
+        "tile_ms": 1.4992,
+        "default_ms": 1.0247,
+        "cueq_ms": 1.6486,
+        "tile_over_default": 0.683
+       },
+       {
+        "N": 546,
+        "cell": "pf_c1_b0",
+        "tile_ms": 1.4401,
+        "default_ms": 1.0279,
+        "cueq_ms": 1.6553,
+        "tile_over_default": 0.714
+       },
+       {
+        "N": 705,
+        "cell": "pf_c10_b47",
+        "tile_ms": 2.073,
+        "default_ms": 2.2384,
+        "cueq_ms": 3.5619,
+        "tile_over_default": 1.08
+       },
+       {
+        "N": 705,
+        "cell": "pf_c1_b0",
+        "tile_ms": 2.062,
+        "default_ms": 2.2371,
+        "cueq_ms": 3.405,
+        "tile_over_default": 1.085
+       },
+       {
+        "N": 813,
+        "cell": "pf_c10_b47",
+        "tile_ms": 2.9999,
+        "default_ms": 2.8785,
+        "cueq_ms": 4.9928,
+        "tile_over_default": 0.96
+       },
+       {
+        "N": 813,
+        "cell": "pf_c1_b0",
+        "tile_ms": 2.9598,
+        "default_ms": 2.8493,
+        "cueq_ms": 4.9893,
+        "tile_over_default": 0.963
+       }
+      ]
+     }
+    },
+    {
+     "cfg": "default tile with MAXNREG=128",
+     "why_rejected": "sweep @705: 2.264 ms vs 2.169 uncapped vs 2.240 at 144 -> the cap that helps sm_100 (x1.14, SM100 track) does NOT help sm_120"
+    }
+   ]
+  },
+  "not adopted on sm_100": "128x32 ROWS1 4 warps 3 stages MAXNREG 128: x1.03-1.05 over the B200 entry @705 with the same error class but NOT bitwise to default -> would need its own Tier-2 sign-off; gain too small. fpf_triatt_sm100 (tcgen05/TMA Triton port): 2.03-2.06 ms @705 H=8 = parity with the B200 entry; engineering artifact only (notes not included in this package).",
+  "loader": "patched loader prints once per process: '[triatt_k2b] K2B cells: cc=(x, y) name=... -> entry <key> via cc|name(secondary) (MAXNREG=...)' or '-> no entry (...); package default (MAXNREG=...)'. Unit test: python cells/k2b_cells.py cells/K2B_CELLS.json (8 fake cc/name pairs incl. H200 -> default, unknown-name cc 10.0 -> sm100).",
+  "context (NOT an entry; different provider)": "Landscape @705 tok H=8 on B200, kernel-only per call: cuEq 0.11.1 sm80-cuDNN path 5.14 ms | K2B v1.1 @MAXNREG128 (this file's sm100 entry) 2.12 ms | cuEquivariance cu13 build's sm100-native cuDNN tri-attention ('sm100f', needs S_kv % 8 == 0 -> pad-8 shim) 1.38 ms (probe track, 2026-08-23). The cu13 provider is under SEPARATE sign-off; on cu12 images (the pinned ones today) K2B with this cells file is the sm_100 Tier-2 tri-attention provider; sm_90 / sm_120 unaffected.",
+  "v4 (2026-08-24)": "adds cc 9.0 -> entry sm90 (MAXNREG 128); admission rule: output torch.equal vs the served default at >= 2 sizes at the real call layout AND not slower anywhere; every entry in this file remains output-bitwise-identical to the package default it replaces."
+ },
+ "H100": {
+  "bf16": {
+   "32": [
+    [
+     1073741824,
+     {
+      "BLOCK_M": 64,
+      "BLOCK_N": 32,
+      "ROWS": 2,
+      "num_warps": 4,
+      "num_stages": 3,
+      "ORDER": 0,
+      "MAXNREG": 128
+     }
+    ]
+   ]
+  }
+ }
+}

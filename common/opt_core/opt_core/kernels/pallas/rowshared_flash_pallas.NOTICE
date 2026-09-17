@@ -1,0 +1,7 @@
+rowshared_flash_pallas.py -- row-shared pair-bias flash attention forward (ROWS batch rows per program reuse each
+[bq, bk] pair-bias tile; online softmax, fp32 statistics), backward = the carried pallas_attn kernels (jax.custom_vjp).
+Origin: an earlier row-attention kernel package (version 0.2.0) by the same authors, this file
+carried byte for byte (it imports the sibling kernels/pallas_attn/af2_flash_pallas.py by a package-relative import, which is
+why it sits at this package's top level); the package's tiles_by_arch.json, __init__ and notes are not carried (the
+measured settings are cells of PALLAS_CELLS.json).  Portions Copyright 2021 DeepMind Technologies Limited (AlphaFold 2,
+Apache-2.0: the calling convention); no AlphaFold source is copied here.

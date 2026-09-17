@@ -1,0 +1,58 @@
+# colabdesign_opt — explicit interface to the ColabDesign AF-Multimer design-step optimizations.
+# Install editable from the release tree: `pip install -e common/opt_core -e colabdesign/opt` (the shared core this kit pins below, then
+# the kit). The tree it runs lives beside the package (stock/ — BindCraft's vendored design step, the pins) and is resolved from the
+# package location, so the install must stay editable (or point
+# COLABDESIGN_OPT_HOME / MODEL_OPT at the tree). No
+# install-time dependency on colabdesign or jax (stock/PINS.json): the pins are checked at activation. The build backend is the tree's one
+# backend (common/opt_core/kit_template/_build_backend.py, byte-for-byte): setuptools plus one step that ships colabdesign_opt_autoload.pth
+# at the wheel root, which is what makes `COLABDESIGN_OPT=fast` activate without code changes (colabdesign_opt/_autoload.py).
+[build-system]
+requires = ["setuptools>=64", "wheel"]
+build-backend = "_build_backend"
+backend-path = ["."]
+
+[project]
+name = "colabdesign_opt"
+dynamic = ["version"]
+description = "ColabDesign AF-Multimer design-step optimizations: modes off / fast, lazy autoload, activation report"
+requires-python = ">=3.10"
+classifiers = ["Private :: Do Not Upload"]
+dependencies = []
+
+[project.optional-dependencies]
+test = ["pytest", "setuptools>=64", "numpy", "pandas", "scipy", "matplotlib", "biopython"]   # the CPU tests; numpy … biopython = what BindCraft's design step itself imports (the driver tests run its code on the stand-in stack; they skip by name without them)
+
+[project.scripts]
+colabdesign-opt = "colabdesign_opt.__main__:main"  # `colabdesign-opt design|check|warm ...` == `python -m colabdesign_opt ...`
+
+[tool.setuptools]
+packages = ["colabdesign_opt", "colabdesign_opt.kernels", "colabdesign_opt.tests"]
+include-package-data = false
+
+[tool.setuptools.dynamic]
+version = {attr = "colabdesign_opt.__version__"}
+
+# The shared core this kit runs against (common/opt_core, imported as `opt_core`: the build backend, the GPU / distribution / core-pin
+# gates, the subprocess runner, the exit codes and partial-activation lines). `version` is the MINIMUM core version this kit needs; every entry of the package
+# runs colabdesign_opt/_core_gate.py (the tree's kit_template copy) before any opt_core import: a located core that is absent or older than
+# `version` is `[colabdesign-opt] NOT ACTIVE: reason=core_missing|core_mismatch|core_pin_unreadable …`, exit 3.
+[tool.opt_core]
+path = "../../common/opt_core"
+version = "0.5.30.0"
+
+# forward_numerics: every file of this kit whose bytes decide the forward+backward numerics of a design step and of a trajectory, in the
+# kit-route mode (fast) and in the stock arm — BindCraft's design step as vendored (binder_hallucination and the modules it
+# imports, the pinned settings file; the DSSP executable its optimise_beta check runs is fetched at install and enters through its sha256
+# pin in stock/PINS.json), the driver that calls it and the observer wrapped around
+# ColabDesign's design class, the levers (adapters over the shared core: the kernel, the serve layer and the sub-batch policy live in
+# common/opt_core), their installer, the mode -> lever table, the settings loader, the arm launchers and the design script, the stock
+# pins, the arm's environment file. Paths relative to the kit directory (colabdesign/).
+forward_numerics = [
+    "stock/src/bindcraft/functions/colabdesign_utils.py", "stock/src/bindcraft/functions/biopython_utils.py", "stock/src/bindcraft/functions/generic_utils.py",
+    "stock/src/bindcraft/settings_advanced/default_4stage_multimer.json",
+    "opt/colabdesign_opt/bindcraft.py", "opt/colabdesign_opt/units.py", "opt/colabdesign_opt/settings.py", "opt/colabdesign_opt/stock_design.py",
+    "opt/colabdesign_opt/nosub.py", "opt/colabdesign_opt/pallas.py", "opt/colabdesign_opt/levers.py", "opt/colabdesign_opt/modes.py", "opt/colabdesign_opt/names.py",
+    "opt/colabdesign_opt/registry.py", "opt/colabdesign_opt/kernels/*.py",
+    "opt/colabdesign_opt/launch.py", "opt/colabdesign_opt/kit_launch.py", "opt/colabdesign_opt/stock_launch.py", "opt/colabdesign_opt/envproof.py",
+    "stock/PINS.json", "configs/h100.env",
+]

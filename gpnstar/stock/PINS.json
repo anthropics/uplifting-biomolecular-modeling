@@ -1,0 +1,641 @@
+{
+ "model": "gpnstar",
+ "what": "The stock this kit is exact against, pinned: the upstream package (songlab-cal/gpn at one commit; the git archive of that commit is carried in stock/), the library stack, and the released GPN-Star checkpoints (Hugging Face repository, revision, per-file bytes and sha256). Read by stock/check_pins.py.",
+ "upstream": {
+  "gpn": {
+   "repo": "https://github.com/songlab-cal/gpn",
+   "commit": "6f28c81bcbfe7d65cb6d8ece9ce88f87ca583791",
+   "commit_date": "2026-09-09T12:13:22-04:00",
+   "version": "0.9.0",
+   "tag": null,
+   "describe": "v0.9.0-2-g6f28c81 (git describe --tags: two commits after the v0.9.0 tag; the package version string is still 0.9.0)",
+   "install": "gpn[inference] @ git+https://github.com/songlab-cal/gpn@6f28c81bcbfe7d65cb6d8ece9ce88f87ca583791",
+   "archive": "stock/gpn-6f28c81b.tar.gz",
+   "package_dir": "src/gpn",
+   "build_backend": "hatchling.build",
+   "requires_python": ">=3.13,<3.14",
+   "console_script": "gpn = gpn.cli:main",
+   "licence": "MIT (LICENSE at the archive root: 'MIT License', 'Copyright (c) 2022 Song Lab @ Cal'; pyproject.toml license = \"MIT\", license-files = [\"LICENSE\"])",
+   "declared_ranges": {
+    "cyclopts": ">=4.22.5,<5",
+    "huggingface-hub": ">=0.26",
+    "jaxtyping": ">=0.3.2",
+    "networkx": ">=3.2",
+    "numpy": ">=1.26",
+    "torch": ">=2.5",
+    "transformers": "==5.15.0"
+   },
+   "extras": {
+    "inference": [
+     "accelerate>=1",
+     "biopython>=1.83",
+     "datasets>=3",
+     "pandas>=2.1",
+     "pyarrow>=15",
+     "zarr>=2.17,<4"
+    ]
+   },
+   "cite": "the archive's pyproject.toml L1-3 (build backend), L6-7 (name, version), L10 (requires-python), L11-12 (licence), L34-42 (dependencies; L41 the transformers pin), L44-45 (console script), L47-55 (the inference extra), L103-104 (wheel packages = src/gpn)"
+  }
+ },
+ "upstream_lock": {
+  "file": "uv.lock at the archive root (requires-python ==3.13.*)",
+  "versions": {
+   "torch": "2.13.0 (resolved from the lock's pytorch-cpu index: the lock pins the CPU build; the CUDA build is chosen at install)",
+   "transformers": "5.15.0",
+   "numpy": "2.5.2",
+   "huggingface-hub": "1.28.0",
+   "safetensors": "0.8.0",
+   "accelerate": "1.14.0",
+   "zarr": "3.3.0",
+   "datasets": "5.0.1",
+   "pandas": "3.0.5",
+   "pyarrow": "25.0.1",
+   "biopython": "1.88"
+  },
+  "note": "pinned_stack below is the stack the kit was measured on (pip's resolution of the install line on Python 3.13 with the torch 2.13.0 CUDA 13.0 wheel); it equals the lock for torch, transformers, safetensors and zarr and is newer by a patch/minor release for accelerate, huggingface-hub and numpy"
+ },
+ "archive_recipe": "git archive --format=tar.gz --prefix=gpn-6f28c81b/ 6f28c81bcbfe7d65cb6d8ece9ce88f87ca583791 (the whole tree at the commit; git 2.43.0, its built-in gzip)",
+ "archive": {
+  "file": "gpn-6f28c81b.tar.gz",
+  "sha256": "cd419bb743cb464e2bcd8697d3087f1ccf928453c184fdc16ce9a47748823f22",
+  "bytes": 1655917,
+  "tar_sha256": "a43698e8d456359bfed120c0ce02dcd75a1963791bdc12805453eac2c55a23fd",
+  "tar_bytes": 2795520,
+  "members": 129,
+  "git_version": "2.43.0",
+  "same_tree_as": {
+   "url": "https://github.com/songlab-cal/gpn/archive/6f28c81bcbfe7d65cb6d8ece9ce88f87ca583791.tar.gz",
+   "sha256": "837d1b228512625db99729c210338ea015143dca107ec2e7e78a7282bbd71071",
+   "bytes": 1655540,
+   "note": "the archive GitHub serves for the commit (member prefix gpn-<commit>/): the same files with the same content digests, file for file; only the member prefix and the gzip framing differ from stock/gpn-6f28c81b.tar.gz"
+  }
+ },
+ "python": "3.13",
+ "pinned_stack": {
+  "python": "3.13",
+  "torch": "2.13.0",
+  "torch_version_str": "2.13.0+cu130",
+  "cuda": "13.0",
+  "cudnn": "9.20.0.48 (nvidia-cudnn-cu13)",
+  "triton": "3.7.1",
+  "transformers": "5.15.0",
+  "huggingface_hub": "1.31.0",
+  "safetensors": "0.8.0",
+  "accelerate": "1.15.0",
+  "numpy": "2.5.3",
+  "zarr": "3.3.0",
+  "nvidia_cublas": "13.1.1.3",
+  "nvidia_cuda_runtime": "13.0.96",
+  "gpn": "0.9.0",
+  "tested_on": "python 3.13, torch 2.13.0+cu130 (CUDA 13.0, cuDNN 9.20), triton 3.7.1, transformers 5.15.0, accelerate 1.15.0, huggingface_hub 1.31.0, safetensors 0.8.0, numpy 2.5.3, zarr 3.3.0, gpn 0.9.0 from git @ 6f28c81bcbfe7d65cb6d8ece9ce88f87ca583791; NVIDIA H100 80GB HBM3, driver 580.95.05; TF32 off (the PyTorch defaults: torch.backends.cuda.matmul.allow_tf32 False, float32_matmul_precision 'highest'); weights not in the image (a record of where the numbers were taken; nothing reads or compares it)"
+ },
+ "pins": {
+  "torch": "2.13.0",
+  "triton": "3.7.1",
+  "transformers": "5.15.0",
+  "huggingface_hub": "1.31.0",
+  "safetensors": "0.8.0",
+  "accelerate": "1.15.0",
+  "numpy": "2.5.3",
+  "zarr": "3.3.0",
+  "nvidia_cudnn_cu13": "9.20.0.48",
+  "gpn": "0.9.0"
+ },
+ "numerics": {
+  "stock": "fp32 weights and activations (config.json torch_dtype float32; from_pretrained with no dtype argument), eval mode, the forward under transformers Trainer.predict (torch.no_grad, no autocast), scaled_dot_product_attention restricted to the math backend by the model code, TF32 off (the package sets no TF32 or matmul-precision flag: PyTorch defaults)",
+  "cite": "src/gpn/star/inference.py L42-46 (from_pretrained, eval); src/gpn/star/model.py L339-342 and L514-517 (torch.backends.cuda.sdp_kernel(enable_flash=False, enable_math=True, enable_mem_efficient=False) around F.scaled_dot_product_attention); src/gpn/inference.py L51-52, L124 (Trainer(model=..., args=...).predict)"
+ },
+ "weights": {
+  "songlab/gpn-star-hg38-v100-200m": {
+   "snapshot_commit": "0c949f132d35619a3eb188b402848c998a3313ae",
+   "role": "primary (the human model the exactness and speed statements are made on)",
+   "n_species": 100,
+   "window_size": 128,
+   "files": {
+    ".gitattributes": {
+     "sha256": "11ad7efa24975ee4b0c3c3a38ed18737f0658a5f75a0a96787b576a78a023361",
+     "size_bytes": 1519,
+     "blob_oid": "a6344aac8c09253b3b630fb776ae94478aa0275b"
+    },
+    "README.md": {
+     "sha256": "d8d7a46d41a1a37fe4f0a5f637bf55c649310185329127d8a2204632e480be17",
+     "size_bytes": 24,
+     "blob_oid": "7be5fc7f47d5db027d120b8024982df93db95b74"
+    },
+    "calibration_table/entropy.parquet": {
+     "sha256": "b2e0a1f9586d7e378a09eb8923feb4f49b2e466900bb7f1fcee9ed752f5333e1",
+     "size_bytes": 12414,
+     "lfs": true
+    },
+    "calibration_table/llr.parquet": {
+     "sha256": "162ed3d1bc05208a955f0440c4a010c82213632c41870307e701ba011775a5e4",
+     "size_bytes": 34104,
+     "lfs": true
+    },
+    "config.json": {
+     "sha256": "4ba460a8fbe150041287e9d236ef71d98d538632e6970ad128f5d132888b473c",
+     "size_bytes": 727,
+     "blob_oid": "f8a396dfb7083363cef34767985528da4467f251"
+    },
+    "model.safetensors": {
+     "sha256": "994188342625ae86bf9b43f7463f471a92cfbf0ad80db4848dcdd8a534607f52",
+     "size_bytes": 812151500,
+     "lfs": true
+    },
+    "phylo_dist/.snakemake_timestamp": {
+     "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+     "size_bytes": 0,
+     "blob_oid": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+    },
+    "phylo_dist/in_clade.npy": {
+     "sha256": "73f690315127e55ea00acb9079dbe29d17d89810c42eaaf7b488767182472470",
+     "size_bytes": 928,
+     "lfs": true
+    },
+    "phylo_dist/pairwise.npy": {
+     "sha256": "4b7fbc2fbaa60022e94996e90e1de1fd984e2b774175cd20285ba0adbe56343b",
+     "size_bytes": 80128,
+     "lfs": true
+    }
+   },
+   "weights_files": [
+    "model.safetensors"
+   ],
+   "total_weights_bytes": 812151500,
+   "snapshot_bytes": 812281344,
+   "gated": false,
+   "card_licence": "mit",
+   "card_licence_line": "license: mit"
+  },
+  "songlab/gpn-star-ce11-n135-25m": {
+   "snapshot_commit": "078ad60c23bbaf40fbeae89fb509a21320a71bbb",
+   "role": "second pinned model (small; a different species count and model size)",
+   "n_species": 135,
+   "window_size": 128,
+   "files": {
+    ".gitattributes": {
+     "sha256": "11ad7efa24975ee4b0c3c3a38ed18737f0658a5f75a0a96787b576a78a023361",
+     "size_bytes": 1519,
+     "blob_oid": "a6344aac8c09253b3b630fb776ae94478aa0275b"
+    },
+    "README.md": {
+     "sha256": "d8d7a46d41a1a37fe4f0a5f637bf55c649310185329127d8a2204632e480be17",
+     "size_bytes": 24,
+     "blob_oid": "7be5fc7f47d5db027d120b8024982df93db95b74"
+    },
+    "calibration_table/entropy.parquet": {
+     "sha256": "03b328ef7483cacbae15e5a04d0f56b4721e388d8ae666ee23364070c4d94977",
+     "size_bytes": 12414,
+     "lfs": true
+    },
+    "calibration_table/llr.parquet": {
+     "sha256": "b267b7d9fd345e806c4eb084f5dae03bea16a9af1f0a5a695409f5f00a3397d7",
+     "size_bytes": 34104,
+     "lfs": true
+    },
+    "config.json": {
+     "sha256": "c891e49c35526419167d364efb3005ec9a53aa912b6e631e4c61a198019dadd1",
+     "size_bytes": 726,
+     "blob_oid": "383de23ca7d75f0bc14a60e84c4ff837706c4419"
+    },
+    "model.safetensors": {
+     "sha256": "25a27fbde23054440ea8fe2c7080b3af0b5779887be7ff0adb0cb11664e1ca06",
+     "size_bytes": 103510204,
+     "lfs": true
+    },
+    "phylo_dist/.snakemake_timestamp": {
+     "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+     "size_bytes": 0,
+     "blob_oid": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+    },
+    "phylo_dist/in_clade.npy": {
+     "sha256": "7e73d324a9002802cc4bd39ea08e07b78a293cf1d85352102963befa921bdb1d",
+     "size_bytes": 1208,
+     "lfs": true
+    },
+    "phylo_dist/pairwise.npy": {
+     "sha256": "e8ec14467980d82e1ab9b75f064817f1969dff84db0fd27bb3db15e1adc3253b",
+     "size_bytes": 145928,
+     "lfs": true
+    }
+   },
+   "weights_files": [
+    "model.safetensors"
+   ],
+   "total_weights_bytes": 103510204,
+   "snapshot_bytes": 103706127,
+   "gated": false,
+   "card_licence": "mit",
+   "card_licence_line": "license: mit"
+  },
+  "songlab/gpn-star-hg38-m447-200m": {
+   "snapshot_commit": "0d8f5164fba8e8108200c160370b86652bfb6244",
+   "role": "optional",
+   "n_species": 447,
+   "window_size": 256,
+   "files": {
+    ".gitattributes": {
+     "sha256": "11ad7efa24975ee4b0c3c3a38ed18737f0658a5f75a0a96787b576a78a023361",
+     "size_bytes": 1519,
+     "blob_oid": "a6344aac8c09253b3b630fb776ae94478aa0275b"
+    },
+    "README.md": {
+     "sha256": "d8d7a46d41a1a37fe4f0a5f637bf55c649310185329127d8a2204632e480be17",
+     "size_bytes": 24,
+     "blob_oid": "7be5fc7f47d5db027d120b8024982df93db95b74"
+    },
+    "calibration_table/entropy.parquet": {
+     "sha256": "134d516ab5b8be052fef8cdc2464e83a9c2058c6eca9711950f729d63a50a12c",
+     "size_bytes": 12418,
+     "lfs": true
+    },
+    "calibration_table/llr.parquet": {
+     "sha256": "40d5d191b8aaaf6cd171f0bf09e1dccf93734fa299b1604930c4a1cf0b446fae",
+     "size_bytes": 34084,
+     "lfs": true
+    },
+    "config.json": {
+     "sha256": "c1b9708aa1ecbd5346245691b1c1da3915dab47a8be1d68fe5aa56b6e12c806e",
+     "size_bytes": 731,
+     "blob_oid": "bb81afc83092e57beef4b71e094fa2e5fff14d53"
+    },
+    "model.safetensors": {
+     "sha256": "b4a9605ae7036a02aaab4350de3c7f5ba1e3768e66e059b2ad8f1f3eeea890a5",
+     "size_bytes": 812151500,
+     "lfs": true
+    },
+    "phylo_dist/.snakemake_timestamp": {
+     "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+     "size_bytes": 0,
+     "blob_oid": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+    },
+    "phylo_dist/in_clade.npy": {
+     "sha256": "23a8dae6b7e7dcdd6c167e33fbc58ad45d306bc477a0a6b9b90ba5570699864c",
+     "size_bytes": 3704,
+     "lfs": true
+    },
+    "phylo_dist/pairwise.npy": {
+     "sha256": "d6e3a614232de741e313c3b0388f358ff2c7c4e9ddacac7dca5d42d36b523117",
+     "size_bytes": 1598600,
+     "lfs": true
+    }
+   },
+   "weights_files": [
+    "model.safetensors"
+   ],
+   "total_weights_bytes": 812151500,
+   "snapshot_bytes": 813802580,
+   "gated": false,
+   "card_licence": "mit",
+   "card_licence_line": "license: mit"
+  },
+  "songlab/gpn-star-hg38-p243-200m": {
+   "snapshot_commit": "16773016130e826cd3d72e91ed312a3cb27ba2b5",
+   "role": "optional",
+   "n_species": 243,
+   "window_size": 256,
+   "files": {
+    ".gitattributes": {
+     "sha256": "11ad7efa24975ee4b0c3c3a38ed18737f0658a5f75a0a96787b576a78a023361",
+     "size_bytes": 1519,
+     "blob_oid": "a6344aac8c09253b3b630fb776ae94478aa0275b"
+    },
+    "README.md": {
+     "sha256": "d8d7a46d41a1a37fe4f0a5f637bf55c649310185329127d8a2204632e480be17",
+     "size_bytes": 24,
+     "blob_oid": "7be5fc7f47d5db027d120b8024982df93db95b74"
+    },
+    "calibration_table/entropy.parquet": {
+     "sha256": "59e75d2415e97e0a7a9bea8a54fa8b7e9abb0b79704fde7a2df25248f3126e5d",
+     "size_bytes": 12414,
+     "lfs": true
+    },
+    "calibration_table/llr.parquet": {
+     "sha256": "eb02f7818dea4927655e6e7fd4bd2a3453d1954b49c73db600aa45dde0ef8d00",
+     "size_bytes": 34100,
+     "lfs": true
+    },
+    "config.json": {
+     "sha256": "17453e1c9ddd7fcbb4145c5f01063aa35b8085e80270c87687d490a4cc391597",
+     "size_bytes": 728,
+     "blob_oid": "d784ddba3fe8fee0fa13ab7f6e6c07f4e7ec1dd0"
+    },
+    "model.safetensors": {
+     "sha256": "7961bb5072fab482889d8fd179831ff0227a4c5f92dcb527c8da5eca50b41586",
+     "size_bytes": 812151500,
+     "lfs": true
+    },
+    "phylo_dist/.snakemake_timestamp": {
+     "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+     "size_bytes": 0,
+     "blob_oid": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+    },
+    "phylo_dist/in_clade.npy": {
+     "sha256": "047129c30fa9f92185c2da3664beeda33e2b038b4e3298a996a584679f74f88e",
+     "size_bytes": 2072,
+     "lfs": true
+    },
+    "phylo_dist/pairwise.npy": {
+     "sha256": "e11c048c95885da03f2f5c14aa8c3ca226e08c11ca1c7f26a613d320f769eef1",
+     "size_bytes": 472520,
+     "lfs": true
+    }
+   },
+   "weights_files": [
+    "model.safetensors"
+   ],
+   "total_weights_bytes": 812151500,
+   "snapshot_bytes": 812674877,
+   "gated": false,
+   "card_licence": "mit",
+   "card_licence_line": "license: mit"
+  },
+  "songlab/gpn-star-tair10-b18-25m": {
+   "snapshot_commit": "317841ed55164ff4cd3d14e636bcc2d5de23cf49",
+   "role": "optional",
+   "n_species": 18,
+   "window_size": 128,
+   "files": {
+    ".gitattributes": {
+     "sha256": "11ad7efa24975ee4b0c3c3a38ed18737f0658a5f75a0a96787b576a78a023361",
+     "size_bytes": 1519,
+     "blob_oid": "a6344aac8c09253b3b630fb776ae94478aa0275b"
+    },
+    "README.md": {
+     "sha256": "d8d7a46d41a1a37fe4f0a5f637bf55c649310185329127d8a2204632e480be17",
+     "size_bytes": 24,
+     "blob_oid": "7be5fc7f47d5db027d120b8024982df93db95b74"
+    },
+    "calibration_table/entropy.parquet": {
+     "sha256": "226ba92d377b5bfdd03d89c3ce7a42b9b0b80e8c30006be4a12f8e8e04736e3b",
+     "size_bytes": 12706,
+     "lfs": true
+    },
+    "calibration_table/llr.parquet": {
+     "sha256": "bb8ad59f418d392933d04dae52348647bebddffc3d2f29281254bb9aba0b261e",
+     "size_bytes": 34153,
+     "lfs": true
+    },
+    "config.json": {
+     "sha256": "441ee6a0ccf9d0a583eb7301adca5948334518ad6ad0512160c0a71f6a179aa4",
+     "size_bytes": 736,
+     "blob_oid": "323a7332e137a01d24cab932c7fff521d2427644"
+    },
+    "model.safetensors": {
+     "sha256": "c9633dc18df7fc8a2f2da38dddf219e3253063533f2fcab9d92235e233e67ad3",
+     "size_bytes": 103510204,
+     "lfs": true
+    },
+    "phylo_dist/.snakemake_timestamp": {
+     "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+     "size_bytes": 0,
+     "blob_oid": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+    },
+    "phylo_dist/in_clade.npy": {
+     "sha256": "219879b6c98090879cba7bed52040a5d5c5bc1b03623b9798c7b87c294b63e95",
+     "size_bytes": 272,
+     "lfs": true
+    },
+    "phylo_dist/pairwise.npy": {
+     "sha256": "8c2faa8ef97f6f03549c99d3d2d9ee7dca467cd33cde385a83cc1022bbf6e5b6",
+     "size_bytes": 2720,
+     "lfs": true
+    }
+   },
+   "weights_files": [
+    "model.safetensors"
+   ],
+   "total_weights_bytes": 103510204,
+   "snapshot_bytes": 103562334,
+   "gated": false,
+   "card_licence": "mit",
+   "card_licence_line": "license: mit"
+  },
+  "root": "the Hugging Face cache under HF_HOME (upstream's own location: hub/models--songlab--gpn-star-<name>/snapshots/<commit>/); --model-path takes the repository id with --model-revision <commit>, or the snapshot directory"
+ },
+ "weights_layout": {
+  "form": "HF cache: <HF_HOME>/hub/models--songlab--<repo>/snapshots/<commit>/ with refs/main = the commit; read with HF_HUB_OFFLINE=1",
+  "files_read_at_load": "config.json, model.safetensors (AutoModelForMaskedLM.from_pretrained); phylo_dist/in_clade.npy and phylo_dist/pairwise.npy via config.json phylo_dist_path (the model's phylogenetic-distance tables); calibration_table/*.parquet is not read by gpn star vep|logits|embedding",
+  "manifest": "python -I stock/check_pins.py --weights <HF_HOME> --variant <key>|all checks every pinned file under <HF_HOME>/hub/models--songlab--<name>/snapshots/<commit>/ against the digests above (sha256 and size); the files in required_files must be present",
+  "required_files": [
+   "config.json",
+   "*.safetensors",
+   "phylo_dist/pairwise.npy",
+   "phylo_dist/in_clade.npy"
+  ]
+ },
+ "variants": {
+  "v100-200m": {
+   "hf_repo": "songlab/gpn-star-hg38-v100-200m",
+   "snapshot_commit": "0c949f132d35619a3eb188b402848c998a3313ae",
+   "n_species": 100,
+   "window_size": 128,
+   "role": "primary"
+  },
+  "ce11-25m": {
+   "hf_repo": "songlab/gpn-star-ce11-n135-25m",
+   "snapshot_commit": "078ad60c23bbaf40fbeae89fb509a21320a71bbb",
+   "n_species": 135,
+   "window_size": 128,
+   "role": "second pinned model"
+  },
+  "m447-200m": {
+   "hf_repo": "songlab/gpn-star-hg38-m447-200m",
+   "snapshot_commit": "0d8f5164fba8e8108200c160370b86652bfb6244",
+   "n_species": 447,
+   "window_size": 256,
+   "role": "optional"
+  },
+  "p243-200m": {
+   "hf_repo": "songlab/gpn-star-hg38-p243-200m",
+   "snapshot_commit": "16773016130e826cd3d72e91ed312a3cb27ba2b5",
+   "n_species": 243,
+   "window_size": 256,
+   "role": "optional"
+  },
+  "tair10-25m": {
+   "hf_repo": "songlab/gpn-star-tair10-b18-25m",
+   "snapshot_commit": "317841ed55164ff4cd3d14e636bcc2d5de23cf49",
+   "n_species": 18,
+   "window_size": 128,
+   "role": "optional"
+  }
+ },
+ "configs": {
+  "songlab/gpn-star-hg38-v100-200m": {
+   "model_type": "GPNStar",
+   "architectures": [
+    "GPNStarForMaskedLM"
+   ],
+   "hidden_size": 1024,
+   "num_hidden_layers": 16,
+   "num_attention_heads": 16,
+   "intermediate_size": 4096,
+   "vocab_size": 6,
+   "max_position_embeddings": 1536,
+   "torch_dtype": "float32",
+   "phylo_dist_path": "results/phylo_info/hg38/multiz100way/100/phylo_dist/0.2",
+   "clade_thres": 0.2,
+   "time_enc": "fire_1",
+   "transformers_version": "4.37.2"
+  },
+  "songlab/gpn-star-ce11-n135-25m": {
+   "model_type": "GPNStar",
+   "architectures": [
+    "GPNStarForMaskedLM"
+   ],
+   "hidden_size": 512,
+   "num_hidden_layers": 8,
+   "num_attention_heads": 8,
+   "intermediate_size": 2048,
+   "vocab_size": 6,
+   "max_position_embeddings": 1536,
+   "torch_dtype": "float32",
+   "phylo_dist_path": "results/phylo_info/ce11/multiz135way/135/phylo_dist/0.2",
+   "clade_thres": 0.2,
+   "time_enc": "fire_1",
+   "transformers_version": "4.37.2"
+  },
+  "songlab/gpn-star-hg38-m447-200m": {
+   "model_type": "GPNStar",
+   "architectures": [
+    "GPNStarForMaskedLM"
+   ],
+   "hidden_size": 1024,
+   "num_hidden_layers": 16,
+   "num_attention_heads": 16,
+   "intermediate_size": 4096,
+   "vocab_size": 6,
+   "max_position_embeddings": 1536,
+   "torch_dtype": "float32",
+   "phylo_dist_path": "results/phylo_info/hg38/cactus447way/447/phylo_dist/0.05",
+   "clade_thres": 0.05,
+   "time_enc": "fire_1",
+   "transformers_version": "4.37.2"
+  },
+  "songlab/gpn-star-hg38-p243-200m": {
+   "model_type": "GPNStar",
+   "architectures": [
+    "GPNStarForMaskedLM"
+   ],
+   "hidden_size": 1024,
+   "num_hidden_layers": 16,
+   "num_attention_heads": 16,
+   "intermediate_size": 4096,
+   "vocab_size": 6,
+   "max_position_embeddings": 1536,
+   "torch_dtype": "float32",
+   "phylo_dist_path": "results/phylo_info/hg38/cactus447way/243/phylo_dist/0.05",
+   "clade_thres": 0.05,
+   "time_enc": "fire_1",
+   "transformers_version": "4.37.2"
+  },
+  "songlab/gpn-star-tair10-b18-25m": {
+   "model_type": "GPNStar",
+   "architectures": [
+    "GPNStarForMaskedLM"
+   ],
+   "hidden_size": 512,
+   "num_hidden_layers": 8,
+   "num_attention_heads": 8,
+   "intermediate_size": 2048,
+   "vocab_size": 6,
+   "max_position_embeddings": 1536,
+   "torch_dtype": "float32",
+   "phylo_dist_path": "results/phylo_info/tair10/multiz18way/18/phylo_dist/0.05",
+   "clade_thres": 0.05,
+   "time_enc": "fire_1",
+   "transformers_version": "4.37.2"
+  }
+ },
+ "entry_point": {
+  "cli": "gpn star vep --input-path <variants table | dataset id> --msa-path <alignment zarr> --window-size <int> --model-path <repo id | snapshot dir> --output-path <out.parquet> [--model-revision <commit>] [--split test] [checkpoint options] [Transformers prediction options, e.g. --per-device-eval-batch-size N --dataloader-num-workers N]",
+  "module": "src/gpn/cli.py (cyclopts App 'gpn' > 'star' > vep|logits|embedding|train)",
+  "commands": {
+   "vep": "src/gpn/cli.py L318-346",
+   "logits": "L349-379 (adds --phylo-dist-path, default None)",
+   "embedding": "L382-412 (adds --center-window-size, default 100)",
+   "train": "L309-315 (not an inference surface)"
+  },
+  "options": {
+   "--input-path": "required (str)",
+   "--msa-path": "required (str)",
+   "--window-size": "required (int; even and positive for vep|logits: src/gpn/scoring.py L135-141)",
+   "--model-path": "required (str)",
+   "--output-path": "required (Path)",
+   "--model-revision": "None",
+   "--split": "test",
+   "--center-window-size": "100 (embedding only)",
+   "--phylo-dist-path": "None (logits only)",
+   "checkpoint options": "CheckpointArguments (src/gpn/arguments.py): checkpoint_batch_size None = direct, non-resumable run",
+   "Transformers prediction options": "every transformers.TrainingArguments field as a flag (src/gpn/cli.py L16-19); batch size = per_device_eval_batch_size, loader workers = dataloader_num_workers (TrainingArguments defaults when not given)"
+  },
+  "load": "MLMforVEPModel(model_path, model_revision): register_auto_classes('star'); self.model = AutoModelForMaskedLM.from_pretrained(model_path, revision=model_revision); self.model.eval() \u2014 src/gpn/star/inference.py L38-46; logits: MLMforLogitsModel L99-116 (same load); embedding: ModelCenterEmbedding L151-164 (AutoModel.from_pretrained)",
+  "patch_target": "the wrapper's .model attribute (a GPNStarForMaskedLM; its .model is the GPNStarModel encoder: src/gpn/star/model.py L1186-1197)",
+  "forward": "Trainer(model=<wrapper>, args=<prediction TrainingArguments>).predict(test_dataset=dataset).predictions \u2014 src/gpn/inference.py L124 (construction), L52 (predict); invariants applied to the arguments: do_predict, dataloader_drop_last False, dataloader_in_order True, remove_unused_columns False (L68-78)",
+  "input": "vep: columns chrom, pos (one-based), ref, alt (src/gpn/star/inference.py L235-237); logits: chrom, pos (L321-323); embedding: chrom, start, end; a local file by suffix .parquet .csv[.gz] .tsv[.gz] .vcf[.gz] (src/gpn/cli.py L26-38, src/gpn/data.py L13-35) else a Hugging Face dataset id loaded with datasets.load_dataset(path, split=--split) (src/gpn/data.py L57-67)",
+  "msa": "--msa-path: a zarr store opened read-only with zarr.open(path, mode='r'), one array per chromosome keyed by chromosome name, sliced [start:end] over the first n_species columns (src/gpn/star/data.py L22-29, L40); several stores can be summed by species count (find_directory_sum_paths, src/gpn/star/utils.py)",
+  "output": "one Parquet file at --output-path, written atomically: vep -> column 'score' (src/gpn/star/inference.py L298-299); logits -> columns A, C, G, T (L350-351); embedding -> embedding_0..embedding_<d-1> (L393-395); row order = input order (src/gpn/inference.py L154-158, L330)"
+ },
+ "stock_environment": {
+  "reads": [
+   "HF_HOME",
+   "HF_HUB_OFFLINE",
+   "HF_HUB_CACHE",
+   "CUDA_VISIBLE_DEVICES",
+   "TOKENIZERS_PARALLELISM"
+  ],
+  "must_be_absent": [
+   "GPNSTAR_OPT"
+  ],
+  "numerics_must_be_absent": [
+   "NVIDIA_TF32_OVERRIDE"
+  ],
+  "what": "a stock process has GPNSTAR_OPT unset and no TF32 override in the environment; the package itself reads no GPN-specific environment variable for inference"
+ },
+ "licence": {
+  "code": "MIT (songlab-cal/gpn LICENSE)",
+  "weights": {
+   "gpn-star-hg38-v100-200m": "license: mit (model card README.md YAML at 0c949f13)",
+   "gpn-star-ce11-n135-25m": "license: mit (model card README.md YAML at 078ad60c)",
+   "gpn-star-hg38-m447-200m": "license: mit (model card README.md YAML at 0d8f5164)",
+   "gpn-star-hg38-p243-200m": "license: mit (model card README.md YAML at 16773016)",
+   "gpn-star-tair10-b18-25m": "license: mit (model card README.md YAML at 317841ed)"
+  },
+  "alignment_data": {
+   "songlab/multiz100way-pigz": "mit (dataset card @ 6a9d42a3)",
+   "songlab/multiz100way": "mit (dataset card @ a790ef9e)",
+   "songlab/ce11_multiz135way": "no licence field (dataset card @ 1e4b77d7)",
+   "songlab/hg38_cactus447way": "mit (dataset card @ f523f046)",
+   "songlab/tair10_multiz18way": "no licence field (dataset card @ 34b56f69)"
+  }
+ },
+ "gpus": {
+  "h100": {
+   "name": "NVIDIA H100 80GB HBM3",
+   "sm": "sm_90",
+   "memory_mib": 81559
+  },
+  "a100": {
+   "name": "NVIDIA A100-SXM4-80GB",
+   "also": [
+    "NVIDIA A100 80GB PCIe"
+   ],
+   "sm": "sm_80",
+   "memory_mib": 81920,
+   "class": "a100",
+   "what": "the A100 80 GB parts (SXM4 or PCIe, cc 8.0): class a100; the gate is by capability and memory (± tolerance), the names are nvidia-smi spellings"
+  },
+  "a100_40gb": {
+   "name": "NVIDIA A100-SXM4-40GB",
+   "also": [
+    "NVIDIA A100-PCIE-40GB"
+   ],
+   "sm": "sm_80",
+   "memory_mib": 40960,
+   "class": "a100",
+   "what": "the A100 40 GB parts: the same silicon with half the memory, class a100 (the ACTIVE line mib= says which); nothing in the kit is sized by the class"
+  }
+ }
+}

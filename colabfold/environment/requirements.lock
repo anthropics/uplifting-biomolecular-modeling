@@ -1,0 +1,85 @@
+# ColabFold optimization kit — the tested stack: `python -m pip freeze --all` of its interpreter, Python 3.11.5 (/usr/local/bin/python,
+# python-build-standalone 20230826) on Ubuntu 22.04 with the CUDA 12.4.1 runtime base (no C compiler), less the interpreter's bundled pip 23.2.1 and
+# setuptools 68.1.2 (they come with the interpreter), this kit (colabfold/opt) and its shared core (common/opt_core) — those two install editable
+# on top (README.md 'Setup'). jax / jaxlib 0.5.3 with jax-cuda12-plugin / jax-cuda12-pjrt 0.5.3 load the CUDA 12.9 runtime, cuBLAS 12.9,
+# cuDNN 9.23, NCCL 2.30 and ptxas (nvidia-cuda-nvcc-cu12) from the nvidia-*-cu12 wheels below — nothing of the base image's CUDA libraries is
+# used by the model and nothing is compiled at install or run time. The GPU driver is the host's and must run CUDA 12 (driver 550 or newer:
+# `nvidia-smi` reports CUDA Version 12.4 or later). colabfold 1.6.1 and alphafold-colabfold 2.3.13 are the wheels in colabfold/stock/ (the
+# PyPI files; `pip check` is clean on this stack); environment/Dockerfile installs this file with --no-deps.
+absl-py==1.4.0
+alphafold-colabfold==2.3.13
+appdirs==1.4.4
+astunparse==1.6.3
+attrs==26.1.0
+biopython==1.85
+certifi==2026.6.17
+charset-normalizer==3.4.7
+chex==0.1.90
+colabfold==1.6.1
+contourpy==1.3.3
+cycler==0.12.1
+dm-haiku==0.0.16
+dm-tree==0.1.10
+flatbuffers==25.12.19
+fonttools==4.63.0
+gast==0.7.0
+google-pasta==0.2.0
+grpcio==1.81.1
+h5py==3.14.0
+idna==3.18
+immutabledict==4.3.1
+importlib_metadata==8.9.0
+jax==0.5.3
+jax-cuda12-pjrt==0.5.3
+jax-cuda12-plugin==0.5.3
+jaxlib==0.5.3
+jmp==0.0.4
+keras==3.15.0
+kiwisolver==1.5.0
+libclang==18.1.1
+markdown-it-py==4.2.0
+matplotlib==3.11.0
+mdurl==0.1.2
+ml_collections==1.1.0
+ml_dtypes==0.5.4
+namex==0.1.0
+numpy==2.4.6
+nvidia-cublas-cu12==12.9.2.10
+nvidia-cuda-cupti-cu12==12.9.79
+nvidia-cuda-nvcc-cu12==12.9.86
+nvidia-cuda-nvrtc-cu12==12.9.86
+nvidia-cuda-runtime-cu12==12.9.79
+nvidia-cudnn-cu12==9.23.2.1
+nvidia-cufft-cu12==11.4.1.4
+nvidia-cusolver-cu12==11.7.5.82
+nvidia-cusparse-cu12==12.5.10.65
+nvidia-nccl-cu12==2.30.7
+nvidia-nvjitlink-cu12==12.9.86
+opt_einsum==3.4.0
+optree==0.19.1
+orjson==3.11.9
+packaging==26.2
+pandas==2.3.3
+pillow==12.2.0
+protobuf==7.35.1
+py3Dmol==2.5.5
+Pygments==2.20.0
+pyparsing==3.3.2
+python-dateutil==2.9.0.post0
+pytz==2026.2
+PyYAML==6.0.3
+requests==2.34.2
+rich==15.0.0
+scipy==1.17.1
+six==1.17.0
+tabulate==0.10.0
+tensorflow_cpu==2.21.0
+termcolor==3.3.0
+toolz==1.1.0
+tqdm==4.68.3
+typing_extensions==4.15.0
+tzdata==2026.2
+urllib3==2.7.0
+wheel==0.47.0
+wrapt==2.2.2
+zipp==4.1.0

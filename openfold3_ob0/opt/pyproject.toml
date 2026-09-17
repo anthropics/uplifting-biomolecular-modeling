@@ -1,0 +1,39 @@
+# openfold3_ob0_opt — the mode interface (off | exact | fast | big) to the OpenFold3 0.5.0 (OpenBind-0) inference optimizations.
+# Install editable, together with the shared core, from the bundle's top directory: `pip install -e common/opt_core -e openfold3_ob0/opt` into the
+# interpreter that owns `openfold3` (run.sh install does exactly this). The lever code the modes bind lives beside the package (forward/:
+# fast_inference = fast init + CUDA-graphed diffusion step, trunk_kernels = flash triangle attention route + pair cache + template de-duplication,
+# offload = the big line's row-block levers) and is resolved from the package location, so the install must stay editable (or point
+# OPENFOLD3_OB0_OPT_HOME at the openfold3_ob0/ directory). No install-time dependency on openfold3 (stock/PINS.json): its version is checked at
+# activation. The core is pinned below by path and by version; the pin is the first gate of every activation. The build backend is the core's
+# template (opt/_build_backend.py, byte-identical to common/opt_core/kit_template/): setuptools plus one step that ships
+# openfold3_ob0_opt_autoload.pth at the wheel root, which is what makes `OPENFOLD3_OB0_OPT=<mode> run_openfold predict ...` activate without code
+# changes (see openfold3_ob0_opt/_autoload.py).
+[build-system]
+requires = ["setuptools>=64", "wheel"]
+build-backend = "_build_backend"
+backend-path = ["."]
+
+[project]
+name = "openfold3_ob0_opt"
+dynamic = ["version"]
+description = "OpenFold3 0.5.0 (OpenBind-0) inference optimizations: modes exact/fast/big/off, the add-ons' hook order, lazy autoload, activation report"
+requires-python = ">=3.10"
+classifiers = ["Private :: Do Not Upload"]        # not published on PyPI: an upload carrying this classifier is rejected
+dependencies = []
+
+[project.optional-dependencies]
+test = ["pytest", "pyyaml", "numpy"]               # the package's CPU tests (pyyaml: test_kit_bytes / test_line_yaml read the stock yaml; numpy: test_templ_guard runs the stock template mapper over array stand-ins)
+
+[project.scripts]
+openfold3_ob0-opt = "openfold3_ob0_opt.__main__:main"      # `openfold3_ob0-opt pred|check|warm ...` == `python -m openfold3_ob0_opt ...`
+
+[tool.setuptools]
+packages = ["openfold3_ob0_opt", "openfold3_ob0_opt.tests"]
+include-package-data = false
+
+[tool.setuptools.dynamic]
+version = {attr = "openfold3_ob0_opt.__version__"}
+
+[tool.opt_core]
+path = "../../common/opt_core"
+version = "0.5.220.4"

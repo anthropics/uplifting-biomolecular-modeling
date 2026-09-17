@@ -1,0 +1,50 @@
+{
+ "package": "protenix_fpf_trimul_tx",
+ "version": "1.1",
+ "inputs": {
+  "generator": "ops._closed_form_inputs(N, device)",
+  "N": 160,
+  "description": "closed-form (no RNG): z[i,j,c] = bf16(3 sin(0.37 i + 0.11 c) + 2 cos(0.23 j - 0.07 c) + 0.5 sin(0.013 i j + 0.5 c)); mask[i,j] = ((7 i + 3 j) mod 11 != 0); weights = sin lattices scaled 1/16; LayerNorm gamma = 1 + 0.25 sin(a c), beta = 0.1 cos(a c) (a = 0.09 in / 0.07 out)"
+ },
+ "cases": [
+  {
+   "name": "k1",
+   "call": "ops.k1(z, mask, w) -> planes [512, 160, 160] bf16 (fast path: LayerNorm_in + gated dual projection, padded planes)",
+   "sha256_128": "d67ded824c44495c0eca1786ea3c8ed3",
+   "must_match": true
+  },
+  {
+   "name": "k3",
+   "call": "ops.k3(x_fixed, z, w, residual=True) with x_fixed = bf16(0.5 planes[:256] + 0.25 flip(planes[256:], 0)) -> [160,160,256] bf16",
+   "sha256_128": "9414bfc304fa84bb81a47007d6c9401c",
+   "must_match": true
+  },
+  {
+   "name": "k1s",
+   "call": "ops.k1_stock_order(z, mask, w) -> [512,160,160] bf16 unpadded planes, LayerNorm in the stock kernels' order (exact tier)",
+   "sha256_128": "cc39992a2a52acf6ccba1af032429278",
+   "must_match": true
+  },
+  {
+   "name": "k3s2",
+   "call": "ops.k3(x_fixed[:, :160, :160].contiguous(), z, w, residual=True, lnmode=2) -> [160,160,256] bf16 (exact tier; the N % 4 == 0 tree of the stock transposing LayerNorm)",
+   "sha256_128": "7e9bf7908ead74ed5717446061edcc53",
+   "must_match": true
+  },
+  {
+   "name": "k3s3",
+   "call": "ops.k3(x_fixed[:, :160, :160].contiguous(), z, w, residual=True, lnmode=3) -> [160,160,256] bf16 (exact tier; the N % 4 != 0 tree, numerically valid at any N)",
+   "sha256_128": "18f04baf532336098be2ffaa5c98c160",
+   "must_match": true
+  },
+  {
+   "name": "bmm",
+   "call": "ops.bmm(planes, outgoing=True) -> [256,160,160] bf16 (cuBLAS; informational: another cuBLAS may choose another kernel)",
+   "sha256_128": "2fcadc8027523d8eec75d584a666c67c",
+   "must_match": false
+  }
+ ],
+ "digest": "sha256 over the output tensor's raw bytes (contiguous, bf16 viewed as uint8), first 32 hex digits; computed by ops._digest; the same cases run at every load (ops._loadcheck) against prebuilt/manifest.json 'loadcheck'",
+ "real_shape_evidence": "bitwise identities on recorded 400/800/1400-token activations were checked at development time (not shippable as bytes: 40-500 M elements per tensor)",
+ "package_version": "1.2"
+}

@@ -1,0 +1,11 @@
+EF2_XL_ADDON v1 (ef2_xl.py v1.5.0) — runtime memory levers for ESMFold2 (Biohub transformers fork) — third-party attributions.
+Contains re-issued statement sequences derived from the ESMFold2 and ESMC modeling code of the Biohub fork of Hugging Face `transformers`
+at commit ef32577f (src/transformers/models/esmfold2/modeling_esmfold2.py, modeling_esmfold2_common.py; models/esmc/modeling_esmc.py),
+licensed under the Apache License, Version 2.0 — the fork's LICENSE prints `Copyright 2018- The Hugging Face team. All rights reserved.`
+and the files concerned print `Copyright 2026 Biohub. All rights reserved.` where they carry a header (modeling_esmfold2.py carries none) —
+for the purpose of runtime patching; no upstream file is redistributed or modified on disk. Credit: the Biohub ESMFold2 authors.
+`_trunc_normal_lean_` (lever x8) restates, modified, the rejection-sampling branch of `torch.nn.init._no_grad_trunc_normal_` of
+PyTorch 2.13.0 (BSD-3-Clause; the copyright lines are those printed at the head of PyTorch's LICENSE, reproduced in
+esmfold2/third_party_licenses/PyTorch.BSD-3-Clause.txt). The fold these levers patch runs through Biohub `esm` 3.3.0 (MIT License,
+`Copyright 2026 Chan Zuckerberg Biohub, Inc.`); no `esm` statement is re-issued in this file.
+Licence texts (Apache-2.0, MIT, BSD-3-Clause) and the kit-wide list of files concerned: esmfold2/THIRD_PARTY_NOTICES.md, esmfold2/third_party_licenses/.

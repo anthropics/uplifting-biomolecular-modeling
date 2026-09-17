@@ -1,0 +1,95 @@
+# Genie 3 optimization kit — the pinned Python stack (`pip freeze --all` of the venv the kit was developed and tested in: STOCK.md Stack).
+# Python 3.10.13 on Linux x86_64; every line is a PyPI distribution except the one VCS line, stock Genie 3 itself — upstream ships no wheel, so its
+# pin is the source checkout at commit d77ae5ac installed editable (`pip install -e .`, upstream's README), which pip clones from that line
+# (`--src DIR` chooses where; the image uses /opt, giving /opt/genie3). torch 2.7.1 is PyPI's cu126 build: its nvidia-*-cu12 lines are the
+# CUDA 12.6 / cuDNN 9.5 / NCCL 2.26 runtime it loads, and it needs an NVIDIA driver that runs CUDA 12 applications (525.60 or newer; the stack was
+# tested on 580.95.05, STOCK.md). pip, setuptools and wheel are the venv's own tools at the versions the editable install of the checkout was built
+# with (environment/Dockerfile installs the checkout with --no-build-isolation, as upstream's scripts/setup/setup.sh does).
+# environment/Dockerfile installs this file in two passes: every `name==version` line with --no-deps, then the VCS line with --no-deps
+# --no-build-isolation --src /opt. In your own Python 3.10 venv: `pip install -r requirements.lock --src <dir for the genie3 checkout>`.
+absl-py==2.5.0
+aiohappyeyeballs==2.7.1
+aiohttp==3.14.3
+aiosignal==1.4.0
+annotated-types==0.8.0
+anyio==4.14.2
+async-timeout==5.0.1
+attrs==26.1.0
+biopython==1.85
+certifi==2026.7.22
+charset-normalizer==3.5.1
+click==8.4.2
+Cython==3.3.0
+exceptiongroup==1.3.1
+filelock==3.32.3
+frozenlist==1.8.0
+fsspec==2026.7.0
+-e git+https://github.com/aqlaboratory/genie3.git@d77ae5ac04212ff1e8b29b585859a3244c614804#egg=genie3
+grpcio==1.83.0
+h11==0.16.0
+hf-xet==1.6.0
+httpcore==1.0.9
+httpx==0.28.1
+huggingface_hub==1.28.0
+idna==3.19
+Jinja2==3.1.6
+lightning==2.6.5
+lightning-utilities==0.15.3
+Markdown==3.10.3
+MarkupSafe==3.0.3
+ml_collections==1.1.0
+mpmath==1.3.0
+multidict==6.7.1
+networkx==3.4.2
+numpy==2.2.6
+nvidia-cublas-cu12==12.6.4.1
+nvidia-cuda-cupti-cu12==12.6.80
+nvidia-cuda-nvrtc-cu12==12.6.77
+nvidia-cuda-runtime-cu12==12.6.77
+nvidia-cudnn-cu12==9.5.1.17
+nvidia-cufft-cu12==11.3.0.4
+nvidia-cufile-cu12==1.11.1.6
+nvidia-curand-cu12==10.3.7.77
+nvidia-cusolver-cu12==11.7.1.2
+nvidia-cusparse-cu12==12.5.4.2
+nvidia-cusparselt-cu12==0.6.3
+nvidia-ml-py==13.610.43
+nvidia-nccl-cu12==2.26.2
+nvidia-nvjitlink-cu12==12.6.85
+nvidia-nvtx-cu12==12.6.77
+opentelemetry-api==1.44.0
+packaging==26.3
+pandas==2.3.3
+pillow==12.3.0
+pip==26.2.1
+platformdirs==4.11.3
+propcache==0.5.2
+protobuf==7.36.0
+psutil==7.2.2
+pydantic==2.13.4
+pydantic_core==2.46.4
+python-dateutil==2.9.0.post0
+pytorch-lightning==2.6.5
+pytz==2026.3.post1
+PyYAML==6.0.3
+requests==2.34.2
+scipy==1.15.3
+sentry-sdk==2.68.0
+setuptools==84.0.0
+six==1.17.0
+sympy==1.14.0
+tensorboard==2.21.0
+tensorboard-data-server==0.7.2
+torch==2.7.1
+torchmetrics==1.9.0
+tqdm==4.70.0
+triton==3.3.1
+typing-inspection==0.4.4
+typing_extensions==4.16.0
+tzdata==2026.3
+urllib3==2.7.0
+wandb==0.28.2
+Werkzeug==3.1.8
+wheel==0.48.0
+yarl==1.24.5
+zstandard==0.25.0

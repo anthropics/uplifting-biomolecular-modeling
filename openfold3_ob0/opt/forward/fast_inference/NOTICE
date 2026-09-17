@@ -1,0 +1,7 @@
+OpenFold3 fast-inference add-on — third-party attributions.
+
+This add-on contains code derived from OpenFold3 (https://github.com/aqlaboratory/openfold-3),
+Copyright 2025-2026 AlQuraishi Laboratory, licensed under the Apache License, Version 2.0 (its licence text is carried beside this file as OPENFOLD3_LICENSE):
+of3_levers/of3_graphs.py re-states the denoising loop of SampleDiffusion._sample_rollout; marked in the source.
+The barnase and barstar sequences in tests/public_inputs.py are from RCSB PDB entry 1BRS (public domain data, CC0).
+The kit-level notices file is openfold3_ob0/THIRD_PARTY_NOTICES.md; licence texts are also under openfold3_ob0/third_party_licenses/.

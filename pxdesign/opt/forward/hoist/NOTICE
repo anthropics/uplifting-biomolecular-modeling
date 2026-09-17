@@ -1,0 +1,9 @@
+PXDesign hoist add-on (PXDESIGN_HOIST_ADDON_v1)
+
+It contains code derived from, and is designed to run on top of:
+  - PXDesign (https://github.com/bytedance/PXDesign), Copyright ByteDance and/or its affiliates, Apache License 2.0
+    (run on top of: the lever installs on the runner's loaded model at run time; no PXDesign source is modified or redistributed).
+  - Protenix v0.5.0+pxd (https://github.com/bytedance/Protenix), Copyright 2024 ByteDance and/or its affiliates, Apache License 2.0
+    (pxd_xattempt/hoist.py re-implements the control flow of several Protenix module forwards and calls the unmodified upstream sub-modules).
+No model weights are included. The three structure files under inputs/targets/ are public wwPDB entries (5O45, 1TNF, 3DI3; CC0 1.0),
+vendored unmodified. See LICENSE_NOTES.md for per-file notes.

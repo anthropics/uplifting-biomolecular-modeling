@@ -1,0 +1,9 @@
+{
+ "so": "libtriatt_procuda_sm90a.so",
+ "so_sha256": "e9009ba57e432421cf1943cbbe5c22777bc1a674ca0423448ac2f06b9baecbcf",
+ "src": "csrc/triatt_procuda_sm90.cu",
+ "src_sha256": "fc120646461cd993a7d9fc94886a137c74873887da251fa538b1701f7880c1c1",
+ "arch": "sm_90a",
+ "nvcc": "Build cuda_13.0.r13.0/compiler.36424714_0",
+ "built_utc": "2026-09-11T05:35:06Z"
+}

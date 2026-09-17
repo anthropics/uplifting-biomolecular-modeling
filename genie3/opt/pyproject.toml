@@ -1,0 +1,40 @@
+# genie3_opt — explicit interface to the Genie 3 inference optimizations.
+# Install editable from this directory: `pip install -e genie3/opt`. The kit code it wraps lives beside the package (forward/fast_inference)
+# and is resolved from the package location, so the install must stay editable: the core pin gate reads `[tool.opt_core]` from this file above the installed package, and a
+# regular wheel install refuses on every entry (`core_pin_unreadable`, exit 3). No
+# install-time dependency on the upstream package (stock/PINS.json): its checkout is checked at activation. The shared core the package
+# stands on (common/opt_core, pinned in [tool.opt_core]: path + minimum core version) is installed beside it (`pip install -e
+# ../common/opt_core -e opt` from genie3/) or reached through the tree layout; its pin is the first gate of every entry (genie3_opt/_core_gate.py: an absent or
+# mismatched core is one NOT ACTIVE line, exit 3, before anything of the core is imported). The build backend is setuptools plus one step that
+# generates and ships genie3_opt_autoload.pth at the wheel root, which is what makes `GENIE3_OPT=<mode>` act at the stock
+# command line (see genie3_opt/_autoload.py: `genie3 generate` under a kit mode is handed to the design verb; any other genie3 command under a
+# kit mode is refused by name, exit 3; `off` is inert).
+[build-system]
+requires = ["setuptools>=64", "wheel"]
+build-backend = "_build_backend"
+backend-path = ["."]
+
+[project]
+name = "genie3_opt"
+dynamic = ["version"]
+description = "Genie 3 inference optimizations: modes off/exact/fast, the stock caller, the driver caller, activation report"
+requires-python = ">=3.10"
+classifiers = ["Private :: Do Not Upload"]
+dependencies = ["pyyaml"]                            # the request copy (design.py); in the pinned stack's freeze (lightning's own dependency)
+
+[project.optional-dependencies]
+test = ["pytest", "setuptools>=64"]                                    # the package's CPU tests; setuptools: the tests exec opt/_build_backend.py (the build requirement, same floor as [build-system])
+
+[project.scripts]
+genie3-opt = "genie3_opt.__main__:main"              # `genie3-opt design|check|warm ...` == `python -m genie3_opt ...`
+
+[tool.setuptools]
+packages = ["genie3_opt", "genie3_opt.tests"]
+include-package-data = false
+
+[tool.setuptools.dynamic]
+version = {attr = "genie3_opt.__version__"}
+
+[tool.opt_core]
+path = "../../common/opt_core"
+version = "0.5.18.20"

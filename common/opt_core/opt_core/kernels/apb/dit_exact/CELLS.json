@@ -1,0 +1,100 @@
+{
+ "lever": "dit_attn_exact",
+ "package": "protenix_fpf_dit_attn_exact",
+ "kernel_version": "7",
+ "class": "EXACT-BITWISE (vs torch.nn.functional.scaled_dot_product_attention fp32 memory-efficient kernel)",
+ "device": "NVIDIA H100 80GB HBM3 (cc 9.0), development machine, clocks 1980/2619 MHz",
+ "stack": "torch 2.13.0+cu130, CUDA 13.0",
+ "op": "DiffusionTransformer pair-bias attention: softmax(q k^T + bias) v, fp32, head_dim 48, 16 heads, bias [1,16,N,N] shared by the 5 diffusion samples (B=5)",
+ "key": {
+  "cc": "9.0",
+  "dtype": "fp32 (3xTF32 tensor-core products as the replaced kernel)",
+  "c_z": "n/a (token-level single rep, c_s 384 -> 16 heads x 48)",
+  "heads": 16,
+  "head_dim": 48,
+  "direction": "forward (inference)",
+  "N_bucket": "N = tokens; B = 5 samples per call"
+ },
+ "incumbent": "torch SDPA memory-efficient fp32 kernel fmha_cutlassF_f32_aligned_64x64_rf_sm80 (stock and the kit's exact tier before this lever)",
+ "cells_per_call_graph_replay": [
+  {
+   "N": 256,
+   "B": 5,
+   "H": 16,
+   "stock_us": 63.0,
+   "kernel_us": 31.7,
+   "speedup": 1.99
+  },
+  {
+   "N": 400,
+   "B": 5,
+   "H": 16,
+   "stock_us": 177.0,
+   "kernel_us": 74.0,
+   "speedup": 2.39
+  },
+  {
+   "N": 512,
+   "B": 5,
+   "H": 16,
+   "stock_us": 235.0,
+   "kernel_us": 86.0,
+   "speedup": 2.73
+  },
+  {
+   "N": 800,
+   "B": 5,
+   "H": 16,
+   "stock_us": 572.0,
+   "kernel_us": 219.0,
+   "speedup": 2.6
+  },
+  {
+   "N": 1024,
+   "B": 5,
+   "H": 16,
+   "stock_us": 870.0,
+   "kernel_us": 255.0,
+   "speedup": 3.4
+  },
+  {
+   "N": 1536,
+   "B": 5,
+   "H": 16,
+   "stock_us": 1842.0,
+   "kernel_us": 579.0,
+   "speedup": 3.18
+  }
+ ],
+ "e2e_exact_mode_fwd_s": {
+  "runner": "end-to-end runner, exact mode, 3 items per size, medians",
+  "rows": [
+   {
+    "tokens": 400,
+    "exact": 6.58,
+    "exact+lever_v7": 5.92,
+    "delta_pct": -10.0,
+    "tag": "xattn_ab8"
+   },
+   {
+    "tokens": 800,
+    "exact": 22.12,
+    "exact+lever_v7": 20.33,
+    "delta_pct": -8.1,
+    "tag": "xattn_ab8"
+   },
+   {
+    "tokens": 1400,
+    "exact": 88.09,
+    "exact+lever_v4": 83.42,
+    "delta_pct": -5.3,
+    "tag": "xattn_ab2 (v4; v7 is faster per call)"
+   }
+  ]
+ },
+ "notes": [
+  "per-call timing: CUDA graph of 10 calls replayed, arms interleaved 7x, medians",
+  "every row torch.equal-checked against the replaced op before timing",
+  "development-machine numbers (not the sustained-clock protocol); the release tables carry the reference numbers"
+ ]
+}

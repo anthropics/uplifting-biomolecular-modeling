@@ -1,0 +1,41 @@
+# rfdiffusion3_opt — explicit interface to the RFdiffusion3 inference optimizations.
+# Install editable with the core, in each of the two interpreters (the pristine one and the patched one): `run.sh install`
+# (= `pip install -e common/opt_core -e rfdiffusion3/opt`). The install must stay editable: the core pin gate reads [tool.opt_core] from this
+# file, above the package (a regular wheel install is refused on every entry, `core_pin_unreadable`, exit 3), and the kit the package wraps
+# (forward/xattempt_addon/) is resolved beside it (or from $MODEL_OPT, the rfdiffusion3/ directory). No install-time
+# dependency on the upstream package (rc-foundry, stock/PINS.json): the pin is checked at activation. The build backend is setuptools plus
+# one step that ships rfdiffusion3_opt_autoload.pth at the wheel root, which is what makes `RFDIFFUSION3_OPT=<mode> rfd3 design ...` activate
+# without code changes (see rfdiffusion3_opt/_autoload.py); it is the core's template copy, byte for byte.
+[build-system]
+requires = ["setuptools>=64", "wheel"]
+build-backend = "_build_backend"
+backend-path = ["."]
+
+[project]
+name = "rfdiffusion3_opt"
+dynamic = ["version"]
+description = "RFdiffusion3 inference optimizations: modes exact/fast/off over the upstream command line, stock caller, lazy autoload, activation report"
+requires-python = ">=3.10"
+classifiers = ["Private :: Do Not Upload"]        # never uploaded to PyPI: the index rejects this classifier
+dependencies = []
+
+[project.optional-dependencies]
+test = ["pytest", "setuptools>=64"]                # the package's CPU tests; setuptools at the [build-system] floor because the adoption test loads opt/_build_backend.py (Python >= 3.12 venvs carry none)
+
+[project.scripts]
+rfdiffusion3-opt = "rfdiffusion3_opt.__main__:main"   # `rfdiffusion3-opt design|check|warm ...` == `python -m rfdiffusion3_opt ...`
+
+[tool.setuptools]
+packages = ["rfdiffusion3_opt", "rfdiffusion3_opt.tests"]
+include-package-data = false
+
+[tool.setuptools.dynamic]
+version = {attr = "rfdiffusion3_opt.__version__"}
+
+# the shared core this kit stands on (common/opt_core): pinned by path, and by version as a MINIMUM floor (a newer core passes; there
+# is no byte/content check — the git commit identifies the core, not a stored digest). `run.sh install` = pip install -e <that path> -e <this
+# directory>. The core pin gate (rfdiffusion3_opt/_core_gate.py, statement one of every entry) reads this table and refuses by name,
+# exit 3, on a core that is absent or older than the floor, or a pin table it cannot read; nothing of the core is imported first.
+[tool.opt_core]
+path = "../../common/opt_core"
+version = "0.5.18.20"

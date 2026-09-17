@@ -1,0 +1,198 @@
+# Patch: 13_program_cache.diff
+# Lever: L7 -precompile N (reworked: the programs of the run's distinct lengths are prepared ahead of the loop by jax's AOT path — trace, lower, compile on N host threads — no forward is run, nothing is discarded, the featurized inputs are kept for the loop) and L13 -program_cache DIR (new: every program this process compiles is serialized under DIR and LOADED by later processes instead of traced, lowered and compiled again; af2ig_opt.programs). Per new signature a `program` timer record says where the first call's seconds went (t_trace, t_lower, t_compile, t_store | t_load).
+# Numerics class: NONE (exact: the executable run is the one jit would build for the same arguments — AOT — or the one this stack built and serialized; the same output bytes)
+# Default: off in the driver (stock: jax traces and compiles each new length lazily inside the loop, in every process); the kit passes both in every mode
+# Applies to: af2_initial_guess/predict_pdb.py as left by patches 00-12 (apply in numeric order with `patch -p1` from the dl_binder_design checkout root)
+--- a/af2_initial_guess/predict_pdb.py
++++ b/af2_initial_guess/predict_pdb.py
+@@ -34,6 +34,7 @@
+ import uuid
+ import argparse
+ import collections
++import threading
+ 
+ import numpy as np
+ 
+@@ -97,6 +98,7 @@
+ parser.add_argument( "-device_params", action="store_true", default=False, help='L1: put the model parameters on the GPU once at start-up instead of passing host numpy arrays to every model call (stock re-uploads ~370 MB of weights per design)' )
+ parser.add_argument( "-host_outputs", action="store_true", default=False, help='L6: copy the model outputs to host NumPy arrays in one transfer (jax.device_get) before post-processing, instead of letting numpy/scipy pull each device array lazily op by op; the arrays (float32 values) are the same' )
+ parser.add_argument( "-precompile", type=int, default=0, help='L7: before the prediction loop, featurize one input per distinct length and trigger the XLA compilations of the jitted model for all of them from N host threads in parallel (0 = off). The compiled executables are the ones the loop would have compiled serially; outputs unchanged' )
++parser.add_argument( "-program_cache", type=str, default='', help='L13 (exact): DIR — keep every model program this process compiles (one per distinct residue count and lever set) under DIR as a serialized XLA executable and LOAD it in later processes instead of tracing, lowering and compiling the model again (af2ig_opt.programs: the key names the code, the levers, the stack and the device; a file that does not load is named and the program is traced). The executable is the one this stack compiled: bitwise-identical outputs. Empty = off (stock: every process traces and compiles each new length)' )
+ parser.add_argument( "-flash_attn", action="store_true", default=False, help='L8 (changes numerics slightly, see CHANGES.md): the attention core (logits + bias, softmax, weighted sum) of every eligible alphafold Attention call computed by the kit adapter af2ig_opt.flash_attn over the shared Pallas flash-attention kernel of the model-opt tree (opt_core.kernels.pallas_attn) instead of the three XLA ops; ineligible calls run the stock ops and are counted in the flash_attn timer record' )
+ parser.add_argument( "-fused_triattn", action="store_true", default=False, help='L10 (changes numerics slightly, see CHANGES.md): every TriangleAttention module (starting / ending node; Evoformer and template pair stack) computed by the model-opt tree\'s fused triangle-attention block (opt_core.kernels.fpf_pallas_serve.tri_attn_block via af2ig_opt.triattn: LayerNorm + pair bias + q|k|v|gate projections + flash core + gating + output projection in one Pallas program, float32 with TF32 products) instead of the stock body; calls the block refuses run the stock body and are counted by reason' )
+ parser.add_argument( "-fused_trimul", action="store_true", default=False, help='L11 (changes numerics slightly, see CHANGES.md): every TriangleMultiplication module (outgoing / incoming; Evoformer and template pair stack) computed by the model-opt tree\'s fused triangle-multiplication block (opt_core.kernels.fpf_pallas_serve.trimul_block via af2ig_opt.fused_trimul: input LayerNorm + left|right projections and gates + mask in a Pallas prologue, one batched TF32 GEMM, centre LayerNorm + output projection + gate in a Pallas epilogue, float32) instead of the stock body; calls the block refuses run the stock body and are counted by reason' )
+@@ -158,6 +160,44 @@
+ # Timers (pure instrumentation)
+ #################################
+ 
++PROGLIB = None       # af2ig_opt.programs: the model program prepared ahead of its call (L7 -precompile) and kept across processes (L13 -program_cache)
++PROGRAMS = None      # L13: the serialized-program store (af2ig_opt.programs.Store)
++if args.precompile > 0 or args.program_cache:
++    from af2ig_opt import programs as PROGLIB
++
++def _census_snapshot():
++    # the trace-time censuses of the kernel levers of this process (cumulative), read around a model trace (af2ig_opt.programs census_delta)
++    snap = {}
++    if FLASH_ATTN is not None: snap['flash_attn'] = FLASH_ATTN.census()
++    if FUSED_TRIATTN is not None: snap['fused_triattn'] = FUSED_TRIATTN.census()
++    if FUSED_TRIMUL is not None: snap['fused_trimul'] = FUSED_TRIMUL.census()
++    if OPM is not None: snap['opm_reassoc'] = OPM.census()             # L12's trace-time census travels with the program too
++    return snap
++
++def _census_replay(census, L, key):
++    # L13: a LOADED program was traced in an earlier process — replay the kernel calls its trace served / left on the stock ops into this
++    # process's ledgers (shape key 'replayed:L<n>'), so the run's census names the kernels inside the executables it ran (never invented:
++    # the counts are the ones recorded around that trace, stored with the program)
++    adapters = {'flash_attn': FLASH_ATTN, 'fused_triattn': FUSED_TRIATTN, 'fused_trimul': FUSED_TRIMUL, 'opm_reassoc': OPM}
++    for kind, c in (census or {}).items():
++        ad = adapters.get(kind)
++        if ad is None: continue
++        led = ad._ledger()
++        for reason, n in (c.get('fallback_by') or {}).items():
++            for _ in range(int(n)): led.fallback(reason)
++        for _ in range(int(c.get('served') or 0)): led.serve(f'replayed:L{L}')
++    print(f'program_cache: program {key} (L={L}) loaded; trace-time kernel census replayed: ' + ', '.join(f"{k}: served {v.get('served')} fallback {v.get('fallback')}" for k, v in (census or {}).items()))
++
++if args.program_cache:
++    # L13: the store is opened before any design; its key part that does not depend on the inputs (code, levers, stack, device, flags) is computed once here
++    _plocal = None                                               # 0.7.0: with L10's bridge provider on, this process's programs launch triangle attention through FFI specs registered here at trace time — on a core older than 0.5.39.0 (per-process launch specs) not runnable elsewhere: then the store traces, never loads / stores them (named); on a self-describing core they travel (0.7.5)
++    if FUSED_TRIATTN is not None and getattr(FUSED_TRIATTN, 'bridge_on', lambda: False)():
++        _plocal = (getattr(FUSED_TRIATTN, 'process_local_word', None) or (lambda: getattr(FUSED_TRIATTN, 'PROCESS_LOCAL', 'triattn_xla_ffi_specs')))()   # 0.7.5: None on a core whose bridge launches are self-describing (opt_core >= 0.5.39.0): stored / loaded like any program
++    PROGRAMS = PROGLIB.Store(args.program_cache, vars(args), script_dir, census_snapshot=_census_snapshot, census_replay=_census_replay, process_local=_plocal)
++    if _plocal: print(f'program_cache: process-local programs ({_plocal}): the L10 bridge launches through FFI specs registered at trace time in this process — programs are traced here, not loaded or stored')
++    _pp = PROGRAMS.probe()
++    print(f"program_cache: dir {_pp['dir']} key {_pp['static_key'][:16]} (code files {_pp['n_code_files']}, jax {_pp['jax']}, device {_pp['device']}, keyed in {_pp['t_key']} s) entries={_pp['entries']}")
++
+ class Timers:
+     def __init__(self, path):
+         self.path = path
+@@ -348,6 +388,27 @@
+             timers.emit('params_on_device', dt=time.time() - t)
+ 
+         self.seen_lengths = set()
++        self.prepared = {}                   # L7: inputs featurized by the precompile pass, taken by process_struct (each input is featurized once)
++        self.programs = {}                   # L7/L13: input signature -> the compiled model program (af2ig_opt.programs), for the rest of the process
++        self.programs_lock = threading.Lock()
++
++    def model_program(self, model_args, L):
++        # L7/L13: the compiled program for these arguments — prepared ahead of the call by jax's AOT path (trace -> lower -> compile: the
++        # executable jit itself would run, so the same output bytes), one per input signature for the rest of the process; with
++        # -program_cache DIR loaded from / stored to DIR (af2ig_opt.programs.Store). Returns (callable, record-or-None for a signature
++        # already prepared in this process).
++        sig = PROGLIB.signature(model_args)
++        with self.programs_lock:
++            fn = self.programs.get(sig)
++        if fn is not None:
++            return fn, None
++        if PROGRAMS is not None:
++            fn, rec = PROGRAMS.program(self.model_runner.apply, model_args, sig, L)
++        else:
++            fn, rec = PROGLIB.aot_compile(self.model_runner.apply, model_args)
++        with self.programs_lock:
++            fn = self.programs.setdefault(sig, fn)
++        return fn, rec
+ 
+     def featurize(self, feat_holder):
+ 
+@@ -517,7 +578,12 @@
+         self.t0 = timer()
+         t_start = time.time()
+ 
+-        feat_holder, feature_dict, initial_guess = self.prepare_struct(tag)
++        pre = self.prepared.pop(tag, None)
++        if pre is not None:
++            # L7: featurized by the precompile pass — the same inputs, built once
++            feat_holder, feature_dict, initial_guess = pre
++        else:
++            feat_holder, feature_dict, initial_guess = self.prepare_struct(tag)
+         usetag, binderlen, monomer = feat_holder.tag, feat_holder.binderlen, feat_holder.monomer
+         t_feat = time.time()
+ 
+@@ -529,10 +595,15 @@
+         start = timer()
+         print(f'Running {self.model_name}')
+ 
+-        prediction_result = self.model_runner.apply( self.model_runner.params,
+-                                                     jax.random.PRNGKey(0),
+-                                                     feature_dict,
+-                                                     initial_guess )
++        model_args = (self.model_runner.params, jax.random.PRNGKey(0), feature_dict, initial_guess)
++        prog_rec = None
++        if PROGLIB is not None:
++            # L7/L13: the program prepared ahead of the call (loaded, or traced+lowered+compiled once per signature), then run — the
++            # executable and the arguments are the ones apply() would use: the same output bytes
++            prog_fn, prog_rec = self.model_program(model_args, L)
++            prediction_result = prog_fn(*model_args)
++        else:
++            prediction_result = self.model_runner.apply(*model_args)
+         # block so that the model timer is meaningful (process_output pulls these arrays to the host next anyway)
+         jax.tree_util.tree_map(lambda x: x.block_until_ready(), prediction_result)
+         if args.host_outputs:
+@@ -554,6 +625,9 @@
+         self.process_output(feat_holder, feature_dict, prediction_result)
+         t_out = time.time()
+ 
++        if prog_rec is not None:
++            # L7/L13 evidence per new signature: where the first call's seconds went (trace / lower / compile-or-cache-load / store, or load)
++            timers.emit('program', tag=usetag, **prog_rec)
+         if FLASH_ATTN is not None and new_shape:
+             # L8 evidence: the adapter's trace-time census of Attention calls routed to the kernel / left on the stock ops (cumulative over the shapes compiled so far)
+             timers.emit('flash_attn', L_compiled=L, **FLASH_ATTN.census())
+@@ -755,9 +829,9 @@
+     '''
+     L7: XLA compiles one program per host thread; stock compiles each new input length lazily inside the loop
+     (~130-165 s each on H100 for this model). Featurize one representative input per distinct compiled length and
+-    call the jitted apply once per length from a thread pool so the compilations overlap. jax caches executables
+-    in-process keyed on the input signature, so the prediction loop then hits warm caches. Results of these
+-    warm-up calls are discarded.
++    prepare its program (af2ig_opt.programs: jax AOT trace -> lower -> compile, or a load from -program_cache) from a
++    thread pool so the compilations overlap; no forward is run and the featurized inputs are kept for the loop, which
++    calls the prepared executables (AF2_runner.model_program).
+     '''
+     import concurrent.futures
+     from opt_core.oom import is_oom                                  # an out-of-memory is never a skipped input: it propagates (the model-opt tree's one OOM classifier)
+@@ -776,22 +850,26 @@
+     prepared = []
+     for L, pth in todo:
+         try:
+-            prepared.append((L, af2_runner.prepare_struct(pth)))
++            item = af2_runner.prepare_struct(pth)
++            af2_runner.prepared[pth] = item                          # kept for the loop: the input is featurized once
++            prepared.append((L, pth, item))
+         except Exception as e:
+             if is_oom(e): raise
+             print(f'precompile: featurization failed for {pth}: {e!r}')
+     def _compile(item):
+-        L, (fh, feat, ig) = item
++        L, pth, (fh, feat, ig) = item
+         t = time.time()
+-        out = af2_runner.model_runner.apply(af2_runner.model_runner.params, jax.random.PRNGKey(0), feat, ig)
+-        jax.tree_util.tree_map(lambda x: x.block_until_ready(), out)
+-        del out
++        # AOT: the program is traced, lowered and compiled (or loaded, -program_cache) WITHOUT running a forward — nothing is discarded and no
++        # activation memory is taken here; the loop runs the prepared executable
++        _, rec = af2_runner.model_program((af2_runner.model_runner.params, jax.random.PRNGKey(0), feat, ig), L)
+         af2_runner.seen_lengths.add(L)
+-        return L, time.time() - t
++        return L, time.time() - t, rec
+     with concurrent.futures.ThreadPoolExecutor(max_workers=max(1, num_threads)) as pool:
+-        for L, dt in pool.map(_compile, prepared):
+-            print(f'precompile: length {L} compiled+ran in {dt:.1f} s')
+-            timers.emit('precompile_shape', L_compiled=L, dt=dt)
++        for L, dt, rec in pool.map(_compile, prepared):
++            print(f"precompile: length {L} program ready in {dt:.1f} s ({(rec or {}).get('source', 'in memory')})")
++            timers.emit('precompile_shape', L_compiled=L, dt=dt, source=(rec or {}).get('source', 'memory'))
++            if rec is not None:
++                timers.emit('program', tag=None, **rec)
+             if FLASH_ATTN is not None:
+                 timers.emit('flash_attn', L_compiled=L, **FLASH_ATTN.census())
+             if FUSED_TRIATTN is not None:
+@@ -854,4 +932,8 @@
+     # M1 evidence at exit: the whole run's pair-stack census as the last pairstack record, and the per-lever lines on stderr
+     timers.emit('pairstack', L_compiled=None, final=True, **PAIRSTACK.census())
+     PAIRSTACK.print_lines()
++if PROGRAMS is not None:
++    # L13 evidence at exit: the store's census as the last program_store record, and its per-lever line on stderr
++    timers.emit('program_store', **PROGRAMS.census())
++    print(PROGLIB.line(PROGRAMS), file=sys.stderr, flush=True)
+ timers.emit('proc_end', n_done=n_done, t_since_proc0=time.time() - T_PROC0)

@@ -1,0 +1,16 @@
+# OpenFold3 0.4.1 inference configuration with the stock PyTorch attention path selected explicitly — the same `model_update` block as
+# fast_inference/config/stock_predict.yml, repeated here so this add-on is self-contained.
+# WHY: public openfold3 0.4.1 (PyPI wheel == git tag 0.4.1) defaults settings.memory.eval.use_deepspeed_evo_attention to `not _is_rocm` (= True on CUDA).
+#  * On an image WITHOUT a working DeepSpeed DS4Sci evoformer-attention build (no nvcc / no CUTLASS): every predict item raises 'Unable to JIT load the
+#    evoformer_attn op', OpenFold3 catches it per query and `run_openfold predict` exits 0 with ZERO structures.
+#  * On an image WHERE the op builds: the model runs a different attention kernel (bf16 DS4Sci) than the PyTorch path, and that kernel is not run-to-run
+#    deterministic, so no deterministic reference run exists with it on and the fast-inference add-on refuses CUDA-graph capture around it.
+# With this file the model runs the stock PyTorch attention/einsum path.
+# The add-on's own levers (OF3T_TRIMUL=cueq, OF3T_TRIATT=flash) are selected by environment variables at the two triangle modules only and are unaffected by this file.
+model_update:
+  presets: [predict]
+  custom:
+    settings:
+      memory:
+        eval:
+          use_deepspeed_evo_attention: false

@@ -1,0 +1,23 @@
+experiment:
+  name: binder_design_example
+
+paths:
+  rootdir: examples/binder_design
+  dataset: data/design/binder_design/binderbench
+
+generation:
+  dataset:
+    source: target
+    selections: 01_bhrf1
+    n_sample: 5
+  sampler:
+    sampler:
+      direction_scale: 0.0
+
+evaluation:
+  version: binder
+  inverse_folding:
+    num_seq: 1
+  folding:
+    model_name: colabfold
+    mode: template

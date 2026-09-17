@@ -1,0 +1,8 @@
+OpenDDE optimization kit — the XL levers (odde_xl.py).
+Original code of this package: Copyright 2026 Anthropic, PBC; licensed under the Apache License, Version 2.0 (the package's LICENSE file,
+../../../../../LICENSE). Portions derived from Protenix (Apache-2.0, ByteDance) through OpenDDE 1.1.1 (Apache-2.0, Aureka AI Research):
+odde_xl.py restates the prologue statements of upstream's TriangleAttention.forward (opendde/model/triangular/triangular.py) around its per-chunk
+LayerNorm recompute, and keeps the stock chunk-layer body in the un-chunked regime, as its comments mark. The LICENSE file in this directory is
+the Apache License, Version 2.0 text as distributed with Protenix (appendix line "Copyright 2024 ByteDance and/or its affiliates."), kept for those
+portions and for the OpenDDE and Protenix functions the levers wrap; the kit-level table is ../../../../../THIRD_PARTY_NOTICES.md.
+Runs on OpenDDE 1.1.1 (Copyright 2026 Aureka AI Research, Apache-2.0) unchanged: the levers wrap its functions in the running process.

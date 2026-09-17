@@ -1,0 +1,26 @@
+{
+ "exports": {},
+ "kind": "package",
+ "license": "Apache-2.0 (this repository's own code: common/opt_core/LICENSE); portions derive from Protenix (Apache-2.0, Copyright 2024 ByteDance and/or its affiliates): NOTICE in the package directory, licence text kernels/fpf_flashpairformer.PROTENIX_LICENSE",
+ "mechanism": "attn.triangle_attention_prologue (F1: LayerNorm in registers, start node rows / ending node z^T by strides), pair.transition_swiglu (F3: LN-in-kernel transition v1/v2/v3)",
+ "name": "fpf_mkpf",
+ "not_carried": {
+  "design_notes/MANIFEST.json": "not in the package tree (design notes and prototypes, not included in this package: nothing imports or reads them at run time)",
+  "design_notes/MKPF_PREREG_DESIGN.md": "not in the package tree (design notes and prototypes, not included in this package: nothing imports or reads them at run time)",
+  "design_notes/README.md": "not in the package tree (design notes and prototypes, not included in this package: nothing imports or reads them at run time)",
+  "design_notes/env_mkpf.sh": "not in the package tree (design notes and prototypes, not included in this package: nothing imports or reads them at run time)",
+  "design_notes/mk_bench.py": "not in the package tree (design notes and prototypes, not included in this package: nothing imports or reads them at run time)",
+  "design_notes/mk_cert.py": "not in the package tree (design notes and prototypes, not included in this package: nothing imports or reads them at run time)",
+  "design_notes/overlay_sitecustomize.py": "not in the package tree (design notes and prototypes, not included in this package: nothing imports or reads them at run time)",
+  "design_notes/run_selftest.sh": "not in the package tree (design notes and prototypes, not included in this package: nothing imports or reads them at run time)",
+  "design_notes/welford_compile_probe.py": "not in the package tree (design notes and prototypes, not included in this package: nothing imports or reads them at run time)"
+ },
+ "runtime_imports": [
+  "fpf_triatt_pro",
+  "fpf_triatt_epi",
+  "fpf_transition"
+ ],
+ "runtime_imports_note": "__init__.install() patches ptx_trunk2_levers + the three FPF packages (kit hook, engine-named, lazy); its closure-rebinding step _rebind_levers_prologue is a wrapper over _engine_adapter.py (imported on first call; imports the engine's upstream package lazily); selftest.py imports the engine's package when run; kernels.py is engine-free (torch/triton); MKPF_CELLS.json carried as data",
+ "served_note": "kernels.prologue_ln(module_like, z, cch, cfg, ending, ln_arith, fma_flags) — served by opt_core.attn.pair_fused as prologue variant 'mkpf_f1' (ln='fused' calls; ln_arith per cell row: 'welford' = bit-emulation of the fast_layernorm CUDA kernel, C == 256 only; 'fused' = two-pass fp32 LN); transition_ln{,_v2,_v3} (F3) are carried, not served (no pinned F3 cell in MKPF_CELLS)",
+ "version": "MK-PF (vendored from bb13f03b; FLASHPAIRFORMER v0.6.1 tree)"
+}

@@ -1,0 +1,41 @@
+# esm_if1_opt — one command line around ESM-IF1 sequence design. `--mode off` is stock: upstream's sample_sequences.py as shipped in a
+# proven-clean child per structure (esm_if1_opt/stock_design.py over opt_core.stock_proof); `--mode fast` (the default) is the kit's one tier,
+# batched sampling (esm_if1_opt/batched.py in the kit child kit_design.py); any other mode word is a usage error, exit 2. Surface: the script's
+# own arguments (pdbfile, --chain, --temperature, --outpath, --num-samples, --multichain-backbone, --nogpu), --input/--out,
+# --seed/--batch (inputs), --det (never applies here), the evidence lines. Install editable with the core: `pip install -e common/opt_core -e
+# esm_if1/opt` (run.sh install). The build backend is the core's template copy, byte for byte (`_build_backend.py`); this kit ships no autoload
+# .pth (the mode is chosen on the command line; no import is hooked), so the template builds plain setuptools wheels. The core pin gate
+# (`esm_if1_opt/_core_gate.py`, the core's template copy byte for byte; `esm_if1_opt.core_gate()` is statement one of every entry) refuses by name
+# with exit 3 on an absent or older core before anything of the core is imported (the pin below is a minimum-version floor).
+[build-system]
+requires = ["setuptools>=64", "wheel"]
+build-backend = "_build_backend"
+backend-path = ["."]
+
+[project]
+name = "esm_if1_opt"
+dynamic = ["version"]
+description = "ESM-IF1 sequence design behind one command line: --mode off = upstream's sample_sequences.py as shipped in a proven-clean child; --mode fast (default) = batched sampling over the unmodified upstream modules; the script's own arguments plus --input/--out/--seed/--batch_size"
+requires-python = ">=3.9"
+classifiers = ["Private :: Do Not Upload"]
+dependencies = []
+
+[project.optional-dependencies]
+test = ["pytest", "setuptools>=64"]                 # the package's CPU tests (no torch, no esm; setuptools: the tests execute _build_backend.py)
+
+[project.scripts]
+esm_if1-opt = "esm_if1_opt.__main__:main"          # `esm_if1-opt design|check ...` == `python -m esm_if1_opt ...`
+
+[tool.setuptools]
+packages = ["esm_if1_opt", "esm_if1_opt.tests"]
+include-package-data = false
+
+[tool.setuptools.dynamic]
+version = {attr = "esm_if1_opt.__version__"}
+
+# The shared core this kit stands on (common/opt_core): pinned by path and by a minimum version; pip install -e <that path> -e <this directory>;
+# the core pin gate compares this table with the installed core's own __version__ at every entry. The table header line carries nothing but
+# the header (the gate's no-tomllib reader matches it whole).
+[tool.opt_core]
+path = "../../common/opt_core"
+version = "0.5.18.20"

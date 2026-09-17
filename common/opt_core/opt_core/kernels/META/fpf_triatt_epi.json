@@ -1,0 +1,12 @@
+{
+ "exports": {},
+ "kind": "package",
+ "license": "Apache-2.0 (this repository's own code: common/opt_core/LICENSE); portions derive from Protenix (Apache-2.0, Copyright 2024 ByteDance and/or its affiliates): NOTICE in the package directory, licence text kernels/fpf_flashpairformer.PROTENIX_LICENSE",
+ "mechanism": "attn.triangle_attention_epilogue",
+ "name": "fpf_triatt_epi",
+ "not_carried": {},
+ "runtime_imports": [],
+ "runtime_imports_note": "the registry ops live in _engine_adapter.py (fn / fn_block_residual / _stock_prologue_attention import the engine's upstream package lazily inside the functions); epilogue.py keeps same-name, same-signature wrappers that import _engine_adapter on first call (importing the unit never imports it); the unit's own self-test / timing / batch-check / spec-script programs are not carried (they import the engine's package when run); the core's serve layer calls epilogue.triatt_epilogue / torch_reference_epilogue only",
+ "served_note": "triatt_epilogue(o, g, wo16, z, ending, residual, out, cfg, woT16, o_layout): bf16(sigmoid(g)*o) @ Wo^T (+z, transposed scatter for the ending node) in one kernel; PINNED_CONFIG keyed (c, H, D, gpu_class); pinned {(256,8,32,'sm90')} in the carried bytes — other cells via cfg= from the core's cell table",
+ "version": "epilogue v2/v1 (FPF Fusion TriAttEpi, FLASHPAIRFORMER v0.6.1 tree)"
+}

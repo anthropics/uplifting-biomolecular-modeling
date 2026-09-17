@@ -1,0 +1,10 @@
+{
+ "exports": {},
+ "kind": "package",
+ "license": "Apache-2.0 (this repository's own code: common/opt_core/LICENSE); portions derive from Protenix (Apache-2.0, Copyright 2024 ByteDance and/or its affiliates): NOTICE in the package directory, licence text kernels/fpf_flashpairformer.PROTENIX_LICENSE",
+ "mechanism": "attn.triangle_multiplication",
+ "name": "fpf_trimul",
+ "not_carried": {},
+ "runtime_imports": [],
+ "version": "3.3, grid schedule (trimul._select_cfg schedules the stage-A/C tile height by N so every served cell launches through N = 5632; kernels.stage_grid_y is the one statement of the token-row tiling); kernels, tiles and cfg tables of the TM-K3 exact line unchanged below each cell's own launch limit"
+}

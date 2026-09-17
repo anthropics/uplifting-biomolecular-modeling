@@ -1,0 +1,168 @@
+{
+ "kit": "fused",
+ "record": "SERVED \u2014 the shapes the kit serves and the per-shape composition, with the identity checks that admitted the 300m / 600m shapes",
+ "served_configs": {
+  "300m": [
+   960,
+   30,
+   15
+  ],
+  "600m": [
+   1152,
+   36,
+   18
+  ],
+  "6b": [
+   2560,
+   80,
+   40
+  ]
+ },
+ "composition": {
+  "2560": [
+   "base",
+   "residual_ln.residual",
+   "residual_ln.residual_ln_qkv",
+   "qk_rotary.qk_ln_rotary",
+   "thin.attn/ffn/ln_qkv/out_proj/rotary"
+  ],
+  "960|1152": [
+   "base",
+   "residual_ln.residual",
+   "qk_rotary.qk_ln_rotary",
+   "thin.attn/ffn/ln_qkv/out_proj/rotary"
+  ],
+  "out_by_shape_below_2049": {
+   "residual_ln.residual_ln_qkv": "TE general<8192,1,4,16> LayerNorm config = 2048 < N <= 8192; 960 / 1152 select <1024|2048,4,1,16>"
+  }
+ },
+ "checks": [
+  {
+   "date": "2026-09-10",
+   "gpu": "NVIDIA H100 80GB HBM3 (sm90)",
+   "image": "accel (torch 2.11.0+cu130, TE 2.15.0, flash-attn 2.7.4.post1)",
+   "route": "stock vs exact, fresh processes, the SDK one-protein call and the padded batched forward",
+   "inputs": "10 sequences: 2 public + synthetic 60/150/150/300/300/300 + one with 3 <mask> + one 1500-mer",
+   "regimes": [
+    "batch 1",
+    "batch 8"
+   ],
+   "result": {
+    "300m": "10/10 items bitwise (logits, embeddings) in both regimes",
+    "600m": "10/10 both regimes",
+    "6b": "10/10 both regimes"
+   }
+  },
+  {
+   "date": "2026-09-10",
+   "gpu": "NVIDIA A100-SXM4-80GB (sm80)",
+   "image": "accel",
+   "route": "stock vs exact, the SDK one-protein call and the padded batched forward",
+   "inputs": "same 10",
+   "regimes": [
+    "batch 1",
+    "batch 8"
+   ],
+   "result": {
+    "300m": "10/10 both regimes",
+    "600m": "10/10 both regimes"
+   }
+  },
+  {
+   "date": "2026-09-10",
+   "gpu": "H100",
+   "route": "in-process probe (driver.run_b1 / run_batched b=4), items composed one at a time",
+   "inputs": "10 sequences 37-611 aa incl. <mask>",
+   "result": "base, thin, residual, base+residual+thin: 10/10 bitwise at 960 and 1152; qk_ln_rotary at 960/1152: 0/10 (kernel assumes N % 512 == 0) -> out by shape; residual_ln_qkv: refused by its own N-range check -> out by shape"
+  },
+  "H100: qk_ln_rope with the ragged last pass at 300m / 600m / 6b, 10 sequences (37-611 aa, one with <mask>), batch 1 and batched(4): logits + embeddings sha256 identical to stock 10/10 each; per-call forward with the full composition 300m 33.7 -> 10.4 ms, 600m 39.4 -> 12.5 ms, 6b 88.2 -> 30.6 ms"
+ ],
+ "speed_h100_ms_per_call": {
+  "300m": {
+   "1x256": [
+    29.5,
+    11.6
+   ],
+   "16x256": [
+    40.5,
+    14.7
+   ],
+   "64x256": [
+    53.5,
+    40.9
+   ],
+   "256x256": [
+    187.2,
+    156.6
+   ],
+   "16x1024": [
+    57.0,
+    44.3
+   ],
+   "64x1024": [
+    201.1,
+    170.6
+   ]
+  },
+  "600m": {
+   "1x256": [
+    34.6,
+    13.9
+   ],
+   "16x256": [
+    42.4,
+    16.5
+   ],
+   "64x256": [
+    77.8,
+    62.6
+   ],
+   "256x256": [
+    284.8,
+    244.3
+   ],
+   "16x1024": [
+    82.9,
+    67.6
+   ],
+   "64x1024": [
+    306.6,
+    266.2
+   ]
+  },
+  "note": "[stock, fused] median of 12 timed calls after 4 warm-up calls; indicative measurements on one card",
+  "small_width_kernels_2026-09-10": {
+   "what": "[stock, fused] median per-call forward, 10 sequences 37-611 aa, batch 1 | batched(4), full composition incl. residual_ln_qkv + qk_ln_rotary at every width (probe, one H100)",
+   "300m": {
+    "b1": [
+     34.0,
+     11.8
+    ],
+    "batched4": [
+     29.6,
+     11.8
+    ]
+   },
+   "600m": {
+    "b1": [
+     40.0,
+     13.5
+    ],
+    "batched4": [
+     36.1,
+     13.4
+    ]
+   },
+   "6b": {
+    "b1": [
+     96.9,
+     30.0
+    ],
+    "batched4": [
+     89.4,
+     28.4
+    ]
+   }
+  }
+ }
+}

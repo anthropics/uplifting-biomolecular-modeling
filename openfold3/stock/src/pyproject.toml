@@ -1,0 +1,187 @@
+[build-system]
+# torch used at build needs to match the one at runtime
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "openfold3"
+version = "0.4.1"
+dependencies = [
+  "awscli",
+  "awscrt",
+  "torch",# ==2.5.1",
+  "pytorch-lightning >=2.1",
+  "numpy",
+  "pandas",
+  "PyYAML",
+  "requests",
+  "scipy",
+  "tqdm",
+  "typing-extensions",
+  "wandb",
+  "ml-collections",
+  "mkl",
+  "aria2",
+  "biotite",
+  "rdkit",
+  "boto3",
+  "memory_profiler",
+  "func_timeout",
+  "lmdb", # == 1.6  # This verison might be required to avoid Error during training
+  "ijson",
+  "deepspeed",
+  "pdbeccdutils",
+  # For cutlass >=4, import library is cutlass_cppgen, but deepspeed is
+  # currently using cutlass.
+  "nvidia-cutlass <4",
+  "kalign-python",
+
+  # additional pins
+
+  # Pinned cutlass <4 calls from cuda.__version__, which was removed when
+  # cuda-python went fully metapackage
+  "cuda-python <12.9.1",
+]
+authors = [
+  {name = "OpenFold Team", email = "support@openfold.io" }
+]
+description = "OpenFold's Biological Structure Prediction Model based on DeepMind's AlphaFold 3"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "Apache-2.0" }
+classifiers = [
+    "License :: OSI Approved :: Apache Software License",
+    "Operating System :: POSIX :: Linux",
+    "Programming Language :: Python :: 3.10",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+
+[project.urls]
+Repository = "https://github.com/aqlaboratory/openfold-3"
+
+[project.scripts]
+run_openfold="openfold3.run_openfold:cli"
+setup_openfold="openfold3.setup_openfold:main"
+validate-openfold3-rocm="openfold3.entry_points.validate_rocm:main"
+
+[dependency-groups]
+test = [
+  "pytest",
+  "ruff",
+  "awscli",
+  "aria2",
+  "pytest-xdist",
+  "pytest-cov",
+  "pytest-benchmark",
+  "pytest-regressions",
+  "debugpy",
+  "pytest-recording",
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest",
+  "ruff",
+  # used for documentation
+  "sphinx",
+  "myst-parser",
+  "furo"
+]
+cuequivariance = [
+  "cuequivariance>=0.6.1",
+  "cuequivariance-ops-torch-cu12>=0.6.1",
+  "cuequivariance-torch>=0.6.1",
+  "torch>=2.7",
+]
+
+[tool.setuptools]
+include-package-data = true
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["openfold3*", "scripts*"] 
+
+[tool.setuptools.package-data]
+openfold3 = [
+  "projects/*/config/*.yml",
+  "tests/test_data/**/*",
+  "scripts/*.sh"
+]
+
+# much of the cibuildwheel config taken from benfred/implicit
+[tool.cibuildwheel]
+before-all = "devtools/install_cuda.sh"
+manylinux-x86_64-image = "manylinux2014"
+
+[tool.cibuildwheel.linux]
+repair-wheel-command = """
+AUDITWHEEL_PLAT=manylinux2014_$(uname -m) \
+auditwheel repair \
+    --exclude libc10.so \
+    --exclude libtorch.so \
+    --exclude libtorch_cpu.so \
+    --exclude libtorch_python.so \
+    -w {dest_dir} {wheel}
+"""
+
+[tool.cibuildwheel.linux.environment]
+CUDACXX = "/usr/local/cuda/bin/nvcc"
+
+[tool.ruff]
+line-length = 88
+
+[tool.ruff.lint]
+select = [
+    # pycodestyle
+    "E",
+    # Pyflakes
+    "F",
+    # pyupgrade
+    "UP",
+    # flake8-bugbear
+    "B",
+    # flake8-simplify
+    "SIM",
+    # isort
+    "I",
+]
+ignore = [
+    "E741",
+    "SIM108",
+    "B905",  # explicit strict= for zip
+]
+extend-safe-fixes = ["UP006"]
+
+[tool.ruff.lint.per-file-ignores]
+"**/tests/**" = ["E501"]
+
+[tool.pytest.ini_options]
+log_cli = true
+log_cli_level = "WARNING"
+log_cli_format = "%(asctime)s [%(levelname)8s] %(message)s (%(filename)s:%(lineno)s)"
+log_cli_date_format = "%Y-%m-%d %H:%M:%S"
+testpaths = ["openfold3/tests"]
+python_files = ["test_*.py"]
+markers = [
+    "inference_verification: Tests to verify installation on inference example",
+    "slow: Large size test"
+]
+
+# Exclude directories during collection
+[tool.coverage.run]
+omit = [
+    "openfold3/tests/*",
+]
+
+# Exclude directories from reporting
+[tool.coverage.report]
+omit = [
+    "openfold3/tests/*",
+]
+
+# Map /opt/openfold3/openfold3/ (docker path) to openfold3/ (local path) during `coverage combine`
+[tool.coverage.paths]
+source = [
+    "openfold3/",
+    "/opt/openfold3/openfold3/",
+]

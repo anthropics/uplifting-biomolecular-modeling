@@ -1,0 +1,54 @@
+diff --git a/caliby/model/seq_denoiser/denoisers/atom_mpnn_denoiser.py b/caliby/model/seq_denoiser/denoisers/atom_mpnn_denoiser.py
+index 680c6b5..a7e20a0 100644
+--- a/caliby/model/seq_denoiser/denoisers/atom_mpnn_denoiser.py
++++ b/caliby/model/seq_denoiser/denoisers/atom_mpnn_denoiser.py
+@@ -177,7 +177,8 @@ class AtomMPNNDenoiser(BaseSeqDenoiser):
+ 
+         # Compute potts parameters.
+         potts_decoder_aux, batch, sampling_inputs = self.compute_potts_params(batch, sampling_inputs)
+-        aux["potts_decoder_aux"] = to(potts_decoder_aux, "cpu")
++        if _fast_potts_params_level() == 0:
++            aux["potts_decoder_aux"] = to(potts_decoder_aux, "cpu")  # FAST: dead copy (aux["potts_decoder_aux"] is never read); skipped at level >= 1
+ 
+         # Set up Potts sampling
+         potts_sampling_cfg = sampling_inputs["potts_sampling_cfg"]
+@@ -351,7 +352,7 @@ class AtomMPNNDenoiser(BaseSeqDenoiser):
+         """
+         # Aggregate on CPU to avoid memory usage scaling with ensemble size.
+         batch_device = batch["restype"].device
+-        aggregate_device = "cpu"
++        aggregate_device = "cpu" if _fast_potts_params_level() == 0 else batch_device  # FAST: level>=1 aggregates on the GPU (no DtoH/HtoD round trip; values identical)
+ 
+         subbatch_size = sampling_inputs["batch_size"]
+         B = batch["restype"].shape[0]
+@@ -395,7 +396,11 @@ class AtomMPNNDenoiser(BaseSeqDenoiser):
+ 
+         # Handle symmetric decoding by folding the Potts parameters.
+         if sampling_inputs.get("symmetry_pos", None) is not None:
+-            potts_decoder_aux = _fold_symmetry_pos(potts_decoder_aux, sampling_inputs["symmetry_pos"])
++            _no_groups = all(len(g) == 0 for g in sampling_inputs["symmetry_pos"])
++            if _fast_potts_params_level() >= 2 and _no_groups:
++                pass  # FAST level 2: no symmetry groups -> keep the sparse (B,N,K,C,C) Potts parameters (skips N x N densification; changes the J_i reduction order -> Tier-2 candidate)
++            else:
++                potts_decoder_aux = _fold_symmetry_pos(potts_decoder_aux, sampling_inputs["symmetry_pos"])
+ 
+         # Move outputs back to batch device. Potts params stay in reduced state space.
+         potts_decoder_aux = to(potts_decoder_aux, batch_device)
+@@ -575,6 +580,17 @@ def _generate_gaussian_conformers(
+     return batch
+ 
+ 
++import os as _os
++
++
++def _fast_potts_params_level() -> int:
++    """CALIBY_FAST_POTTS_PARAMS: 0 = stock; 1 = GPU-side aggregation + densification, no dead host copy (exact); 2 = 1 + no densification when there are no symmetry groups (Tier-2 candidate)."""
++    try:
++        return int(_os.environ.get("CALIBY_FAST_POTTS_PARAMS", "0"))
++    except ValueError:
++        return 0
++
++
+ def _fold_symmetry_pos(
+     potts_decoder_aux: dict[str, TensorType["b ..."]], symmetry_pos: list[list[list[int]]]
+ ) -> dict[str, TensorType["b ..."]]:

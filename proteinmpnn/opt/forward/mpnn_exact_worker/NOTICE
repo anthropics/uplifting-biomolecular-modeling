@@ -1,0 +1,10 @@
+mpnn_exact_worker — notices and attributions
+
+This directory contains code derived from:
+  * ProteinMPNN — https://github.com/dauparas/ProteinMPNN (commit 8907e667), MIT License, Copyright (c) 2022 Justas Dauparas.
+    addon/mpnn_worker2.py re-implements the control flow of ProteinMPNN.sample() / ProteinMPNN.forward() (protein_mpnn_utils.py) for
+    batched, CUDA-graph execution and imports protein_mpnn_utils unmodified at run time; the upstream copyright notice is retained in the
+    file header. No ProteinMPNN file is modified or redistributed here.
+  * the persistent-worker design of ../mpnn_pdb_parser/ (same project, MIT): addon/mpnn_worker2.py began as a patched copy of
+    that directory's worker.
+No model weights and no third-party structure files are redistributed.

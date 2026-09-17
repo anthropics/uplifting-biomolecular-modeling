@@ -1,0 +1,188 @@
+# Copyright 2026 AlQuraishi Laboratory
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import pytorch_lightning as pl
+import torch
+from ml_collections import ConfigDict
+
+from openfold3.core.utils.exponential_moving_average import ExponentialMovingAverage
+from openfold3.core.utils.tensor_utils import tensor_tree_map
+
+
+# TODO implement shared hooks and methods for OpenFold models
+class ModelRunner(pl.LightningModule):
+    """High-level LightningModule class implementing hooks shared by OpenFold models.
+
+    For clarity, where possible, follow the hook order specified in the pseudocode
+    provided in the PL documentation:
+    https://lightning.ai/docs/pytorch/stable/common/lightning_module.html#hooks"""
+
+    def __init__(
+        self,
+        model_class: torch.nn.Module,
+        config: ConfigDict,
+    ) -> None:
+        """Assign general attributes and initialize the model.
+
+        Args:
+            model_class (nn.Module):
+                The model class to be used.
+            config (ConfigDict):
+                <Here, need a description of general config structure and
+                arguments.>
+        """
+        super().__init__()
+        # Save hyperparameters before defining model as recommended here:
+        # https://github.com/Lightning-AI/pytorch-lightning/discussions/13615
+        self.save_hyperparameters()
+        self.config = config
+
+        self.model = model_class(self.config)
+
+        self.ema = ExponentialMovingAverage(model=self.model, **config.settings.ema)
+        self.cached_weights = None
+        self.last_lr_step = -1
+
+    def forward(self, batch):
+        return self.model(batch)
+
+    # TODO refactor training stage logic here
+    def _log(self, loss_breakdown, batch, outputs, train=True):
+        phase = "train" if train else "val"
+        for loss_name, indiv_loss in loss_breakdown.items():
+            self.log(
+                f"{phase}/{loss_name}",
+                indiv_loss,
+                prog_bar=(loss_name == "loss"),
+                on_step=train,
+                on_epoch=(not train),
+                logger=True,
+                sync_dist=False,
+            )
+
+            if train:
+                self.log(
+                    f"{phase}/{loss_name}_epoch",
+                    indiv_loss,
+                    on_step=False,
+                    on_epoch=True,
+                    logger=True,
+                    sync_dist=False,
+                )
+
+        with torch.no_grad():
+            other_metrics = self._compute_validation_metrics(
+                batch, outputs, superimposition_metrics=(not train)
+            )
+
+        for k, v in other_metrics.items():
+            self.log(
+                f"{phase}/{k}",
+                torch.mean(v),
+                prog_bar=(k == "loss"),
+                on_step=False,
+                on_epoch=True,
+                logger=True,
+                sync_dist=False,
+            )
+
+    def training_step(self, batch, batch_idx):
+        example_feat = next(
+            iter(v for v in batch.values() if isinstance(v, torch.Tensor))
+        )
+        if self.ema.device != example_feat.device:
+            self.ema.to(example_feat.device)
+
+        # Run the model
+        outputs = self.model(batch)
+
+        # Compute loss
+        loss, loss_breakdown = self.loss(batch, outputs, _return_breakdown=True)
+
+        # Log it
+        self._log(loss_breakdown, batch, outputs)
+
+        return loss
+
+    def on_train_batch_end(self, outputs, batch, batch_idx):
+        # Update EMA weights after optimizer step
+        # Skip grad accumulation steps
+        is_last_step_of_cycle = (
+            batch_idx + 1
+        ) % self.trainer.accumulate_grad_batches == 0
+        if is_last_step_of_cycle or self.trainer.is_last_batch:
+            self.ema.update(self.model)
+
+    def eval_step(self, batch, batch_idx):
+        # At the start of validation, load the EMA weights
+        if self.cached_weights is None:
+            # model.state_dict() contains references to model weights rather
+            # than copies. Therefore, we need to clone them before calling
+            # load_state_dict().
+            def clone_param(t):
+                return t.detach().clone()
+
+            self.cached_weights = tensor_tree_map(clone_param, self.model.state_dict())
+            self.model.load_state_dict(self.ema.state_dict()["params"])
+
+        # Run the model
+        outputs = self(batch)
+
+        batch["use_clamped_fape"] = 0.0
+
+        # Compute loss and other metrics
+        _, loss_breakdown = self.loss(outputs, batch, _return_breakdown=True)
+
+        self._log(loss_breakdown, batch, outputs, train=False)
+
+    def validation_step(self, batch, batch_idx):
+        self.eval_step(batch, batch_idx)
+
+    def test_step(self, batch, batch_idx):
+        self.eval_step(batch, batch_idx)
+
+    def predict_step(self, batch, batch_idx):
+        # TODO implement
+        pass
+
+    def configure_optimizers(self):
+        pass
+
+    def on_load_checkpoint(self, checkpoint):
+        ema = checkpoint["ema"]
+        if not self.model.template_config.enabled:
+            ema["params"] = {
+                k: v for k, v in ema["params"].items() if "template" not in k
+            }
+        self.ema.load_state_dict(ema)
+
+    def on_save_checkpoint(self, checkpoint):
+        checkpoint["ema"] = self.ema.state_dict()
+
+    def resume_last_lr_step(self, lr_step):
+        """A helper method to manually specify the lr_step."""
+        self.last_lr_step = lr_step
+
+    def on_validation_epoch_end(self):
+        # Restore the model weights to normal
+        self.model.load_state_dict(self.cached_weights)
+        self.cached_weights = None
+
+    def _compute_validation_metrics(
+        self, batch, outputs, superimposition_metrics=False
+    ):
+        pass
+
+    def _compute_confidence_scores(self, batch: dict, outputs: dict):
+        pass

@@ -1,0 +1,11 @@
+# PDB 1BRS barnase (chain A, 110 aa) + barstar (chain B, 89 aa) in single-sequence mode: 199 tokens. The README's example input.
+version: 1
+sequences:
+  - protein:
+      id: A
+      sequence: AQVINTFDGVADYLQTYHKLPDNYITKSEAQALGWVASKGNLADVAPGKSIGGDIFSNREGKLPGKSGRTWREADINYTSGFRNSDRILYSSDWLIYKTTDHYQTFTKIR
+      msa: empty
+  - protein:
+      id: B
+      sequence: KKAVINGEQIRSISDLHQTLKKELALPEYYGENLDALWDALTGWVEYPLVLEWRQFEQSKQLTENGAESVLQVFREAKAEGADITIILS
+      msa: empty

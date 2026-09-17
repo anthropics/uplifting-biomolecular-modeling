@@ -1,0 +1,24 @@
+{
+ "unit": "protenix_fpf_flash_transition",
+ "version": "1.1.0",
+ "op": "pair_transition",
+ "definition": "out = z + Linear_o( SiLU(LN(z) Wa^T) * (LN(z) Wb^T) )  (AF3 Transition, n=4) on bf16 rows with fp32 accumulation; also the update-only form fn(). Numerics class EXACT: bit-identical to the stock Protenix bf16-autocast chain (fast_layernorm + cuBLAS + F.silu) on the rows below.",
+ "levers": {"flash_transition": "LN = the module's fast_layernorm kernel, then one sm_90a kernel", "flash_transition_ln": "LN inside the same kernel's prologue (one launch per call)"},
+ "key_fields": ["cc", "dtype", "c_in", "hidden", "M_rows", "N_token"],
+ "measurement": "CUDA-graph replay of each arm on the same real input (z entering the 48-block stack's pair transition + that block's weights, dumped from run.sh pred on exact_ladder_v4 items), arms interleaved A B A B, medians of 20, H100 80GB HBM3 (sm_90), torch 2.13.0+cu130, clocks 1980 MHz at start (sustained-load throttling to ~1800 MHz on the 1400 row noted); times are per call in milliseconds and include the LayerNorm.",
+ "incumbent": "opt_core fpf_transition.fn_residual (stock fast_layernorm kernel + one Triton kernel; the kit path before this unit)",
+ "rows": [
+  {"cc": "9.0", "dtype": "bf16", "c_in": 256, "hidden": 1024, "N_token": 200,  "M_rows": 40000,   "ms": {"flash_transition_ln": 0.157, "flash_transition": 0.161, "incumbent": 0.230}, "vs_incumbent": {"flash_transition_ln": 0.68, "flash_transition": 0.70}, "bitwise_equal_stock": true},
+  {"cc": "9.0", "dtype": "bf16", "c_in": 256, "hidden": 1024, "N_token": 400,  "M_rows": 160000,  "ms": {"flash_transition_ln": 0.472, "flash_transition": 0.501, "incumbent": 0.734}, "vs_incumbent": {"flash_transition_ln": 0.64, "flash_transition": 0.68}, "bitwise_equal_stock": true},
+  {"cc": "9.0", "dtype": "bf16", "c_in": 256, "hidden": 1024, "N_token": 800,  "M_rows": 640000,  "ms": {"flash_transition_ln": 1.716, "flash_transition": 1.867, "incumbent": 2.757}, "vs_incumbent": {"flash_transition_ln": 0.62, "flash_transition": 0.68}, "bitwise_equal_stock": true,
+   "in_model_device_time_ms": {"flash_transition_ln": 1.66, "flash_transition": 1.81, "incumbent": 2.72, "note": "torch.profiler over 8 consecutive 48-stack blocks of a full predict (exact, 800 tokens)"}},
+  {"cc": "9.0", "dtype": "bf16", "c_in": 256, "hidden": 1024, "N_token": 1400, "M_rows": 1960000, "ms": {"flash_transition_ln": 5.21, "flash_transition": 5.76, "incumbent": 8.53}, "vs_incumbent": {"flash_transition_ln": 0.61, "flash_transition": 0.68}, "bitwise_equal_stock": true}
+ ],
+ "reference_arms_not_measured_here": {"cuequivariance": "n/a (no transition op)"},
+ "uncovered_cells": [
+  {"c_in": 128, "hidden": 512, "where": "MSA-module transition (c_m 128 on protenix-v2)", "status": "served by the kit's t1_fused_transition / opt_core Triton path"},
+  {"c_in": 64, "hidden": 256, "where": "template pair stack transition", "status": "stock"},
+  {"c_in": 384, "hidden": 1536, "where": "single-track transition", "status": "kit t1 path; negligible cost"},
+  {"cc": "8.0 / 10.x", "status": "no build (the kernel is sm_90a-specific: wgmma + TMA); those rows keep the incumbent"}
+ ]
+}

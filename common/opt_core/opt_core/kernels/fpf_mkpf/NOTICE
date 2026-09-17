@@ -1,0 +1,8 @@
+fpf_mkpf (a FlashPairformer kernel carried in opt_core: opt_core/kernels/fpf_mkpf) — third-party attributions.
+
+Portions of this kernel re-state the arithmetic of Protenix's pair-stack modules (protenix/model/triangular/*,
+protenix/model/modules/pairformer.py, protenix/model/layer_norm): Protenix, Copyright 2024 ByteDance and/or its affiliates, Apache License 2.0,
+https://github.com/bytedance/Protenix. The licence text is carried as opt_core/kernels/fpf_flashpairformer.PROTENIX_LICENSE (one directory up
+from this file). No Protenix source file is included; where this kernel matches Protenix's fast LayerNorm bit for bit it re-states that kernel's reduction order (ln_mode 'welford').
+
+Third-party software this kernel calls and does not include or modify: PyTorch (BSD-3-Clause), OpenAI Triton (MIT).

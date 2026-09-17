@@ -1,0 +1,12 @@
+{
+ "exports": {},
+ "kind": "package",
+ "license": "NOTICE in the package directory: kernels.py / kernels_desc.py derive from the ESM-family TriMul Triton kernels carried at kernels/trimul/esm_v5/ef2_trimul_v5.py (byte-equal output at one channel chunk / bf16 / descriptor K1), themselves derived from fpf_trimul_v4 (Apache-2.0 lineage text kernels/fpf_flashpairformer.PROTENIX_LICENSE); the face, tests and TILE_TABLES.json are the core's own",
+ "mechanism": "kernels.trimul_esm_shapes.triangle_multiplication / select_cell (a row the kernels.trimul provider imports by name)",
+ "name": "trimul_esm_shapes",
+ "not_carried": {},
+ "runtime_imports": [],
+ "runtime_imports_note": "the face imports torch and the package's own kernels module inside the serving call only; kernels.py imports torch and triton at module level; kernels_desc.py (descriptor K1) is imported by kernels.launch_k1 only for a cell that asks for it",
+ "served_note": "pair widths (c_z, c_hidden) in (64,64) (64,128) (128,128) (256,256) (384,384), B = 1, bf16 or fp32 activations, cc 9.0 (descriptor K1) and cc 8.0 (pointer K1) cells in TILE_TABLES.json",
+ "version": "1.2.1"
+}

@@ -1,0 +1,30 @@
+# AF3-torch optimization kit — Apptainer / Singularity image made FROM the container image of af3_torch/environment/Dockerfile: the same stack
+# and the same /kit, for hosts that run Apptainer instead of Docker. The source is the image tagged af3_torch-kit:dev in the local Docker daemon
+# (build it first: README.md 'Setup'); an image pushed to a registry is used with `Bootstrap: docker` and `From:` naming that image instead.
+#   apptainer build af3_torch.sif af3_torch/environment/apptainer.def
+#   apptainer run --nv --cleanenv --bind /path/to/params:/params --env AF3_TORCH_PARAMS_DIR=/params --bind "$PWD/out":/out --env AF3_TORCH_CACHE_ROOT=/out/cache \
+#     af3_torch.sif pred --config h100 --mode fast --json_path /kit/af3_torch/inputs/1BRS.json --output_dir /out/fast
+# The image is read-only: give every verb an --output_dir on a bound, writable path and point AF3_TORCH_CACHE_ROOT (the Triton / Inductor / JAX
+# compile caches, /tmp/af3_torch_cache by default) at one too when you want the caches kept between runs; %environment keeps a host user
+# site-packages (PEP 370) from shadowing the pinned stack, --cleanenv keeps the host's variables out.
+Bootstrap: docker-daemon
+From: af3_torch-kit:dev
+
+%post
+    mkdir -p /opt/culib && ln -s /.singularity.d/libs/libcuda.so.1 /opt/culib/libcuda.so && ln -s /.singularity.d/libs/libcuda.so.1 /opt/culib/libcuda.so.1
+
+%environment
+    export PYTHONNOUSERSITE=1
+    # Triton <= 3.5 links its launcher stub with -lcuda: offer the unversioned name when --nv bound only libcuda.so.1
+    if [ -z "${TRITON_LIBCUDA_PATH:-}" ] && [ -e /opt/culib/libcuda.so ]; then export TRITON_LIBCUDA_PATH=/opt/culib; fi
+
+%runscript
+    cd /kit/af3_torch && exec bash /kit/af3_torch/run.sh "$@"
+
+%help
+    AF3-torch optimization kit: drop-in modes that make stock xfold (a PyTorch re-implementation of the AlphaFold 3 forward pass, run on the
+    converted OpenFold3-preview2 weights) faster or lighter on GPU memory without changing how it is called — off = stock exactly; exact =
+    identical outputs, faster; fast = small documented numeric differences, faster still (the default); big = lowest memory for large inputs.
+    `apptainer run --nv af3_torch.sif <verb> ...` = `bash /kit/af3_torch/run.sh <verb> ...` (verbs: install, pred, check, stock;
+    /kit/af3_torch/README.md inside the image). Requires an NVIDIA driver that runs CUDA 13.0 (580 or newer) and AF3_TORCH_PARAMS_DIR naming
+    the directory that holds the converted checkpoint (of3_ported_weights.bin.zst).

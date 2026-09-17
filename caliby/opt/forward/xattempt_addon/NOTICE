@@ -1,0 +1,16 @@
+CALIBY_XATTEMPT_ADDON_v1 ("xattempt add-on")
+
+This add-on contains modified copies of files from:
+ - caliby (github.com/ProteinDesignLab/caliby, commit 41d31560) — Apache License 2.0. Files: caliby/model/seq_denoiser/denoisers/seq_design/potts.py,
+   caliby/model/seq_denoiser/denoisers/atom_mpnn_denoiser.py, caliby/api.py, caliby/eval/eval_utils/seq_des_utils.py,
+   caliby/eval/eval_utils/inference_dataloader.py (originals in stock/, modified copies in fast/, diffs in patches/).
+ - Protpardelle-1c (github.com/ProteinDesignLab/protpardelle-1c, commit 7962da09) — MIT License. Files: src/protpardelle/core/models.py,
+   src/protpardelle/data/pdb_io.py (originals in stock/protpardelle_*.py, modified copies in fast/protpardelle_*.py, diffs in patches/X008, X009).
+ - chroma (vendored inside the caliby repository; Copyright Generate Biomedicines, Inc.) — Apache License 2.0. File: chroma/layers/complexity.py.
+ - CALIBY_FAST_INFERENCE_KIT_v1 (the "kit", ../fast_inference/; its patches 0002/0003 are the base of fast/potts.py and fast/atom_mpnn_denoiser.py; the kit-patched
+   files ship once, here in fast/, with this add-on's patches on top) — modifications of the same Apache-2.0 caliby files.
+ - Example structures in tests/public_inputs/ are copied from the caliby repository (examples/example_data/), which distributes them under the
+   repository licence — five unchanged, two (7urp.cif, 8sot.cif) with the `_entry.author` value replaced by `?` and otherwise unchanged; coordinates
+   originate from RCSB PDB entries 7URP, 7XHZ, 7XZ3, 8HUZ, 8SOT, 1TNF, 5JE6.
+No source code from PyTorch, Triton, atomworks or biotite is included; they are runtime dependencies (see LICENSE_NOTES.md). The two modified Protpardelle-1c files keep their MIT licence (Copyright (c) 2025 Protein Design Lab; the MIT permission notice is carried verbatim in the kit's third_party_licenses/protpardelle-1c.MIT.txt, i.e. ../../../third_party_licenses/protpardelle-1c.MIT.txt from here); the modifications are contributed under the same terms.
+Kit-level summary of all third-party components and licence texts: ../../../THIRD_PARTY_NOTICES.md and ../../../third_party_licenses/.

@@ -1,0 +1,163 @@
+{
+ "model": "colabfold",
+ "upstream": {
+  "colabfold": {
+   "package": "colabfold",
+   "version": "1.6.1",
+   "repo": "https://github.com/sokrypton/ColabFold",
+   "install": "pip install colabfold[alphafold]==1.6.1   # == pip install stock/colabfold-1.6.1-py3-none-any.whl (same bytes: the PyPI wheel); the alphafold extra carries jax, dm-haiku, alphafold-colabfold",
+   "wheel": {
+    "file": "stock/colabfold-1.6.1-py3-none-any.whl",
+    "bytes": 79802
+   },
+   "cli": {
+    "command": "colabfold_batch",
+    "entry_point": "colabfold.batch:main",
+    "note": "the wheel's console script (entry_points.txt); main() parses the flags and calls run(queries=...) (colabfold/batch.py:1743, :2202-2203)"
+   },
+   "requires_python": ">=3.10",
+   "declared_ranges": [
+    "alphafold-colabfold==2.3.13",
+    "jax>=0.5.2,<0.6.0",
+    "dm-haiku>=0.0.16,<0.0.17",
+    "dm-tree>=0.1.9,<0.2.0",
+    "numpy>=2.0.2,<3.0.0",
+    "tensorflow-cpu>=2.16.2,<3.0.0",
+    "biopython<1.86",
+    "pandas>=2.2.2,<3.0.0",
+    "importlib-metadata>=8.6.1,<9.0.0",
+    "appdirs>=1.4.4,<2.0.0",
+    "orjson>=3.11.4,<4.0.0",
+    "matplotlib>=3.8.4,<4.0.0",
+    "requests>=2.26.0,<3.0.0",
+    "tqdm>=4.62.2,<5.0.0",
+    "absl-py>=1.0.0,<2.0.0"
+   ],
+   "note": "the wheel's METADATA Requires-Dist (the alphafold extras); every range is satisfied by the freeze"
+  },
+  "alphafold_colabfold": {
+   "package": "alphafold-colabfold",
+   "version": "2.3.13",
+   "repo": "https://github.com/sokrypton/alphafold",
+   "install": "pip install alphafold-colabfold==2.3.13   # == pip install stock/alphafold_colabfold-2.3.13-py3-none-any.whl (same bytes: the PyPI wheel)",
+   "wheel": {
+    "file": "stock/alphafold_colabfold-2.3.13-py3-none-any.whl",
+    "bytes": 248430
+   },
+   "pin": {
+    "note": "sokrypton/alphafold carries no commit or tag matching this release; the PyPI sdist is the source instead",
+    "source": "pypi",
+    "package": "alphafold-colabfold",
+    "version": "2.3.13",
+    "sdist_sha256": "b3971ce19662c60c01baad6d10ab2bb49a4e1935ff5d5a6cf2dd4f4d3625421b"
+   },
+   "license": "Apache-2.0"
+  }
+ },
+ "image": {
+  "tested_on": "the image environment/Dockerfile builds (Ubuntu 22.04, CUDA 12.4.1 runtime, Python 3.11.5, environment/requirements.lock) — documentation only: nothing reads or compares this line",
+  "python": "/usr/local/bin/python",
+  "python_version": "3.11.5",
+  "colabfold_batch": "/usr/local/bin/colabfold_batch",
+  "base": "nvidia/cuda:12.4.1 on Ubuntu 22.04.4",
+  "env": {
+   "JAX_PLATFORMS": "cuda",
+   "JAX_COMPILATION_CACHE_DIR": "/root/.cache/jax",
+   "XLA_PYTHON_CLIENT_MEM_FRACTION": "0.95",
+   "TF_FORCE_UNIFIED_MEMORY": "0",
+   "PYTHONHASHSEED": "0",
+   "CFLAGS": "-g0"
+  },
+  "env_note": "the ENV block of environment/Dockerfile (the process environment of the tested stack, baked into the image); colabfold/batch.py:4-6 sets TF_FORCE_UNIFIED_MEMORY=1 and XLA_PYTHON_CLIENT_MEM_FRACTION=4.0 only where unset, so on this image unified memory is off and 95 % of device memory is preallocated; check_pins.py reports these variables and gates on none of them",
+  "compiler": "no cc, gcc or ptxas on PATH (nvidia-cuda-nvcc-cu12 12.9.86 is a pip package)",
+  "gpu": "NVIDIA H100 80GB HBM3"
+ },
+ "freeze": {
+  "file": "environment/requirements.lock",
+  "packages": 77
+ },
+ "check_packages": [
+  "colabfold",
+  "alphafold-colabfold",
+  "jax",
+  "jaxlib",
+  "jax-cuda12-plugin",
+  "jax-cuda12-pjrt",
+  "dm-haiku",
+  "dm-tree",
+  "numpy",
+  "scipy",
+  "tensorflow_cpu",
+  "biopython",
+  "ml_collections",
+  "chex",
+  "pandas",
+  "nvidia-cudnn-cu12",
+  "nvidia-cublas-cu12",
+  "nvidia-cuda-nvcc-cu12",
+  "nvidia-cuda-runtime-cu12"
+ ],
+ "weights": {
+  "env": "COLABFOLD_OPT_DATA_DIR",
+  "flag": "--data",
+  "model_type": "alphafold2_multimer_v3",
+  "source": "https://storage.googleapis.com/alphafold/alphafold_params_2022-12-06.tar; colabfold's own fetch URL is alphafold_params_colab_2022-12-06.tar (colabfold/download.py:41)",
+  "license": "CC BY 4.0",
+  "marker": {
+   "file": "params/download_complexes_multimer_v3_finished.txt",
+   "bytes": 0,
+   "note": "download_alphafold_params (colabfold/download.py:38-44, :70) fetches the parameters from the network unless this file exists"
+  },
+  "files": {
+   "params/params_model_1_multimer_v3.npz": {
+    "sha256": "611da8fc7478928f68de12e8b226260ef1f4ce62bcc29b008572e52f4f212959",
+    "bytes": 373043148
+   },
+   "params/params_model_2_multimer_v3.npz": {
+    "sha256": "51362b0844382ae0f5720c59b81dd13a43eea40fbf9995dd2573bdab88865378",
+    "bytes": 373043148
+   },
+   "params/params_model_3_multimer_v3.npz": {
+    "sha256": "46d9bcad288edc7ad5a6362ee8e5f84307a69712e00e6c36b1ef9daf96ebc9ce",
+    "bytes": 373043148
+   },
+   "params/params_model_4_multimer_v3.npz": {
+    "sha256": "59bdabd2d69c07fe26b37882d544acbd1b9f89f196828f4220da49e0610b572c",
+    "bytes": 373043148
+   },
+   "params/params_model_5_multimer_v3.npz": {
+    "sha256": "917742be5a105d6b80f13f1f13f20459f27ec3fdcd34ea088b359f4502d6177f",
+    "bytes": 373043148
+   }
+  }
+ },
+ "stock_proof": {
+  "must_be_absent_prefixes": [
+   "COLABFOLD_OPT",
+   "AF_PALLAS_ATTN"
+  ],
+  "cli": "colabfold_batch"
+ },
+ "stack": {
+  "key_form": "jax<ver>-cu<x.y>-sm<cc>",
+  "kernel_key_form": "<cc>|<jax>",
+  "jax": "0.5.3",
+  "jaxlib": "0.5.3",
+  "jax_cuda12_plugin": "0.5.3",
+  "cuda_runtime": "12.9 (nvidia-cuda-runtime-cu12 12.9.79)",
+  "cuda_base_image": "12.4.1",
+  "python": "3.11.5",
+  "dm_haiku": "0.0.16",
+  "gpu": "NVIDIA H100 80GB HBM3",
+  "compute_cap": "9.0",
+  "note": "the kit's requirements (opt/forward/af2_pallas_flash/README.md:18-21): jax[cuda12] 0.5.3-0.7.x, compute capability >= 8.0; the Pallas Triton lowering ships inside jaxlib, so no C compiler is needed and the pinned image carries none"
+ },
+ "hardware": {
+  "gate": "compute capability >= 8.0 (kit README.md:19); the constant lives in colabfold_opt/stack.py"
+ },
+ "stock_files": [
+  "alphafold/model/modules.py",
+  "colabfold/batch.py",
+  "colabfold/input.py"
+ ]
+}

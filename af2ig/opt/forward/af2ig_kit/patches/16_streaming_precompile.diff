@@ -1,0 +1,132 @@
+# 16_streaming_precompile.diff — L7 (0.7.7): the streaming precompile. The first length of the loop's order is prepared first and alone, the other lengths on the
+# -precompile N background threads once it is ready; each design waits only on its own length (af2ig_opt.precompile.Streaming); records as programs become ready and
+# the precompile_done record at exit. Applies after 15_tmpl_pointwise_sub.diff.
+--- a/af2_initial_guess/predict_pdb.py
++++ b/af2_initial_guess/predict_pdb.py
+@@ -168,10 +168,14 @@
+ WRITER = None        # L16: the OutputWriter of this process (built before the loop)
+ if args.prefetch > 0 or args.overlap_output > 0:
+     from af2ig_opt import prefetch as PREFETCHLIB
++PRECOMP = None       # L7 (0.7.7): the streaming precompile scheduler of this process (af2ig_opt.precompile.Streaming) — the loop waits on its own length only
+ PROGLIB = None       # af2ig_opt.programs: the model program prepared ahead of its call (L7 -precompile) and kept across processes (L13 -program_cache)
+ PROGRAMS = None      # L13: the serialized-program store (af2ig_opt.programs.Store)
+ if args.precompile > 0 or args.program_cache:
+     from af2ig_opt import programs as PROGLIB
++PRECOMPLIB = None    # af2ig_opt.precompile: the streaming scheduler (L7, 0.7.7)
++if args.precompile > 0:
++    from af2ig_opt import precompile as PRECOMPLIB
+ 
+ def _census_snapshot():
+     # the trace-time censuses of the kernel levers of this process (cumulative), read around a model trace (af2ig_opt.programs census_delta)
+@@ -411,6 +415,11 @@
+         # executable jit itself would run, so the same output bytes), one per input signature for the rest of the process; with
+         # -program_cache DIR loaded from / stored to DIR (af2ig_opt.programs.Store). Returns (callable, record-or-None for a signature
+         # already prepared in this process).
++        if PRECOMP is not None and L in PRECOMP and threading.current_thread().name.split('_')[0] != 'precompile':   # 0.7.7: a design waits on ITS OWN length's background prepare only (never on the other lengths'); a failed prepare raises here = this design's named failure
++            _, waited = PRECOMP.wait(L)
++            _precompile_emit()                                                          # records of the programs that became ready meanwhile (main thread)
++            if waited >= 0.5:
++                print(f'precompile: waited {waited:.1f} s for length {L}')
+         sig = PROGLIB.signature(model_args)
+         with self.programs_lock:
+             fn = self.programs.get(sig)
+@@ -884,29 +893,56 @@
+             print(f'precompile: skipping {pth}: {e!r}'); continue
+         L = len(seq) if (len(chl) > 1 and not args.force_monomer) else chl[0]
+         if L not in reps: reps[L] = pth
+-    todo = sorted(reps.items())
++    todo = list(reps.items())                                        # 0.7.7: the LOOP's order (first appearance; U1 sorts the inputs by length), not sorted() — the first design's length is prepared first
+     print(f'precompile: {len(todo)} distinct compiled lengths over {len(paths)} inputs: {[l for l, _ in todo]} with {num_threads} threads')
+     prepared = []
+-    for L, pth in todo:
++    def _featurize(L, pth):
+         try:
+             item = af2_runner.prepare_struct(pth)
+             af2_runner.prepared[pth] = item                          # kept for the loop: the input is featurized once
+-            prepared.append((L, pth, item))
++            prepared.append((L, pth, item)); return item
+         except Exception as e:
+             if is_oom(e): raise
+-            print(f'precompile: featurization failed for {pth}: {e!r}')
++            print(f'precompile: featurization failed for {pth}: {e!r}'); return None
+     def _compile(item):
+-        L, pth, (fh, feat, ig) = item
++        L, (pth, (fh, feat, ig)) = item
+         t = time.time()
+         # AOT: the program is traced, lowered and compiled (or loaded, -program_cache) WITHOUT running a forward — nothing is discarded and no
+         # activation memory is taken here; the loop runs the prepared executable
+         _, rec = af2_runner.model_program((af2_runner.model_runner.params, jax.random.PRNGKey(0), feat, ig), L)
+         af2_runner.seen_lengths.add(L)
+-        return L, time.time() - t, rec
+-    with concurrent.futures.ThreadPoolExecutor(max_workers=max(1, num_threads)) as pool:
+-        for L, dt, rec in pool.map(_compile, prepared):
+-            print(f"precompile: length {L} program ready in {dt:.1f} s ({(rec or {}).get('source', 'in memory')})")
+-            timers.emit('precompile_shape', L_compiled=L, dt=dt, source=(rec or {}).get('source', 'memory'))
++        return rec
++    # 0.7.7 — STREAMING: the first length of the loop's order is prepared first and ALONE, the others on the N threads once it is ready; the loop
++    # starts now and each design waits only on its own length (AF2_runner.model_program). Records are emitted as programs become ready
++    # (_precompile_emit, main thread) and the precompile_done record at exit (precompile_finish).
++    global PRECOMP
++    bg = PRECOMPLIB.background_threads(num_threads)                   # the background concurrency for the lengths after the first, sized to the host (min(N, (cpus-2)//4)); the first is always alone
++    PRECOMP = PRECOMPLIB.Streaming(_compile, threads=bg)
++    PRECOMP.t_enter = t0; PRECOMP.requested = num_threads; PRECOMP.host_cpus = PRECOMPLIB.host_cpus()
++    started = False
++    for L, pth in todo:                                              # 0.7.7: the FIRST length is featurized and its compile started before the other lengths are even featurized
++        item = _featurize(L, pth)
++        if item is None: continue
++        if not started:
++            PRECOMP.start([(L, (pth, item))]); started = True
++        else:
++            PRECOMP.add_rest([(L, (pth, item))])
++    if not started:
++        PRECOMP.start([])
++    PRECOMP.close()
++    print(f'precompile: streaming — length {prepared[0][0] if prepared else None} first and alone, then {[l for l, _, _ in prepared[1:]]} on {bg} background thread(s) (requested {num_threads}, host cpus {PRECOMP.host_cpus}); the loop starts now (each design waits on its own length only)')
++
++_PRECOMP_EMIT_LOCK = threading.Lock()
++def _precompile_emit():
++    # the records of every program that became ready since the last call (same kinds as before 0.7.7: precompile_shape, program, the kernel censuses)
++    if PRECOMP is None: return
++    with _PRECOMP_EMIT_LOCK:
++        for L, dt, rec, exc in PRECOMP.drain():
++            if exc is not None:
++                print(f'precompile: length {L} program FAILED after {dt:.1f} s: {exc!r} (its designs fail by name in the loop)')
++                timers.emit('precompile_shape', L_compiled=L, dt=dt, source='failed', err=repr(exc)); continue
++            print(f"precompile: length {L} program ready in {dt:.1f} s ({(rec or {}).get('source', 'in memory')}), {PRECOMP.ready_at.get(L, 0):.1f} s after the pass began")
++            timers.emit('precompile_shape', L_compiled=L, dt=dt, source=(rec or {}).get('source', 'memory'), ready_at=PRECOMP.ready_at.get(L), began_at=PRECOMP.began_at.get(L))
+             if rec is not None:
+                 timers.emit('program', tag=None, **rec)
+             if FLASH_ATTN is not None:
+@@ -921,8 +957,16 @@
+                 timers.emit('pairstack', L_compiled=L, **PAIRSTACK.census())
+             if SUBBATCH is not None:
+                 timers.emit('subbatch', L_compiled=L, **SUBBATCH.record(L))
+-    timers.emit('precompile_done', n_shapes=len(prepared), threads=num_threads, dt=time.time() - t0)
+-    print(f'precompile: done in {time.time() - t0:.1f} s')
++
++def precompile_finish():
++    # at exit (or before the exit records): wait for the stragglers, emit their records and the precompile_done record (n_shapes, threads, dt = pass
++    # start -> last program ready; dt_first = -> first program ready; streaming=1)
++    if PRECOMP is None: return
++    summ = PRECOMP.finish()
++    _precompile_emit()
++    dt_all = (summ.get('dt_all') or 0.0) + (PRECOMP.t0 - PRECOMP.t_enter if PRECOMP.t0 else 0.0)
++    timers.emit('precompile_done', n_shapes=summ.get('n'), threads=summ.get('threads'), requested=getattr(PRECOMP, 'requested', None), host_cpus=getattr(PRECOMP, 'host_cpus', None), dt=dt_all, dt_first=summ.get('dt_first'), hold_s=summ.get('hold_s'), streaming=1, order=summ.get('order'), failed=summ.get('failed'))
++    print(f"precompile: done — {summ.get('n')} program(s), first ready {summ.get('dt_first') or 0:.1f} s / all {dt_all:.1f} s after the pass began (streaming; failed: {summ.get('failed') or 'none'})")
+ 
+ if args.precompile > 0:
+     precompile_shapes(list(struct_manager.iterate()), args.precompile)
+@@ -986,6 +1030,13 @@
+ for pdb in struct_manager.iterate():
+     _run_one(pdb)
+     n_done += 1
++    if n_done == 1 and PRECOMP is not None:      # L7 (0.7.7): the first design is written (its outputs drained from the writer thread first) — only now may the other lengths' compiles start
++        if WRITER is not None:
++            WRITER.drain()
++        PRECOMP.release()
++        print(f'precompile: first design done {time.time() - T_PROC0:.1f} s after process start — background compiles released')
++
++precompile_finish()      # L7 (0.7.7): stragglers + the precompile_done record before the exit records
+ 
+ if WRITER is not None:
+     # L16: every queued output is written before the exit records; then the writer's census as the output_writer record and its LEVER line

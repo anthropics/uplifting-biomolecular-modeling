@@ -1,0 +1,120 @@
+[project]
+name = "mosaic"
+version = "0.1.0"
+description = "composite objective protein design"
+readme = "README.md"
+authors = [
+    { name = "Nick Boyd", email = "nick@escalante.bio" }
+]
+requires-python = "==3.12.*"
+dependencies = [
+    "dm-haiku>=0.0.13",
+    "esm2quinox>=0.1.0",
+    "flax>=0.10.2",
+    "gemmi>=0.6.5",
+    "ipymolstar>=0.0.9",
+    "jax>=0.8.1,<0.11",
+    "joltz",
+    "marimo>=0.10.9",
+    "matplotlib>=3.10.0",
+    "ml-collections>=1.0.0",
+    "optax>=0.2.4",
+    "scipy>=1.15.1",
+    "ablang>=0.3.1",
+    "jablang",
+    "torchvision>=v0.22.0",
+    "equinox>=0.13.0",
+    "torch==2.7.1",
+    "numpy>=2.1",
+    "protenix",
+    "httpx>=0.28.1",
+    "joltzgen",
+    "polars>=1.37.1",
+    "jopenfold3",
+    "jproteina-complexa",
+    "jpromera",
+    "jopendde",
+    "opendde",
+    "boltz",
+    "boltzgen",
+    "esmjfold2",
+    "transformers",
+    "esm",
+    "accelerate",
+    "safetensors",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=9.0.3",
+    "ruff>=0.15.12",
+    "ty>=0.0.33",
+]
+jax-cpu = [
+  "jax[cpu]",
+]
+jax-cuda = [
+  "jax[cuda]",
+  "nvidia-cublas-cu12>=12.9.1.4",
+  "nvidia-cusolver-cu12==11.7.3.90",
+]
+jax-tpu= [
+  "jax[tpu]",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build]
+artifacts = [
+    "src/mosaic/proteinmpnn/weights/*",
+    "src/mosaic/data/*",
+]
+
+[[tool.uv.index]]
+name = "pytorch"
+url = "https://download.pytorch.org/whl/cpu"
+explicit = true
+
+[tool.uv.sources]
+torch = { index = "pytorch" }
+torchvision = { index = "pytorch" }
+joltz = { git = "https://github.com/nboyd/joltz" }
+protenix = { git = "https://github.com/escalante-bio/protenij"}
+jablang = { git = "https://github.com/escalante-bio/jablang" }
+joltzgen = { git = "https://github.com/escalante-bio/joltzgen.git" }
+jopenfold3 = { git = "https://github.com/escalante-bio/jopenfold3.git" }
+jproteina-complexa = { git = "https://github.com/escalante-bio/jproteina-complexa.git" }
+boltz = { git = "https://github.com/escalante-bio/boltz.git" }
+boltzgen = { git = "https://github.com/escalante-bio/boltzgen.git" }
+esmjfold2 = { git = "https://github.com/escalante-bio/esmjfold2.git" }
+esm = { git = "https://github.com/Biohub/esm.git" }
+jpromera = { git = "https://github.com/escalante-bio/jpromera.git"}
+jopendde = { git = "https://github.com/escalante-bio/jopendde.git" }
+opendde = { git = "https://github.com/escalante-bio/jopendde.git", subdirectory = "OpenDDE" }
+
+[tool.ruff.lint]
+ignore = ["F722"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+markers = [
+    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+    "model_smoke: loads real checkpoints and exercises model featurization",
+    "model_forward: runs model output, prediction, and loss forwards",
+    "opendde_smoke: exercises OpenDDE weight-free featurization",
+]
+addopts = "-m 'not slow'"
+
+[tool.uv]
+required-environments = ["sys_platform == 'linux' and platform_machine == 'x86_64'"]
+conflicts = [
+    [
+      { group = "jax-cpu" },
+      { group = "jax-cuda" },
+      { group = "jax-tpu" },
+    ],
+]
+package = true
+

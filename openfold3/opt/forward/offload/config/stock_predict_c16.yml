@@ -1,0 +1,15 @@
+# OpenFold3 0.4.1 stock inference configuration with the chunk size PINNED through stock's own settings (no code change):
+# settings.memory.eval.chunk_size = 16 and chunk-size tuning OFF (architecture.*.tune_chunk_size share one FieldReference;
+# setting it under `pairformer` sets it for every stack).  Both arms of the `big` equality runs use it (modes.OFFLOAD_C16_YAML)
+# so that every GEMM/attention chunk shape coincides.  DS4Sci attention off, as in fast_inference/config/stock_predict.yml.
+model_update:
+  presets: [predict]
+  custom:
+    settings:
+      memory:
+        eval:
+          use_deepspeed_evo_attention: false
+          chunk_size: 16
+    architecture:
+      pairformer:
+        tune_chunk_size: false

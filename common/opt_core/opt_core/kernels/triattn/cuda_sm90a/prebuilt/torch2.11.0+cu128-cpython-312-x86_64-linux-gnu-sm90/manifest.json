@@ -1,0 +1,43 @@
+{
+ "build_s": 34.7,
+ "built_utc": "2026-09-12T01:21:44Z",
+ "capability": [
+  9,
+  0
+ ],
+ "cuda": "12.8",
+ "gpu": "NVIDIA H100 80GB HBM3",
+ "loadcheck_cases": [
+  "nomask_S200",
+  "mask_B2_S150",
+  "rows2to6_S260_prefix"
+ ],
+ "loadcheck_sha256_16": {
+  "mask_B2_S150": "9678bf3ccfea4269",
+  "nomask_S200": "4206a7327578db20",
+  "rows2to6_S260_prefix": "70585af2be2fbe3c"
+ },
+ "module_name": "triattn_cuda_sm90",
+ "note": "built inside the torch 2.11.0+cu128 / cpython-312 image of the inverse-folding stack that runs it, with the CUDA 12.8.93 compiler of that runtime release, ninja and the CUTLASS v4.7.1 headers added on top; H100",
+ "nvcc": "Build cuda_12.8.r12.8/compiler.35583870_0",
+ "nvcc_flags": [
+  "-O3",
+  "-std=c++17",
+  "-gencode",
+  "arch=compute_90a,code=sm_90a",
+  "--expt-relaxed-constexpr",
+  "-DNDEBUG",
+  "-Xptxas",
+  "-v"
+ ],
+ "python": "3.12.14",
+ "python_soabi": "cpython-312-x86_64-linux-gnu",
+ "so": "triattn_cuda_sm90.so",
+ "so_sha256": "b14383db1e922cca13a56fbfa1f41d2d94d0db9c5d6b642a04c8c05904fe720a",
+ "source_sha256": {
+  "mw_ptx.h": "aa22a8a237f1915f467b2091de84c7060790c1641f6c4d8b3758c33172cf1e33",
+  "triattn_mw.cu": "14eb59c6a2028df19fdc7ff34c180bd9acf0c292484bf3bb7ec013f447be33a5"
+ },
+ "stack_key": "torch2.11.0+cu128-cpython-312-x86_64-linux-gnu-sm90",
+ "torch": "2.11.0+cu128"
+}

@@ -1,0 +1,101 @@
+{
+ "_doc": "fpf_trimul_v4 launch cells keyed '<cc major.minor>|<triton major.minor>' (programme hazard #26: never key by cc alone). k1 = LN_in + dual gated projection (_k1c pointer loads; _k1t device TMA descriptors when impl='tma'; kdesc._k1d host descriptors with transposed incoming planes when impl='tma2'); k3 = _k3c epilogue (kdesc._k3d host descriptors when impl='tma'); the descriptor cells serve plane extents >= kdesc.N_MIN_DESC on bf16 input, else the replaced kernels of the same numbers. Lookup order: exact 'cc|triton' -> 'cc|*' (pointer-load cell valid for any triton >= 3.3 on that cc; printed as generic) -> no row -> STOCK forward. status CERTIFIED_OP rows name their op-level evidence jobs (numerics vs stock+fp64 on real dumps, r2r, graph replay); other statuses are served only with FPF_TRIMUL_V4_ALLOW_DEFAULT_CELLS=1.",
+ "9.0|3.3": {
+  "status": "CERTIFIED_OP (v4.0.3 ptr cell on the torch 2.7.1 / triton 3.3.1: identity runs (== fpf_trimul v1 8/8 @356/705) + op runs)",
+  "image": "torch 2.7.1 / torch2.7.1/triton3.3.1",
+  "k1": {
+   "BM": 128,
+   "BN": 128,
+   "num_warps": 8,
+   "num_stages": 1
+  },
+  "k3": {
+   "BM": 64,
+   "BN": 64,
+   "num_warps": 4,
+   "num_stages": 1
+  }
+ },
+ "9.0|3.6": {
+  "status": "CERTIFIED_OP (v4.0.4 tma cell on torch 2.11 / torch 2.11 / triton 3.6.0: runs, 356/705 x 2 regimes x out/in 8/8, r2r, graph)",
+  "image": "torch 2.11 / torch2.11/triton3.6.0",
+  "k1": {
+   "impl": "tma2",
+   "BM": 128,
+   "BN": 32,
+   "num_warps": 4,
+   "num_stages": 3
+  },
+  "k3": {
+   "impl": "tma",
+   "BM": 64,
+   "BN": 64,
+   "num_warps": 4,
+   "num_stages": 1
+  }
+ },
+ "9.0|3.7": {
+  "status": "CERTIFIED_OP (v4.0.4 tma cell; runs torch 2.13 / triton 3.7.1: 356/546/705/813 x 2 regimes x out/in TIER2_SAME_CLASS 24/24, r2r, graph; planes bitwise == 9.0|* cell (6be84aeb))",
+  "image": "torch 2.13 / torch2.13/triton3.7.1",
+  "k1": {
+   "impl": "tma2",
+   "BM": 128,
+   "BN": 32,
+   "num_warps": 4,
+   "num_stages": 3
+  },
+  "k3": {
+   "impl": "tma",
+   "BM": 64,
+   "BN": 64,
+   "num_warps": 4,
+   "num_stages": 1
+  }
+ },
+ "9.0|*": {
+  "status": "CERTIFIED_OP (v4.0.3 cell; runs on torch 2.13 / triton 3.7.1: 356/546/705/813 x 2 regimes x out/in TIER2_SAME_CLASS 24/24, r2r, graph)",
+  "k1": {
+   "BM": 128,
+   "BN": 128,
+   "num_warps": 8,
+   "num_stages": 1
+  },
+  "k3": {
+   "BM": 64,
+   "BN": 64,
+   "num_warps": 4,
+   "num_stages": 1
+  }
+ },
+ "10.0|3.7": {
+  "status": "CERTIFIED_OP (v4.0.3 cell; runs on torch 2.13 /: 356/546/705/813 x 2 regimes x out/in TIER2_SAME_CLASS, r2r, graph)",
+  "image": "torch 2.13 / torch2.13/triton3.7.1",
+  "k1": {
+   "BM": 128,
+   "BN": 64,
+   "num_warps": 4,
+   "num_stages": 1
+  },
+  "k3": {
+   "BM": 64,
+   "BN": 64,
+   "num_warps": 8,
+   "num_stages": 1
+  }
+ },
+ "10.0|*": {
+  "status": "CERTIFIED_OP (same cell as 10.0|3.7; pointer loads only)",
+  "k1": {
+   "BM": 128,
+   "BN": 64,
+   "num_warps": 4,
+   "num_stages": 1
+  },
+  "k3": {
+   "BM": 64,
+   "BN": 64,
+   "num_warps": 8,
+   "num_stages": 1
+  }
+ }
+}

@@ -1,0 +1,12 @@
+# Two barnase + barstar complexes from PDB 1BRS (its asymmetric unit holds three): barnase (chains A, B; 110 aa) + barstar (chains C, D; 89 aa)
+# in single-sequence mode: 398 tokens — above every fused kernel's token floor (300). The `warm` verb's input.
+version: 1
+sequences:
+  - protein:
+      id: [A, B]
+      sequence: AQVINTFDGVADYLQTYHKLPDNYITKSEAQALGWVASKGNLADVAPGKSIGGDIFSNREGKLPGKSGRTWREADINYTSGFRNSDRILYSSDWLIYKTTDHYQTFTKIR
+      msa: empty
+  - protein:
+      id: [C, D]
+      sequence: KKAVINGEQIRSISDLHQTLKKELALPEYYGENLDALWDALTGWVEYPLVLEWRQFEQSKQLTENGAESVLQVFREAKAEGADITIILS
+      msa: empty

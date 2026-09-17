@@ -1,0 +1,22 @@
+# The big lines' runner yaml (modes.Line.runner_yaml of resident and tp: modes.BIG_BF16_C16_YAML; the ×P launcher tp.py pins the run's
+# chunk plan, the tuners and the kernel switches on top of it, tp.pinned_yaml; a caller's --runner-yaml under `big` is composed under it):
+# the kernels-off configuration — upstream's Triton triangle kernels, the cuEquivariance triangle kernels and the DS4Sci evoformer attention
+# all off (upstream 0.5.0's PyTorch pair statements; 0.5.0 defaults the Triton kernels on, so the key is explicit), the chunk-size autotuner
+# off (the one FieldReference reaches every stack's tune_chunk_size) and the pair-stack chunk plan pinned at 16 rows — with upstream's own
+# bf16 trainer precision (pl_trainer_args.precision: bf16-mixed). The levers restate stock's statements at these chunk boundaries, so the
+# plan is the line's precondition. Every other key keeps the `predict` preset's value (offload_inference of the confidence heads above 2800
+# tokens included). `pred --mode off --runner-yaml <this file>` runs it as given: stock on the big lines' configuration (cli.row_yaml).
+pl_trainer_args:
+  precision: bf16-mixed
+model_update:
+  presets:
+    - predict
+  custom:
+    settings:
+      memory:
+        eval:
+          use_triton_triangle_kernels: false
+          use_cueq_triangle_kernels: false
+          use_deepspeed_evo_attention: false
+          tune_chunk_size: false
+          chunk_size: 16

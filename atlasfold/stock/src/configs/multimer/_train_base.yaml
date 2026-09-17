@@ -1,0 +1,119 @@
+# Configuration for training
+name: multimer
+out_dir: ./experiments/
+
+# Reproducibility
+seed: 1
+
+# Multi-state training
+load_opt_state: true
+init_from_ema: []
+
+# Compilation settings
+compile:
+  enabled: false
+  mode: "default"
+  dynamic: false
+
+data:
+  # Training hyperparameters
+  max_length: ???
+  max_seq_length: ???
+  max_contiguous_chains: 6
+
+  # DataLoader
+  batch_size: 1
+  global_batch_size: 256
+  num_workers: 8
+  persistent_workers: true
+  pin_memory: true
+
+  # Datasets
+  data_root: ???
+  train_datasets: []
+  val_dataset: {}
+
+# Lightning Trainer Configuration
+trainer:
+  accelerator: "auto"
+  strategy: "auto"
+  devices: "auto"
+  num_nodes: 1
+  precision: bf16-mixed
+  max_epochs: -1
+  limit_train_batches: 500 # Will be multiplied by accumulate_grad_batches
+  limit_val_batches: null
+  log_every_n_steps: 10
+  enable_checkpointing: true
+  accumulate_grad_batches: null # Automatically set based on global_batch_size and batch_size
+  gradient_clip_val: 5.0
+
+# Exponential Moving Average (EMA)
+training:
+  # Training step hyperparameters
+  train_trunk: true
+  train_diffusion_head: true
+  train_confidence_head: true
+  train_pde_head: true
+  train_pae_head: true
+
+  num_recycles: 3
+
+  # For structure module training
+  diffusion_batch_size: 32
+
+  # For confidence module training
+  num_mini_rollout_steps: 20 # Number of rollout steps for confidence training
+
+validation:
+  # Validation step hyperparameters
+  num_recycles: 3
+  num_steps: 100
+  num_diffusion_samples: 5
+
+optimizer:
+  opt: "adam"
+  beta_1: 0.9
+  beta_2: 0.95
+  eps: 1e-8
+  lr_scheduler: alphafold
+  max_lr: 0.0018
+  warmup_steps: 1000
+  decay_steps: 50000
+  lr_decay_factor: 0.95
+  ema_decay: 0.999
+  ema_ignore_params: ["lm."]
+  ema_update_params: null
+
+loss:
+  weights:
+    # Global loss weights
+    distogram: 0.03
+    diffusion: 4.0
+    confidence: 0.0001
+    # Diffusion loss weights
+    smooth_lddt: 0.0
+    pae: 1.0
+
+  # Distogram loss
+  distogram_loss: {}
+
+  # Diffusion loss
+  diffusion_loss:
+    mse_loss: {}
+    smooth_lddt_loss:
+      cutoff: 15.0
+      chunk_size: null
+      use_kernel: true
+
+  # Confidence loss
+  confidence_loss:
+    plddt_loss: {}
+    pae_loss: {}
+    pde_loss: {}
+    experimentally_resolved_loss: {}
+
+wandb:
+  use: false
+  project: "AtlasFold_Multimer" # Set your project name
+  entity: null # Defaults to the authenticated user's entity

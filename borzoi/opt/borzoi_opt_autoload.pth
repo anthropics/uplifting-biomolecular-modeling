@@ -1,0 +1,2 @@
+# opt_core autoload guard: package=borzoi_opt env=BORZOI_OPT tag=borzoi-opt exit=3
+import os as _o, sys as _s; exec("try:\n import borzoi_opt._autoload\nexcept SystemExit as _x:\n _s.stderr.flush(); _o._exit(_x.code if isinstance(_x.code, int) else 3)\nexcept BaseException as _e:\n if (_o.environ.get('BORZOI_OPT') or '').strip().lower() not in ('', 'off'):\n  _s.stderr.write('[borzoi-opt] NOT ACTIVE: borzoi_opt._autoload is not importable (%s: %s) under BORZOI_OPT=%s (exit 3)\\n' % (type(_e).__name__, _e, _o.environ.get('BORZOI_OPT'))); _s.stderr.flush(); _o._exit(3)\n")

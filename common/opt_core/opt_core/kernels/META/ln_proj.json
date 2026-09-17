@@ -1,0 +1,12 @@
+{
+ "exports": {},
+ "kind": "module",
+ "license": "the release tree's own code (no third-party header)",
+ "mechanism": "pair.ln_projection",
+ "name": "ln_proj",
+ "not_carried": {},
+ "runtime_imports": [],
+ "runtime_imports_note": "none; pure functions: pack_pair_bias_weights(ln_w, ln_b, w [H, c], eps, device, dot_fp32=) / pair_bias(z, packed, out_layout=, out_dtype=, out=); pack_ln_linear_weights / ln_linear; layernorm_rows; served_* -> (bool, reason); Unsupported(reason) outside the domain",
+ "served_note": "pair_bias: z [B?, I, J, c] (bf16 or fp32, unit channel stride, any other strides incl. transposed / channel-sliced views) -> LayerNorm(c) -> W [H, c] -> bias planes written head-major [B?, H, I, ld][..., :J] (ld = J rounded up to LD_ALIGN=8: 16-byte rows) or [B?, I, J, H]; c in {64, 128}, H <= 64; ln_linear: [M, c] rows, c in {64,128,256,384}, nout <= 1024, optional bias / silu|sigmoid / row mask; fp32 statistics, bf16 MMA with fp32 accumulation (or an fp32 dot), one rounding; int64 offsets; deterministic; any CUDA capability (launch settings measured on sm_90)",
+ "version": "ln_proj (docstring header: pair_bias / ln_linear / layernorm_rows; head-major LD_ALIGN=8 layout)"
+}

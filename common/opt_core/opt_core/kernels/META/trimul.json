@@ -1,0 +1,78 @@
+{
+ "core_added": {
+  "tx_sm90a/build_prebuilt.py": "build script for a prebuilt of this package per ABI key (the kit ships none)",
+  "tx_sm90a/prebuilt/torch2.13.0+cu130-cpython-312-x86_64-linux-gnu-sm90/PROVENANCE.json": "provenance of the cp312 build",
+  "tx_sm90a/prebuilt/torch2.13.0+cu130-cpython-312-x86_64-linux-gnu-sm90/protenix_trimul_tx_sm90.so": "cp312 build of the shipped csrc (manifest digests; load-check fingerprints equal the recorded kernels')",
+  "tx_sm90a/prebuilt/torch2.11.0+cu128-cpython-312-x86_64-linux-gnu-sm90/PROVENANCE.json": "provenance of the torch 2.11.0+cu128 / cp312 build (the inverse-folding stack's image + the CUDA 12.8 toolchain of its runtime release)",
+  "tx_sm90a/prebuilt/torch2.11.0+cu128-cpython-312-x86_64-linux-gnu-sm90/protenix_trimul_tx_sm90.so": "torch 2.11.0+cu128 / cp312 build of the shipped csrc (manifest digests; load-check fingerprints equal the recorded kernels')",
+  "esm_v5/__init__.py": "package marker of the carried ESM-family forward line (docstring only)",
+  "esm_v5/route.py": "the core's plain-torch weight relayout (== the engine's own pack for this line, byte for byte), the engine's (cc|triton) cell lookup order over the carried table, envelope check, forward entry (row esm_v5_fwd)",
+  "esm_v61/__init__.py": "the face of the sealed package: ACTIVE_PKG, DIGESTS of every carried file, install() (digests -> driver binding, the carried module's compile-cache directory held to _private_cache_dir -> capability -> triton descriptors -> the package's own load with manifest checks -> load check 168 registers / 0 local bytes -> the package's vectors as byte gate), pack() / forward() over the package face, the zero-tile residual map for residual=False, refusals by name",
+  "esm_v61/cudrv.py": "the CUDA driver entry points the package calls (cuModuleLoadData / cuModuleGetFunction / cuFuncSet|GetAttribute / cuLaunchKernel / cuTensorMapEncodeTiled + enumerators) resolved to the cuda.bindings wheel when present, else a ctypes binding of the same names and return conventions over libcuda.so.1; handed to the package's single driver accessor at install (nothing added to or replaced in sys.modules; NVRTC half = a named refusal); standard library at import",
+  "esm_v61/pkg/v6.1/tests/vectors/vectors.pt": "the sealed test tensors the package's tests/test_vectors.py reads from its first lookup path (the producer keeps them beside the previous generation; sha256 == vectors.json pt_sha256)",
+  "_pystack.py": "the large-frame trampoline the face runs one-off host work through (padded_call / import_padded / call_cost_here): a library import or a first launch never executes on the interpreter's stack-chunk boundary",
+  "of3_form.py": "core-written row of3_form: the OpenFold-family TriangleMultiplicativeUpdate inference statement issued whole-tensor (LayerNorms on kernels.ln's exactln row, projections / contraction / gates as the module's own cuBLAS / ATen calls in measured layouts); no donor file -- the statement is an engine module's, reproduced bit for bit by measurement (TRIMUL_CELLS.json rows.of3_form, cells' in_form records)",
+  "af3t_form.py": "core-written row af3t_form: the AF3-family torch engine's TriangleMultiplication module statement issued whole-tensor (this tree's own Triton LayerNorm / tiled-transpose / fused-gate kernels + the module's cuBLAS calls in measured layouts); no donor file -- the statement is an engine module's, reproduced bit for bit by measurement (TRIMUL_CELLS.json rows.af3t_form, form_cells '+af3t_module', cells' in_form af3t_* records)",
+  "native/__init__.py": "core-written face of the sealed trimul_native payload (digests, install, admits, forward); the payload under native/pkg/v5/ (1.2.2: sm_90a + sm_80 members; python-only over 1.2.1 / 1.2.0 with byte-identical cubins) is the producer's sealed tree byte for byte (ACTIVE_PKG names v5) and is the only payload directory on disk; the earlier payload directories native/pkg/v1/ (1.0.1), native/pkg/v2/ (1.1.0), native/pkg/v3/ (1.2.0) and native/pkg/v4/ (1.2.1, the 0.5.108.0 rollback directory) have left the tree"
+ },
+ "exports": {},
+ "kind": "package",
+ "license": "tx_sm90a/NOTICE.md (original source incl. the prebuilt sm_90a binary built from csrc/; no third-party source), ef2/ef2_trimul.py (original source, this repository; calls the ESM-family image's installed kernels, none copied), esm_v5/ef2_trimul_v5.py + esm_v5/ef2_w4_fpf_trimul_v4_cells.json (original source, this repository: the ESM-family engine's own kernels for this line, K1/K3 structure derived from fpf_trimul_v4 as its header credits, Apache-2.0 lineage text carried at kernels/fpf_flashpairformer.PROTENIX_LICENSE), esm_v61/pkg/v6.1/** (original source, this repository: the same engine's sealed package generation 6.1 -- src/ef2_trimul_v5.py and src/ef2_trimul_v6.py incl. the CUDA C++ / CuTe K3 source it embeds (== src/k3v6.cu) and the two sm_90a cubins compiled from it, K1/K3 structure derived from fpf_trimul_v4 as its header credits, Apache-2.0 lineage text carried at kernels/fpf_flashpairformer.PROTENIX_LICENSE; the cubins were compiled against the NVIDIA CUTLASS / CuTe and CCCL header distributions and contain object code instantiated from CUTLASS / CuTe templates (BSD-3-Clause, Copyright (c) 2017 - 2025 NVIDIA CORPORATION & AFFILIATES; notice esm_v61/NOTICE.md, licence texts common/opt_core/third_party_licenses/NVIDIA-CUTLASS.LICENSE.txt and NVIDIA-CCCL.LICENSE.txt; no source of theirs is carried)); esm_v61/NOTICE.md (source and binary attributions of that payload); the face, esm_v61/__init__.py + cudrv.py and TRIMUL_CELLS.json are the core's own",
+ "mechanism": "kernels.trimul.select / kernels.trimul.triangle_multiplication",
+ "name": "trimul",
+ "not_byte_identical": {
+  "tx_sm90a/CELLS.json": "two `notes` entries restated in release-tree vocabulary (the kit's file names its development tooling and another study's timing table by working titles) and that study's reference column (null in every row) left out together with its note; cells, measured values and every other note unchanged",
+  "tx_sm90a/TESTVECTORS.json": "line 48 only: the `real_shape_evidence` sentence restated in release-tree vocabulary; every vector and digest unchanged",
+  "tx_sm90a/ops.py": "abi_tag() returns the FULL ABI key torch<version>-<CPython SOABI>-sm90 (one prebuilt directory per torch / CUDA / interpreter / arch) and load() accepts the kit's pre-full-key tag only as an alias; kernels, digests, load-check unchanged",
+  "tx_sm90a/prebuilt/manifest.json": "binaries keyed by the full ABI key: the kit's cp311 payload migrated to torch2.13.0+cu130-cpython-311-x86_64-linux-gnu-sm90 (bytes unchanged) plus the cp312 build torch2.13.0+cu130-cpython-312-x86_64-linux-gnu-sm90; sources and load-check fingerprints unchanged",
+  "tx_sm90a/prebuilt/torch2.13.0+cu130-cpython-311-x86_64-linux-gnu-sm90/PROVENANCE.json": "the kit's torch213_cu130_sm90/PROVENANCE.json under the full-key directory; line 7 `build_tool` restated in release-tree vocabulary",
+  "esm_v61/pkg/v6.1/python/face.py": "line 21 only: one docstring phrase restated in release-tree vocabulary; code unchanged",
+  "esm_v61/pkg/v6.1/tests/vectors/vectors.json": "line 1306 only: one free-text `withdrawn` note restated in release-tree vocabulary; every case, digest and recorded value unchanged (the file's own pt_sha256 still names the carried vectors.pt)",
+  "esm_v61/pkg/v6.1/bin/manifest.json": "line 15 (the free-text build note) restated in release-tree vocabulary; every other byte, the cubin digests and the K3_SRC source digest it records are the producer's",
+  "esm_v61/pkg/v6.1/src/ef2_trimul_v6.py": "lines 520-524 -> 520-523 only: the compile-cache directory helper `_jit_dir` no longer imports the engine's package for a stack key (this copy serves prebuilt cubins and never compiles; the key comes from MODEL_OPT_STACK_KEY or is 'unknown-stack'); the kernel source K3_SRC and every other line unchanged (K3_SRC sha256 558a71ac... == bin/manifest.json's record; file sha256 as carried 943a98bc...)",
+  "tx_sm90a/NOTICE.md": "lines 9-12 only: the exact-tier LayerNorm clause restated as a statement about results (outputs bitwise identical to the installed function's, written independently against its observable numerics, guarded by the live check); attribution, provenance and licence statements unchanged",
+  "tx_sm90a/INTEGRATION.md": "five passages (the EXACT-tier bullet, the served-cell sentence, the live-check sentence, the ragged-N sentence, the last IOU) restated the same way: the exact tier described by its results and its live check; every number, marker, command and instruction to the integrator unchanged",
+  "tx_sm90a/__init__.py": "module docstring only: the EXACT tier's LayerNorm clause states the result (summation order chosen so results are bitwise identical to the stock op for supported shapes); code unchanged",
+  "tx_sm90a/trimul_exact.py": "module docstring only: the same LayerNorm clause restated as a result statement; code unchanged"
+ },
+ "not_carried": {
+  "the ESM-family kit's ef2_autograd_kernels / test_ef2_trimul.py": "kit files; the K-A2 arm is recorded in TRIMUL_CELLS.json cells.extra only",
+  "the kits' adapters, lever words, registries, site caches and tests around these kernels": "kit files: a kit binds a row through its own mechanism (opt_core.trimul.Lever + by_word, or its registry)",
+  "tx_sm90a/trimul.py and trimul_exact.py provider plugs": "carried for byte identity but never imported by the face (they import the kit's own registry); the face calls ops.py",
+  "esm_v61/pkg/v6.1/README.md": "the package's documentation (timing tables, the release-ordering analysis, provenance prose): restated where load-bearing in TRIMUL_CELLS.json rows.esm_v61 and the core's notes; not read by any code",
+  "esm_v61/pkg/v6.1/src/SOURCES.json": "the package's provenance record of its source copies (origins / branches / digests): the digests live in esm_v61/__init__.py DIGESTS; not read by any code"
+ },
+ "runtime_imports": [
+  "fpf_trimul_v4",
+  "fpf_trimul",
+  "ln"
+ ],
+ "runtime_imports_note": "the face imports the v4 / TM-K3 rows BY NAME when a kit routed them (the module object the kit runs today), else the core copies (opt_core.kernels.fpf_trimul_v4 / fpf_trimul); tx_sm90a / ef2 / esm_v5 are sub-packages imported at call time; torch only inside functions of the face (the carried sub-packages import torch, triton and -- ef2 -- the ESM-family image's transformers kernels at their own module level; esm_v5/route.py is standard library at import and imports torch / the carried Triton module inside its functions) esm_v61 imports torch, triton and its driver binding (cudrv: cuda.bindings or ctypes/libcuda) at install time only; the package face and its two source modules are loaded by path under fixed module names (the package registers ef2_trimul_v5 / ef2_trimul_v6; a module of either name imported from elsewhere is refused by name, never served). Row of3_form (of3_form.py) imports the LayerNorm provider (opt_core.kernels.ln, row exactln) at call time and nothing else but torch. Row af3t_form (af3t_form.py) imports torch and triton at call time and no other package of this tree.",
+ "served_note": "tx_sm90a = package 1.2 (prebuilt torch213_cu130_sm90 only; other ABIs refuse by name: no_prebuilt:<tag>); ef2 rows need the ESM-family image (transformers.models.esmfold2 kernels; cuequivariance_ops_torch for the tile row); esm_v5_fwd = the engine's forward line carried whole (torch + triton >= 3.6 with tensor descriptors; no model package of that image), forward only, residual optional; TRIMUL_CELLS.json trimul_cells/v1: 178 measured cells on 7 stacks (cc 9.0 and 8.0), 48 target-coverage rows esm_v61 = the sealed package generation 6.1 (K3 = prebuilt sm_90a cubins through the CUDA driver: capability 9.0, c 256 bf16, forward only, residual True or the zero-tile form; keyed by architecture, one payload for every image whose driver loads it; refusals by name -> esm_v5_fwd / v4). esm_v5_fwd:f32in = row esm_v5_fwd's line behind a boundary cast for fp32 / tf32 callers (z -> bf16 once, update -> fp32; tolerance class vs the fp32 stock op; never chosen by a tier word). native / native_exact / native:f32in = the sealed package trimul_native under kernels/trimul/native/pkg/<ACTIVE_PKG> (ACTIVE_PKG v5 = 1.2.2 since 0.5.108.0 -- 1.2.0's kernels byte for byte with a bounded workspace-retention policy on both members; v4 = 1.2.1 from 0.5.105.0, v3 = 1.2.0 from 0.5.96.0 --: sm_90a + sm_80 members, see TRIMUL_CELLS.json rows.native.payload; the sm_90a envelope as recorded for 1.1.0: 24 sm_90a cubins launched through the CUDA driver: capability 9.0, every (c_z, c_hidden) pair of {64,128,256,384}^2 for bf16 z (fast + exact variants), fp32 z inside a bf16 autocast region at the nine pairs without a 384 width (fp32 update / residual sum; fp32-resident z with a 384 width refused by name no_cubin:sm_90a:z<c_z>_h<c_hidden>_f32z), forward only, residual optional; one payload for every image whose driver loads it; digests + load check + the payload's vectors as byte gate once per process; native_exact = bitwise == the cuequivariance op where the cells' vouched_on records the stack, refused by name below 101 tokens (exact_small_n); cc != 9.0 refused by name (cc_unsupported: no sm_80 member in 1.1.0); refusals by name -> v4 / tmk3_exact / cueq; pkg/v1 (1.0.1) inert on disk for one version).",
+ "version": "1.0.0",
+ "carried_digests_note": "sha256 of every kit-origin file of the four donor-backed sub-packages as carried (core_added files and the two package markers excluded; the not_byte_identical files: of the restated bytes).  The kit byte-identity test pins the carried copy to these and compares a kit copy found beside common/ digest to digest: equal passes; a kit copy that is absent, moved or edited after the carry is a SKIP BY NAME naming the file and both digests -- the provider serves the carried bytes until the release lead names the kit's newer bytes the source of record (then re-carry = copy + record).",
+ "carried_digests": {
+  "ef2": {
+   "ef2_trimul.py": "deba72785a0e7604877157d799f84cd94c5a014e8f7a5149f3b0caddc7b701b3"
+  },
+  "esm_v5": {
+   "ef2_trimul_v5.py": "0a137dc9d540dccf58b3ebeea0a025668022bec59f89d149e8cf66d1f766e3ac",
+   "ef2_w4_fpf_trimul_v4_cells.json": "ea6f9639180ea896aaeff125d0b6de111a10e0c043e045ae924a2c63fd611bd9"
+  },
+  "tx_sm90a": {
+   "CELLS.json": "5d1956dc66f1111eb24675b045760d4f2ba85ac6e1994b1f17e0731ea5a4715c",
+   "INTEGRATION.md": "19244ec61c7dc4ec4e9ce2ecf7a66f1bd5cc6e5c2d5ccf94f2c9ef0ac709bb18",
+   "NOTICE.md": "bc9e321d980fe529a72d672eb83609a10ea94c1bc58f8bb6eb2e54704111286f",
+   "TESTVECTORS.json": "50503823558dd0bc5e7ded30490ed9408e7f43248f505560895512943a169562",
+   "__init__.py": "053070dfdc0a7992753026c593b29ebee96dd9e7722e07973b4cea3f1222e8b6",
+   "ops.py": "85ddeb0f42a794a51034cccdba49e19c08486073e3cece80380428eee2d906c4",
+   "trimul.py": "997c985fe804af3ab378f81c6c11905f8cef95637f09280a9dba366f23b80911",
+   "trimul_exact.py": "58b5ea418db636ad696b1e780964f9dabde517ea4a5f212ce19ab4b46397ef3f",
+   "csrc/trimul_tx.cu": "19fb2bdf4a6845339592fd0c0c8772470492df105ba4a1a6ea21809da2a2d1aa",
+   "csrc/tx_ptx.h": "848836474c9b3a219c15cfb2dd8494e7438175dd31769c5c15408c782f5b60ec",
+   "prebuilt/manifest.json": "65fa66f24ab2aa0b08f437d359363f7a46f512db30e89eafea30a9ef797828fc",
+   "prebuilt/torch2.13.0+cu130-cpython-311-x86_64-linux-gnu-sm90/PROVENANCE.json": "2b43f7bca86c126c642df7ebe97c4eed37c91d1a4382aa8b4a7d644c171144f5",
+   "prebuilt/torch2.13.0+cu130-cpython-311-x86_64-linux-gnu-sm90/protenix_trimul_tx_sm90.so": "e913917e2d714daa98feb97f40973adc29994c392b75a26b15db1284928af64a"
+  }
+ }
+}

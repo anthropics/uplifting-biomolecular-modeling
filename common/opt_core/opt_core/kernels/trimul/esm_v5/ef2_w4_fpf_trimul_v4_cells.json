@@ -1,0 +1,173 @@
+{
+ "_doc": "fpf_trimul_v4 launch cells keyed '<cc major.minor>|<triton major.minor>' (never key by cc alone: the Triton version selects the load path). k1 = LN_in + dual gated projection (_k1c pointer loads, or _k1t TMA descriptor loads when impl='tma'); k3 = _k3c epilogue. Lookup order: exact 'cc|triton' -> 'cc|*' (pointer-load cell valid for any triton >= 3.3 on that cc; printed as generic) -> '*|*' (ef2_w4._t9_load: the '*|*' row is the table's DEFAULT cell \u2014 it serves a capability or triton no measured row names, named on the T9 line as such; a cell that cannot compile or launch on the device is disabled by name by ef2_w4's probe launch, never silently) -> no row -> STOCK forward. A row's status word (TESTED\u2026 for a measured row, DEFAULT\u2026 for the default) is carried onto the T9 line, never a gate. The 8.0 rows (A100-80GB, pointer loads; 'overrides' = the core resolver's per-(C,D)-class refinement, k1_C<C>_D<D>) are the shared core's A100 sweep on this stack (torch 2.13.0+cu130 / triton 3.7.1): 92/92 cases within the kernel's tier vs the torch module, run-to-run and graph-replay equal, 48/48 timings not slower.",
+ "9.0|3.3": {
+  "status": "TESTED_OP",
+  "image": "torch2.7.1/triton3.3.1",
+  "k1": {
+   "BM": 128,
+   "BN": 128,
+   "num_warps": 8,
+   "num_stages": 1
+  },
+  "k3": {
+   "BM": 64,
+   "BN": 64,
+   "num_warps": 4,
+   "num_stages": 1
+  }
+ },
+ "9.0|3.6": {
+  "status": "TESTED_OP",
+  "image": "torch2.11/triton3.6.0",
+  "k1": {
+   "impl": "tma",
+   "BM": 128,
+   "BN": 32,
+   "num_warps": 4,
+   "num_stages": 3
+  },
+  "k3": {
+   "BM": 64,
+   "BN": 64,
+   "num_warps": 4,
+   "num_stages": 1
+  }
+ },
+ "9.0|3.7": {
+  "status": "TESTED_OP",
+  "image": "torch2.13/triton3.7.1",
+  "k1": {
+   "impl": "tma",
+   "BM": 128,
+   "BN": 32,
+   "num_warps": 4,
+   "num_stages": 3
+  },
+  "k3": {
+   "BM": 64,
+   "BN": 64,
+   "num_warps": 4,
+   "num_stages": 1
+  }
+ },
+ "9.0|*": {
+  "status": "TESTED_OP",
+  "k1": {
+   "BM": 128,
+   "BN": 128,
+   "num_warps": 8,
+   "num_stages": 1
+  },
+  "k3": {
+   "BM": 64,
+   "BN": 64,
+   "num_warps": 4,
+   "num_stages": 1
+  }
+ },
+ "10.0|3.7": {
+  "status": "TESTED_OP",
+  "image": "torch2.13/triton3.7.1",
+  "k1": {
+   "BM": 128,
+   "BN": 64,
+   "num_warps": 4,
+   "num_stages": 1
+  },
+  "k3": {
+   "BM": 64,
+   "BN": 64,
+   "num_warps": 8,
+   "num_stages": 1
+  }
+ },
+ "10.0|*": {
+  "status": "TESTED_OP",
+  "k1": {
+   "BM": 128,
+   "BN": 64,
+   "num_warps": 4,
+   "num_stages": 1
+  },
+  "k3": {
+   "BM": 64,
+   "BN": 64,
+   "num_warps": 8,
+   "num_stages": 1
+  }
+ },
+ "8.0|3.7": {
+  "status": "TESTED_OP",
+  "image": "A100 torch2.13.0+cu130/triton3.7.1",
+  "k1": {
+   "BM": 128,
+   "BN": 64,
+   "num_warps": 8,
+   "num_stages": 2
+  },
+  "k3": {
+   "BM": 64,
+   "BN": 64,
+   "num_warps": 4,
+   "num_stages": 1
+  },
+  "overrides": {
+   "k1_C128_D128": {
+    "BM": 128,
+    "BN": 32,
+    "num_warps": 4,
+    "num_stages": 1
+   },
+   "k3_C128_D128": {
+    "BM": 128,
+    "BN": 64,
+    "num_warps": 4,
+    "num_stages": 1
+   }
+  }
+ },
+ "8.0|*": {
+  "status": "TESTED_OP",
+  "k1": {
+   "BM": 128,
+   "BN": 64,
+   "num_warps": 8,
+   "num_stages": 2
+  },
+  "k3": {
+   "BM": 64,
+   "BN": 64,
+   "num_warps": 4,
+   "num_stages": 1
+  },
+  "overrides": {
+   "k1_C128_D128": {
+    "BM": 128,
+    "BN": 32,
+    "num_warps": 4,
+    "num_stages": 1
+   },
+   "k3_C128_D128": {
+    "BM": 128,
+    "BN": 64,
+    "num_warps": 4,
+    "num_stages": 1
+   }
+  }
+ },
+ "*|*": {
+  "status": "DEFAULT: no measured row for this capability or triton \u2014 the single-stage pointer-load cell (the 10.0|* values); ef2_w4 names it on the T9 line and its probe launch keeps T9 on only where the cell compiles and launches",
+  "k1": {
+   "BM": 128,
+   "BN": 64,
+   "num_warps": 4,
+   "num_stages": 1
+  },
+  "k3": {
+   "BM": 64,
+   "BN": 64,
+   "num_warps": 8,
+   "num_stages": 1
+  }
+ }
+}

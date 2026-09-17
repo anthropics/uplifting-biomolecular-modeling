@@ -1,0 +1,18 @@
+OF3 offload add-on — large-input (row-blocked, single-GPU and row-sharded) inference add-on for OpenFold3 0.5.0.
+Third-party attributions. Portions derive from OpenFold3 (https://github.com/aqlaboratory/openfold-3, tag v0.5.0),
+Copyright 2026 AlQuraishi Laboratory, licensed under the Apache License, Version 2.0; OpenFold3's licence text is carried beside this file
+as OPENFOLD3_LICENSE (also at openfold3_ob0/third_party_licenses/OpenFold3.Apache-2.0.txt).
+
+This add-on contains:
+  * of3o/of3_offload.py — row-blocked re-statements of OpenFold3 0.5.0 statements of the pair stack (triangle multiplication, triangle
+    attention, pair transition), the input embedder's relative-position features, the recycling embedder's pair add, the template embedder,
+    the diffusion conditioning's pair path and the confidence heads' pair embedding (the operand shapes of every stock statement kept; tensor
+    residency and the lifetime of pair-sized transients changed); the restated regions name the upstream function they follow in their
+    docstrings or comments.
+  * of3o/of3o_confidence.py — the confidence heads' pair path re-stated per row block (carries the upstream copyright line in its header).
+  * of3o/of3o_blockreduce.py — row-block reductions of the confidence summaries; applies OpenFold3's post-contraction statements verbatim
+    on row blocks.
+  * of3o/sitecustomize.py, README.md — this add-on's own hook and description.
+Third-party software USED (not redistributed): OpenFold3 (Apache-2.0), PyTorch (BSD-3-Clause), Triton (MIT), NVIDIA cuEquivariance (its own
+licence; installed by the user), DeepSpeed (Apache-2.0).
+The kit-level notices file is openfold3_ob0/THIRD_PARTY_NOTICES.md.

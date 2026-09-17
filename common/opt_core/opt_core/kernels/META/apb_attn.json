@@ -1,0 +1,10 @@
+{
+ "exports": {},
+ "kind": "module",
+ "license": "the release tree's own code (no third-party header)",
+ "mechanism": "attn.pair_bias_attention",
+ "name": "apb_attn",
+ "not_carried": {},
+ "runtime_imports": [],
+ "version": "APB v1.2 (docstring header; shared or per-sample pair bias, key mask, fused sigmoid gate, strided operands with alignment divisors, head dims to 64; direct launch of the compiled handle per specialization; approximate exp2; finite mask_neg)"
+}

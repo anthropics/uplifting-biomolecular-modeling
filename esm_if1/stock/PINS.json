@@ -1,0 +1,24 @@
+{
+ "model": "esm_if1",
+ "upstream": {
+  "fair-esm": {
+   "repo": "https://github.com/facebookresearch/esm",
+   "commit": "2b369911bb5b4b0dda914521b9475cad1656b2ac",
+   "version": "2.0.1",
+   "tag": null,
+   "ref": "main (repository archived, read-only); v2.0.0 + 74 commits; esm/version.py = 2.0.1 (never published to PyPI \u2014 PyPI's fair-esm 2.0.0 is not the pin)",
+   "license": "MIT (stock/src/LICENSE)",
+   "archive": "stock/fair-esm-2b369911.tar.gz",
+   "install": "pip install --no-deps stock/fair-esm-2b369911.tar.gz",
+   "module": "esm.inverse_folding",
+   "example_entry": "examples/inverse_folding/sample_sequences.py"
+  }
+ },
+ "weights": {
+  "file": "esm_if1_gvp4_t16_142M_UR50.pt",
+  "source_url": "https://dl.fbaipublicfiles.com/fair-esm/models/esm_if1_gvp4_t16_142M_UR50.pt",
+  "loader": "esm.pretrained.esm_if1_gvp4_t16_142M_UR50() via torch.hub ($TORCH_HOME/hub/checkpoints/)",
+  "bytes": 1700450121,
+  "sha256": "be4ba36edec22a9bfaa4946ff6b2815f1f19d8a3d7e0eada8b796d5a0eae9fd4"
+ }
+}

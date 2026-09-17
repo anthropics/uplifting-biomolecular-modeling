@@ -1,0 +1,14 @@
+{
+ "exports": {},
+ "kind": "package",
+ "license": "NOTICE in the package directory: kernels.py derives from the fpf_trimul_v4 kernels carried at kernels/fpf_trimul_v4 (Apache-2.0 lineage text kernels/fpf_flashpairformer.PROTENIX_LICENSE) and the channel-chunk walk of kernels/trimul_esm_shapes/kernels.py (the core's own); the face, tests and table_rows.json are the core's own",
+ "mechanism": "opt_core.mem.rowpair.trimul_fused (the sharded row-block provider, P > 1) -> kernels.fpf_trimul_rows.select / kernels.launch_k1 / launch_k3; no whole-plane provider imports it",
+ "name": "fpf_trimul_rows",
+ "not_carried": {},
+ "runtime_imports": [
+  "fpf_trimul_v4"
+ ],
+ "runtime_imports_note": "the face (__init__.py) is standard library at import and imports nothing of this tree; kernels.py imports torch and triton at module level and is imported by the row-block provider at its first served call only; the weight pack the provider hands these kernels is fpf_trimul_v4.kernels.pack_generic (imported by the provider, not by this package)",
+ "served_note": "pair widths (c_z, c_hidden) with both in {64, 128, 256, 384} through the row-block provider only; cells keyed '<cc>|C<c_z>|H<c_hidden>' in table_rows.json (0.1.0: 9.0 (384,384) and (64,64) MEASURED_OP from an H100 tile sweep (triton 3.6.0); 8.0 (384,384) and (64,64) MEASURED_OP + (256,256) floor from the A100 cells pass; cards without a key are declined c=384/384 / c=64/64 by name; a PLACEHOLDER (unmeasured) key is declined by name unless ROWPAIR_TRIMUL_ROWS_UNMEASURED=1; 9.0 (256,256) = a floor-only entry for the fpf_trimul_v4 row blocks)",
+ "version": "0.1.0"
+}

@@ -1,0 +1,192 @@
+{
+ "bridge": {
+  "CELLS.json": {
+   "carried_sha256": "9e8ed8d08c691146d9d75becd0b25d2bec72aae266a645bb0a5d126e174f0359",
+   "checkpoint_path": "CELLS.json",
+   "checkpoint_sha256": "2b1d1257e94010f08e4b3b95711d2d644110cfffe77e4004ef373eb9b5c30dfb",
+   "transform": "data-reshaped: proven rows of the carried kernel route only, consumed keys {id,status,route,when,binary_fingerprint,route_fingerprint}, route_fingerprint re-stamped (see restamp)"
+  },
+  "__init__.py": {
+   "carried_sha256": "4ef16e29f2e088bc8b81a8e74639d646e996a15a40053ba9d7d680aeba18aabb",
+   "checkpoint_path": "triattn_exact/__init__.py",
+   "checkpoint_sha256": "4ef16e29f2e088bc8b81a8e74639d646e996a15a40053ba9d7d680aeba18aabb",
+   "transform": "verbatim"
+  },
+  "_paths.py": {
+   "carried_sha256": "a9a8ff3b4f578d08fa03bd1a436f8428ab38751df97c942467146cfc7cf89461",
+   "checkpoint_path": "triattn_exact/_paths.py",
+   "checkpoint_sha256": "201d1b36a68c0bba14101afd9e2a7672b4aeba86300934939da20e1d5a8612e1",
+   "transform": "verbatim-plus-cache-directory-rule: cache_root's default is per user, cache_dir returns only a directory no other account could have written (_private_cache_dir)"
+  },
+  "_prebuilt/__init__.py": {
+   "carried_sha256": "fe366d8c351d7c243252bba4dbf09f1ef690f99900c9af92e8f0f417d5c608a2",
+   "checkpoint_path": "triattn_exact/_prebuilt/__init__.py",
+   "checkpoint_sha256": "70eb7e71cf450caca71f1ca1511aa5c6f3787e7485e104fb7c6f8d31c268f2b0",
+   "transform": "verbatim-plus-cache-directory-rule: the cache_dir fallback (taken only without _paths) returns only a directory no other account could have written (_private_dir)"
+  },
+  "_prebuilt/blobs/cuda_mma-v3.3-srca1ceadcb993c-sm_80-cuda12_6.cubin.xz": {
+   "carried_sha256": "2b6252db1fa01fc468764bfe546390b3d93f155241e394e7390a9d278758bb58",
+   "checkpoint_path": "triattn_exact/_prebuilt/blobs/cuda_mma-v3.3-srca1ceadcb993c-sm_80-cuda12_6.cubin.xz",
+   "checkpoint_sha256": "2b6252db1fa01fc468764bfe546390b3d93f155241e394e7390a9d278758bb58",
+   "transform": "verbatim"
+  },
+  "_prebuilt/blobs/cuda_mma-v3.3-srca1ceadcb993c-sm_80-cuda13_0.cubin.xz": {
+   "carried_sha256": "2493acd2126f77a2e2ff8af486859ec03aff173602b62a8a794cf65445c41de2",
+   "checkpoint_path": "triattn_exact/_prebuilt/blobs/cuda_mma-v3.3-srca1ceadcb993c-sm_80-cuda13_0.cubin.xz",
+   "checkpoint_sha256": "2493acd2126f77a2e2ff8af486859ec03aff173602b62a8a794cf65445c41de2",
+   "transform": "verbatim"
+  },
+  "_prebuilt/blobs/cuda_mma-v3.3-srca1ceadcb993c-sm_90-cuda12_6.cubin.xz": {
+   "carried_sha256": "730ca9f4fbb1653995fb227831dc57cfb2423bce5331447ae91dc5df7cba6456",
+   "checkpoint_path": "triattn_exact/_prebuilt/blobs/cuda_mma-v3.3-srca1ceadcb993c-sm_90-cuda12_6.cubin.xz",
+   "checkpoint_sha256": "730ca9f4fbb1653995fb227831dc57cfb2423bce5331447ae91dc5df7cba6456",
+   "transform": "verbatim"
+  },
+  "_prebuilt/blobs/cuda_mma-v3.3-srca1ceadcb993c-sm_90-cuda13_0.cubin.xz": {
+   "carried_sha256": "f4f1891ea2f8768f792ebee5bad03cab9edbb2af4a637073f6936aa5d0ce7849",
+   "checkpoint_path": "triattn_exact/_prebuilt/blobs/cuda_mma-v3.3-srca1ceadcb993c-sm_90-cuda13_0.cubin.xz",
+   "checkpoint_sha256": "f4f1891ea2f8768f792ebee5bad03cab9edbb2af4a637073f6936aa5d0ce7849",
+   "transform": "verbatim"
+  },
+  "_prebuilt/blobs/cuda_mma-v3.3-srca1ceadcb993c-sm_90a-cuda12_6.cubin.xz": {
+   "carried_sha256": "a284cdb9314b02c9de962e2adc3a22dfe70259c6637192e659530c00b64c0bb3",
+   "checkpoint_path": "triattn_exact/_prebuilt/blobs/cuda_mma-v3.3-srca1ceadcb993c-sm_90a-cuda12_6.cubin.xz",
+   "checkpoint_sha256": "a284cdb9314b02c9de962e2adc3a22dfe70259c6637192e659530c00b64c0bb3",
+   "transform": "verbatim"
+  },
+  "_prebuilt/blobs/cuda_mma-v3.3-srca1ceadcb993c-sm_90a-cuda13_0.cubin.xz": {
+   "carried_sha256": "9dde8fd77891b1de549bc1d033a61c24ea28c5a61ae433c3d0ddf4df7bd81b27",
+   "checkpoint_path": "triattn_exact/_prebuilt/blobs/cuda_mma-v3.3-srca1ceadcb993c-sm_90a-cuda13_0.cubin.xz",
+   "checkpoint_sha256": "9dde8fd77891b1de549bc1d033a61c24ea28c5a61ae433c3d0ddf4df7bd81b27",
+   "transform": "verbatim"
+  },
+  "_prebuilt/cuda_mma.py": {
+   "carried_sha256": "f91170e2619c29ec7c4edea7ec3f13f763fbddc7b55ce2faa054ea2c93f39700",
+   "checkpoint_path": "triattn_exact/_prebuilt/cuda_mma.py",
+   "checkpoint_sha256": "f91170e2619c29ec7c4edea7ec3f13f763fbddc7b55ce2faa054ea2c93f39700",
+   "transform": "verbatim"
+  },
+  "_prebuilt/driver.py": {
+   "carried_sha256": "c444545fda3705cde897e79478cef1eb772add6697d5c5f3fb9e61d73dee0798",
+   "checkpoint_path": "triattn_exact/_prebuilt/driver.py",
+   "checkpoint_sha256": "c444545fda3705cde897e79478cef1eb772add6697d5c5f3fb9e61d73dee0798",
+   "transform": "verbatim"
+  },
+  "_prebuilt/manifest.json": {
+   "carried_sha256": "00a1f8d5a25bceeb23c9422cdb02079c012ddafb13c5e8b5b530f0eca2da0509",
+   "checkpoint_path": "triattn_exact/_prebuilt/manifest.json",
+   "checkpoint_sha256": "6c8b443c623500e15626a465b9b54dd08292e52b3fcc3a08f3e026577da832ef",
+   "transform": "data-reshaped: builds of the current kernel ABI only, consumed keys, tag := abi version"
+  },
+  "csrc/cuda_mma/triattn_v3.cu": {
+   "carried_sha256": "d5365b4d1bc472f8853deb51649810af959ab45b7baaa5e750cc4e7388a02720",
+   "checkpoint_path": "csrc/cuda_mma/triattn_v3.cu",
+   "checkpoint_sha256": "4b3d2c1b5501321622e741ff45db53c5a1e21cc64ce0aa6f28f54ee05a8ac655",
+   "transform": "verbatim-below-2-header-comment-lines"
+  },
+  "cuda_mma/__init__.py": {
+   "carried_sha256": "fad10acd7a4e4d4636c4dfbd7e9c3ba611c2b817173149f01ec9b0f6a3bd8635",
+   "checkpoint_path": "triattn_exact/cuda_mma/__init__.py",
+   "checkpoint_sha256": "1938c04c0abfbea0c9188e0883111ce44db3d35e69f863ae25750f92ca2782d7",
+   "transform": "ast-equal-narration-stripped+message-literals"
+  },
+  "face.py": {
+   "carried_sha256": "16a66a23e3e56c968e3c3feb77bc59bf4547776afbb6ac235cd6c1bb3de52267",
+   "checkpoint_path": "triattn_exact/face.py",
+   "checkpoint_sha256": "770de6853511504b5193cf0e0487fc950e7b9fc45134b3e2e06bcbc76ba2af52",
+   "transform": "ast-equal-narration-stripped"
+  }
+ },
+ "cells": {
+  "proven": 14,
+  "total": 14
+ },
+ "checkpoint": "adc4ecacfcea313d1147bfc9824d17f221093f41",
+ "files": {
+  "CELLS.json": "9e8ed8d08c691146d9d75becd0b25d2bec72aae266a645bb0a5d126e174f0359",
+  "__init__.py": "4ef16e29f2e088bc8b81a8e74639d646e996a15a40053ba9d7d680aeba18aabb",
+  "_paths.py": "a9a8ff3b4f578d08fa03bd1a436f8428ab38751df97c942467146cfc7cf89461",
+  "_prebuilt/__init__.py": "fe366d8c351d7c243252bba4dbf09f1ef690f99900c9af92e8f0f417d5c608a2",
+  "_prebuilt/blobs/cuda_mma-v3.3-srca1ceadcb993c-sm_80-cuda12_6.cubin.xz": "2b6252db1fa01fc468764bfe546390b3d93f155241e394e7390a9d278758bb58",
+  "_prebuilt/blobs/cuda_mma-v3.3-srca1ceadcb993c-sm_80-cuda13_0.cubin.xz": "2493acd2126f77a2e2ff8af486859ec03aff173602b62a8a794cf65445c41de2",
+  "_prebuilt/blobs/cuda_mma-v3.3-srca1ceadcb993c-sm_90-cuda12_6.cubin.xz": "730ca9f4fbb1653995fb227831dc57cfb2423bce5331447ae91dc5df7cba6456",
+  "_prebuilt/blobs/cuda_mma-v3.3-srca1ceadcb993c-sm_90-cuda13_0.cubin.xz": "f4f1891ea2f8768f792ebee5bad03cab9edbb2af4a637073f6936aa5d0ce7849",
+  "_prebuilt/blobs/cuda_mma-v3.3-srca1ceadcb993c-sm_90a-cuda12_6.cubin.xz": "a284cdb9314b02c9de962e2adc3a22dfe70259c6637192e659530c00b64c0bb3",
+  "_prebuilt/blobs/cuda_mma-v3.3-srca1ceadcb993c-sm_90a-cuda13_0.cubin.xz": "9dde8fd77891b1de549bc1d033a61c24ea28c5a61ae433c3d0ddf4df7bd81b27",
+  "_prebuilt/cuda_mma.py": "f91170e2619c29ec7c4edea7ec3f13f763fbddc7b55ce2faa054ea2c93f39700",
+  "_prebuilt/driver.py": "c444545fda3705cde897e79478cef1eb772add6697d5c5f3fb9e61d73dee0798",
+  "_prebuilt/manifest.json": "00a1f8d5a25bceeb23c9422cdb02079c012ddafb13c5e8b5b530f0eca2da0509",
+  "csrc/cuda_mma/triattn_v3.cu": "d5365b4d1bc472f8853deb51649810af959ab45b7baaa5e750cc4e7388a02720",
+  "cuda_mma/__init__.py": "fad10acd7a4e4d4636c4dfbd7e9c3ba611c2b817173149f01ec9b0f6a3bd8635",
+  "face.py": "16a66a23e3e56c968e3c3feb77bc59bf4547776afbb6ac235cd6c1bb3de52267"
+ },
+ "prebuilt": [
+  {
+   "abi": "cuda_mma.v3.3",
+   "arch": "sm_80",
+   "blob": "blobs/cuda_mma-v3.3-srca1ceadcb993c-sm_80-cuda12_6.cubin.xz",
+   "cubin_sha256": "ddea8ab62cf7692e81060a2449d605c415f0a015a390c37626fc9114a14e6c08",
+   "cuda": "12.6"
+  },
+  {
+   "abi": "cuda_mma.v3.3",
+   "arch": "sm_80",
+   "blob": "blobs/cuda_mma-v3.3-srca1ceadcb993c-sm_80-cuda13_0.cubin.xz",
+   "cubin_sha256": "be562c5832a4275ea8f00c0fa8d241a6024f8cde61f47fd51d797f70198a5b97",
+   "cuda": "13.0"
+  },
+  {
+   "abi": "cuda_mma.v3.3",
+   "arch": "sm_90",
+   "blob": "blobs/cuda_mma-v3.3-srca1ceadcb993c-sm_90-cuda12_6.cubin.xz",
+   "cubin_sha256": "1943bdb4c28ec3879e03c0b948d623ccfc0a16a5699b890497ab217512f49c59",
+   "cuda": "12.6"
+  },
+  {
+   "abi": "cuda_mma.v3.3",
+   "arch": "sm_90",
+   "blob": "blobs/cuda_mma-v3.3-srca1ceadcb993c-sm_90-cuda13_0.cubin.xz",
+   "cubin_sha256": "9a5746f8fa2b358f6a4f77f638190f7da12b7ab6d774d9bece4a2fadf929ea5a",
+   "cuda": "13.0"
+  },
+  {
+   "abi": "cuda_mma.v3.3",
+   "arch": "sm_90a",
+   "blob": "blobs/cuda_mma-v3.3-srca1ceadcb993c-sm_90a-cuda12_6.cubin.xz",
+   "cubin_sha256": "a65ee40459006c8fa630335cf19109b818aa7029a852be6fafc10daf39300402",
+   "cuda": "12.6"
+  },
+  {
+   "abi": "cuda_mma.v3.3",
+   "arch": "sm_90a",
+   "blob": "blobs/cuda_mma-v3.3-srca1ceadcb993c-sm_90a-cuda13_0.cubin.xz",
+   "cubin_sha256": "5906c195a1cbf89f96e646a6cbb5a22fceb6bd55428f9174c3e36dcd83abcb8a",
+   "cuda": "13.0"
+  }
+ ],
+ "restamp": {
+  "algorithm": "triattn_exact.face.route_fingerprint (sha256 over sorted relpath + NUL + sha256(file) + LF per file; relpaths from the package's parent directory; files *.cu *.cuh *.h *.hpp *.py *.json *.ptx; dirs variants/tests/microtests/__pycache__ excluded)",
+  "deterministic": true,
+  "dirs": {
+   "cuda_mma": [
+    "csrc/cuda_mma -> <package>/csrc/cuda_mma (TRIATTN_EXACT_CSRC, set by kernels.triattn.exact_member.load)",
+    "triattn_exact/cuda_mma"
+   ]
+  },
+  "what": "cells[*].route_fingerprint.sha256 of every carried proven row whose route is fingerprinted on source",
+  "why": "the carried .py files differ from the checkpoint's in docstrings/comments only (AST-equal, proven by the vendoring step), so the checkpoint's source fingerprints no longer name these bytes; the carried table certifies the carried bytes and tests recompute the values"
+ },
+ "route_fingerprints": {
+  "cuda_mma": {
+   "files": [
+    "csrc/cuda_mma/triattn_v3.cu",
+    "triattn_exact/cuda_mma/__init__.py"
+   ],
+   "sha256": "6b3ba45e9eaa445f10291c3e150fb0bfa7f65ffcb3d6c60cba05ccbfdc9d5c56"
+  }
+ },
+ "routes": [
+  "cuda_mma",
+  "_prebuilt"
+ ]
+}

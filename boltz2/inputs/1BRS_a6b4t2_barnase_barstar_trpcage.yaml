@@ -1,0 +1,18 @@
+# PDB 1BRS barnase (chains A-F; 110 aa) x6 + barstar (chains G-J; 89 aa) x4 + the Trp-cage mini-protein (PDB 1L2Y; chains K, L; 20 aa) x2, single-sequence mode:
+# 6*110 + 4*89 + 2*20 = 1056 tokens = 66*16 — the >= 1,024-token class, N = 0 (mod 16): the fused cells' 1,024+-row configurations, the exact tier's
+# residual-fused LayerNorm cubins (from 725 tokens) and the large-N classes of the NVRTC / Triton cells compile here once instead of on a user's first
+# large input. The `warm` verb's fourth input.
+version: 1
+sequences:
+  - protein:
+      id: [A, B, C, D, E, F]
+      sequence: AQVINTFDGVADYLQTYHKLPDNYITKSEAQALGWVASKGNLADVAPGKSIGGDIFSNREGKLPGKSGRTWREADINYTSGFRNSDRILYSSDWLIYKTTDHYQTFTKIR
+      msa: empty
+  - protein:
+      id: [G, H, I, J]
+      sequence: KKAVINGEQIRSISDLHQTLKKELALPEYYGENLDALWDALTGWVEYPLVLEWRQFEQSKQLTENGAESVLQVFREAKAEGADITIILS
+      msa: empty
+  - protein:
+      id: [K, L]
+      sequence: NLYIQWLKDGGPSSGRPPPS
+      msa: empty

@@ -1,0 +1,329 @@
+{
+ "model": "borzoi",
+ "upstream": {
+  "borzoi": {
+   "repo": "https://github.com/calico/borzoi",
+   "commit": "5c9358222b5026abb733ed5fb84f3f6c77239b37",
+   "tag": null,
+   "git_describe": "v1.0.0-7-g5c93582",
+   "version": "1.0.1.dev7+g5c9358222 (the image's editable install, setuptools_scm)",
+   "install": "pip install -e <checkout of https://github.com/calico/borzoi at 5c9358222b5026abb733ed5fb84f3f6c77239b37>   (README.md:26-31; the image's route)",
+   "install_alt": "borzoi @ git+https://github.com/calico/borzoi.git@5c9358222b5026abb733ed5fb84f3f6c77239b37",
+   "archive": "stock/borzoi-5c93582.tar.gz",
+   "archive_size_bytes": 5384494,
+   "role": "the entry script (src/scripts/borzoi_sad.py), examples/params.json, examples/targets_*.txt",
+   "note": "the commit is the pin (git describe v1.0.0-7-g5c93582: seven commits after tag v1.0.0; origin/main's tip at the time of the clone). The borzoi_sad.py digest (stock_scripts below) is the one the kit's build.py (STOCK_SHA, STOCK_COMMIT) and the package's stock gate assert."
+  },
+  "baskerville": {
+   "repo": "https://github.com/calico/baskerville",
+   "commit": "544073b87245d9f43ba63442c75bdbf32a9f8720",
+   "tag": "v1.0.0",
+   "git_describe": "v1.0.0",
+   "version": "1.0.0 (the image's editable install, setuptools_scm)",
+   "install": "pip install -e <checkout of https://github.com/calico/baskerville at 544073b87245d9f43ba63442c75bdbf32a9f8720>   (borzoi README.md:19-24; the image's route)",
+   "install_alt": "baskerville @ git+https://github.com/calico/baskerville.git@544073b87245d9f43ba63442c75bdbf32a9f8720",
+   "archive": "stock/baskerville-544073b.tar.gz",
+   "archive_size_bytes": 11004128,
+   "role": "the library: seqnn.SeqNN (model build / restore / ensemble), layers (EnsembleReverseComplement, SwitchReverse), dataset (targets_prep_strand, untransform_preds1), vcf (vcf_snps, snp_seq1), dna (dna_1hot)",
+   "note": "tag v1.0.0 == the commit == origin/main's tip at the time of the clone"
+  }
+ },
+ "archive_recipe": "git archive --format=tar --prefix=<name>-<commit7>/ <commit> | gzip -n   (the whole tree at the commit, no .git; `git archive` regenerates the same bytes). An archive install needs a version for setuptools_scm (no .git inside): SETUPTOOLS_SCM_PRETEND_VERSION_FOR_<BORZOI|BASKERVILLE>=<version> pip install --no-deps stock/<archive>.",
+ "image": {
+  "tested_on": "Debian 12, python 3.10.17, tensorflow 2.15.1 built for CUDA 12.2 / cuDNN 8.9 (pinned_stack below); a documentation line, compared against by nothing",
+  "borzoi_checkout": "/opt/borzoi   (stock script /opt/borzoi/src/scripts/borzoi_sad.py; examples at /opt/borzoi/examples/)",
+  "baskerville_checkout": "/opt/baskerville   (editable install; git HEAD 544073b87245d9f43ba63442c75bdbf32a9f8720)",
+  "git_heads": {
+   "/opt/borzoi": "5c9358222b5026abb733ed5fb84f3f6c77239b37",
+   "/opt/baskerville": "544073b87245d9f43ba63442c75bdbf32a9f8720",
+   "worktree_state": "mode-only changes (chmod +x), no content diff in either checkout",
+   "read_by": "read from the pinned image itself (git -C <checkout> rev-parse HEAD)"
+  },
+  "os": "Debian GNU/Linux 12 (bookworm)",
+  "glibc": "2.36",
+  "python_executable": "/usr/local/bin/python3",
+  "environment": {
+   "BORZOI_DIR": "/opt/borzoi",
+   "BASKERVILLE_DIR": "/opt/baskerville",
+   "PYTHONPATH": "/opt/borzoi/src/scripts:/opt/baskerville/src/baskerville/scripts:/pkg/:/root/",
+   "TF_CPP_MIN_LOG_LEVEL": "1",
+   "PATH_head": "/opt/borzoi/src/scripts:/opt/baskerville/src/baskerville/scripts"
+  },
+  "tf32_execution_enabled_default": true,
+  "tf_has_enable_op_determinism": true,
+  "bedtools": "2.30.0"
+ },
+ "python": "3.10.17",
+ "pinned_stack": {
+  "python": "3.10.17",
+  "tensorflow": "2.15.1",
+  "keras": "2.15.0",
+  "cuda": "12.2 (the tensorflow build; nvidia-cuda-runtime-cu12 12.2.140, nvidia-cublas-cu12 12.2.5.6)",
+  "cudnn": "8 (the tensorflow build; nvidia-cudnn-cu12 8.9.4.25)",
+  "cuda_compute_capabilities_built": "['sm_50', 'sm_60', 'sm_70', 'sm_75', 'compute_80']",
+  "numpy": "1.24.4",
+  "nvidia_wheels": {
+   "nvidia-cublas-cu12": "12.2.5.6",
+   "nvidia-cuda-cupti-cu12": "12.2.142",
+   "nvidia-cuda-nvcc-cu12": "12.2.140",
+   "nvidia-cuda-nvrtc-cu12": "12.2.140",
+   "nvidia-cuda-runtime-cu12": "12.2.140",
+   "nvidia-cudnn-cu12": "8.9.4.25",
+   "nvidia-cufft-cu12": "11.0.8.103",
+   "nvidia-curand-cu12": "10.3.3.141",
+   "nvidia-cusolver-cu12": "11.5.2.141",
+   "nvidia-cusparse-cu12": "12.1.2.141",
+   "nvidia-nccl-cu12": "2.16.5",
+   "nvidia-nvjitlink-cu12": "12.2.140"
+  }
+ },
+ "pins": {
+  "tensorflow": "2.15.1",
+  "numpy": "1.24.4",
+  "h5py": "3.10.0",
+  "pandas": "1.5.3",
+  "pysam": "0.22.1",
+  "scipy": "1.9.3",
+  "pybedtools": "0.10.0",
+  "pyfaidx": "0.7.2.2",
+  "tqdm": "4.65.2",
+  "natsort": "7.1.1",
+  "intervaltree": "3.1.0",
+  "keras": "2.15.0",
+  "protobuf": "4.25.9",
+  "ml-dtypes": "0.3.2"
+ },
+ "upstream_declared_dependencies": {
+  "borzoi/pyproject.toml:16-38": {
+   "requires-python": ">=3.9",
+   "h5py": "~=3.10.0",
+   "intervaltree": "~=3.1.0",
+   "joblib": "~=1.1.1",
+   "matplotlib": "~=3.7.1",
+   "google-cloud-storage": "~=2.0.0",
+   "natsort": "~=7.1.1",
+   "networkx": "~=2.8.4",
+   "numpy": "~=1.24.3",
+   "pandas": "~=1.5.3",
+   "pybigwig": "~=0.3.18",
+   "pybedtools": "~=0.10.0",
+   "pysam": "~=0.22.0",
+   "qnorm": "~=0.8.1",
+   "seaborn": "~=0.12.2",
+   "scikit-learn": "~=1.2.2",
+   "scipy": "~=1.9.1",
+   "tensorflow": "~=2.15.0",
+   "tqdm": "~=4.65.0",
+   "pyfaidx": "~=0.7.1",
+   "pyranges": "~=0.0.129"
+  },
+  "baskerville/pyproject.toml:15-38": {
+   "requires-python": ">=3.9",
+   "h5py": "~=3.10.0",
+   "intervaltree": "~=3.1.0",
+   "joblib": "~=1.1.1",
+   "matplotlib": "~=3.7.1",
+   "google-cloud-storage": "~=2.0.0",
+   "natsort": "~=7.1.1",
+   "networkx": "~=2.8.4",
+   "numpy": "~=1.24.3",
+   "pandas": "~=1.5.3",
+   "pybigwig": "~=0.3.18",
+   "pybedtools": "~=0.10.0",
+   "pysam": "~=0.22.0",
+   "qnorm": "~=0.8.1",
+   "seaborn": "~=0.12.2",
+   "scikit-learn": "~=1.2.2",
+   "scipy": "~=1.9.1",
+   "statsmodels": "~=0.13.5",
+   "tabulate": "~=0.8.10",
+   "tensorflow": "~=2.15.0",
+   "tqdm": "~=4.65.0",
+   "pyfaidx": "~=0.7.1"
+  },
+  "baskerville_optional": {
+   "gpu": [
+    "tensorrt==8.6.1"
+   ],
+   "file_line": "baskerville/pyproject.toml:47-49"
+  },
+  "readme_versions": {
+   "Python": "== 3.10",
+   "Tensorflow": "== 2.15.x",
+   "file_line": "borzoi/README.md:40-42"
+  }
+ },
+ "weights": {
+  "f0/model0_best.h5": {
+   "url": "https://storage.googleapis.com/seqnn-share/borzoi/f0/model0_best.h5",
+   "source": "borzoi/README.md:84 'Borzoi Replicate 0 (human)'; download_models.sh:4-10 fetches it as examples/saved_models/f3c0/train/model0_best.h5",
+   "sha256": "7661c8d8541ae39293b1bf25392a4ec7b97b76114be5ddf82764644c3094eb9f",
+   "size_bytes": 744112468,
+   "head": "human = models[0] (head keys natsorted: head_human, head_mouse; seqnn.py:164-165, 198-201); restore(model_file, head_i=0) loads it (seqnn.py:1148-1154); head_human units 7611 (examples/params.json:76-80)",
+   "format": "Keras HDF5 weights file loaded with model.load_weights (seqnn.py:1153)"
+  },
+  "other_replicates": "f1, f2, f3 (human model0_best.h5, 744,112,468 B each) and the mouse heads (model1_best.h5, README.md:84-87) are named by upstream, not wired: the pinned command takes f0's model0_best.h5"
+ },
+ "data": {
+  "genome": {
+   "file": "hg38.ml.fa (+ its .fai; pysam.Fastafile builds one beside the FASTA when absent — borzoi_sad.py:246)",
+   "source": "https://storage.googleapis.com/seqnn-share/helper/dependencies/hg38.ml.fa.gz — NOT the README route's UCSC hg38.fa (download_models.sh:63-67; the -f default borzoi_sad.py:55)",
+   "sha256": "a3145abd8cad4cfdedde7e68a5c6263d4dfbdf1bfe4008beac9f002ddc6c8149",
+   "fai_sha256": "791ccb7c1f4408c004519c2d61b560d4f0b0d59c2ec643dbca86e40d0180f885",
+   "contig_names": "must carry the chr prefix: vcf.SNP prepends 'chr' to bare chromosome names (vcf.py:672-675)",
+   "size_bytes": 3091663428,
+   "fai_size_bytes": 726
+  },
+  "targets": {
+   "file": "targets.txt == calico/borzoi examples/targets_human.txt @ 5c9358222b5026abb733ed5fb84f3f6c77239b37",
+   "sha256_repo_file": "cb0c1d4baf514f44de458364b2ae0b85f722a80b72cbe66c56bd700faa481785",
+   "size_bytes": 1215560,
+   "rows": 7611,
+   "columns": [
+    "identifier",
+    "file",
+    "clip",
+    "clip_soft",
+    "scale",
+    "sum_stat",
+    "strand_pair",
+    "description"
+   ],
+   "strand_collapsed_rows": 6385,
+   "sum_sqrt_rows": 1543,
+   "note": "rows / collapsed rows counted from the bytes with the stock rule (dataset.py:352-375): input facts (shapes)"
+  },
+  "params": {
+   "file": "params.json == calico/borzoi examples/params.json @ 5c9358222b5026abb733ed5fb84f3f6c77239b37",
+   "sha256": "c19278bbbc2c77e3ae16faa77622148248ec4b3ad479a3d7ae5a030a6f5f008c",
+   "size_bytes": 2382,
+   "keys_read_by_borzoi_sad": {
+    "train.batch_size": 2,
+    "model.seq_length": 524288,
+    "model.strand_pair": "injected by the script from the targets file (borzoi_sad.py:186)"
+   },
+   "note": "examples/params_pred.json (sha256 247b6eaadda8a2721c4baeda7716201ffaa2aa133a969576086164e1c61a094d) differs: Cropping1D 16 instead of 5120 and verbose=false — not the pinned file. The repository file examples/params.json (sha256 c19278bb…f008c, the copy in the image and the staged copy) is the one pinned; the bucket copy https://storage.googleapis.com/seqnn-share/borzoi/params.json is not used."
+  },
+  "targets_gtex": {
+   "file": "examples/targets_gtex.txt (89 GTEx RNA-seq tracks)",
+   "sha256": "3d46b79e4af58d4b585064f602a311a6d80405d843a3300049d44e6a4493eac3",
+   "size_bytes": 14773,
+   "rows": 89,
+   "all_self_paired": true
+  }
+ },
+ "entry_point": {
+  "cli": "borzoi_sad.py [options] <params_file> <model_file> <vcf_file>   (src/scripts/borzoi_sad.py:50; optparse)",
+  "script": "src/scripts/borzoi_sad.py",
+  "command": "borzoi_sad.py -f <hg38.ml.fa> -o <out_dir> --rc --stats SAD,logSAD,D2,logD2 -t <targets.txt> -u <params.json> <model0_best.h5> <vcf>",
+  "options": {
+   "-f": "<hg38.ml.fa>",
+   "-o": "<out_dir>",
+   "--rc": true,
+   "--stats": "SAD,logSAD,D2,logD2",
+   "-t": "<targets.txt>",
+   "-u": true,
+   "--shifts": "0 (default)",
+   "-p": "unset (default)",
+   "--no_untransform": false
+  },
+  "positional": [
+   "<params.json>",
+   "<model0_best.h5>",
+   "<vcf>"
+  ],
+  "unit_of_work": "one variant job: VCF -> <out_dir>/sad.h5 (borzoi_sad.py:322)",
+  "output": "<out_dir>/sad.h5 (opened 'w': an existing file is overwritten; out_dir created non-recursively, borzoi_sad.py:155-156)",
+  "stdout_stderr": "SeqNN.verbose defaults True (seqnn.py:54): model.summary() and model_strides/target_lengths/target_crops print to stdout on every run (seqnn.py:209-210, 1232-1235); tqdm progress on stderr (borzoi_sad.py:260); vcf warnings on stderr (vcf.py:234-248)"
+ },
+ "library_defaults": {
+  "one_hot": "vcf.snp_seq1 -> vcf.dna_length_1hot -> dna.dna_1hot(seq, n_uniform=True): float16 (seq_len, 4), N = 0.25 in every channel (vcf.py:252-261, 495-514; dna.py:68-69, 85-86); window 1-based [pos-(seq_len//2-1), pos+seq_len//2] i.e. 0-based fetch(chr, pos-1-262143, pos+262144) for a SNV at seq_length 524288 (vcf.py:198-212); N-fill before the contig start and after its end (vcf.py:209-216)",
+  "batch": "[ref, alt] one-hot list -> np.array (2, 524288, 4); train.batch_size == 2 -> one call seqnn_model(snps_1hot), ref = [0], alt = [1] (borzoi_sad.py:262-271); batch_size == 1 would run ref and alt separately (borzoi_sad.py:266-268)",
+  "rc": "--rc -> SeqNN.build_ensemble(True, [0]) (seqnn.py:238-279): layers.EnsembleReverseComplement (gather [3,2,1,0] on the channel axis, reverse the length axis; layers.py:959-978) -> the base model on fwd and rc -> layers.SwitchReverse(strand_pair) reverses the rc prediction's length axis and gathers the strand_pair columns (layers.py:998-1034) -> tf.keras.layers.Average (seqnn.py:276). Per variant: 2 sequences x 2 orientations inside one ensemble call.",
+  "shifts": "--shifts default '0' -> [0] -> shift_bool False -> no EnsembleShift (seqnn.py:240-248; layers.py:1090-1107)",
+  "slice": "-t -> build_slice(targets_df.index): tf.gather on the last axis (seqnn.py:296-320); with targets_human.txt the index is 0..7610 (every column)",
+  "restore": "seqnn.SeqNN(params_model) builds every head (seqnn.py:38-42, 132-213); restore(model_file) = models[0].load_weights (seqnn.py:1148-1154)",
+  "call": "SeqNN.__call__ -> model(x).numpy().astype('float32') (seqnn.py:1046-1061); shape (2, target_length, num_targets)",
+  "target_length": "seq_length / model stride, cropped: 524288 / 32 = 16384 bins, minus Cropping1D 5120 on each side = 6144 (examples/params.json:18, 26-69; the value SeqNN prints as target_lengths, seqnn.py:1225-1234)",
+  "untransform": "-u -> dataset.untransform_preds1 (dataset.py:406-434): preds / scale; where preds > clip_soft: clip_soft + (preds - clip_soft)**2; sum_stat containing '_sqrt': ** (4/3); then * scale (unscale=False). Default (no -u) -> dataset.untransform_preds (dataset.py:378-403): clip_soft - 1 + (preds - clip_soft + 1)**2 where preds > clip_soft; '_sqrt' columns -1 + (preds + 1)**2; no scale. --no_untransform skips both; no -t skips both (borzoi_sad.py:274-281). targets_df.scale / clip_soft are float64 arrays, so the float32 predictions promote to float64 from the first divide onward.",
+  "strand_collapse": "targets_prep_strand (dataset.py:352-375) keeps every row whose identifier does not end in '-' (paired rows collapse to the '+' row); the script builds its own dok_matrix strand_transform (borzoi_sad.py:189-200; NOT dataset.make_strand_transform, dataset.py:314-349) and right-multiplies: preds (L x T) * (T x T') (borzoi_sad.py:284-286)",
+  "stats": "write_snp_len (borzoi_sad.py:408-523): SAD = sum_L(alt) - sum_L(ref); logSAD = sum_L(log2(alt+1)) - sum_L(log2(ref+1)); D2 = sqrt(sum_L((alt-ref)^2)); logD2 = sqrt(sum_L((log2(alt+1)-log2(ref+1))^2)); each clipped to the float16 range and stored float16 (lines 436-439, 444-447, 474-478, 479-483)",
+  "sum_length_path": "sum_length = (options.sad_stats == 'SAD') compares a list to a str (borzoi_sad.py:159, 210): always False -> build_sad()/write_snp are never reached; every run takes write_snp_len",
+  "percentiles": "write_pct (borzoi_sad.py:372-395): 279 percentiles (0.001..0.099 step 0.001, 0.10..0.89 step 0.01, 0.900..0.999 step 0.001), float64; <stat>_pct = np.percentile(stat, 100*p, axis=0).T -> (num_targets, 279) float16",
+  "tf_numerics": "no TF32 / mixed-precision call in borzoi_sad.py, seqnn.py or layers.py (grep tensor_float_32|mixed_precision|set_floatx: none in the SAD path; mixed_float16 appears only in hound_eval*.py / hound_train.py): the SAD route runs at TensorFlow's own defaults (float32 Keras policy; TF32 execution enabled by TensorFlow's default on Ampere+ GPUs — the image: tf.config.experimental.tensor_float_32_execution_enabled() == True)",
+  "training_time_params_inert_at_inference": "model.augment_rc / augment_shift (examples/params.json:19-20) build StochasticReverseComplement / StochasticShift layers that return the input unchanged when training is not True (layers.py:987-995, 1128-1141) and a SwitchReverse with a constant False (seqnn.py:141-144, 185-191)"
+ },
+ "output_schema": {
+  "file": "<out_dir>/sad.h5",
+  "file_line": "borzoi_sad.py:316-369 (initialize_output_h5), 372-395 (write_pct)",
+  "datasets": {
+   "snp": "S (bytes) rsid; '.' becomes 'chr:pos' (vcf.py:683-684)",
+   "chr": "S; 'chr'-prefixed (vcf.py:672-675)",
+   "pos": "uint32 (line 333)",
+   "ref_allele": "S (flipped only when vcf_snps(flip_ref=True) — never in borzoi_sad.py; lines 337-351)",
+   "alt_allele": "S (first ALT allele)",
+   "target_ids": "S targets_strand_df.identifier (line 355)",
+   "target_labels": "S targets_strand_df.description (line 356)",
+   "<stat>": "(num_snps, num_targets) float16 (lines 364-367); REF/ALT: (num_snps, target_length, num_targets) float16 (lines 360-363)",
+   "percentiles": "float64 (279,) (line 383)",
+   "<stat>_pct": "(num_targets, 279) float16 (lines 391-395)"
+  },
+  "datasets_for_the_command": [
+   "snp",
+   "chr",
+   "pos",
+   "ref_allele",
+   "alt_allele",
+   "target_ids",
+   "target_labels",
+   "SAD",
+   "logSAD",
+   "D2",
+   "logD2",
+   "percentiles",
+   "SAD_pct",
+   "logSAD_pct",
+   "D2_pct",
+   "logD2_pct"
+  ],
+  "num_targets": 6385
+ },
+ "stock_environment": {
+  "reads": [
+   "BORZOI_HG38 (only the -f default, borzoi_sad.py:55 — inert when -f is passed)",
+   "TensorFlow's own variables (TF_CPP_MIN_LOG_LEVEL, CUDA_VISIBLE_DEVICES, TF_*)"
+  ],
+  "must_be_absent_prefixes": [
+   "KIT_",
+   "BORZOI_OPT"
+  ],
+  "kit_switch_names_read_by_pipeline_tf_v17": [
+   "KIT_POST_WRITER",
+   "KIT_FWD",
+   "KIT_STAMP_DIR"
+  ],
+  "note": "the stock script sets no numerics flag and reads no lever; a stock pass proves an empty KIT_*/BORZOI_OPT grep in its own environment"
+ },
+ "license": {
+  "borzoi": {
+   "file": "LICENSE",
+   "first_line": "Apache License",
+   "text": "Apache License, Version 2.0, January 2004",
+   "classifier": "License :: OSI Approved :: Apache License (pyproject.toml:13)",
+   "script_header": "Copyright 2017 Calico LLC; Licensed under the Apache License, Version 2.0 (borzoi_sad.py:2-4)"
+  },
+  "baskerville": {
+   "file": "LICENSE",
+   "first_line": "Apache License",
+   "text": "Apache License, Version 2.0, January 2004 (byte-identical to borzoi's LICENSE)",
+   "classifier": "License :: OSI Approved :: MIT License (pyproject.toml:12) — disagrees with the LICENSE file; the LICENSE file is the licence"
+  }
+ },
+ "stock_scripts": {
+  "borzoi_sad.py": {
+   "path": "src/scripts/borzoi_sad.py",
+   "sha256": "10c7016704d9972a225311ddda5b872ee585c76e1112f067a232a40ad5957911",
+   "bytes": 18259
+  }
+ }
+}

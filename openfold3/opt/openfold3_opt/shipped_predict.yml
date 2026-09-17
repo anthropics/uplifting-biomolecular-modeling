@@ -1,0 +1,8 @@
+# OpenFold3 0.4.1 at upstream's SHIPPED configuration: what `run_openfold predict` builds when it is given no --runner-yaml
+# (openfold3/entry_points/validator.py:378, ModelUpdate(presets=["predict"]), nothing else). On CUDA the eval kernel flags then stay at
+# their defaults (openfold3/projects/of3_all_atom/config/model_config.py:115-118): use_deepspeed_evo_attention true (the DS4Sci evoformer
+# attention kernel, bf16), use_cueq_triangle_kernels false, use_triton_triangle_kernels false (ROCm only), use_lma false. The tree's
+# stock configuration for the kit arms (opt/forward/fast_inference/config/stock_predict.yml) differs from this file by exactly one line:
+# it sets use_deepspeed_evo_attention false. Runs only where deepspeed's evoformer_attn op is installed.
+model_update:
+  presets: [predict]

@@ -1,0 +1,26 @@
+name: Build and release wheel
+
+on:
+  release:
+    types: [created]
+  workflow_dispatch:
+
+jobs:
+  build-wheel:
+    name: Build manylinux wheel (cp312)
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Build wheel
+        uses: pypa/cibuildwheel@v2.23.0
+        env:
+          CIBW_BUILD: cp312-manylinux_x86_64
+          CIBW_MANYLINUX_X86_64_IMAGE: manylinux_2_28
+          CIBW_BUILD_VERBOSITY: 1
+
+      - name: Upload wheel to release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release upload ${{ github.ref_name }} wheelhouse/alphafold3_open-*.whl --clobber

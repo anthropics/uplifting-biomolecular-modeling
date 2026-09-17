@@ -1,0 +1,39 @@
+# protenix_v1_opt — explicit interface to the Protenix v1 (protenix==1.1.0) inference optimizations.
+# Install editable, the shared core first: `pip install -e "$TREE/common/opt_core" -e "$TREE/protenix_v1/opt"` (= `run.sh install`) into the
+# interpreter that owns the `protenix` command. The kit code it wraps lives beside the package (forward/v05_addon/, the kit byte
+# for byte) and is resolved from the package location, so the install must stay editable (or point PROTENIX_V1_OPT_KIT at the kit
+# directory). No install-time dependency on the upstream package (protenix: stock/PINS.json): its version is checked at activation. The
+# core (common/opt_core: the shared mechanisms of this tree) is not on any index and a relative path cannot be a dependency line, so it is
+# pinned below by path and by a minimum version ([tool.opt_core]; protenix_v1_opt/_core_gate.py — the core's kit_template gate, byte-identical — is statement one of every entry: the importable opt_core must be at or above this version, else NOT ACTIVE reason=core_missing|core_mismatch, exit 3).
+# The build backend is the core's template, carried byte for byte (setuptools plus one step that ships protenix_v1_opt_autoload.pth at the
+# wheel root, which is what makes `PROTENIX_V1_OPT=<mode> protenix pred ...` activate the mode, or stop with a named refusal, without code
+# changes: protenix_v1_opt/_autoload.py).
+[build-system]
+requires = ["setuptools>=64", "wheel"]
+build-backend = "_build_backend"
+backend-path = ["."]
+
+[project]
+name = "protenix_v1_opt"
+dynamic = ["version"]
+description = "Protenix v1 inference optimizations: modes exact/fast/big/off, activation report, CLI pred|check|warm"
+requires-python = ">=3.11"
+classifiers = ["Private :: Do Not Upload"]
+dependencies = []
+
+[project.optional-dependencies]
+test = ["pytest"]                                   # the package's CPU tests
+
+[project.scripts]
+protenix-v1-opt = "protenix_v1_opt.__main__:main"  # `protenix-v1-opt pred|check|warm ...` == `python -m protenix_v1_opt ...`
+
+[tool.setuptools]
+packages = ["protenix_v1_opt", "protenix_v1_opt.tests"]
+include-package-data = false
+
+[tool.setuptools.dynamic]
+version = {attr = "protenix_v1_opt.__version__"}
+
+[tool.opt_core]
+path = "../../common/opt_core"
+version = "0.5.228.0"

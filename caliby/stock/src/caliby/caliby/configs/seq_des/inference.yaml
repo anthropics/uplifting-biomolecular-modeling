@@ -1,0 +1,31 @@
+defaults:
+  - _self_
+
+batch_size: 4
+num_seqs_per_pdb: 1
+verbose: true
+num_workers: 2  # number of workers for data loading
+
+# Sequence design options
+omit_aas: null  # exclude certain aatypes globally, e.g. ["C", "G"]. "X" is always excluded.
+ensemble_ignore_res_idx_mismatch: false  # if True, ignore mismatches in residue index between the primary structure and the decoy structures
+
+# Create Gaussian ensembles on the fly. Set noise_std to 0 to disable.
+gaussian_conformers_cfg:
+  n_conformers: 0
+  noise_std: 0.0
+
+# Potts sampling options
+potts_sampling_cfg:
+  regularization: "LCP"
+  potts_sweeps: 500
+  potts_proposal: "dlmc"
+  potts_temperature: 0.01
+  rejection_step: false
+  potts_only_cond: false  # Restrict sequence conditioning to within the potts model
+
+# Sidechain packing options
+scn_packing_cfg:
+  # Sidechain diffusion parameters.
+  num_steps: 50
+  step_scale: 1.5

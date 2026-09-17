@@ -1,0 +1,626 @@
+{
+ "_doc": "fpf_trimul_v4 launch cells: ONE table. Rows keyed '<cc major.minor>|<triton major.minor>' (exact) and '<cc>|*' (any other triton on that capability; pointer-load cells only). A row's k1/k3 are the (C, D) = (256, 256) no-bias cells; 'overrides' carry the per-shape cells the kernel resolves by k1_C<C>_D<D>[_bias] / k3_... (table.resolve_cfg: first match of C_D_bias, C_D, C_bias, C, else the row's k1/k3). impl='tma' K1 cells (kernels._k1t) and the host-descriptor cells impl='tma2' (K1, kdesc._k1d: incoming planes transposed, both directions one a @ b^T GEMM) / K3 impl='tma' (kdesc._k3d) need triton's tensor-descriptor API (else the next candidate row serves; fp32 input and plane extents below kdesc.N_MIN_DESC always take the pointer / _k1t kernels of the same cell numbers). 'kit_keys': the exact parts where two sweeps measured different (128,128) no-bias cells \u2014 there a kit's own table (FPF_TRIMUL_V4_CELLS) that serves the part serves it (source=kit-table); everywhere else this table's row serves and the kit's table is evidence only, named per part. A capability with no row serves the SAFE cell of opt_core.kernels.safe_settings ('pair_fused:trimul': the capability's row or its any-capability '*' row), named once. 'successors': per override key, the cell this row served before its current one when the change kept the output bytes (the descriptor cells of CHANGELOG 4.4.0 replaced the cells named there): a kit's measured selection of the older cell is a served, named change (opt_core tests/test_trimul_v4_one_table.py), not a divergence. Served rows: status prefix table.SERVED_STATUS_PREFIX. Which engine's measurement supplies each cell: opt_core CHANGES.md 0.5.18.9.",
+ "kit_keys": [
+  "9.0|3.3",
+  "10.0|3.7",
+  "10.3|3.7"
+ ],
+ "8.0|3.3": {
+  "k1": {
+   "BM": 128,
+   "BN": 64,
+   "num_warps": 8,
+   "num_stages": 2
+  },
+  "k3": {
+   "BM": 64,
+   "BN": 64,
+   "num_warps": 4,
+   "num_stages": 1
+  },
+  "overrides": {
+   "k1_C128_D128_bias": {
+    "BM": 128,
+    "BN": 32,
+    "num_warps": 4,
+    "num_stages": 1
+   },
+   "k3_C128_D128_bias": {
+    "BM": 128,
+    "BN": 64,
+    "num_warps": 4,
+    "num_stages": 1
+   },
+   "k1_C128_D128": {
+    "BM": 128,
+    "BN": 64,
+    "num_warps": 4,
+    "num_stages": 2
+   },
+   "k3_C128_D128": {
+    "BM": 128,
+    "BN": 64,
+    "num_warps": 4,
+    "num_stages": 1
+   }
+  },
+  "status": "CERTIFIED_OP (pointer K1; per-shape cells for (C, D, bias) under overrides)"
+ },
+ "8.0|3.6": {
+  "k1": {
+   "BM": 128,
+   "BN": 64,
+   "num_warps": 8,
+   "num_stages": 2
+  },
+  "k3": {
+   "BM": 64,
+   "BN": 64,
+   "num_warps": 4,
+   "num_stages": 1
+  },
+  "overrides": {
+   "k1_C128_D128_bias": {
+    "BM": 128,
+    "BN": 32,
+    "num_warps": 4,
+    "num_stages": 1
+   },
+   "k3_C128_D128_bias": {
+    "BM": 128,
+    "BN": 64,
+    "num_warps": 4,
+    "num_stages": 1
+   },
+   "k1_C128_D128": {
+    "BM": 128,
+    "BN": 32,
+    "num_warps": 4,
+    "num_stages": 1
+   },
+   "k3_C128_D128": {
+    "BM": 128,
+    "BN": 64,
+    "num_warps": 4,
+    "num_stages": 1
+   }
+  },
+  "status": "CERTIFIED_OP (pointer K1; per-shape cells for (C, D, bias) under overrides)"
+ },
+ "8.0|3.7": {
+  "k1": {
+   "BM": 128,
+   "BN": 64,
+   "num_warps": 8,
+   "num_stages": 2
+  },
+  "k3": {
+   "BM": 64,
+   "BN": 64,
+   "num_warps": 4,
+   "num_stages": 1
+  },
+  "overrides": {
+   "k1_C128_D128_bias": {
+    "BM": 128,
+    "BN": 32,
+    "num_warps": 4,
+    "num_stages": 1
+   },
+   "k3_C128_D128_bias": {
+    "BM": 128,
+    "BN": 64,
+    "num_warps": 4,
+    "num_stages": 1
+   },
+   "k1_C128_D128": {
+    "BM": 128,
+    "BN": 32,
+    "num_warps": 4,
+    "num_stages": 1
+   },
+   "k3_C128_D128": {
+    "BM": 128,
+    "BN": 64,
+    "num_warps": 4,
+    "num_stages": 1
+   }
+  },
+  "status": "CERTIFIED_OP (pointer K1; per-shape cells for (C, D, bias) under overrides)"
+ },
+ "8.0|*": {
+  "k1": {
+   "BM": 128,
+   "BN": 64,
+   "num_warps": 8,
+   "num_stages": 2
+  },
+  "k3": {
+   "BM": 64,
+   "BN": 64,
+   "num_warps": 4,
+   "num_stages": 1
+  },
+  "overrides": {
+   "k1_C128_D128_bias": {
+    "BM": 128,
+    "BN": 32,
+    "num_warps": 4,
+    "num_stages": 1
+   },
+   "k3_C128_D128_bias": {
+    "BM": 128,
+    "BN": 64,
+    "num_warps": 4,
+    "num_stages": 1
+   },
+   "k1_C128_D128": {
+    "BM": 128,
+    "BN": 32,
+    "num_warps": 4,
+    "num_stages": 1
+   },
+   "k3_C128_D128": {
+    "BM": 128,
+    "BN": 64,
+    "num_warps": 4,
+    "num_stages": 1
+   }
+  },
+  "status": "CERTIFIED_OP (pointer K1; per-shape cells for (C, D, bias) under overrides)"
+ },
+ "9.0|3.3": {
+  "k1": {
+   "BM": 128,
+   "BN": 128,
+   "num_warps": 8,
+   "num_stages": 1
+  },
+  "k3": {
+   "BM": 64,
+   "BN": 64,
+   "num_warps": 4,
+   "num_stages": 1
+  },
+  "overrides": {
+   "k1_C128_D128_bias": {
+    "BM": 128,
+    "BN": 128,
+    "num_warps": 8,
+    "num_stages": 1
+   },
+   "k3_C128_D128_bias": {
+    "BM": 64,
+    "BN": 64,
+    "num_warps": 4,
+    "num_stages": 1
+   },
+   "k1_C128_D128": {
+    "BM": 64,
+    "BN": 32,
+    "num_warps": 4,
+    "num_stages": 2
+   },
+   "k3_C128_D128": {
+    "BM": 64,
+    "BN": 64,
+    "num_warps": 4,
+    "num_stages": 1
+   }
+  },
+  "status": "CERTIFIED_OP (pointer K1; per-shape cells for (C, D, bias) under overrides)"
+ },
+ "9.0|3.6": {
+  "k1": {
+   "impl": "tma",
+   "BM": 128,
+   "BN": 32,
+   "num_warps": 4,
+   "num_stages": 3
+  },
+  "k3": {
+   "BM": 64,
+   "BN": 64,
+   "num_warps": 4,
+   "num_stages": 1
+  },
+  "overrides": {
+   "k1_C128_D128_bias": {
+    "impl": "tma",
+    "BM": 128,
+    "BN": 32,
+    "num_warps": 4,
+    "num_stages": 3
+   },
+   "k3_C128_D128_bias": {
+    "BM": 64,
+    "BN": 64,
+    "num_warps": 4,
+    "num_stages": 1
+   },
+   "k1_C128_D128": {
+    "impl": "tma2",
+    "BM": 128,
+    "BN": 32,
+    "num_warps": 4,
+    "num_stages": 3
+   },
+   "k3_C128_D128": {
+    "impl": "tma",
+    "BM": 64,
+    "BN": 64,
+    "num_warps": 4,
+    "num_stages": 1
+   }
+  },
+  "successors": {
+   "k1_C128_D128": {
+    "impl": "tma",
+    "BM": 128,
+    "BN": 32,
+    "num_warps": 4,
+    "num_stages": 3
+   },
+   "k3_C128_D128": {
+    "BM": 64,
+    "BN": 64,
+    "num_warps": 4,
+    "num_stages": 1
+   }
+  },
+  "status": "CERTIFIED_OP (TMA K1; per-shape cells for (C, D, bias) under overrides; (128, 128) no-bias: host-descriptor K1 'tma2' (transposed incoming planes) + K3 'tma', output bytes equal to the cells they replace on recorded activations)"
+ },
+ "9.0|3.7": {
+  "k1": {
+   "impl": "tma",
+   "BM": 128,
+   "BN": 32,
+   "num_warps": 4,
+   "num_stages": 3
+  },
+  "k3": {
+   "BM": 64,
+   "BN": 64,
+   "num_warps": 4,
+   "num_stages": 1
+  },
+  "overrides": {
+   "k1_C128_D128_bias": {
+    "impl": "tma",
+    "BM": 128,
+    "BN": 32,
+    "num_warps": 4,
+    "num_stages": 3
+   },
+   "k3_C128_D128_bias": {
+    "BM": 64,
+    "BN": 64,
+    "num_warps": 4,
+    "num_stages": 1
+   },
+   "k1_C128_D128": {
+    "impl": "tma2",
+    "BM": 128,
+    "BN": 32,
+    "num_warps": 4,
+    "num_stages": 3
+   },
+   "k3_C128_D128": {
+    "impl": "tma",
+    "BM": 64,
+    "BN": 64,
+    "num_warps": 4,
+    "num_stages": 1
+   },
+   "k3_C256_D256_bias": {
+    "BM": 128,
+    "BN": 64,
+    "num_warps": 8,
+    "num_stages": 1
+   }
+  },
+  "successors": {
+   "k1_C128_D128": {
+    "impl": "tma",
+    "BM": 64,
+    "BN": 32,
+    "num_warps": 4,
+    "num_stages": 3
+   },
+   "k3_C128_D128": {
+    "BM": 64,
+    "BN": 64,
+    "num_warps": 4,
+    "num_stages": 1
+   }
+  },
+  "status": "CERTIFIED_OP (TMA K1; per-shape cells for (C, D, bias) under overrides; (128, 128) no-bias: host-descriptor K1 'tma2' (transposed incoming planes) + K3 'tma', output bytes equal to the cells they replace on recorded activations)"
+ },
+ "9.0|*": {
+  "k1": {
+   "BM": 128,
+   "BN": 128,
+   "num_warps": 8,
+   "num_stages": 1
+  },
+  "k3": {
+   "BM": 64,
+   "BN": 64,
+   "num_warps": 4,
+   "num_stages": 1
+  },
+  "overrides": {
+   "k1_C128_D128_bias": {
+    "BM": 128,
+    "BN": 128,
+    "num_warps": 8,
+    "num_stages": 1
+   },
+   "k3_C128_D128_bias": {
+    "BM": 64,
+    "BN": 64,
+    "num_warps": 4,
+    "num_stages": 1
+   },
+   "k1_C128_D128": {
+    "BM": 64,
+    "BN": 32,
+    "num_warps": 4,
+    "num_stages": 2
+   },
+   "k3_C128_D128": {
+    "BM": 64,
+    "BN": 64,
+    "num_warps": 4,
+    "num_stages": 1
+   }
+  },
+  "status": "CERTIFIED_OP (pointer K1; per-shape cells for (C, D, bias) under overrides)"
+ },
+ "10.0|3.6": {
+  "k1": {
+   "BM": 128,
+   "BN": 64,
+   "num_warps": 4,
+   "num_stages": 1
+  },
+  "k3": {
+   "BM": 64,
+   "BN": 64,
+   "num_warps": 8,
+   "num_stages": 1
+  },
+  "overrides": {
+   "k1_C128_D128_bias": {
+    "BM": 128,
+    "BN": 64,
+    "num_warps": 4,
+    "num_stages": 1
+   },
+   "k3_C128_D128_bias": {
+    "BM": 64,
+    "BN": 64,
+    "num_warps": 8,
+    "num_stages": 1
+   },
+   "k1_C128_D128": {
+    "BM": 128,
+    "BN": 64,
+    "num_warps": 4,
+    "num_stages": 1
+   },
+   "k3_C128_D128": {
+    "BM": 64,
+    "BN": 64,
+    "num_warps": 8,
+    "num_stages": 1
+   }
+  },
+  "status": "CERTIFIED_OP (pointer K1; per-shape cells for (C, D, bias) under overrides)"
+ },
+ "10.0|3.7": {
+  "k1": {
+   "BM": 128,
+   "BN": 64,
+   "num_warps": 4,
+   "num_stages": 1
+  },
+  "k3": {
+   "BM": 64,
+   "BN": 64,
+   "num_warps": 8,
+   "num_stages": 1
+  },
+  "overrides": {
+   "k1_C128_D128_bias": {
+    "BM": 128,
+    "BN": 64,
+    "num_warps": 4,
+    "num_stages": 1
+   },
+   "k3_C128_D128_bias": {
+    "BM": 64,
+    "BN": 64,
+    "num_warps": 8,
+    "num_stages": 1
+   },
+   "k1_C128_D128": {
+    "BM": 128,
+    "BN": 64,
+    "num_warps": 4,
+    "num_stages": 1
+   },
+   "k3_C128_D128": {
+    "BM": 64,
+    "BN": 64,
+    "num_warps": 8,
+    "num_stages": 1
+   }
+  },
+  "status": "CERTIFIED_OP (pointer K1; per-shape cells for (C, D, bias) under overrides)"
+ },
+ "10.0|*": {
+  "k1": {
+   "BM": 128,
+   "BN": 64,
+   "num_warps": 4,
+   "num_stages": 1
+  },
+  "k3": {
+   "BM": 64,
+   "BN": 64,
+   "num_warps": 8,
+   "num_stages": 1
+  },
+  "overrides": {
+   "k1_C128_D128_bias": {
+    "BM": 128,
+    "BN": 64,
+    "num_warps": 4,
+    "num_stages": 1
+   },
+   "k3_C128_D128_bias": {
+    "BM": 64,
+    "BN": 64,
+    "num_warps": 8,
+    "num_stages": 1
+   },
+   "k1_C128_D128": {
+    "BM": 128,
+    "BN": 64,
+    "num_warps": 4,
+    "num_stages": 1
+   },
+   "k3_C128_D128": {
+    "BM": 64,
+    "BN": 64,
+    "num_warps": 8,
+    "num_stages": 1
+   }
+  },
+  "status": "CERTIFIED_OP (pointer K1; per-shape cells for (C, D, bias) under overrides)"
+ },
+ "10.3|3.6": {
+  "k1": {
+   "BM": 128,
+   "BN": 64,
+   "num_warps": 4,
+   "num_stages": 1
+  },
+  "k3": {
+   "BM": 64,
+   "BN": 64,
+   "num_warps": 8,
+   "num_stages": 1
+  },
+  "overrides": {
+   "k1_C128_D128_bias": {
+    "BM": 128,
+    "BN": 64,
+    "num_warps": 4,
+    "num_stages": 1
+   },
+   "k3_C128_D128_bias": {
+    "BM": 64,
+    "BN": 64,
+    "num_warps": 8,
+    "num_stages": 1
+   },
+   "k1_C128_D128": {
+    "BM": 128,
+    "BN": 64,
+    "num_warps": 4,
+    "num_stages": 1
+   },
+   "k3_C128_D128": {
+    "BM": 64,
+    "BN": 64,
+    "num_warps": 8,
+    "num_stages": 1
+   }
+  },
+  "status": "CERTIFIED_OP (pointer K1; per-shape cells for (C, D, bias) under overrides)"
+ },
+ "10.3|3.7": {
+  "k1": {
+   "BM": 128,
+   "BN": 64,
+   "num_warps": 4,
+   "num_stages": 1
+  },
+  "k3": {
+   "BM": 64,
+   "BN": 64,
+   "num_warps": 8,
+   "num_stages": 1
+  },
+  "overrides": {
+   "k1_C128_D128_bias": {
+    "BM": 128,
+    "BN": 64,
+    "num_warps": 4,
+    "num_stages": 1
+   },
+   "k3_C128_D128_bias": {
+    "BM": 64,
+    "BN": 64,
+    "num_warps": 8,
+    "num_stages": 1
+   },
+   "k1_C128_D128": {
+    "BM": 128,
+    "BN": 64,
+    "num_warps": 4,
+    "num_stages": 1
+   },
+   "k3_C128_D128": {
+    "BM": 64,
+    "BN": 64,
+    "num_warps": 8,
+    "num_stages": 1
+   }
+  },
+  "status": "CERTIFIED_OP (pointer K1; per-shape cells for (C, D, bias) under overrides)"
+ },
+ "10.3|*": {
+  "k1": {
+   "BM": 128,
+   "BN": 64,
+   "num_warps": 4,
+   "num_stages": 1
+  },
+  "k3": {
+   "BM": 64,
+   "BN": 64,
+   "num_warps": 8,
+   "num_stages": 1
+  },
+  "overrides": {
+   "k1_C128_D128_bias": {
+    "BM": 128,
+    "BN": 64,
+    "num_warps": 4,
+    "num_stages": 1
+   },
+   "k3_C128_D128_bias": {
+    "BM": 64,
+    "BN": 64,
+    "num_warps": 8,
+    "num_stages": 1
+   },
+   "k1_C128_D128": {
+    "BM": 128,
+    "BN": 64,
+    "num_warps": 4,
+    "num_stages": 1
+   },
+   "k3_C128_D128": {
+    "BM": 64,
+    "BN": 64,
+    "num_warps": 8,
+    "num_stages": 1
+   }
+  },
+  "status": "CERTIFIED_OP (pointer K1; per-shape cells for (C, D, bias) under overrides)"
+ }
+}

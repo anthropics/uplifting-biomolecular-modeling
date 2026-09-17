@@ -1,0 +1,136 @@
+{
+ "model": "genie3",
+ "upstream": {
+  "genie3": {
+   "repo": "https://github.com/aqlaboratory/genie3",
+   "commit": "d77ae5ac04212ff1e8b29b585859a3244c614804",
+   "tag": null,
+   "version": "0.0.1",
+   "archive": "stock/genie3-d77ae5ac.tar.gz",
+   "install": "a source checkout at $GENIE3_ROOT installed editable into its own venv: `pip install -e .` (upstream README.md at the pin; README.md \"Install\"); pip records the checkout as {\"dir_info\": {\"editable\": true}, \"url\": \"file://<GENIE3_ROOT>\"} — the record the package and stock/check_pins.py resolve the checkout from when GENIE3_ROOT is unset",
+   "entry_point": "console script genie3 = genie3.cli:main (setup.py:14); `genie3 generate -c <experiment.yaml>` (src/genie3/cli.py:61 -c/--config required; :71-72 --log-dir default logs/runs; :102,109 --shard-id/--num-shards; :76 --num-devices)"
+  }
+ },
+ "archive_recipe": {
+  "command": "git archive --format=tar --prefix=genie3-d77ae5ac/ d77ae5ac04212ff1e8b29b585859a3244c614804 -- LICENSE README.md setup.py src examples scripts/setup data/design/binder_design/binderbench/problems data/design/binder_design/binderbench/targets/pdb | gzip -n -9",
+  "paths": [
+   "LICENSE",
+   "README.md",
+   "setup.py",
+   "src",
+   "examples",
+   "scripts/setup",
+   "data/design/binder_design/binderbench/problems",
+   "data/design/binder_design/binderbench/targets/pdb"
+  ],
+  "excluded": [
+   "assets",
+   "scripts/problem",
+   "data/design/binder_design/binderbench/targets/fasta",
+   "data/design/binder_design/binderbench/targets/msa",
+   "data/design/motif_scaffolding",
+   ".gitignore"
+  ],
+  "members": 188
+ },
+ "weights": {
+  "checkpoint": "step=600000.ckpt",
+  "step=600000.ckpt": {
+   "sha256": "57039afcd4e5a66e58c52ba1ece256bc311a4294a31c37fca7301dd3a4c4479e",
+   "size_bytes": 346849270,
+   "source": "https://huggingface.co/yeqinglin/genie3 (pretrained/v1/checkpoints/step=600000.ckpt; scripts/setup/download.sh:48-55 `hf download yeqinglin/genie3 --include 'pretrained/**'`)"
+  },
+  "config.yaml": {
+   "sha256": "a01d7ad8b908e4380f45a11c8d691ccf27af3f50a9dfb209823ee99989a343e5",
+   "source": "https://huggingface.co/yeqinglin/genie3 (pretrained/v1/config.yaml)",
+   "size_bytes": 772
+  }
+ },
+ "pinned_stack": {
+  "id": "g3cu126",
+  "base_image": "nvidia/cuda:12.6.3-cudnn-runtime-ubuntu22.04 + python 3.10 (environment/Dockerfile; the full list: environment/requirements.lock)",
+  "python": "3.10.13",
+  "torch": "2.7.1+cu126",
+  "cuda": "12.6",
+  "cudnn": "9.5.1",
+  "triton": "3.3.1",
+  "lightning": "2.6.5",
+  "numpy": "2.2.6",
+  "scipy": "1.15.3",
+  "ml_collections": "1.1.0",
+  "driver": "580.95.05",
+  "stack_check": {
+   "torch": "2.7.1+cu126",
+   "lightning": "2.6.5",
+   "numpy": "2.2.6"
+  },
+  "arch_list": "sm_50 sm_60 sm_70 sm_75 sm_80 sm_86 sm_90 (torch.cuda.get_arch_list() of the pinned stack's torch; cuobjdump of its libtorch_cuda.so: 381 sm_90 objects, 2 sm_89, none above sm_90)",
+  "checkout": "a git checkout at the pin (HEAD d77ae5ac…; `git status --porcelain --untracked-files=no` empty), installed editable into the stack's venv (direct_url.json {\"dir_info\": {\"editable\": true}, \"url\": \"file://<GENIE3_ROOT>\"}); the five patch targets equal HEAD (unpatched); weights under <checkout>/pretrained/v1 when GENIE3_WEIGHTS is unset (the stock layout: `run.sh install --weights <checkout>`); upstream's evaluation packages (the ones its scripts/setup/setup.sh installs) under <checkout>/packages/ (gitignored) when installed \u2014 environment/Dockerfile installs neither"
+ },
+ "upstream_declared": {
+  "setup.py": {
+   "torch": "2.7.1 (setup.py:20 torch==2.7.1)",
+   "numpy": ">=2.0.2,<3 (setup.py:19)",
+   "biopython": "<1.86 (setup.py:25)",
+   "lightning": "unversioned (setup.py:24)",
+   "python": "unstated"
+  }
+ },
+ "cli_defaults": {
+  "source": "src/genie3/config/loader.py, src/genie3/generation/config/diffusion/sampler/ddim.py, src/genie3/generation/config/data/sample_dataset.py, src/genie3/config/models.py",
+  "values": {
+   "experiment.seed": null,
+   "generation.base.checkpoint": "pretrained/v1/checkpoints/step=600000.ckpt",
+   "generation.base.config": "pretrained/v1/config.yaml",
+   "generation.inference.sampler.name": "ddim",
+   "generation.dataset.batch_size": 1,
+   "generation.dataset.cond_strategy": "extended",
+   "generation.dataset.n_sample": "required (no default)",
+   "generation.sampler.sampler.direction_scale": "required (no default); upstream's binder-design example sets 0.0, its unconditional example 0.8",
+   "generation.sampler.sampler.eta": 1.0,
+   "generation.sampler.sampler.n_sample_step": 100,
+   "generation.sampler.sampler.noise_scale": 1.0,
+   "generation.io.outdir": "paths.rootdir",
+   "generation.dataset.datadir": "paths.dataset",
+   "--log-dir": "logs/runs"
+  },
+  "lines": {
+   "experiment.seed": "src/genie3/config/models.py:18",
+   "generation.base.checkpoint": "src/genie3/config/loader.py:201",
+   "generation.base.config": "src/genie3/config/loader.py:202",
+   "generation.inference.sampler.name": "src/genie3/config/loader.py:208",
+   "generation.dataset.batch_size": "src/genie3/config/loader.py:211",
+   "generation.dataset.cond_strategy": "src/genie3/generation/config/data/sample_dataset.py:52",
+   "generation.dataset.n_sample": "src/genie3/generation/config/data/sample_dataset.py:49",
+   "generation.sampler.sampler.direction_scale": "src/genie3/generation/config/diffusion/sampler/ddim.py:13; examples/binder_design/experiment.yaml:15; examples/unconditional/experiment.yaml:16",
+   "generation.sampler.sampler.eta": "src/genie3/generation/config/diffusion/sampler/ddim.py:14",
+   "generation.sampler.sampler.n_sample_step": "src/genie3/generation/config/diffusion/sampler/ddim.py:15",
+   "generation.sampler.sampler.noise_scale": "src/genie3/generation/config/diffusion/sampler/ddim.py:16",
+   "generation.io.outdir": "src/genie3/config/loader.py:259",
+   "generation.dataset.datadir": "src/genie3/config/loader.py:219",
+   "--log-dir": "src/genie3/cli.py:71-72; src/genie3/runtime/context.py:223"
+  }
+ },
+ "stock_environment": {
+  "reads": [
+   "GENIE3_ROOT",
+   "GENIE3_WEIGHTS"
+  ],
+  "must_be_absent_prefixes": [
+   "GENIE3_OPT",
+   "GENIE3_",
+   "CUDA_MPS_",
+   "NVIDIA_TF32_OVERRIDE",
+   "TORCH_ALLOW_TF32_"
+  ],
+  "allowed_exceptions": [
+   "GENIE3_ROOT",
+   "GENIE3_WEIGHTS"
+  ],
+  "guards": {
+   "tf32": {
+    "TORCH_ALLOW_TF32_CUBLAS_OVERRIDE": "1"
+   }
+  }
+ }
+}

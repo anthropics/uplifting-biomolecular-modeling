@@ -1,0 +1,16 @@
+{
+ "exports": {},
+ "files_note": "__init__.py is empty: the kit ships af2_flash_pallas.py as a loose module on PYTHONPATH; the empty package init makes the carried directory importable (as fpf_trimul's)",
+ "kind": "package",
+ "license": "Apache-2.0 (this repository's own code: common/opt_core/LICENSE); attribution of the AlphaFold 2 reference (Apache-2.0, Copyright 2021 DeepMind Technologies Limited) in the package NOTICE",
+ "mechanism": "attn.pallas_flash_attention",
+ "name": "pallas_attn",
+ "not_carried": {
+  "pallas_compat_jax053.py": "API-name shim for an engine's in-tree Pallas kernels written against jax>=0.7 running on jax 0.5.3; af2_flash_pallas.py does not use it (it carries its own pl.load/plgpu.load shims)",
+  "sitecustomize_example.py, bench/, tests/, results/, docs/, patches/, README.md, MANIFEST.json": "the kit's launch example, timing scripts, self-test, raw results and as-built record: kit evidence, cited from the kit",
+  "the haiku Attention-class adapter module": "the kit's adapter beside the kernel: re-expressed as generic core code in pallas_attn_serve.enable()/served_attention_call() (no default engine module names, named fallbacks into a Ledger) rather than carried; the kit's adapter names its module object(s), its size rule and its tag"
+ },
+ "runtime_imports": [],
+ "served_note": "make_flash_attention(f32_precision='ieee'|'tf32'|'bf16') — the forward's float32 product class: F32_PRECISIONS=('tf32','ieee','bf16'), default 'ieee' (full fp32 products = the v2 statement; alias 'highest'); 'tf32' = the class of the stock XLA einsums it replaces (opt-in per op); 'bf16' = bf16 operands, fp32 accumulate; env AF_PALLAS_ATTN_F32_PRECISION; any other word (bf16x3, tf32x3, high) raises naming the valid set; describe_op(op) / op.f32_precision record what was built and make_flash_attention(bwd_f32_precision='ieee'|'tf32') — the backward's float32 product class (default 'ieee' = the v2 statement; env AF_PALLAS_ATTN_BWD_F32_PRECISION); make_flash_attention(dq='kernel'|'from_ds') — dQ by the second Pallas kernel (default, the v2 statement) or dQ = dS·K over the fp32 per-batch dS buffer (env AF_PALLAS_ATTN_DQ); make_flash_attention(dbias='xla'|'kernel') — d(pair bias) from per-batch dS partials reduced by XLA (default, the v2 statement) or summed over the batch inside a third Pallas kernel with no [B,H,Sq,Sk] partials buffer (env AF_PALLAS_ATTN_DBIAS; dq='from_ds' refuses dbias='kernel'); pallas_attn_serve.emit_line stamps precision=<word> bwd_precision=<word> dq=<word> dbias=<word>",
+ "version": "af2-pallas-v2.5@17db9694"
+}

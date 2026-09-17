@@ -1,0 +1,35 @@
+# RFdiffusion3 optimization kit — Apptainer / Singularity image made FROM the container image of rfdiffusion3/environment/Dockerfile: the same stack, the
+# same two interpreters and the same /kit, for hosts that run Apptainer instead of Docker. The source is the image tagged rfdiffusion3-kit:dev in the local Docker
+# daemon (build it first with environment/Dockerfile: STOCK.md 'Stack'); for a published tag the two header lines read `Bootstrap: docker` / `From: <registry>/rfdiffusion3-kit:<tag>`.
+#   apptainer build rfdiffusion3-kit.sif rfdiffusion3/environment/apptainer.def
+#   apptainer run --nv --cleanenv --bind /path/to/weights:/weights --env RFD3_CKPT=/weights/rfd3_latest.ckpt --bind "$PWD":/work rfdiffusion3-kit.sif \
+#     design --config h100 --mode fast inputs=/work/my_design.json out_dir=/work/out/fast n_batches=1 seed=101
+# The image is read-only: give every design an out_dir= on a bound, writable path; the JIT caches go under $HOME/.cache (bound by default) or under
+# MODEL_OPT_JIT_ROOT when that names a bound directory; %environment keeps a host user site-packages (PEP 370) from shadowing the pinned stack,
+# --cleanenv keeps the host's variables out (the image's own PATH and RFDIFFUSION3_STOCK_PYTHON stay). The container image already carries the
+# kit's ten-file overlay in /opt/kit (its Dockerfile applies it at build; /opt/stock stays pristine); %post re-runs `install apply` from
+# /kit/rfdiffusion3 — a no-op on the applied files — and `check-only`, so a .sif is only assembled from an image whose /opt/kit matches the kit
+# tree inside it. A .sif belongs to one kit version: when the kit is updated, rebuild the container image (route A) and then this .sif.
+Bootstrap: docker-daemon
+From: rfdiffusion3-kit:dev
+
+%post
+    cd /kit/rfdiffusion3 && /opt/kit/bin/python -m rfdiffusion3_opt.install apply && /opt/kit/bin/python -m rfdiffusion3_opt.install check-only || exit 1
+    mkdir -p /opt/culib && ln -s /.singularity.d/libs/libcuda.so.1 /opt/culib/libcuda.so && ln -s /.singularity.d/libs/libcuda.so.1 /opt/culib/libcuda.so.1
+
+%environment
+    export PYTHONNOUSERSITE=1
+    # Triton <= 3.5 links its launcher stub with -lcuda: offer the unversioned name when --nv bound only libcuda.so.1
+    if [ -z "${TRITON_LIBCUDA_PATH:-}" ] && [ -e /opt/culib/libcuda.so ]; then export TRITON_LIBCUDA_PATH=/opt/culib; fi
+
+%runscript
+    cd /kit/rfdiffusion3 && exec bash /kit/rfdiffusion3/run.sh "$@"
+
+%help
+    RFdiffusion3 optimization kit: drop-in modes that make stock RFdiffusion3 (rfd3 design, RosettaCommons foundry at commit 4010e3e2) faster on one
+    GPU without changing how it is called — off = stock exactly; exact = the same designs as eager stock, faster; fast = small documented numeric
+    differences, faster still (the default). `apptainer run --nv rfdiffusion3-kit.sif <verb> ...` = `bash /kit/rfdiffusion3/run.sh <verb> ...` (verbs: install,
+    design, check, warm; /kit/rfdiffusion3/README.md inside the image). Requires an NVIDIA driver that runs CUDA 13.0 (580 or newer) and RFD3_CKPT naming
+    the checkpoint (`run.sh install --weights DIR` fetches it). The kit's ten patched rfd3 files were put into /opt/kit when this image was built, from
+    the kit tree at /kit/rfdiffusion3 of the same build (`python -m rfdiffusion3_opt.install status` lists them); the image is read-only, so a kit
+    update means rebuilding the container image and then this .sif.

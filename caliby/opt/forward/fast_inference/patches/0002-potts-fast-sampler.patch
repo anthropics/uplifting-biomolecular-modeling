@@ -1,0 +1,158 @@
+diff --git a/caliby/model/seq_denoiser/denoisers/seq_design/potts.py b/caliby/model/seq_denoiser/denoisers/seq_design/potts.py
+index 4d805a7..f4c3402 100644
+--- a/caliby/model/seq_denoiser/denoisers/seq_design/potts.py
++++ b/caliby/model/seq_denoiser/denoisers/seq_design/potts.py
+@@ -665,6 +665,20 @@ def sample_potts(
+         U_trajectory (list[torch.Tensor]): List of sampled energies through time
+             each with shape `(num_batch)`.
+     """
++    _lvl = _fast_sampler_level()
++    if (
++        _lvl > 0
++        and proposal == "dlmc"
++        and not rejection_step
++        and not return_trajectory
++        and differentiable_penalty
++        and h.is_cuda
++    ):
++        return _sample_potts_fast(
++            h, J, edge_idx, mask_i, mask_ij, S, mask_sample, num_sweeps, temperature, temperature_init,
++            annealing_fraction, penalty_func, verbose, _lvl,
++        )
++
+     S_reduced, h, J, mask_sample_reduced = normalize_potts_inputs(
+         S=S,
+         h=h,
+@@ -788,6 +802,132 @@ def sample_potts(
+         return S, U
+ 
+ 
++# ======================================================================================================================
++# FAST SAMPLER (inference-optimisation kit, 2026-08-22).  Selected by env CALIBY_FAST_SAMPLER:
++#   unset/"0" -> stock sample_potts (unchanged, below)
++#   "1"       -> eager, host-sync-free sweep loop: masks hoisted out of the loop, the redundant per-sweep trailing energy
++#                evaluation dropped (its value is only consumed after the LAST sweep), Categorical/multinomial replaced by
++#                the identical op sequence without their host-side validity checks.  Same ops, same order, same RNG draws.
++#   "2"       -> "1" + the per-sweep body captured ONCE per call into a CUDA graph and replayed num_sweeps times.
++# Only the campaign configuration takes the fast path (proposal="dlmc", no rejection step, no trajectory,
++# differentiable penalty, CUDA tensors); anything else falls through to the stock code.
++# ======================================================================================================================
++import os as _os
++
++
++def _fast_sampler_level() -> int:
++    try:
++        return int(_os.environ.get("CALIBY_FAST_SAMPLER", "0"))
++    except ValueError:
++        return 0
++
++
++def _categorical_sample_nocheck(logits_in: torch.Tensor) -> torch.Tensor:
++    """Bitwise replica of torch.distributions.Categorical(logits=logits_in).sample() (n_sample=1 multinomial fast path:
++    q ~ Exp(1); argmax(p / q)) without the host-synchronising argument/probability validity checks."""
++    B, N, C = logits_in.shape
++    logits = logits_in - logits_in.logsumexp(dim=-1, keepdim=True)   # Categorical.__init__
++    probs = F.softmax(logits, dim=-1)                                 # Categorical.probs
++    probs_2d = probs.reshape(-1, C)                                   # Categorical.sample
++    q = torch.empty_like(probs_2d).exponential_(1)                    # multinomial fast path (Distributions.cpp)
++    q = probs_2d / q
++    S = q.argmax(dim=-1, keepdim=True)                                # argmax_out(result, q, -1, keepdim=True)
++    return S.T.reshape(B, N)
++
++
++def _sample_potts_fast(
++    h, J, edge_idx, mask_i, mask_ij, S, mask_sample, num_sweeps, temperature, temperature_init, annealing_fraction,
++    penalty_func, verbose, level,
++):
++    S_reduced, h, J, mask_sample_reduced = normalize_potts_inputs(S=S, h=h, J=J, mask_i=mask_i, mask_S=mask_sample)
++    mask_S, mask_mutatable, S_reduced = init_sampling_masks(-h, mask_sample_reduced, S_reduced)
++    h_numerical_zero = h.max() + 1e3 * max(1.0, temperature)
++    h = torch.where(mask_S > 0, h, h_numerical_zero * torch.ones_like(h))
++
++    num_iterations = num_sweeps
++    num_iterations_annealing = int(annealing_fraction * num_iterations)
++    temperatures = np.linspace(temperature_init, temperature, num_iterations_annealing).tolist() + [temperature] * (
++        num_iterations - num_iterations_annealing
++    )
++
++    # Hoisted constants (stock recomputes these inside every sweep from the same inputs -> identical values).
++    h_m = h * mask_i[..., None] if mask_i is not None else h
++    J_m = J * mask_ij[..., None, None] if mask_ij is not None else J
++    mask_update = torch.ones_like(S_reduced) > 0
++    if mask_mutatable is not None:
++        mask_update = mask_update * (mask_mutatable > 0)
++    B, N, C = h.shape
++    dt = 0.1
++
++    def sweep(S_cur, T_scalar, invT_tensor):
++        # == _potts_proposal_dlmc(S_cur, h, J, ..., T=T_i, penalty_func, differentiable_penalty=True) with hoisted masks
++        U, U_i = _compute_potts_energy_reduced(S=S_cur, h=h_m, J=J_m, edge_idx=edge_idx, mask_i=None, mask_ij=None)
++        if penalty_func is not None:
++            O = F.one_hot(S_cur, C).float()
++            with torch.enable_grad():
++                O.requires_grad = True
++                U_penalty = penalty_func(O)
++                U_i_adjustment = torch.autograd.grad(U_penalty.sum(), [O])[0].detach()
++                U_penalty = U_penalty.detach()
++                U_i_adjustment = U_i_adjustment - torch.gather(U_i_adjustment, -1, S_cur[..., None])
++            U_i = U_i + U_i_adjustment
++            U = U + U_penalty
++        if invT_tensor is None:
++            logP_j = F.log_softmax(-U_i / T_scalar, dim=-1)
++        else:
++            # CUDA's tensor/cpu-scalar true division computes a * (1/b) in float32 (BinaryDivTrueKernel.cu); replicate it
++            # with a device-resident reciprocal so the graph has no host scalar.
++            logP_j = F.log_softmax((-U_i) * invT_tensor, dim=-1)
++        O = F.one_hot(S_cur, C).float()
++        logP_i = torch.gather(logP_j, -1, S_cur[..., None])
++        log_Q_ij = F.logsigmoid(logP_j - logP_i)
++        rate = torch.exp(log_Q_ij - logP_j)
++        logP_ij = logP_j + (-(-dt * rate).expm1()).log()
++        p_flip = ((1.0 - O) * logP_ij.exp()).sum(-1, keepdim=True)
++        logP_ii = (1.0 - p_flip).clamp(1e-5).log()
++        logP_ij = (1.0 - O) * logP_ij + O * logP_ii
++        # == Categorical(logits=logP_ij).sample() ; S_new = where(mask_update, S_new, S_cur)
++        S_new = _categorical_sample_nocheck(logP_ij)
++        return torch.where(mask_update, S_new, S_cur)
++
++    if level >= 2 and S_reduced.is_cuda:
++        dev = S_reduced.device
++        S_static = S_reduced.clone()
++        invT_static = torch.empty((), dtype=torch.float32, device=dev)
++        invT_sched = torch.tensor(
++            [float(np.float32(1.0) / np.float32(T_i)) for T_i in temperatures], dtype=torch.float32, device=dev
++        )
++        # warm-up on a side stream (required before capture); it consumes RNG, so the generator state is restored after
++        rng_state = torch.cuda.get_rng_state(dev)
++        s = torch.cuda.Stream(device=dev)
++        s.wait_stream(torch.cuda.current_stream(dev))
++        with torch.cuda.stream(s):
++            invT_static.copy_(invT_sched[0])
++            for _ in range(2):
++                sweep(S_static, None, invT_static)
++        torch.cuda.current_stream(dev).wait_stream(s)
++        torch.cuda.synchronize(dev)
++        torch.cuda.set_rng_state(rng_state, dev)
++        g = torch.cuda.CUDAGraph()
++        with torch.cuda.graph(g):
++            S_out = sweep(S_static, None, invT_static)
++            S_static.copy_(S_out)
++        for i in range(num_iterations):
++            invT_static.copy_(invT_sched[i])
++            g.replay()
++        S_reduced = S_static
++    else:
++        for T_i in temperatures:
++            S_reduced = sweep(S_reduced, T_i, None)
++
++    U, _ = _compute_potts_energy_reduced(S=S_reduced, h=h_m, J=J_m, edge_idx=edge_idx, mask_i=None, mask_ij=None)
++    if verbose:
++        eff = num_iterations * float(mask_update.float().sum(1).mean().item()) / S_reduced.shape[1]
++        print(f"Effective number of sweeps: {eff}")
++    S = map_potts_indices_to_af3(S_reduced)
++    return S, U
++
++
+ def init_sampling_masks(
+     logits_init: torch.Tensor,
+     mask_sample: Optional[torch.Tensor] = None,

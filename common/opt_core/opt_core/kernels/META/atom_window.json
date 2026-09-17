@@ -1,0 +1,10 @@
+{
+ "exports": {},
+ "kind": "module",
+ "license": "the release tree's own code (no third-party header)",
+ "mechanism": "attn.sequence_local_atom_attention",
+ "name": "atom_window",
+ "not_carried": {},
+ "runtime_imports": [],
+ "version": "ATOM_WINDOW v0.1 (docstring header; window_starts / ln_qkvg / window_attn / warmup, precision words tf32rn | tf32x3 | tf32 | ieee)"
+}

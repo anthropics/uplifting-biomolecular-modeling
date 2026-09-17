@@ -1,0 +1,45 @@
+{
+ "exports": {
+  "MODEL_OPT_LEVERS_OFF": {
+   "param": "levers_off",
+   "path": false,
+   "required": false,
+   "what": "the uniform ablation switch: the words `triattn_xla` (every row), `triattn_xla:triattn_native`, `triattn_xla:cuda_sm90a`, `triattn_xla:k2b_aot`, `triattn_xla:vjp` (the differentiable row) switch rows off; a switched-off row is named in the refusal"
+  },
+  "TRIATTN_XLA_CC": {
+   "param": "cc",
+   "path": false,
+   "required": false,
+   "what": "compute capability `<major>.<minor>` used for row selection instead of the default backend's first device (tests; tracing on a host that is not the target)"
+  },
+  "TRIATTN_XLA_LAUNCHER": {
+   "param": "launcher",
+   "path": true,
+   "required": false,
+   "what": "a launcher build outside the package (bring-up on a jaxlib line whose XLA-FFI API version has no build under bin/launcher/)"
+  },
+  "TRIATTN_XLA_M1_LIB": {
+   "param": "m1_lib",
+   "path": true,
+   "required": false,
+   "what": "an alternative build of bin/cuda/sm_90a/libtriattn_m1_xla.so by absolute path (measurement A/B of two package generations); default: the manifest's"
+  },
+  "TRIATTN_XLA_VJP_FWD": {
+   "param": "vjp_fwd",
+   "path": false,
+   "required": false,
+   "what": "force the differentiable row's forward launch (`cuda_lse` | `k2bl`) instead of CELLS.json vjp.fwd_by_cc (measurement / bring-up)"
+  }
+ },
+ "kind": "package",
+ "license": "this repository's; the CUDA kernel compiled into bin/cuda/ is kernels/triattn/cuda_sm90a/csrc (this repository's own sources, carried by the torch provider, not copied here); the K2B cubins compile kernels/fpf_triatt_k2b (portions derive from Protenix, Apache-2.0: kernels/fpf_triatt_k2b/NOTICE, licence text kernels/fpf_flashpairformer.PROTENIX_LICENSE); provenance of every part in NOTICE",
+ "mechanism": "triangle attention (pair bias + key mask, forward) for JAX / XLA programs: one XLA-FFI launcher (jax.ffi; self-describing custom calls: cubin key + digest, grid and parameter recipe as attributes, cubins read from the package on first use in any process) launching pre-compiled kernels -- the fleet sm_90a CUDA kernel of kernels/triattn/triattn_native generation 10 (row triattn_native), the sm_90a CUDA kernel of kernels/triattn/cuda_sm90a (row cuda_sm90a) and the K2B Triton kernel compiled ahead of time for sm_90 / sm_80 (row k2b_aot); rows chosen per compute capability by CELLS.json (auto takes a row over an incumbent only where measured >= 5 % faster beyond noise; other rows by word); refused by name with the fallback `stock: xla`; forward-only (differentiation refused by name); PLUS a differentiable row reached only by word (vjp=...): jax.custom_vjp whose forward is the sm_90a CUDA kernel built with a per-row log-sum-exp store (compute capability 9.0; csrc/cuda_lse.patch on the carried sources) or the K2B cubin compiled with that store and whose backward is a Pallas kernel pair chosen per (compute capability, dtype) -- kernels/pallas_triatt attbwd_dkdv or kernels/pallas_attn's backward -- refused by name with the fallback `XLA autodiff of the program's own attention`; row cuda_80 = the same kernel family's sm_80 member (compute capability 8.0, bf16, head_dim 16/32/64) behind the launcher's triattn_xla_sm80_fwd target",
+ "name": "triattn_xla",
+ "not_carried": {},
+ "runtime_imports": [
+  "pallas_attn",
+  "pallas_triatt"
+ ],
+ "served_note": "house-written package (not a kit copy): the face opt_core.kernels.triattn_xla.triangle_attention, binaries under bin/ with manifest.json (sha256 of every binary and source), test inputs generator + recorded torch-launch digests (vectors.json)",
+ "version": "1.6.1"
+}

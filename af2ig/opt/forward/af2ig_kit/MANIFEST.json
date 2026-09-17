@@ -1,0 +1,32 @@
+{
+  "name": "AF2IG_FAST_INFERENCE_KIT_v1.4.0",
+  "engine": "AlphaFold2 initial-guess interface filter (dl_binder_design af2_initial_guess/predict.py) via the PyRosetta-free PDB front end predict_pdb.py",
+  "upstream": {
+    "repo": "https://github.com/nrbennet/dl_binder_design",
+    "commit_pinned": "cafa3853ac94dceb1b908c8d9e6954d71749871a",
+    "commit_date": "2024-01-10",
+    "upstream_head_checked_on": "2026-08-23",
+    "upstream_head_commit": "cafa3853ac94dceb1b908c8d9e6954d71749871a",
+    "patches_apply_on_head": true
+  },
+  "weights": {
+    "file": "params/params_model_1_ptm.npz",
+    "source": "https://storage.googleapis.com/alphafold/alphafold_params_2022-12-06.tar",
+    "license": "CC BY 4.0",
+    "redistributed": false
+  },
+  "levers": {
+    "exact_default_stack": "-fast (= -host_outputs -device_params -sort_by_length) + -precompile N + -program_cache DIR + -prefetch N + -overlap_output N",
+    "tier2_opt_in": ["-subbatch", "-flash_attn", "-fused_triattn", "-fused_trimul", "-opm_reassoc", "-tmpl_pointwise_sub"],
+    "tier2_env": ["AF2IG_OPT_TRIATTN_CORE_DTYPE=bf16"],
+    "memory_line": [
+      "XLA_PYTHON_CLIENT_MEM_FRACTION"
+    ],
+    "memory_opt_in": [
+      "-trimul_chunk"
+    ],
+    "deployment": [
+      "JAX_COMPILATION_CACHE_DIR"
+    ]
+  }
+}

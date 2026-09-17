@@ -1,0 +1,10 @@
+{
+ "exports": {},
+ "kind": "module",
+ "license": "the release tree's own code (no third-party header)",
+ "mechanism": "of3_trunk.templ_embed",
+ "name": "templ_embed",
+ "not_carried": {},
+ "runtime_imports": [],
+ "version": "TEMPL_EMBED v1.0 (docstring header; fused template feature embedding + mean/relu/linear_t tail, any template stride, int64 offsets, c_z to 256)"
+}

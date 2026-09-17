@@ -1,0 +1,21 @@
+{
+ "fast_inference": [
+  "HOWTO.md",
+  "patches/01_run_alphafold_fast_inference.diff",
+  "patches/patched_files/run_alphafold.py",
+  "rows.sh",
+  "tests/inputs/1brs_barnase_barstar.json"
+ ],
+ "fpf": [
+  "README.md",
+  "af3_flashpairformer/__init__.py",
+  "af3_flashpairformer/diffusion_hoist.py",
+  "af3_flashpairformer/patch.py",
+  "run_alphafold_flashpairformer.py"
+ ],
+ "pallas": [
+  "HOWTO.md",
+  "NOTICE",
+  "patches/af3_pallas_levers.py"
+ ]
+}

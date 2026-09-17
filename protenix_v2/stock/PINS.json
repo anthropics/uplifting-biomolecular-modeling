@@ -1,0 +1,101 @@
+{
+ "protenix_version": "2.0.0",
+ "upstream": {
+  "repo": "https://github.com/bytedance/Protenix",
+  "tag": "v2.0.0",
+  "commit": "2475421477ab414b571149ad4a875c390ff8a35d",
+  "excluded": [
+   "assets/**",
+   "docs/**",
+   "examples/**",
+   "scripts/msa/data/**"
+  ],
+  "excluded_note": "non-code: rendered images/license header (assets), narrative docs and PDFs (docs), and demo/sample inputs for the MSA pipeline and inference examples (examples, scripts/msa/data). A couple of standalone __main__-guarded scripts cite these paths as example defaults, but nothing under these globs is needed to import protenix or run inference. Every other upstream file at this commit is carried byte-identical."
+ },
+ "wheel": {
+  "file": "stock/protenix-2.0.0-py3-none-any.whl",
+  "sha256": "be4584dda688e0518ce12909d8d51d0a0868e7daa2bbb95cbac17440c0ac309f"
+ },
+ "checkpoint": {
+  "file": "checkpoint/protenix-v2.pt",
+  "sha256": "8f931f9774a396b67033d0e58628e1834f4a1448165e04254b40a780b0c0d599",
+  "root_env": "PROTENIX_ROOT_DIR",
+  "bytes": 1859785497
+ },
+ "data_caches": {
+  "files": {
+   "common/components.cif": {
+    "sha256": "bb31ae5cf6c8bc669924313077cb4231ee5ffefd3a20118cd14f3ec89f8bb6a5",
+    "bytes": 490777362
+   },
+   "common/components.cif.rdkit_mol.pkl": {
+    "sha256": "d1cfb71f5993a3ebea7c47877022d7f597bbfbaf86e28a4770e957da6c50cd35",
+    "bytes": 142498117
+   },
+   "common/obsolete_release_date.csv": {
+    "sha256": "a4f3f63ac5d7eebd78b07995cc669b9eccd6f5d8813c9492c9df02868893cf33",
+    "bytes": 134716
+   },
+   "common/clusters-by-entity-40.txt": {
+    "sha256": "1ab4af905e75b382eda8dec59917dc3608bee0729e36b9e71baf860bbe86850c",
+    "bytes": 21699572
+   },
+   "common/release_date_cache.json": {
+    "sha256": "8b1ef12ddc01a0d5eb2d388c77ded91aa906eebce7440726c57b6f8d1a3ec142",
+    "bytes": 12754898
+   },
+   "common/obsolete_to_successor.json": {
+    "sha256": "2bc08348d0efba438c109bb27be6fa25b611d371c60b8a8da3de387a4a0698ad",
+    "bytes": 86882
+   }
+  },
+  "note": "the six files the stock CLI downloads under PROTENIX_ROOT_DIR/common/ when absent (stock/src/runner/inference.py download_inference_cache: the four data caches, and release_date_cache.json + obsolete_to_successor.json under --use_template true); `run.sh install --weights DIR` fetches them and the checkpoint with that routine and checks these digests (opt/protenix_opt/weights.py); every route then reads them in place"
+ },
+ "wheel_requires": {
+  "torch": "2.7.1",
+  "triton": "3.3.1",
+  "cuequivariance-torch": "0.8.0",
+  "cuequivariance-ops-torch-cu12": "0.8.0"
+ },
+ "python": "3.11.5",
+ "pinned_stack": {
+  "python": "3.11.5",
+  "torch": "2.13.0+cu130",
+  "triton": "3.7.1",
+  "cuda": "13.0",
+  "cuequivariance-torch": "0.11.1",
+  "cuequivariance-ops-torch-cu13": "0.11.1"
+ },
+ "pinned_stack_note": "installed: cuequivariance 0.11.1 (cu13) per pinned_stack; the vendored wheel's Requires-Dist declares ==0.8.0/cu12",
+ "torch_build": {
+  "dist_version": "2.13.0+cu130",
+  "runtime_version": "2.13.0+cu130",
+  "cuda": "13.0",
+  "source": "PyTorch cu130 wheel (local tag +cu130; CUDA 13 runtime wheels nvidia-* and nvidia-cudnn-cu13)"
+ },
+ "cli_defaults": {
+  "seeds": "101",
+  "cycle": 10,
+  "step": 200,
+  "sample": 5,
+  "dtype": "bf16",
+  "LAYERNORM_TYPE": "fast_layernorm"
+ },
+ "stock_environment": {
+  "reads": [
+   "PROTENIX_ROOT_DIR",
+   "LAYERNORM_TYPE",
+   "TORCH_EXTENSIONS_DIR",
+   "TRITON_CACHE_DIR"
+  ],
+  "must_be_absent_prefixes": [
+   "PTX_",
+   "FPF_",
+   "INFOPT_",
+   "PF_",
+   "PROTENIX_OPT",
+   "CUEQ_TRITON_CACHE_DIR"
+  ],
+  "note": "every entry is a name prefix: the kit's switch families (PTX_*, FPF_*, INFOPT_*, PF_*), the package's own switches (PROTENIX_OPT*) and the cuEquivariance Triton cache override; a stock process carries none of them and no kit directory on PYTHONPATH"
+ }
+}

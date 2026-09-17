@@ -1,0 +1,12 @@
+{
+ "extension": "esmc_v3_sdkfused_r1",
+ "source": "kernels.cu",
+ "build": {
+  "tool": "torch.utils.cpp_extension.load",
+  "extra_cuda_cflags": [
+   "-O3"
+  ],
+  "extra_cflags": [],
+  "extra_ldflags": []
+ }
+}

@@ -1,0 +1,328 @@
+{
+ "model": "esmc",
+ "variants": {
+  "300m": {
+   "hf_repo": "biohub/ESMC-300M",
+   "model_name": "esmc_300m"
+  },
+  "600m": {
+   "hf_repo": "biohub/ESMC-600M",
+   "model_name": "esmc_600m"
+  },
+  "6b": {
+   "hf_repo": "biohub/ESMC-6B",
+   "model_name": "esmc_6b"
+  }
+ },
+ "upstream": {
+  "esm": {
+   "repo": "https://github.com/Biohub/esm",
+   "commit": "43ccece2ad485f27db46afdb67da2a9601e8f106",
+   "version": "3.4.0",
+   "tag": null,
+   "install": "esm @ git+https://github.com/Biohub/esm.git@43ccece2ad485f27db46afdb67da2a9601e8f106 (install the transformers pin first, then esm with --no-deps: esm's pyproject declares transformers @ main, floating)",
+   "archive": "stock/esm-43ccece2.tar.gz",
+   "python_requires": ">=3.12,<3.13",
+   "licence": "MIT (LICENSE.md; THIRD_PARTY_NOTICE.md)",
+   "accel_extra": "optional-dependencies accel = flash-attn==2.7.4.post1, transformer-engine[pytorch]==2.15.0, nvidia-cublas>=13.6 (pyproject.toml @ the commit)"
+  },
+  "transformers": {
+   "repo": "https://github.com/huggingface/transformers",
+   "origin": "the Biohub fork of transformers; the Biohub/transformers repository is no longer public, and github.com/huggingface/transformers serves the same commit unchanged",
+   "commit": "ef32577f55da19a4989cd7b22e004dc43a4998cb",
+   "version": "4.57.6",
+   "tag": null,
+   "install": "transformers @ git+https://github.com/huggingface/transformers.git@ef32577f55da19a4989cd7b22e004dc43a4998cb",
+   "archive": "stock/transformers-ef32577f.tar.gz"
+  }
+ },
+ "archive_recipe": "git archive --format=tar --prefix=<name>-<commit8>/ <commit> <paths> | gzip -n -9  (esm: esm pyproject.toml LICENSE.md THIRD_PARTY_NOTICE.md README.md; transformers: src/transformers setup.py pyproject.toml LICENSE README.md)",
+ "python": "3.12.1",
+ "pins": {
+  "torch": "2.11.0",
+  "torch_runtime": "2.11.0+cu130",
+  "cuda": "13.0",
+  "triton": "3.6.0",
+  "transformers": "4.57.6",
+  "esm": "3.4.0",
+  "huggingface_hub": "0.36.2",
+  "safetensors": "0.8.0",
+  "tokenizers": "0.22.2",
+  "einops": "0.8.2",
+  "nvidia_cudnn_cu13": "9.19.0.56",
+  "nvidia_cuda_runtime": "13.0.96",
+  "nvidia_cuda_nvrtc": "13.0.88",
+  "flash_attn": "2.7.4.post1",
+  "transformer_engine": "2.15.0",
+  "nvidia_cublas": "13.6.1.10",
+  "numpy": "2.5.2",
+  "xformers": null
+ },
+ "stacks": {
+  "accel": {
+   "role": "pinned stack (the one stack of this kit: every mode runs on it)",
+   "tested_on": "NVIDIA H100 80GB HBM3 (sm90), torch 2.11.0+cu130 / CUDA 13.0 / cuDNN 9.19.0, flash-attn 2.7.4.post1, transformer-engine 2.15.0 (a documentation line: nothing compares against it)",
+   "definition": "upstream's install line resolved on Python 3.12 (torch 2.11.0+cu130), xformers removed, plus upstream's own `accel` extra (flash-attn 2.7.4.post1, transformer-engine 2.15.0 with its cu13 and torch pieces, nvidia-cublas >= 13.6); route B runs bf16 + flash_attention_2 on a Transformer-Engine-backed encoder",
+   "flash_attn": "2.7.4.post1",
+   "transformer_engine": "2.15.0",
+   "nvidia_cublas": "13.6.1.10",
+   "numpy": "2.5.2",
+   "flash_attn_wheel": {
+    "file": "flash_attn-2.7.4.post1-cp312-cp312-linux_x86_64.whl",
+    "sha256": "94468e84d0783c13b8209c83cb8df90ee81f302d534a5b630525a91a737e64c5",
+    "source": "upstream's wheel release py312-pt211-cu13-sm80-90 (evolutionaryscale/wheels)"
+   },
+   "transformer_engine_torch_wheel": {
+    "file": "transformer_engine_torch-2.15.0-cp312-cp312-linux_x86_64.whl",
+    "sha256": "b8ad3d9a8b53040b2ba6310d782f1780e2cccbd98f00d228e8e04375d5c99f73",
+    "source": "the same release"
+   },
+   "jit_key": {
+    "h100": "torch2.11.0-cu130-sm90",
+    "h200": "torch2.11.0-cu130-sm90",
+    "a100_80gb": "torch2.11.0-cu130-sm80",
+    "b200": "torch2.11.0-cu130-sm100"
+   }
+  }
+ },
+ "weights": {
+  "biohub/ESMC-300M": {
+   "snapshot_commit": "a59b831785f907e96e6a246b1d142bfb76df31ee",
+   "files": {
+    "README.md": {
+     "blob_oid": "93b18d4fc9393d91b7239b2b9757ce8cf8ad040b",
+     "size_bytes": 14887
+    },
+    "config.json": {
+     "blob_oid": "9a49eacf4e65c39f74381f0f0d240e3b89ef43d7",
+     "size_bytes": 340
+    },
+    "images/contact_pal.png": {
+     "blob_oid": "c5508be57c45255493c0a4810ffbb05365b4d5e1",
+     "size_bytes": 30187
+    },
+    "model.safetensors": {
+     "sha256": "0772d8fe64bb25e14fe6f23b80e3c9a7d215d0da3c6cba5bd356d7c0e0bb22cc",
+     "size_bytes": 1332036392
+    },
+    "special_tokens_map.json": {
+     "blob_oid": "c907ee1dc19b24241749b32d665c291c7e6e8e4b",
+     "size_bytes": 171
+    },
+    "tokenizer.json": {
+     "blob_oid": "81c797f56768b22dec0301fa771f018b7e43e98c",
+     "size_bytes": 2879
+    },
+    "tokenizer_config.json": {
+     "blob_oid": "2238856624f8d39f03af53a2576c2d9b18c82f61",
+     "size_bytes": 1392
+    }
+   },
+   "weights_files": [
+    "model.safetensors"
+   ],
+   "total_weights_bytes": 1332036392,
+   "gated": false
+  },
+  "biohub/ESMC-600M": {
+   "snapshot_commit": "a7e82012c83126b9eedb055fea9fa84b6c02f094",
+   "files": {
+    "README.md": {
+     "blob_oid": "93b18d4fc9393d91b7239b2b9757ce8cf8ad040b",
+     "size_bytes": 14887
+    },
+    "config.json": {
+     "blob_oid": "71c8241dc28a5fb636248267a0927c0242b264c1",
+     "size_bytes": 341
+    },
+    "images/contact_pal.png": {
+     "blob_oid": "c5508be57c45255493c0a4810ffbb05365b4d5e1",
+     "size_bytes": 30187
+    },
+    "model.safetensors": {
+     "sha256": "e4232c30fd35fe2f57051ec88a703996ac94520580b4b836894207a3d45d9ff8",
+     "size_bytes": 2300205696
+    },
+    "special_tokens_map.json": {
+     "blob_oid": "c907ee1dc19b24241749b32d665c291c7e6e8e4b",
+     "size_bytes": 171
+    },
+    "tokenizer.json": {
+     "blob_oid": "81c797f56768b22dec0301fa771f018b7e43e98c",
+     "size_bytes": 2879
+    },
+    "tokenizer_config.json": {
+     "blob_oid": "2238856624f8d39f03af53a2576c2d9b18c82f61",
+     "size_bytes": 1392
+    }
+   },
+   "weights_files": [
+    "model.safetensors"
+   ],
+   "total_weights_bytes": 2300205696,
+   "gated": false
+  },
+  "biohub/ESMC-6B": {
+   "snapshot_commit": "45b0fa5d7fb06faefbd5e3b89bdcef35d564e79a",
+   "files": {
+    "README.md": {
+     "blob_oid": "93b18d4fc9393d91b7239b2b9757ce8cf8ad040b",
+     "size_bytes": 14887
+    },
+    "config.json": {
+     "blob_oid": "19f5fb09e4f630fb5b748a497183c22a87ec5102",
+     "size_bytes": 341
+    },
+    "images/contact_pal.png": {
+     "blob_oid": "c5508be57c45255493c0a4810ffbb05365b4d5e1",
+     "size_bytes": 30187
+    },
+    "model-00001-of-00006.safetensors": {
+     "sha256": "bd90149ff223e6ac1a0cac6147a5ae0df20d3a21df4f65356a1f19cd14f4aa8a",
+     "size_bytes": 4864457920
+    },
+    "model-00002-of-00006.safetensors": {
+     "sha256": "f75e2144d8269fe2eb4b3e0823fb089b94f176d8024153e85b8fb573a42294fa",
+     "size_bytes": 4971211344
+    },
+    "model-00003-of-00006.safetensors": {
+     "sha256": "f699f01ecc9691d9c6470492765fe54b8b5d2e9f277c139e89427433ffdfe0b2",
+     "size_bytes": 4863752992
+    },
+    "model-00004-of-00006.safetensors": {
+     "sha256": "46add1b7be098bbfdc3073884851ba3057f1b33ea23a158b650a37007dabd13d",
+     "size_bytes": 4971211344
+    },
+    "model-00005-of-00006.safetensors": {
+     "sha256": "1e1cb62f060a34e18f54a31a76683ef888b8cec59e73315f5b31d25d45a1f88c",
+     "size_bytes": 4863752992
+    },
+    "model-00006-of-00006.safetensors": {
+     "sha256": "56c73e13ae96e777ce65eee99364056069ef93b646470f352f83c5f1037b1b18",
+     "size_bytes": 873762296
+    },
+    "model.safetensors.index.json": {
+     "blob_oid": "a780483ca93cf7e05c18a7d5bf25a9e56a7d98cf",
+     "size_bytes": 97349
+    },
+    "special_tokens_map.json": {
+     "blob_oid": "c907ee1dc19b24241749b32d665c291c7e6e8e4b",
+     "size_bytes": 171
+    },
+    "tokenizer.json": {
+     "blob_oid": "81c797f56768b22dec0301fa771f018b7e43e98c",
+     "size_bytes": 2879
+    },
+    "tokenizer_config.json": {
+     "blob_oid": "2238856624f8d39f03af53a2576c2d9b18c82f61",
+     "size_bytes": 1392
+    }
+   },
+   "weights_files": [
+    "model-00001-of-00006.safetensors",
+    "model-00002-of-00006.safetensors",
+    "model-00003-of-00006.safetensors",
+    "model-00004-of-00006.safetensors",
+    "model-00005-of-00006.safetensors",
+    "model-00006-of-00006.safetensors"
+   ],
+   "total_weights_bytes": 25408148888,
+   "gated": false
+  },
+  "root": "the HF cache under HF_HOME (upstream's own location: hub/models--biohub--ESMC-<SIZE>/snapshots/<commit>)"
+ },
+ "weights_layout": {
+  "root": "the HF cache under HF_HOME (upstream's own location: hub/models--biohub--ESMC-<SIZE>/snapshots/<commit>)",
+  "hf_home": "the directory HF_HOME names (README 'Variables'): the checkpoints resolve under <HF_HOME>/hub/models--<org>--<repo>/snapshots/<commit>/",
+  "form": "HF cache: hf/hub/models--<org>--<repo>/snapshots/<commit>/ with refs/main = the commit; read with HF_HUB_OFFLINE=1",
+  "manifest": "python -I stock/check_pins.py --weights <root> --variant <v> checks every pinned file under <root>/hf/hub/ against the digests above (HF_HOME = <root>/hf)"
+ },
+ "entry_point": {
+  "cli": null,
+  "route_B": "client = esm.models.esmc.ESMC.from_pretrained(<model name>, device=<device>) [esm/models/esmc/compatibility.py:154-168: bf16 off CPU, attn_implementation flash_attention_2 (use_flash_attn=True default) else sdpa]; protein_tensor = client.encode(ESMProtein(sequence=seq)); out = client.logits(protein_tensor, LogitsConfig(sequence=True, return_embeddings=True)) [:296-322: torch.no_grad + autocast(bfloat16), output_hidden_states=True] -> out.logits.sequence [1, L+2, 64], out.embeddings [1, L+2, d]; client.model = the package's EsmcForMaskedLM (where the levers attach)",
+  "route_B_raw_batched": "tokenizer(sequences, return_tensors='pt', padding=True); model(input_ids=\u2026, attention_mask=\u2026, output_hidden_states=True) under torch.inference_mode() [cookbook/snippets/esmc.py raw_forward] \u2014 the user's own padded batched form (the batched regime, --batch N)",
+  "route_A": "transformers fork: AutoModelForMaskedLM.from_pretrained(<repo>, device_map='auto') + AutoTokenizer; model(**inputs) under torch.inference_mode(); fp32 checkpoint dtype [upstream README] \u2014 documented, not an arm of this tree",
+  "route": "route_B (this tree's stock arm and every lever)",
+  "one_prediction": "one sequence through the one-protein call of route B (batch 1); batched and unbatched outputs are not bitwise-comparable by construction (padding changes the reduction composition)",
+  "script": "none: the kit ships no caller of its own \u2014 the user's own code makes the route B calls (README 'Run'); the kit engages inside ESMC.from_pretrained when ESMC_OPT=exact"
+ },
+ "library_defaults": {
+  "route_B": {
+   "from_pretrained": "model_name=ESMC_600M, device=None (cuda if available), use_flash_attn=True",
+   "dtype": "bfloat16 when the device is not CPU; logits() runs under torch.autocast(bfloat16)",
+   "attention": "flash_attention_2 when flash_attn imports, else the package's F.scaled_dot_product_attention path",
+   "encoder": "Transformer Engine modules when transformer_engine imports on CUDA (esm/models/esmc/model.py: use_te = on_cuda and TE_INSTALLED), else torch modules",
+   "LogitsConfig_defaults": {
+    "sequence": false,
+    "structure": false,
+    "secondary_structure": false,
+    "sasa": false,
+    "function": false,
+    "residue_annotations": false,
+    "return_embeddings": false,
+    "return_hidden_states": false,
+    "return_mean_embedding": false,
+    "return_mean_hidden_states": false,
+    "ith_hidden_layer": -1
+   }
+  },
+  "precision": "the package sets no numerics flag (PyTorch defaults)"
+ },
+ "configs": {
+  "biohub/ESMC-300M": {
+   "d_model": 960,
+   "n_layers": 30,
+   "n_heads": 15
+  },
+  "biohub/ESMC-600M": {
+   "d_model": 1152,
+   "n_layers": 36,
+   "n_heads": 18
+  },
+  "biohub/ESMC-6B": {
+   "d_model": 2560,
+   "n_layers": 80,
+   "n_heads": 40
+  },
+  "common": {
+   "vocab_size": 64,
+   "pad_token_id": 1,
+   "mask_token_id": 32,
+   "cls_token_id": 0,
+   "eos_token_id": 2,
+   "checkpoint_dtype": "float32",
+   "source": "each snapshot's config.json (digests above); esm/models/esmc/config.py"
+  }
+ },
+ "stock_environment": {
+  "reads": [
+   "HF_HOME",
+   "HF_HUB_OFFLINE",
+   "TRITON_CACHE_DIR",
+   "TORCH_EXTENSIONS_DIR",
+   "CUDA_VISIBLE_DEVICES",
+   "LD_LIBRARY_PATH"
+  ],
+  "allowed_exceptions": [
+   "HF_HOME"
+  ],
+  "must_be_absent": [
+   "ESMC_OPT",
+   "ESMC_KIT",
+   "NVIDIA_TF32_OVERRIDE"
+  ],
+  "home": "opt/esmc_opt/registry.py KIT_SWITCHES (the kits' switches, file:line each) + stack.PACKAGE_ENV (the package's own) + stack.PACKAGE_COMPOSED_ENV; must_be_absent below is locked to that union by the package's tests",
+  "numerics_must_be_absent": [
+   "NVIDIA_TF32_OVERRIDE"
+  ]
+ },
+ "licence": {
+  "code": "MIT (Biohub/esm LICENSE.md)",
+  "weights": "the model cards' licence field: mit (+ the third-party notices)",
+  "transformers_fork": "Apache-2.0",
+  "accel_components": {
+   "flash_attn": "BSD-3-Clause",
+   "transformer_engine": "Apache-2.0"
+  }
+ }
+}

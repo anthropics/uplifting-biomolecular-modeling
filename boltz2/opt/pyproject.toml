@@ -1,0 +1,36 @@
+# boltz2_opt — the Boltz-2 optimization kit's package: modes exact / fast / big on the persistent worker, the stock caller (off), the activation report.
+# Install editable with the core: `run.sh install` (= `pip install -e common/opt_core -e boltz2/opt`). The kit code it wraps lives beside the package (forward/)
+# and is resolved from the package location (or from $MODEL_OPT, the boltz2/ directory), so the install must stay editable. No install-time
+# dependency on boltz: the stock pin (2.2.1, stock/PINS.json) is checked at activation by stock/check_pins.py. The build backend is
+# setuptools plus one step that ships boltz2_opt_autoload.pth at the wheel root, which is what makes `BOLTZ2_OPT=<mode>` reach the
+# package without code changes (see boltz2_opt/_autoload.py); it is the core's template copy, byte for byte.
+[build-system]
+requires = ["setuptools>=64", "wheel"]
+build-backend = "_build_backend"
+backend-path = ["."]
+
+[project]
+name = "boltz2_opt"
+dynamic = ["version"]
+description = "Boltz-2 inference optimizations: modes exact/fast/big on the persistent-worker route, boltz predict's own options, stock caller (off), activation report"
+requires-python = ">=3.10"
+classifiers = ["Private :: Do Not Upload"]
+dependencies = []
+
+[project.optional-dependencies]
+test = ["pytest", "pyyaml"]                          # the package's CPU tests (pyyaml: the input YAML reader used by pred)
+
+[project.scripts]
+boltz2-opt = "boltz2_opt.__main__:main"            # `boltz2-opt pred|check|warm ...` == `python -m boltz2_opt ...`
+
+[tool.setuptools]
+packages = ["boltz2_opt", "boltz2_opt.tests"]
+include-package-data = false
+
+[tool.setuptools.dynamic]
+version = {attr = "boltz2_opt.__version__"}
+
+# The opt_core pin: `run.sh install` = pip install -e <path> -e <this directory>; the kit's core pin gate (boltz2_opt/_core_gate.py) compares this pin (a minimum version) with the installed core's version at every entry, before any core import.
+[tool.opt_core]
+path = "../../common/opt_core"
+version = "0.5.228.0"

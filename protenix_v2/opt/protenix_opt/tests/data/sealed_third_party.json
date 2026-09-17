@@ -1,0 +1,248 @@
+{
+ "_about": "Every file under opt/forward/flashpairformer/third_party/ (the vendored / producer packages the kit carries: sealed, byte-frozen) with the sha256, size and git blob id of its published bytes, recorded from those published bytes. opt/protenix_opt/tests/test_sealed_third_party.py fails BY NAME on any edit, addition or removal inside that tree; kit behaviour changes go in opt/protenix_opt/ (glue), never in the sealed tree. A sanctioned re-seal regenerates this file deliberately (python -m protenix_opt.tests.test_sealed_third_party --reseal).",
+ "count": 48,
+ "files": {
+  "blockfuse_addon/LICENSE": {
+   "bytes": 11788,
+   "git_blob": "c6dd1f322a49000ac84f511711b418fdcaaeda9e",
+   "sha256": "add3b0d4449b29559d6f429d84a09a9b363d78fd516b3315a8ed946eb12ad8eb"
+  },
+  "blockfuse_addon/NOTICE": {
+   "bytes": 2079,
+   "git_blob": "c146e313dd7420f1fd2448bb47bd84a898806471",
+   "sha256": "7a93d7c0fe5979c4dc34291730fbf53b7c3d505365ae6cc48f75c2ff5bdce743"
+  },
+  "blockfuse_addon/VENDORED.txt": {
+   "bytes": 444,
+   "git_blob": "787ae5e00fa49b5fb260f78e8442eb09ef6b3555",
+   "sha256": "bddca30358e76e610b267afbd730bcc2b9e3475a8b47fb815c5e6d8069e05653"
+  },
+  "blockfuse_addon/blockfuse/__init__.py": {
+   "bytes": 0,
+   "git_blob": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "blockfuse_addon/blockfuse/biasln.py": {
+   "bytes": 4678,
+   "git_blob": "2d679db1f0f08b2d1868daf798b44666aa0b68ae",
+   "sha256": "a8f185e38769a6f105fdea2bc560ae02267686a022be3f1c9f3071d4dbe884a2"
+  },
+  "blockfuse_addon/blockfuse_xl/__init__.py": {
+   "bytes": 10313,
+   "git_blob": "e9d4babb309cd3e50fa7ee6a90a73cda78004503",
+   "sha256": "5052a7c1ea26005052c9e440da08d944531f6051ec15028da9fca42f3e44bbc1"
+  },
+  "fastln_prebuilt.py": {
+   "bytes": 9702,
+   "git_blob": "f41a30ecf5f4aa62ba18a89c036e0f4c464134a6",
+   "sha256": "5cb7f6f97ecc19d8699a7587b5d3f90342ea33037cb4b8a07911af33f1dacf35"
+  },
+  "fastln_prebuilt/SHA256SUMS": {
+   "bytes": 100,
+   "git_blob": "46ba74ed5fdd9dd56078cae6077ed4621119b327",
+   "sha256": "da652fdee7dac631720bd7b2d2a25cd1e0dbd6da186ec960946bb55a65eb7be2"
+  },
+  "fastln_prebuilt/fast_layer_norm_cuda_v2_stream.so": {
+   "bytes": 3092032,
+   "git_blob": "5ae10b9db4e37c49542f502a515e1285b3adc5b8",
+   "sha256": "c295028752de1efc9a714d371f9ef8b467f60943ad3183bcee0afd925290a0a4"
+  },
+  "fastln_prebuilt/manifest.json": {
+   "bytes": 1928,
+   "git_blob": "eaa13f81815415d05de5f525ed6b5ca4b0325a4a",
+   "sha256": "4d13388d7ef0d9e2523d436f2b9db715887eab0dc442f799b430cb7746016f77"
+  },
+  "fastln_prebuilt/patched_src/compat.h": {
+   "bytes": 816,
+   "git_blob": "9a0e4e2209a31467bc8e7a333ca81c7779ce670a",
+   "sha256": "24da65d5e0a58c6483abd60e7a6d6fca7e4abc9303f08c902975c77bdeacbc08"
+  },
+  "fastln_prebuilt/patched_src/layer_norm_cuda.cpp": {
+   "bytes": 8097,
+   "git_blob": "16fcfc4b2519910fcc769ec82476a636c611e7ed",
+   "sha256": "b03d995042fede126b1e36a8e9c9e73433a598f523ad914789d7aeaeb8ac842d"
+  },
+  "fastln_prebuilt/patched_src/layer_norm_cuda_kernel.cu": {
+   "bytes": 45539,
+   "git_blob": "9db8a1503699317729924ab4cf1505f2ff3e0509",
+   "sha256": "fc1540b4410728ffd8c0b761fd4c3494290c5a6256e40d84a928f608c6cbbc36"
+  },
+  "fastln_prebuilt/patched_src/type_shim.h": {
+   "bytes": 13237,
+   "git_blob": "e9a9bc99c72ded0c38308d4fbe762dec890d9803",
+   "sha256": "824a0dfdb5bfb1316187b3a3f7c10c9b41496b97259ddf84c882152ccec66a7a"
+  },
+  "fastln_prebuilt_cu130/PROVENANCE.md": {
+   "bytes": 968,
+   "git_blob": "a2f6afc4d59362236dfdefe81f7b7178af7fb792",
+   "sha256": "691092b54a2bbfec0ce2a88adbe869c78c6ca9855b2862d15fb52739a820dc2d"
+  },
+  "fastln_prebuilt_cu130/SHA256SUMS": {
+   "bytes": 100,
+   "git_blob": "c48d0ffe6dd382325ecad44af8b89d05a476c9ee",
+   "sha256": "c3c2869eba0b722c61f2be10ad624bda7b12d72ba2db891ec5c108f49eb0fc0c"
+  },
+  "fastln_prebuilt_cu130/fast_layer_norm_cuda_v2_stream.so": {
+   "bytes": 3453104,
+   "git_blob": "b304a3645bb6e68f44a2a1647b9e8bba7ad4125f",
+   "sha256": "ab5ce7d841e9376e346131449f141f87510a3011334965cce3b9e4eb8b06ca4b"
+  },
+  "fastln_prebuilt_cu130/manifest.json": {
+   "bytes": 1928,
+   "git_blob": "15555ceb6a75cd415a83a3589f58c2b83f4c3128",
+   "sha256": "dc04f0d40b306732e36e1e4c3b1abdc8a4dd6a4bc7b8bc8c1f4018a5fbcd8f58"
+  },
+  "fastln_prebuilt_cu130/patched_src/compat.h": {
+   "bytes": 816,
+   "git_blob": "9a0e4e2209a31467bc8e7a333ca81c7779ce670a",
+   "sha256": "24da65d5e0a58c6483abd60e7a6d6fca7e4abc9303f08c902975c77bdeacbc08"
+  },
+  "fastln_prebuilt_cu130/patched_src/layer_norm_cuda.cpp": {
+   "bytes": 8097,
+   "git_blob": "16fcfc4b2519910fcc769ec82476a636c611e7ed",
+   "sha256": "b03d995042fede126b1e36a8e9c9e73433a598f523ad914789d7aeaeb8ac842d"
+  },
+  "fastln_prebuilt_cu130/patched_src/layer_norm_cuda_kernel.cu": {
+   "bytes": 45539,
+   "git_blob": "9db8a1503699317729924ab4cf1505f2ff3e0509",
+   "sha256": "fc1540b4410728ffd8c0b761fd4c3494290c5a6256e40d84a928f608c6cbbc36"
+  },
+  "fastln_prebuilt_cu130/patched_src/type_shim.h": {
+   "bytes": 13237,
+   "git_blob": "e9a9bc99c72ded0c38308d4fbe762dec890d9803",
+   "sha256": "824a0dfdb5bfb1316187b3a3f7c10c9b41496b97259ddf84c882152ccec66a7a"
+  },
+  "fpf_cueq_pad8exact/__init__.py": {
+   "bytes": 13286,
+   "git_blob": "9d3c87f28d2d26fe670c4f25bf6dfdf74f8122cb",
+   "sha256": "4915ed2df6ecab8a1165b90daa5c0d37de2b6c2c3a9e29c7578917f2ff3c80a2"
+  },
+  "fpf_pad8exact/__init__.py": {
+   "bytes": 2255,
+   "git_blob": "52130cc3c30d5840084e0b955f59dd49aab68b40",
+   "sha256": "26955a1c495546f156ecdaa7f3140e60e6e2d9d235d6f028831fa5ff62515059"
+  },
+  "fpf_smalln/__init__.py": {
+   "bytes": 13385,
+   "git_blob": "fd02b9d42eac47224d18ab69bed8aa5fe63bdd2c",
+   "sha256": "be35aefa0f1ae3e4c95c3d508946b1117dc345ff8851ccdd9db38b69951b2318"
+  },
+  "protenix_fpf_ditfast/CELLS.json": {
+   "bytes": 4286,
+   "git_blob": "6f34a1477a7aa78648f597286047a4509eec24b8",
+   "sha256": "32c5fb59550192b4368a05ee8fdedd20e0a21128ebf10fa8cee536eaa663b7cd"
+  },
+  "protenix_fpf_ditfast/NOTICE": {
+   "bytes": 1148,
+   "git_blob": "b245566df18375a2d96c8a016a11ebf17ce58e94",
+   "sha256": "42f8ef55018cb40fce16bd86a0181e796e7601d5097ecafc3aec8d405b4f351b"
+  },
+  "protenix_fpf_ditfast/__init__.py": {
+   "bytes": 1669,
+   "git_blob": "47cbb56922b5973d267d75fd9ea591e4823d95a6",
+   "sha256": "c8c273a95e597be5aff959a30b0d88be802de1635f2f51ee506567f65d4d3cb0"
+  },
+  "protenix_fpf_ditfast/_plumbing.py": {
+   "bytes": 1798,
+   "git_blob": "ff7677a1945eb77e247772a60d7af6ef7f2436bc",
+   "sha256": "4f29c5c538d77af5a076ea659ceaf8bbd91cb421638fb1306d95bf90964845bd"
+  },
+  "protenix_fpf_ditfast/atom_fast.py": {
+   "bytes": 13662,
+   "git_blob": "cc0477fbfba339729162b764bf951dd4e1778fde",
+   "sha256": "f2abb10179e486510d8508e9990a441d9ee72b66bdc994eab746dd1422de6184"
+  },
+  "protenix_fpf_ditfast/cond_dedupe.py": {
+   "bytes": 2843,
+   "git_blob": "60b75f0fd870ea16068847f0a42972520df3794a",
+   "sha256": "13296b54ae5b9520c57d8149b9c70b9573989cb19ef2a6cbfb6cee8795f92020"
+  },
+  "protenix_fpf_ditfast/dit_fast.py": {
+   "bytes": 17280,
+   "git_blob": "9346de82b5d54bda160ca684ad1b057313f486a2",
+   "sha256": "44b108d258ad13a342106844ffdfb9360644bf51a9cdbcab4c73a3e94255e47a"
+  },
+  "protenix_fpf_ditfast/vectors.json": {
+   "bytes": 1941,
+   "git_blob": "2fb8be6ba5ace1266c34921528654d3355d0feba",
+   "sha256": "6ee3cc1493a12e381a0a1fdb416f7646848c95530da6e19c17b0b2be3ffde011"
+  },
+  "protenix_fpf_ditfast/vectors.py": {
+   "bytes": 4940,
+   "git_blob": "555adf175f3e6189b885b4e495af35accb86ea84",
+   "sha256": "6f21480e978328d825492897d8bdad919e51e156ed10b3d770d1cf67d975a913"
+  },
+  "protenix_fpf_msa/CELLS.json": {
+   "bytes": 4995,
+   "git_blob": "acbf14ed2683c4c9860e059a4a40c723b4884440",
+   "sha256": "06d3661ce7dc4d953d853861af21410a2f8abfb3d1af3859a335cec98b22eb04"
+  },
+  "protenix_fpf_msa/NOTICE.md": {
+   "bytes": 285,
+   "git_blob": "84296e5983b9b363545d3a3f4bad059538069670",
+   "sha256": "2720da22effe0b1f59503a81873b66877b8a5e1fdce18b4736dd0cd27fab0a99"
+  },
+  "protenix_fpf_msa/VECTORS.json": {
+   "bytes": 1334,
+   "git_blob": "e9ca4432476dce6781ff202f10cf2aae2affa582",
+   "sha256": "7f429fdeb52c958eb89f66016249da95bf073d6cb52d4ee2221fc83add9794f6"
+  },
+  "protenix_fpf_msa/__init__.py": {
+   "bytes": 584,
+   "git_blob": "7f4180e6ee0001f131b1f7f37ca2d0239f28f744",
+   "sha256": "ef2950111a1ecb15524d74f1b6abbd96fd3b741593c918ad78a8ada16f34fe87"
+  },
+  "protenix_fpf_msa/install.py": {
+   "bytes": 11740,
+   "git_blob": "3c97dc2d4b56047aa144d0c025019fdfce706a2e",
+   "sha256": "0c6b8e4e954d3b25c2034eddca22013619872bd40ce35927ee41f6b4cdc289a1"
+  },
+  "protenix_fpf_msa/loadcheck.py": {
+   "bytes": 3030,
+   "git_blob": "1e4b88a172a68425468529761bbfbee866b93093",
+   "sha256": "cdbc81ef5e6a8bcbf88dbdaf89a410741fdbcdebbc52d8c155e0bfc2bf1c67bf"
+  },
+  "protenix_fpf_triatt_procuda/__init__.py": {
+   "bytes": 10998,
+   "git_blob": "3995760279c145985224f6654d1a593369bfb388",
+   "sha256": "c8359d782c043818f4d3630e9a63d6a11c1db31fe29251468b16afbe7ecf4faa"
+  },
+  "protenix_fpf_triatt_procuda/binding.py": {
+   "bytes": 6600,
+   "git_blob": "1e506d75d972c61b60dd9b611b63851197555e49",
+   "sha256": "46b9081daec059be837a8abe3dcabdd1803bcfd2936133fdb2d2def927335fe0"
+  },
+  "protenix_fpf_triatt_procuda/build.py": {
+   "bytes": 1831,
+   "git_blob": "71cf76af1eec9ff2d12f709444d447a3546cf150",
+   "sha256": "89237a9ce479c5884db9f2f8b7522095fdd36ecfa890725d540338d3d8087229"
+  },
+  "protenix_fpf_triatt_procuda/csrc/triatt_procuda_sm90.cu": {
+   "bytes": 42281,
+   "git_blob": "26e2f361994cbb12e7388c9607bde48e4cd9843b",
+   "sha256": "fc120646461cd993a7d9fc94886a137c74873887da251fa538b1701f7880c1c1"
+  },
+  "protenix_fpf_triatt_procuda/prebuilt/NOTICE.md": {
+   "bytes": 2120,
+   "git_blob": "d6d45ebc0426a6284ff678c63cee17e7606b4821",
+   "sha256": "e2c6e3d0052be6c9fa0ce122fe721ae9a35aa432b918f8c08be57db8fd311517"
+  },
+  "protenix_fpf_triatt_procuda/prebuilt/SHA256SUMS": {
+   "bytes": 93,
+   "git_blob": "52c03d964dc7b469b38a8e4d425c04ec56a732ee",
+   "sha256": "8eb43e4ce9b2f1ae4c3bce85d0ce8dd63a3a5d6f30e10c0028ca70dd6377424d"
+  },
+  "protenix_fpf_triatt_procuda/prebuilt/libtriatt_procuda_sm90a.so": {
+   "bytes": 1025792,
+   "git_blob": "77b97803499ff33ddb39ae8cf122e00df5f20a8d",
+   "sha256": "e9009ba57e432421cf1943cbbe5c22777bc1a674ca0423448ac2f06b9baecbcf"
+  },
+  "protenix_fpf_triatt_procuda/prebuilt/manifest.json": {
+   "bytes": 355,
+   "git_blob": "287df86cd47b50138d9f2626dcdfddda66dcaff1",
+   "sha256": "ba04b28c0a7c0ab033ba13a16507a4f7f32e34f8fd93e4e817f41e2a1b1bcbc7"
+  }
+ },
+ "recorded_at": "protenix_opt 0.3.48",
+ "tree": "opt/forward/flashpairformer/third_party"
+}

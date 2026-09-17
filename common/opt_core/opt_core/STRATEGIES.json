@@ -1,0 +1,452 @@
+{
+ "aliases": {
+  "F1.blk2_pro_epi_exact": "F1.triatt_lean_exact",
+  "F1.flash_triangle_attention_pallas": "F1.flash_triatt",
+  "F1.flash_triattn": "F1.flash_triatt",
+  "F1.k2b": "F1.flash_triatt",
+  "F1.of3t_flash_tf32x3": "F1.flash_triatt",
+  "F1.pallas_attn": "F1.flash_triatt",
+  "F1.pallas_flash_attn": "F1.flash_triatt",
+  "F2.adapter": "F2.fpf_trimul_fast",
+  "F2.cuequivariance": "F2.cueq_tuned_tiles",
+  "F2.fpf_trimul": "F2.fpf_trimul_fast",
+  "F2.fpf_trimul_shared": "F2.fpf_trimul_fast",
+  "F2.fpf_trimul_v4": "F2.fpf_trimul_fast",
+  "F2.fpf_v4": "F2.fpf_trimul_fast",
+  "F2.lower_memory_exact_trimul": "F2.fpf_trimul_exact",
+  "F2.pallas_fpf": "F2.fpf_trimul_fast",
+  "F2.trimul_memsafe_fast": "F2.fpf_trimul_fast",
+  "F3.capture_hygiene": "F3.cuda_graph_trunk",
+  "F3.compile_cache_key": "F3.jit_cache_keyed",
+  "F3.const_memo(hoist)": "LOCAL.step_invariant_hoist",
+  "F3.cuda_graph_diffusion_step": "F3.cuda_graph_sampler",
+  "F3.cudagraph_diffusion_step": "F3.cuda_graph_sampler",
+  "F3.cudagraph_step_helper": "F3.cuda_graph_sampler",
+  "F3.exec_serialize": "F3.cuda_graph_trunk",
+  "F3.graph_confidence_head": "F3.cuda_graph_trunk",
+  "F3.graph_exact_line": "F3.cuda_graph_trunk",
+  "F3.graph_trunk_stack": "F3.cuda_graph_trunk",
+  "F3.hoist": "LOCAL.step_invariant_hoist",
+  "F3.jit_cache": "F3.jit_cache_keyed",
+  "F3.persistent_compile_cache": "F3.jit_cache_keyed",
+  "F3.sampler_graph_token_cap_raise": "F3.cuda_graph_sampler",
+  "F3.serialized_executables": "F3.xla_flags_compile",
+  "F3.shape_bucket": "F3.shape_buckets",
+  "F3.size_gated_capture": "F3.cuda_graph_sampler",
+  "F3.stepgraph": "F3.cuda_graph_sampler",
+  "F3.torch_compile_regional": "F3.torch_compile",
+  "F3.trunk_graph": "F3.cuda_graph_trunk",
+  "F3.xla_exec_cache": "F3.xla_flags_compile",
+  "F4.bf16_autocast_trunk": "F4.autocast_policy",
+  "F4.bf16_evoformer": "F4.autocast_policy",
+  "F4.bf16_trunk": "F4.autocast_policy",
+  "F4.det_scatter": "F4.det_recipe",
+  "F4.fp32_readout": "F4.autocast_policy",
+  "F4.input_precision_table": "F4.autocast_policy",
+  "F4.numerics_signature": "F4.det_recipe",
+  "F4.tf32_matmul": "F4.autocast_policy",
+  "F4.tf32_matmul_fast": "F4.autocast_policy",
+  "F4.tf32_matmul_policy": "F4.autocast_policy",
+  "F4.tf32_or_bf16_denoiser": "F4.autocast_policy",
+  "F5.apb_sdpa": "F5.flash_attn_dense",
+  "F5.attn_tile_pin": "F5.flash_attn_dense",
+  "F5.diffusion_attn_flash": "F5.flash_attn_dense",
+  "F5.dit_atom_fused": "LOCAL.dit_fused_kernels",
+  "F5.dit_kernels": "LOCAL.dit_fused_kernels",
+  "F5.dtk_dit_attention": "F5.flash_attn_dense",
+  "F5.evo_attn_pallas": "F5.flash_attn_dense",
+  "F5.flash_attn": "F5.flash_attn_dense",
+  "F5.fused_dit_sampler": "LOCAL.dit_fused_kernels",
+  "F5.msa_module_kernels": "F5.fpf_msa_kernels",
+  "F5.pair_attn_unchunk": "F5.flash_attn_dense",
+  "F5.pallas_attn_all": "F5.flash_attn_dense",
+  "F5.sdpa_cudnn": "F5.flash_attn_dense",
+  "F5.sdpa_diffusion": "F5.flash_attn_dense",
+  "F5.softmax_bias_fused_exact": "F5.fused_bias_softmax_exact",
+  "F6.coldstart": "F6.weights_residency_init",
+  "F6.device_resident_io": "F6.device_resident",
+  "F6.esm_memo_cross_request": "F6.feature_cache",
+  "F6.feature_memo": "F6.feature_cache",
+  "F6.featurisation_memo": "F6.feature_cache",
+  "F6.featurisation_prefetch": "F6.feature_cache",
+  "F6.featurise_cache": "F6.feature_cache",
+  "F6.featurise_prefetch": "F6.item_ordering_prefetch",
+  "F6.featurization": "F6.feature_cache",
+  "F6.featurization_cache": "F6.feature_cache",
+  "F6.featurize_overlap": "F6.feature_cache",
+  "F6.host_gpu_overlap": "F6.persistent_process",
+  "F6.host_outputs": "F6.host_sync_elimination",
+  "F6.lazy_init": "F6.weights_residency_init",
+  "F6.multiseed_batch": "F6.item_ordering_prefetch",
+  "F6.plm_memo": "F6.feature_cache",
+  "F6.serve_protocol": "F6.persistent_process",
+  "F6.skip_unused_featurisation": "F6.feature_cache",
+  "F6.t11": "F6.item_ordering_prefetch",
+  "F7.alloc_policy": "F7.expandable_segments",
+  "F7.arithmetic_free_frees": "F7.chunked_eval",
+  "F7.big_compose": "F7.graph_pool_budget",
+  "F7.big_fast_threshold": "F7.graph_pool_budget",
+  "F7.chunked_heads_attention": "F7.chunked_eval",
+  "F7.chunked_pair_ops": "F7.chunked_eval",
+  "F7.chunked_pairformer_for_crop2048": "F7.chunked_eval",
+  "F7.cycle_ckpt": "F7.ckpt_resume_samples",
+  "F7.diffusion_sample_chunk": "F7.chunked_eval",
+  "F7.pair_offload_conf": "F7.pair_offload",
+  "F7.pair_rowchunk": "F7.chunked_eval",
+  "F7.protenix_memory_set": "F7.pair_offload",
+  "F7.tp": "F7.tensor_parallel",
+  "F7.transition_row_chunk": "F7.chunked_eval",
+  "F7.x1": "LOCAL.step_invariant_hoist",
+  "LOCAL.dit_bias_hoist": "LOCAL.dit_fused_kernels",
+  "LOCAL.eval_dropout_elide_exact": "F5.kernel_glue_gates",
+  "LOCAL.transition_fused_bitwise": "LOCAL.fused_transition"
+ },
+ "canonical": [
+  {
+   "family": "F1",
+   "id": "F1.flash_triatt",
+   "numerics_changing": true
+  },
+  {
+   "family": "F1",
+   "id": "F1.triatt_lean_exact",
+   "numerics_changing": false
+  },
+  {
+   "family": "F2",
+   "id": "F2.fpf_trimul_fast",
+   "numerics_changing": true
+  },
+  {
+   "family": "F2",
+   "id": "F2.fpf_trimul_exact",
+   "numerics_changing": false
+  },
+  {
+   "family": "F2",
+   "id": "F2.trimul_tperm_exact",
+   "numerics_changing": false
+  },
+  {
+   "family": "F2",
+   "id": "F2.cueq_tuned_tiles",
+   "numerics_changing": false
+  },
+  {
+   "family": "F2",
+   "id": "F2.trimul",
+   "numerics_changing": true
+  },
+  {
+   "family": "LOCAL",
+   "id": "LOCAL.fused_transition",
+   "numerics_changing": true
+  },
+  {
+   "family": "LOCAL",
+   "id": "LOCAL.step_invariant_hoist",
+   "numerics_changing": false
+  },
+  {
+   "family": "LOCAL",
+   "id": "LOCAL.dit_fused_kernels",
+   "numerics_changing": true
+  },
+  {
+   "family": "LOCAL",
+   "id": "LOCAL.deadskip",
+   "numerics_changing": false
+  },
+  {
+   "family": "LOCAL",
+   "id": "LOCAL.layernorm_kernel",
+   "numerics_changing": true
+  },
+  {
+   "family": "F3",
+   "id": "F3.cuda_graph_trunk",
+   "numerics_changing": false
+  },
+  {
+   "family": "F3",
+   "id": "F3.cuda_graph_sampler",
+   "numerics_changing": false
+  },
+  {
+   "family": "F3",
+   "id": "F3.graph_admission_policy",
+   "numerics_changing": false
+  },
+  {
+   "family": "F3",
+   "id": "F3.torch_compile",
+   "numerics_changing": true
+  },
+  {
+   "family": "F3",
+   "id": "F3.jit_cache_keyed",
+   "numerics_changing": false
+  },
+  {
+   "family": "F3",
+   "id": "F3.shape_buckets",
+   "numerics_changing": true
+  },
+  {
+   "family": "F3",
+   "id": "F3.xla_flags_compile",
+   "numerics_changing": false
+  },
+  {
+   "family": "F4",
+   "id": "F4.bf16_weight_precast",
+   "numerics_changing": true
+  },
+  {
+   "family": "F4",
+   "id": "F4.autocast_policy",
+   "numerics_changing": true
+  },
+  {
+   "family": "F4",
+   "id": "F4.tf32x3_compensated",
+   "numerics_changing": true
+  },
+  {
+   "family": "F4",
+   "id": "F4.tf32_matmul",
+   "numerics_changing": true
+  },
+  {
+   "family": "F4",
+   "id": "F4.det_recipe",
+   "numerics_changing": false
+  },
+  {
+   "family": "F5",
+   "id": "F5.fpf_msa_kernels",
+   "numerics_changing": true
+  },
+  {
+   "family": "F5",
+   "id": "F5.fused_bias_softmax_exact",
+   "numerics_changing": false
+  },
+  {
+   "family": "F5",
+   "id": "F5.flash_attn_dense",
+   "numerics_changing": true
+  },
+  {
+   "family": "F5",
+   "id": "F5.gather_attn",
+   "numerics_changing": true
+  },
+  {
+   "family": "F5",
+   "id": "F5.kernel_glue_gates",
+   "numerics_changing": false
+  },
+  {
+   "family": "F5",
+   "id": "F5.row_layernorm",
+   "numerics_changing": true
+  },
+  {
+   "family": "F6",
+   "id": "F6.persistent_process",
+   "numerics_changing": false
+  },
+  {
+   "family": "F6",
+   "id": "F6.per_item_reset",
+   "numerics_changing": false
+  },
+  {
+   "family": "F6",
+   "id": "F6.feature_cache",
+   "numerics_changing": false
+  },
+  {
+   "family": "F6",
+   "id": "F6.weights_residency_init",
+   "numerics_changing": false
+  },
+  {
+   "family": "F6",
+   "id": "F6.host_sync_elimination",
+   "numerics_changing": false
+  },
+  {
+   "family": "F6",
+   "id": "F6.device_resident",
+   "numerics_changing": false
+  },
+  {
+   "family": "F6",
+   "id": "F6.output_overlap",
+   "numerics_changing": false
+  },
+  {
+   "family": "F6",
+   "id": "F6.item_ordering_prefetch",
+   "numerics_changing": false
+  },
+  {
+   "family": "F6",
+   "id": "F6.mps_packing",
+   "numerics_changing": false
+  },
+  {
+   "family": "F6",
+   "id": "F6.recycle_early_exit",
+   "numerics_changing": true
+  },
+  {
+   "family": "F7",
+   "id": "F7.expandable_segments",
+   "numerics_changing": false
+  },
+  {
+   "family": "F7",
+   "id": "F7.pair_offload",
+   "numerics_changing": true
+  },
+  {
+   "family": "F7",
+   "id": "F7.chunked_eval",
+   "numerics_changing": true
+  },
+  {
+   "family": "F7",
+   "id": "F7.graph_pool_budget",
+   "numerics_changing": false
+  },
+  {
+   "family": "F7",
+   "id": "F7.tensor_parallel",
+   "numerics_changing": true
+  },
+  {
+   "family": "F7",
+   "id": "F7.tp_trimul_ring_contract",
+   "numerics_changing": true
+  },
+  {
+   "family": "F7",
+   "id": "F7.tp_conf_blockreduce",
+   "numerics_changing": true
+  },
+  {
+   "family": "F7",
+   "id": "F7.tp_triatt_bias_gather",
+   "numerics_changing": false
+  },
+  {
+   "family": "F7",
+   "id": "F7.tp_a2a_transpose_window",
+   "numerics_changing": false
+  },
+  {
+   "family": "F7",
+   "id": "F7.tp_rank0_featurize_bcast",
+   "numerics_changing": false
+  },
+  {
+   "family": "F7",
+   "id": "F7.tp_shard_park_host",
+   "numerics_changing": false
+  },
+  {
+   "family": "F7",
+   "id": "F7.jax_memory_flags",
+   "numerics_changing": false
+  },
+  {
+   "family": "F7",
+   "id": "F7.ckpt_resume_samples",
+   "numerics_changing": false
+  },
+  {
+   "family": "F7",
+   "id": "F7.sample_loop",
+   "numerics_changing": false
+  },
+  {
+   "family": "F7",
+   "id": "F7.cache_release",
+   "numerics_changing": false
+  },
+  {
+   "family": "F7",
+   "id": "F7.recycle_carry",
+   "numerics_changing": false
+  },
+  {
+   "family": "F7",
+   "id": "F7.seed_batch",
+   "numerics_changing": true
+  },
+  {
+   "family": "F7",
+   "id": "F7.row_dedup",
+   "numerics_changing": true
+  },
+  {
+   "family": "F7",
+   "id": "F7.hoist_off",
+   "numerics_changing": true
+  },
+  {
+   "family": "F7",
+   "id": "F7.jax_subbatch",
+   "numerics_changing": true
+  },
+  {
+   "family": "LOCAL",
+   "id": "LOCAL.chai1_ts2eager",
+   "numerics_changing": false
+  },
+  {
+   "family": "LOCAL",
+   "id": "LOCAL.af2ig_stock_frontend",
+   "numerics_changing": false
+  },
+  {
+   "family": "F7",
+   "id": "F7.tp_trunk_rows",
+   "numerics_changing": true
+  },
+  {
+   "family": "F7",
+   "id": "F7.tp_msa_rows",
+   "numerics_changing": true
+  },
+  {
+   "family": "F7",
+   "id": "F7.tp_msa_host",
+   "numerics_changing": false
+  },
+  {
+   "family": "F7",
+   "id": "F7.tp_template_rows",
+   "numerics_changing": true
+  },
+  {
+   "family": "F7",
+   "id": "F7.tp_heads_rows",
+   "numerics_changing": true
+  },
+  {
+   "family": "F7",
+   "id": "F7.tp_diffusion_rows",
+   "numerics_changing": true
+  },
+  {
+   "family": "F7",
+   "id": "F7.tp_frame_rows",
+   "numerics_changing": false
+  }
+ ],
+ "note": "Canonical strategy ids. A LEVER line's strategy= names one of `canonical[].id` or a kit-local `LOCAL.<kit>.<name>`; an alias is refused naming its replacement. Glosses, ceilings and the kit's own lever names live in the strategy matrix, not here."
+}

@@ -1,0 +1,29 @@
+# mosaic optimization kit — Apptainer / Singularity image made FROM the container image of mosaic/environment/Dockerfile: the same stack and the
+# same /kit, for hosts that run Apptainer instead of Docker. The source is the image tagged mosaic-kit:dev in the local Docker daemon (build it
+# first: README.md 'Setup', route A); for a published tag the two header lines read `Bootstrap: docker` / `From: <registry>/mosaic-kit:<tag>`.
+#   apptainer build mosaic.sif mosaic/environment/apptainer.def
+#   apptainer run --nv --cleanenv --bind /path/to/mosaic_cache:/weights --env MOSAIC_CACHE_DIR=/weights --bind "$PWD/cache":/cache \
+#     --env MOSAIC_OPT_CACHE_ROOT=/cache --bind "$PWD/out":/out mosaic.sif design --config h100 --mode fast --out /out/fast --seed 0
+# The image is read-only: give every verb an --out (and MOSAIC_OPT_CACHE_ROOT, the P1 files' root that `warm` fills and `exact` reads) on a bound,
+# writable path; %environment keeps a host user site-packages (PEP 370) from shadowing the pinned stack, --cleanenv keeps the host's variables out.
+Bootstrap: docker-daemon
+From: mosaic-kit:dev
+
+%post
+    mkdir -p /opt/culib && ln -s /.singularity.d/libs/libcuda.so.1 /opt/culib/libcuda.so && ln -s /.singularity.d/libs/libcuda.so.1 /opt/culib/libcuda.so.1
+
+%environment
+    export PYTHONNOUSERSITE=1
+    # Triton <= 3.5 links its launcher stub with -lcuda: offer the unversioned name when --nv bound only libcuda.so.1
+    if [ -z "${TRITON_LIBCUDA_PATH:-}" ] && [ -e /opt/culib/libcuda.so ]; then export TRITON_LIBCUDA_PATH=/opt/culib; fi
+
+%runscript
+    cd /kit/mosaic && exec bash /kit/mosaic/run.sh "$@"
+
+%help
+    mosaic optimization kit: drop-in modes that make stock escalante-bio mosaic (Boltz-2 binder hallucination through joltz, at its pinned
+    commits) faster to start, faster per design step, or lighter on GPU memory without changing the recipe you run — off = stock exactly;
+    exact = identical outputs, faster; fast = small documented numeric differences, faster still (the default); big = lowest memory.
+    `apptainer run --nv --cleanenv mosaic.sif <verb> ...` = `bash /kit/mosaic/run.sh <verb> ...` (verbs: install, design, check, warm; /kit/mosaic/README.md
+    inside the image). Requires an NVIDIA driver that runs CUDA 12 (550 or newer), MOSAIC_CACHE_DIR naming the weights cache and
+    MOSAIC_OPT_CACHE_ROOT naming a writable directory for the P1 files.

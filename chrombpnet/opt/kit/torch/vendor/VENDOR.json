@@ -1,0 +1,13 @@
+{
+ "source": "bpnet-lite from https://github.com/jmschrei/bpnet-lite at commit b37e766bd7a2bef1614cf18d8bac38167e6f6ff5 (package metadata says 1.0.0) and tangermeme 1.4.1 from the PyPI wheel tangermeme-1.4.1-py3-none-any.whl, as installed by pip: the two packages and their .dist-info directories, copied unmodified (upstream licences under */licenses/LICENSE; notices in the kit's THIRD_PARTY_NOTICES.md)",
+ "contents": [
+  "bpnet_lite-1.0.0.dist-info",
+  "tangermeme-1.4.1.dist-info"
+ ],
+ "licences": {
+  "bpnet_lite-1.0.0.dist-info/licenses/LICENSE": "MIT License",
+  "tangermeme-1.4.1.dist-info/licenses/LICENSE": "MIT License"
+ },
+ "why": "the K1 weight loader (bpnetlite.chrombpnet.ChromBPNet.from_chrombpnet) and its module-level import tangermeme.predict; pure Python; HERE-first on sys.path (fastdefault._torch_stack)",
+ "utc": "2026-08-27T13:58:27Z"
+}

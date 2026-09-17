@@ -1,0 +1,48 @@
+{
+ "arch": [
+  "arch=compute_80,code=sm_80"
+ ],
+ "build_s": 53.6,
+ "built_by": "tools/build_prebuilt.py: the kernel directory's own _build() in the target stack",
+ "built_utc": "2026-09-12T04:05:29Z",
+ "cxx11abi": true,
+ "device": "NVIDIA A100-SXM4-80GB",
+ "dir": "cuda_80",
+ "ext": "triattn_sm80_ext",
+ "loadcheck": {
+  "a80_d64_s512_none": "12d730e5cc87f467",
+  "a80_s1024_endstrided": "bc687e4bc4ee5d4e",
+  "a80_s512_prefixvar": "9644519dab388306"
+ },
+ "loadcheck_bitwise": {
+  "a80_d64_s512_none": true,
+  "a80_s1024_endstrided": true,
+  "a80_s512_prefixvar": true
+ },
+ "module": "triattn_sm80",
+ "module_sha256": {
+  "triattn_sm80.py": "70afc4d4f3997ecd2a9c620b2f129de1abba25d74f9f3190c2333975ffa8cbaa"
+ },
+ "nvcc": "Build cuda_13.0.r13.0/compiler.36424714_0",
+ "ptxas": {
+  "path": "/usr/local/cuda/bin/ptxas",
+  "version": "Build cuda_13.0.r13.0/compiler.36424714_0"
+ },
+ "python": "3.12.1",
+ "route": "cuda_80",
+ "so_bytes": 12286424,
+ "so_sha256": "3652de0be1ed25b7700fb242665a7c94c1fc11d5143cfd3c6b8468376db420a8",
+ "soabi": "cpython-312-x86_64-linux-gnu",
+ "source_sha256": {
+  "inst_d16.cu": "76539b983a51e623a3b8e492b0b3310dad6d4a05f995a890746514a94355327a",
+  "inst_d32.cu": "b26c55672bef4df47d50db2e59adde8d1d40e4720c996088c79f0cdde8db95d6",
+  "inst_d64.cu": "44aee8ff73ab7163286fcf0866ca678c15bf97dae25b69d1f9528f83b51b74df",
+  "inst_sm80.h": "11e0875f43676a211dbf5d78bf50202a4c51bf80d7cb5337602aa3c5811aae72",
+  "launch_sm80.cuh": "977ad52e011f71406bc6a3c1fb538e85f29c364d669858c33c2ec328cf59be28",
+  "sm80_binding.cu": "e57f83ca2f7b3e4017fc9c5330df1224f46581a47a933ce8a7164f427be0f181",
+  "triattn_sm80.cuh": "239ed0c6ee3e34402a46fc4269f926bff6d056ebab235907b672a2cdbd236def"
+ },
+ "stack_tag": "torch2.12.0+cu130-cpython-312-x86_64-linux-gnu",
+ "torch": "2.12.0+cu130",
+ "torch_cuda": "13.0"
+}

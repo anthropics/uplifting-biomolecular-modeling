@@ -1,0 +1,5 @@
+# setuptools/pip build byproducts (test_startup.py's fresh-venv install writes these into the source tree)
+build/
+*.egg-info/
+__pycache__/
+*.pyc

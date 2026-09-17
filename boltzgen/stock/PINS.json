@@ -1,0 +1,209 @@
+{
+ "boltzgen_version": "0.3.2",
+ "upstream": {
+  "repo": "https://github.com/HannesStark/boltzgen",
+  "tag": "v0.3.2",
+  "tag_commit": "31d9d9b9c72245b4ed6fe8742d6fbf4e1a3552a0",
+  "commit_equivalent_for_touched_files": "a3149cf18eeb58648d1abbb27539bd73f746cdda"
+ },
+ "wheel": {
+  "file": "stock/boltzgen-0.3.2-py3-none-any.whl",
+  "sha256": "f832063040eb851deacca5641c1e41a5518696110142a937f888bd8db6806d96",
+  "bytes": 357057,
+  "source": "package index bdist_wheel"
+ },
+ "sdist": {
+  "file": "boltzgen-0.3.2.tar.gz",
+  "sha256": "ddc2832d2e73e24fae9cc027e7a5dd2a94ca49963d685f016d41205039eb1340",
+  "bytes": 312931,
+  "source": "package index sdist digest; not carried"
+ },
+ "touched_modules": [
+  "boltzgen/model/layers/attention.py",
+  "boltzgen/model/layers/initialize.py",
+  "boltzgen/model/layers/triangular_attention/primitives.py",
+  "boltzgen/model/models/boltz.py",
+  "boltzgen/task/predict/predict.py",
+  "boltzgen/model/modules/diffusion.py",
+  "boltzgen/model/modules/trunk.py",
+  "boltzgen/model/layers/transition.py",
+  "boltzgen/model/layers/triangular_attention/attention.py",
+  "boltzgen/model/modules/encoders.py",
+  "boltzgen/model/modules/transformers.py",
+  "boltzgen/task/predict/writer.py"
+ ],
+ "entry_point": {
+  "console_script": "boltzgen = boltzgen.cli.boltzgen:main",
+  "run": "boltzgen run <spec.yaml> --output <dir> ... (unseeded; one subprocess of resources/main.py per step)",
+  "configure": "boltzgen configure <spec.yaml> --output <dir> ... (writes <dir>/steps.yaml + config/*.yaml)",
+  "step_process": "python <site-packages>/boltzgen/resources/main.py <dir>/config/<step>.yaml with BOLTZGEN_PIPELINE_STEP=<step>"
+ },
+ "cli_defaults": {
+  "protocol": "protein-anything",
+  "num_workers": 1,
+  "num_designs": 10000,
+  "budget": 30,
+  "steps": "all (protein-anything: design, inverse_folding, design_folding, folding, analysis, filtering)",
+  "design_checkpoints": [
+   "boltzgen1_diverse.ckpt",
+   "boltzgen1_adherence.ckpt"
+  ],
+  "inverse_fold_checkpoint": "boltzgen1_ifold.ckpt",
+  "folding_checkpoint": "boltz2_conf_final.ckpt",
+  "affinity_checkpoint": "boltz2_aff.ckpt",
+  "diffusion_batch_size": "None -> 1 if num_designs < 100 else 10"
+ },
+ "seed_recipe": {
+  "form": "per step i of <dir>/steps.yaml, one process: pl.seed_everything(seed + i, workers=True); random.seed(seed + i); np.random.seed((seed + i) % (2**32)); torch.manual_seed(seed + i); np.random.default_rng(None) seeded from that stream's state (bg_hook.py = stock_design.seed_default_rng); then resources/main.py main(<config_i>, [])",
+  "source": "opt/forward/fast_inference/src/bg_inproc.py:38-40 and bg_hook.py (the kits' in-process contract); opt/boltzgen_opt/stock_design.py SEED_LINE + seed_default_rng (the stock caller, per step process, when --seed is given)",
+  "env_per_step": {
+   "BOLTZGEN_PIPELINE_STEP": "<step name>",
+   "HF_HUB_OFFLINE": "1",
+   "PYTHONUNBUFFERED": "1"
+  }
+ },
+ "weights": {
+  "hf_cache_layout": "<cache>/models--boltzgen--boltzgen-1/snapshots/<snapshot>/<file>; <cache>/datasets--boltzgen--inference-data/snapshots/<snapshot>/mols.zip",
+  "cache_env": "BOLTZGEN_CACHE",
+  "model_repo": "boltzgen/boltzgen-1",
+  "model_snapshot": "c1be29e1f82ffcc72264f64b993c43fb4e0d17f0",
+  "data_repo": "boltzgen/inference-data",
+  "data_snapshot": "c3d36fd276e9caf098c75d4113c6d5eb320b1a4c",
+  "files": [
+   {
+    "file": "models--boltzgen--boltzgen-1/snapshots/c1be29e1f82ffcc72264f64b993c43fb4e0d17f0/boltzgen1_diverse.ckpt",
+    "sha256": "360af8bd6e59527ff6ec25dd81253967f3bd3567d200053b10680634751f8e3c"
+   },
+   {
+    "file": "models--boltzgen--boltzgen-1/snapshots/c1be29e1f82ffcc72264f64b993c43fb4e0d17f0/boltzgen1_adherence.ckpt",
+    "sha256": "ac7078b3dc13064c68e0c3fd542e5bc538c33558bf6607f65e499eb336ca5e5d"
+   },
+   {
+    "file": "models--boltzgen--boltzgen-1/snapshots/c1be29e1f82ffcc72264f64b993c43fb4e0d17f0/boltzgen1_ifold.ckpt",
+    "sha256": "dd4cf108c94471bdc3a326b7b180fa3854dc019110fae780208c30b50bd56578"
+   },
+   {
+    "file": "models--boltzgen--boltzgen-1/snapshots/c1be29e1f82ffcc72264f64b993c43fb4e0d17f0/boltz2_conf_final.ckpt",
+    "sha256": "525a51ef306da7282a54d23a4a5b91212fc60d0ff6b23b56dd6351de3b387530"
+   },
+   {
+    "file": "models--boltzgen--boltzgen-1/snapshots/c1be29e1f82ffcc72264f64b993c43fb4e0d17f0/boltz2_aff.ckpt",
+    "sha256": "6dc13d488015666d3c3fdffd29fab54d72e4f2597b654f996cdcf5937feab090"
+   },
+   {
+    "file": "datasets--boltzgen--inference-data/snapshots/c3d36fd276e9caf098c75d4113c6d5eb320b1a4c/mols.zip",
+    "sha256": "3d4f56ac4262e745bb3d09cfaa19099b1d01be208122d501667b952e45521e53"
+   }
+  ],
+  "source": "sha256 per file, equal to the Hugging Face LFS digests of the pinned snapshots"
+ },
+ "python": "3.11",
+ "stack_of_record": {
+  "python": "3.11",
+  "torch": "2.13.0+cu130",
+  "triton": "3.7.1",
+  "cuda": "13.0",
+  "cuequivariance": "0.11.1 (cuequivariance, cuequivariance-torch; ops build cuequivariance-ops-torch-cu13 + cuequivariance-ops-cu13 0.11.1 = NVIDIA's published CUDA-13 pair for this torch)",
+  "pytorch_lightning": "2.6.5",
+  "numpy": "2.0.2",
+  "numba": "0.61.0",
+  "freeze": "environment/requirements.lock",
+  "freeze_source": "the carried kits' 103-line freeze with the deviation `freeze_deviation` applied: 101 distributions; environment/requirements.lock lists them as `pip freeze --all` prints them on the stack's interpreter — torch with its CUDA build (2.13.0+cu130), plus pip, setuptools and wheel (104 lines)",
+  "tested_on": "nvidia/cuda:13.0.1-base-ubuntu22.04 + python 3.11 + build-essential + this freeze, the freeze_deviation pair installed from the package index with --require-hashes (a label: nothing reads or compares it)",
+  "driver": "580.95.05 (the kits' environment of record)",
+  "freeze_deviation": {
+   "removed": [
+    "cuequivariance-ops-cu12==0.11.1",
+    "cuequivariance-ops-torch-cu12==0.11.1",
+    "nvidia-cublas-cu12==12.9.2.10",
+    "nvidia-cuda-nvrtc-cu12==12.9.86"
+   ],
+   "added": [
+    "cuequivariance-ops-cu13==0.11.1",
+    "cuequivariance-ops-torch-cu13==0.11.1"
+   ],
+   "why": "the kits' freeze pairs torch 2.13.0+cu130 with the CUDA-12 build of the cuEquivariance ops (plus that build's own nvidia-cublas-cu12 / nvidia-cuda-nvrtc-cu12, loaded into the same process as torch's CUDA-13 libraries); the stack of record carries NVIDIA's CUDA-13 build of the same version, whose libcue_ops.so links libcublas / libnvrtc 13 from torch's own wheels; module names, Python API and dispatch rules are identical",
+   "wheels": {
+    "cuequivariance_ops_torch_cu13-0.11.1-cp311-cp311-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl": "bb5d055cf62c359440193bc88a5d056376372734b154798db9341ebafbce6eab",
+    "cuequivariance_ops_cu13-0.11.1-py3-none-manylinux_2_24_x86_64.manylinux_2_28_x86_64.whl": "2dc36684116ac1eb7ee835b7c58c7000df992f996d91566d033f2aab71263396"
+   },
+   "pip_check": "boltzgen 0.3.2's wheel metadata (wheel_requires) names the -cu12 distributions, so `pip check` reports two unmet names on the stack of record; the -cu13 distributions provide the same modules (cuequivariance_ops, cuequivariance_ops_torch)"
+  }
+ },
+ "wheel_requires": {
+  "python": ">=3.11",
+  "numpy": "==2.0.2",
+  "numba": "==0.61.0",
+  "torch": ">=2.4.1",
+  "cuequivariance_torch": ">=0.5.0",
+  "cuequivariance_ops_cu12": ">=0.5.0",
+  "cuequivariance_ops_torch_cu12": ">=0.5.0",
+  "gemmi": ">=0.6.5",
+  "nvidia-ml-py": ">=12.535.133"
+ },
+ "stock_environment": {
+  "reads": [
+   "BOLTZGEN_CACHE",
+   "HF_HOME",
+   "HF_HUB_OFFLINE",
+   "BOLTZGEN_PIPELINE_STEP",
+   "BOLTZGEN_PIPELINE_PROGRESS",
+   "PYTHONUNBUFFERED",
+   "TRITON_CACHE_DIR",
+   "TORCH_EXTENSIONS_DIR",
+   "CUEQ_DEFAULT_CONFIG",
+   "CUEQ_DISABLE_AOT_TUNING",
+   "CUEQ_TRIATTN_FALLBACK_THRESHOLD",
+   "CUEQ_TRIMUL_FALLBACK_THRESHOLD"
+  ],
+  "must_be_absent_prefixes": [
+   "XA_",
+   "BG_",
+   "SZ_",
+   "FL_",
+   "HL_"
+  ],
+  "kit_module_prefixes": [
+   "xa_",
+   "bg_",
+   "sitecustomize"
+  ],
+  "note": "the stock arm is upstream alone in a pristine environment: no kit module, no kit directory on sys.path, no kit variable (every name under the prefixes and the three exact names above); the seed recipe above is harness code, not a lever",
+  "must_be_absent_names": [
+   "BOLTZGEN_OPT",
+   "PYTHONPATH",
+   "BOLTZGEN_OPT_KERNELS"
+  ],
+  "census": "the one thing of this tree in the stock process: the accelerator census (opt/boltzgen_opt/census.py — the per-process monitor; the modes' policy over it, opt/boltzgen_opt/kernels.py, is never imported there), armed by argument after the environment proof of a GPU step; pass-through call counters on cuequivariance_ops_torch's two dispatch functions and their reference implementations, a pass-through observer on upstream's Boltz.predict_step that reads the TF32 switches each call runs under (no clock, no synchronisation, no line of its own), one KERNELS line (with its report-only stack words) and one PEAK line at exit; arguments and results untouched"
+ },
+ "gpu_of_record": {
+  "name": "NVIDIA H100 80GB HBM3",
+  "memory_total_mib": 81559,
+  "compute_capability": "9.0",
+  "gate": "a visible GPU; a card other than this one by name or total memory is admitted with a NOTE line (gpu_gate=noted), which also says when the card is below min_compute_capability, the lowest capability the kit was run on \u2014 the card is never refused",
+  "min_compute_capability": "8.0"
+ },
+ "prerequisites": {
+  "gcc": "Triton JIT-compiles a launcher at run time (upstream's cuEquivariance kernels at their first call; environment/Dockerfile installs build-essential)"
+ },
+ "step_config_defaults": {
+  "source": "the wheel's resources/config/{design,inverse_fold,fold}.yaml (what `boltzgen configure` writes unless a flag overrides it)",
+  "design": {
+   "matmul_precision": "high",
+   "recycling_steps": 3,
+   "sampling_steps": 500,
+   "num_workers": "configure --num_workers (config default 4; CLI default 1)"
+  },
+  "inverse_folding": {
+   "matmul_precision": null,
+   "recycling_steps": 3,
+   "sampling_steps": 200
+  },
+  "folding": {
+   "matmul_precision": null,
+   "recycling_steps": 3,
+   "sampling_steps": 200
+  }
+ },
+ "wheel_requires_note": "the wheel's own metadata: it names the CUDA-12 ops distributions; the stack of record installs the CUDA-13 pair of the same version instead (stack_of_record.freeze_deviation)"
+}

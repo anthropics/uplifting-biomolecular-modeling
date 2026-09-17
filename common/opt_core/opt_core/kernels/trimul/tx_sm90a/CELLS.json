@@ -1,0 +1,416 @@
+{
+ "package": "protenix_fpf_trimul_tx",
+ "version": "1.1",
+ "op": "Protenix v2 TriangleMultiplication (Outgoing/Incoming), module statement incl. residual",
+ "key_schema": [
+  "cc",
+  "dtype",
+  "c_z",
+  "c_hidden",
+  "heads(n/a)",
+  "head_dim(n/a)",
+  "N_bucket (tokens; pair tensor N x N)",
+  "direction",
+  "lever"
+ ],
+ "notes": [
+  "all rows: one H100 80GB HBM3 development GPU per table (medians of interleaved CUDA-graph replays); development-grade numbers, not acceptance records",
+  "served cells in code: cc 9.0 only; c_z = c_hidden = 256 only; any N >= 101 (fast) / N > 100 (exact); other cells take the stock forward per call",
+  "1.2 exact rows: op with both LayerNorms inside the kernels (stock summation order); ragged N (N % 8 != 0) is slower by two strided copies, e.g. 1.315 ms at N = 389"
+ ],
+ "rows": [
+  {
+   "key": {
+    "cc": "9.0",
+    "dtype": "bf16",
+    "c_z": 256,
+    "c_hidden": 256,
+    "heads": null,
+    "head_dim": null,
+    "N_bucket": 384,
+    "direction": "incoming",
+    "lever": "trimul_tx (fast tier)",
+    "statement": "z + TriMul(z, mask) incl. residual, CUDA-graph replay"
+   },
+   "ms": {
+    "this": 0.3937,
+    "incumbent_kit_trimul_v4": 0.5224,
+    "kit_exact_trimul_exact_Cprime": 0.621,
+    "cuequivariance_0.11.1_default_tiles": 1.4229
+   },
+   "ratio_vs_incumbent": 1.327,
+   "ratio_vs_cuequivariance": 3.614,
+   "source": "OPTABLE v0 (package 1.0 kernels; 1.1 fast path is bitwise identical, timing re-checked within noise)",
+   "device": "NVIDIA H100 80GB HBM3",
+   "torch": "2.13.0+cu130",
+   "reps": 20
+  },
+  {
+   "key": {
+    "cc": "9.0",
+    "dtype": "bf16",
+    "c_z": 256,
+    "c_hidden": 256,
+    "heads": null,
+    "head_dim": null,
+    "N_bucket": 384,
+    "direction": "outgoing",
+    "lever": "trimul_tx (fast tier)",
+    "statement": "z + TriMul(z, mask) incl. residual, CUDA-graph replay"
+   },
+   "ms": {
+    "this": 0.3937,
+    "incumbent_kit_trimul_v4": 0.5218,
+    "kit_exact_trimul_exact_Cprime": 0.6174,
+    "cuequivariance_0.11.1_default_tiles": 1.4219
+   },
+   "ratio_vs_incumbent": 1.325,
+   "ratio_vs_cuequivariance": 3.612,
+   "source": "OPTABLE v0 (package 1.0 kernels; 1.1 fast path is bitwise identical, timing re-checked within noise)",
+   "device": "NVIDIA H100 80GB HBM3",
+   "torch": "2.13.0+cu130",
+   "reps": 20
+  },
+  {
+   "key": {
+    "cc": "9.0",
+    "dtype": "bf16",
+    "c_z": 256,
+    "c_hidden": 256,
+    "heads": null,
+    "head_dim": null,
+    "N_bucket": 512,
+    "direction": "incoming",
+    "lever": "trimul_tx (fast tier)",
+    "statement": "z + TriMul(z, mask) incl. residual, CUDA-graph replay"
+   },
+   "ms": {
+    "this": 0.681,
+    "incumbent_kit_trimul_v4": 0.8663,
+    "kit_exact_trimul_exact_Cprime": 1.0601,
+    "cuequivariance_0.11.1_default_tiles": 2.4986
+   },
+   "ratio_vs_incumbent": 1.272,
+   "ratio_vs_cuequivariance": 3.669,
+   "source": "OPTABLE v0 (package 1.0 kernels; 1.1 fast path is bitwise identical, timing re-checked within noise)",
+   "device": "NVIDIA H100 80GB HBM3",
+   "torch": "2.13.0+cu130",
+   "reps": 20
+  },
+  {
+   "key": {
+    "cc": "9.0",
+    "dtype": "bf16",
+    "c_z": 256,
+    "c_hidden": 256,
+    "heads": null,
+    "head_dim": null,
+    "N_bucket": 512,
+    "direction": "outgoing",
+    "lever": "trimul_tx (fast tier)",
+    "statement": "z + TriMul(z, mask) incl. residual, CUDA-graph replay"
+   },
+   "ms": {
+    "this": 0.681,
+    "incumbent_kit_trimul_v4": 0.8689,
+    "kit_exact_trimul_exact_Cprime": 1.0646,
+    "cuequivariance_0.11.1_default_tiles": 2.502
+   },
+   "ratio_vs_incumbent": 1.276,
+   "ratio_vs_cuequivariance": 3.674,
+   "source": "OPTABLE v0 (package 1.0 kernels; 1.1 fast path is bitwise identical, timing re-checked within noise)",
+   "device": "NVIDIA H100 80GB HBM3",
+   "torch": "2.13.0+cu130",
+   "reps": 20
+  },
+  {
+   "key": {
+    "cc": "9.0",
+    "dtype": "bf16",
+    "c_z": 256,
+    "c_hidden": 256,
+    "heads": null,
+    "head_dim": null,
+    "N_bucket": 768,
+    "direction": "incoming",
+    "lever": "trimul_tx (fast tier)",
+    "statement": "z + TriMul(z, mask) incl. residual, CUDA-graph replay"
+   },
+   "ms": {
+    "this": 1.548,
+    "incumbent_kit_trimul_v4": 1.9872,
+    "kit_exact_trimul_exact_Cprime": 2.4234,
+    "cuequivariance_0.11.1_default_tiles": 5.6528
+   },
+   "ratio_vs_incumbent": 1.284,
+   "ratio_vs_cuequivariance": 3.652,
+   "source": "OPTABLE v0 (package 1.0 kernels; 1.1 fast path is bitwise identical, timing re-checked within noise)",
+   "device": "NVIDIA H100 80GB HBM3",
+   "torch": "2.13.0+cu130",
+   "reps": 20
+  },
+  {
+   "key": {
+    "cc": "9.0",
+    "dtype": "bf16",
+    "c_z": 256,
+    "c_hidden": 256,
+    "heads": null,
+    "head_dim": null,
+    "N_bucket": 768,
+    "direction": "outgoing",
+    "lever": "trimul_tx (fast tier)",
+    "statement": "z + TriMul(z, mask) incl. residual, CUDA-graph replay"
+   },
+   "ms": {
+    "this": 1.4985,
+    "incumbent_kit_trimul_v4": 1.933,
+    "kit_exact_trimul_exact_Cprime": 2.3691,
+    "cuequivariance_0.11.1_default_tiles": 5.6159
+   },
+   "ratio_vs_incumbent": 1.29,
+   "ratio_vs_cuequivariance": 3.748,
+   "source": "OPTABLE v0 (package 1.0 kernels; 1.1 fast path is bitwise identical, timing re-checked within noise)",
+   "device": "NVIDIA H100 80GB HBM3",
+   "torch": "2.13.0+cu130",
+   "reps": 20
+  },
+  {
+   "key": {
+    "cc": "9.0",
+    "dtype": "bf16",
+    "c_z": 256,
+    "c_hidden": 256,
+    "heads": null,
+    "head_dim": null,
+    "N_bucket": 1024,
+    "direction": "incoming",
+    "lever": "trimul_tx (fast tier)",
+    "statement": "z + TriMul(z, mask) incl. residual, CUDA-graph replay"
+   },
+   "ms": {
+    "this": 2.8468,
+    "incumbent_kit_trimul_v4": 3.6148,
+    "kit_exact_trimul_exact_Cprime": 4.4358,
+    "cuequivariance_0.11.1_default_tiles": 10.2354
+   },
+   "ratio_vs_incumbent": 1.27,
+   "ratio_vs_cuequivariance": 3.595,
+   "source": "OPTABLE v0 (package 1.0 kernels; 1.1 fast path is bitwise identical, timing re-checked within noise)",
+   "device": "NVIDIA H100 80GB HBM3",
+   "torch": "2.13.0+cu130",
+   "reps": 20
+  },
+  {
+   "key": {
+    "cc": "9.0",
+    "dtype": "bf16",
+    "c_z": 256,
+    "c_hidden": 256,
+    "heads": null,
+    "head_dim": null,
+    "N_bucket": 1024,
+    "direction": "outgoing",
+    "lever": "trimul_tx (fast tier)",
+    "statement": "z + TriMul(z, mask) incl. residual, CUDA-graph replay"
+   },
+   "ms": {
+    "this": 2.7991,
+    "incumbent_kit_trimul_v4": 3.5593,
+    "kit_exact_trimul_exact_Cprime": 4.3727,
+    "cuequivariance_0.11.1_default_tiles": 10.1866
+   },
+   "ratio_vs_incumbent": 1.272,
+   "ratio_vs_cuequivariance": 3.639,
+   "source": "OPTABLE v0 (package 1.0 kernels; 1.1 fast path is bitwise identical, timing re-checked within noise)",
+   "device": "NVIDIA H100 80GB HBM3",
+   "torch": "2.13.0+cu130",
+   "reps": 20
+  },
+  {
+   "key": {
+    "cc": "9.0",
+    "dtype": "bf16",
+    "c_z": 256,
+    "c_hidden": 256,
+    "heads": null,
+    "head_dim": null,
+    "N_bucket": 1536,
+    "direction": "incoming",
+    "lever": "trimul_tx (fast tier)",
+    "statement": "z + TriMul(z, mask) incl. residual, CUDA-graph replay"
+   },
+   "ms": {
+    "this": 7.2184,
+    "incumbent_kit_trimul_v4": 9.2136,
+    "kit_exact_trimul_exact_Cprime": 11.0142,
+    "cuequivariance_0.11.1_default_tiles": 23.8548
+   },
+   "ratio_vs_incumbent": 1.276,
+   "ratio_vs_cuequivariance": 3.305,
+   "source": "OPTABLE v0 (package 1.0 kernels; 1.1 fast path is bitwise identical, timing re-checked within noise)",
+   "device": "NVIDIA H100 80GB HBM3",
+   "torch": "2.13.0+cu130",
+   "reps": 20
+  },
+  {
+   "key": {
+    "cc": "9.0",
+    "dtype": "bf16",
+    "c_z": 256,
+    "c_hidden": 256,
+    "heads": null,
+    "head_dim": null,
+    "N_bucket": 1536,
+    "direction": "outgoing",
+    "lever": "trimul_tx (fast tier)",
+    "statement": "z + TriMul(z, mask) incl. residual, CUDA-graph replay"
+   },
+   "ms": {
+    "this": 6.9329,
+    "incumbent_kit_trimul_v4": 8.8166,
+    "kit_exact_trimul_exact_Cprime": 10.6883,
+    "cuequivariance_0.11.1_default_tiles": 23.6478
+   },
+   "ratio_vs_incumbent": 1.272,
+   "ratio_vs_cuequivariance": 3.411,
+   "source": "OPTABLE v0 (package 1.0 kernels; 1.1 fast path is bitwise identical, timing re-checked within noise)",
+   "device": "NVIDIA H100 80GB HBM3",
+   "torch": "2.13.0+cu130",
+   "reps": 20
+  },
+  {
+   "key": {
+    "cc": "9.0",
+    "dtype": "bf16",
+    "c_z": 256,
+    "c_hidden": 256,
+    "heads": null,
+    "head_dim": null,
+    "N_bucket": 2048,
+    "direction": "incoming",
+    "lever": "trimul_tx (fast tier)",
+    "statement": "z + TriMul(z, mask) incl. residual, CUDA-graph replay"
+   },
+   "ms": {
+    "this": 14.1758,
+    "incumbent_kit_trimul_v4": 17.7098,
+    "kit_exact_trimul_exact_Cprime": 20.9475,
+    "cuequivariance_0.11.1_default_tiles": 44.1112
+   },
+   "ratio_vs_incumbent": 1.249,
+   "ratio_vs_cuequivariance": 3.112,
+   "source": "OPTABLE v0 (package 1.0 kernels; 1.1 fast path is bitwise identical, timing re-checked within noise)",
+   "device": "NVIDIA H100 80GB HBM3",
+   "torch": "2.13.0+cu130",
+   "reps": 20
+  },
+  {
+   "key": {
+    "cc": "9.0",
+    "dtype": "bf16",
+    "c_z": 256,
+    "c_hidden": 256,
+    "heads": null,
+    "head_dim": null,
+    "N_bucket": 2048,
+    "direction": "outgoing",
+    "lever": "trimul_tx (fast tier)",
+    "statement": "z + TriMul(z, mask) incl. residual, CUDA-graph replay"
+   },
+   "ms": {
+    "this": 13.9316,
+    "incumbent_kit_trimul_v4": 17.0605,
+    "kit_exact_trimul_exact_Cprime": 20.4727,
+    "cuequivariance_0.11.1_default_tiles": 43.6762
+   },
+   "ratio_vs_incumbent": 1.225,
+   "ratio_vs_cuequivariance": 3.135,
+   "source": "OPTABLE v0 (package 1.0 kernels; 1.1 fast path is bitwise identical, timing re-checked within noise)",
+   "device": "NVIDIA H100 80GB HBM3",
+   "torch": "2.13.0+cu130",
+   "reps": 20
+  },
+  {
+   "key": {
+    "cc": "9.0",
+    "dtype": "bf16",
+    "c_z": 256,
+    "c_hidden": 256,
+    "heads": null,
+    "head_dim": null,
+    "N_bucket": 512,
+    "direction": "outgoing",
+    "lever": "trimul_tx_exact (exact tier, 1.2)",
+    "statement": "z + TriMul(z) incl. residual, CUDA-graph replay"
+   },
+   "ms": {
+    "this": 0.712,
+    "incumbent_kit_trimul_exact_Cprime": 1.061,
+    "cuequivariance_0.11.1_default_tiles": 2.493,
+    "this_package_fast_lever": 0.674,
+    "this_1.1_stock_LN_kernels": 1.045
+   },
+   "ratio_vs_incumbent": 1.49,
+   "ratio_vs_cuequivariance": 3.501,
+   "source": "OPTABLE v2 (package 1.2: LayerNorms inside K1/K3 in the stock order)",
+   "device": "NVIDIA H100 80GB HBM3",
+   "torch": "2.13.0+cu130",
+   "reps": 10
+  },
+  {
+   "key": {
+    "cc": "9.0",
+    "dtype": "bf16",
+    "c_z": 256,
+    "c_hidden": 256,
+    "heads": null,
+    "head_dim": null,
+    "N_bucket": 1024,
+    "direction": "outgoing",
+    "lever": "trimul_tx_exact (exact tier, 1.2)",
+    "statement": "z + TriMul(z) incl. residual, CUDA-graph replay"
+   },
+   "ms": {
+    "this": 2.712,
+    "incumbent_kit_trimul_exact_Cprime": 4.292,
+    "cuequivariance_0.11.1_default_tiles": 10.179,
+    "this_package_fast_lever": 2.786,
+    "this_1.1_stock_LN_kernels": 3.877
+   },
+   "ratio_vs_incumbent": 1.583,
+   "ratio_vs_cuequivariance": 3.753,
+   "source": "OPTABLE v2 (package 1.2: LayerNorms inside K1/K3 in the stock order)",
+   "device": "NVIDIA H100 80GB HBM3",
+   "torch": "2.13.0+cu130",
+   "reps": 10
+  },
+  {
+   "key": {
+    "cc": "9.0",
+    "dtype": "bf16",
+    "c_z": 256,
+    "c_hidden": 256,
+    "heads": null,
+    "head_dim": null,
+    "N_bucket": 1536,
+    "direction": "outgoing",
+    "lever": "trimul_tx_exact (exact tier, 1.2)",
+    "statement": "z + TriMul(z) incl. residual, CUDA-graph replay"
+   },
+   "ms": {
+    "this": 7.178,
+    "incumbent_kit_trimul_exact_Cprime": 10.462,
+    "cuequivariance_0.11.1_default_tiles": 23.505,
+    "this_package_fast_lever": 6.998,
+    "this_1.1_stock_LN_kernels": 9.374
+   },
+   "ratio_vs_incumbent": 1.458,
+   "ratio_vs_cuequivariance": 3.275,
+   "source": "OPTABLE v2 (package 1.2: LayerNorms inside K1/K3 in the stock order)",
+   "device": "NVIDIA H100 80GB HBM3",
+   "torch": "2.13.0+cu130",
+   "reps": 10
+  }
+ ]
+}

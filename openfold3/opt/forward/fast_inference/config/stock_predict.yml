@@ -1,0 +1,14 @@
+# OpenFold3 0.4.1 inference configuration with the stock PyTorch attention path selected explicitly; the base of the kit's `fast` and `big` runner YAMLs.
+# Public openfold3 0.4.1 (PyPI wheel == git d12f5955) defaults settings.memory.eval.use_deepspeed_evo_attention to
+# `not _is_rocm` (= True on CUDA). On an image without a working DeepSpeed DS4Sci evoformer-attention build (no CUTLASS checkout /
+# no nvcc toolchain) every predict item then raises 'Unable to JIT load the evoformer_attn op', predict_step catches it, and
+# `run_openfold predict` exits 0 with ZERO structures written (the kit's exit rule turns that case into a non-zero exit: `incomplete`).
+# This file makes the kernels-off configuration explicit WITHOUT editing source (equivalent to model_config.py:115 `"use_deepspeed_evo_attention": False`).
+# Numerics: the DS4Sci flag only selects a kernel backend; with it False the model runs the stock PyTorch eager attention path.
+model_update:
+  presets: [predict]
+  custom:
+    settings:
+      memory:
+        eval:
+          use_deepspeed_evo_attention: false

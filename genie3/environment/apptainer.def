@@ -1,0 +1,30 @@
+# Genie 3 optimization kit — Apptainer / Singularity image made FROM the container image of genie3/environment/Dockerfile: the same stack and the
+# same /kit, for hosts that run Apptainer instead of Docker. The source is the image tagged genie3-kit:dev in the local Docker daemon (build it
+# first: README.md Setup); for a published tag the two header lines read `Bootstrap: docker` / `From: <registry>/genie3-kit:<tag>`,
+# and on a host without a Docker daemon `Bootstrap: docker-archive` / `From: genie3.tar` (after `docker save genie3-kit:dev -o genie3.tar` elsewhere).
+#   apptainer build genie3.sif genie3/environment/apptainer.def
+#   apptainer run --nv --cleanenv --bind /path/to/genie3_downloads:/weights --env GENIE3_WEIGHTS=/weights/pretrained/v1 --bind "$PWD/out":/out genie3.sif \
+#     design --config h100 --mode fast --input /opt/genie3/examples/binder_design/experiment.yaml --out_dir /out/fast --seed 0
+# The image is read-only: give every verb an --out_dir on a bound, writable path; the weights-digest memo and the Triton kernel cache go under
+# $HOME/.cache and $HOME/.triton (bound by default); %environment keeps a host user site-packages (PEP 370) from shadowing the pinned stack,
+# --cleanenv keeps the host's variables out.
+Bootstrap: docker-daemon
+From: genie3-kit:dev
+
+%environment
+    export PYTHONNOUSERSITE=1
+    # Triton <= 3.5 links its launcher stub with -lcuda: offer the unversioned name when --nv bound only libcuda.so.1
+    if [ -z "${TRITON_LIBCUDA_PATH:-}" ] && [ -e /opt/culib/libcuda.so ]; then export TRITON_LIBCUDA_PATH=/opt/culib; fi
+
+%post
+    mkdir -p /opt/culib && ln -s /.singularity.d/libs/libcuda.so.1 /opt/culib/libcuda.so && ln -s /.singularity.d/libs/libcuda.so.1 /opt/culib/libcuda.so.1
+
+%runscript
+    cd /kit/genie3 && exec bash /kit/genie3/run.sh "$@"
+
+%help
+    Genie 3 optimization kit: drop-in modes that make stock Genie 3 (aqlaboratory/genie3 @ d77ae5ac) produce backbone designs faster
+    without changing the request file you give it — off = stock exactly; exact = the same PDB files as stock, faster; fast = small documented
+    numeric differences, faster still (the default). `apptainer run --nv genie3.sif <verb> ...` = `bash /kit/genie3/run.sh <verb> ...` (verbs: install, design, check, warm;
+    /kit/genie3/README.md inside the image). Requires an NVIDIA driver that runs CUDA 12 applications (525.60 or newer) and GENIE3_WEIGHTS naming
+    the directory that holds checkpoints/step=600000.ckpt and config.yaml (`run.sh install --weights DIR` fetches them: DIR/pretrained/v1).

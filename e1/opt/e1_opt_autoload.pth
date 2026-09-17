@@ -1,0 +1,2 @@
+# opt_core autoload guard: package=e1_opt env=E1_OPT tag=e1-opt exit=3
+import os as _o, sys as _s; exec("try:\n import e1_opt._autoload\nexcept SystemExit as _x:\n _s.stderr.flush(); _o._exit(_x.code if isinstance(_x.code, int) else 3)\nexcept BaseException as _e:\n if (_o.environ.get('E1_OPT') or '').strip().lower() not in ('', 'off'):\n  _s.stderr.write('[e1-opt] NOT ACTIVE: e1_opt._autoload is not importable (%s: %s) under E1_OPT=%s (exit 3)\\n' % (type(_e).__name__, _e, _o.environ.get('E1_OPT'))); _s.stderr.flush(); _o._exit(3)\n")

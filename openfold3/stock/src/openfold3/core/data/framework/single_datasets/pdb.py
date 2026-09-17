@@ -1,0 +1,318 @@
+# Copyright 2026 AlQuraishi Laboratory
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import dataclasses
+import logging
+import random
+import traceback
+from collections import Counter
+from enum import IntEnum
+
+import pandas as pd
+import torch
+
+from openfold3.core.data.framework.single_datasets.abstract_single import (
+    register_dataset,
+)
+from openfold3.core.data.framework.single_datasets.base_of3 import (
+    BaseOF3Dataset,
+)
+from openfold3.core.data.framework.single_datasets.dataset_utils import (
+    check_invalid_feature_dict,
+    getitem_debug_log,
+)
+from openfold3.core.data.pipelines.featurization.loss_weights import (
+    set_loss_weights_for_disordered_set,
+)
+from openfold3.core.data.resources.residues import MoleculeType
+
+logger = logging.getLogger(__name__)
+
+
+class DatapointType(IntEnum):
+    CHAIN = 0
+    INTERFACE = 1
+
+
+@dataclasses.dataclass(frozen=False)
+class DatapointCollection:
+    """Dataclass to tally chain/interface properties."""
+
+    pdb_id: list[str]
+    datapoint: list[str | tuple[str, str]]
+    n_prot: list[int]
+    n_nuc: list[int]
+    n_ligand: list[int]
+    type: list[str]
+    n_clust: list[int]
+    metadata = pd.DataFrame()
+
+    @classmethod
+    def create_empty(cls):
+        """Create an empty instance of the dataclass."""
+        return cls(
+            pdb_id=[],
+            datapoint=[],
+            n_prot=[],
+            n_nuc=[],
+            n_ligand=[],
+            type=[],
+            n_clust=[],
+        )
+
+    def append(
+        self,
+        pdb_id: str,
+        datapoint: str | tuple[str, str],
+        moltypes: str | tuple[str, str],
+        type: DatapointType,
+        n_clust: int,
+    ) -> None:
+        """Append datapoint metadata to the tally.
+
+        Args:
+            pdb_id (str):
+                PDB ID.
+            datapoint (int | tuple[int, int]):
+                Chain or interface ID.
+            moltypes (str | tuple[str, str]):
+                Molecule types in the datapoint.
+            type (DatapointType):
+                Datapoint type. One of chain or interface.
+            n_clust (int):
+                Size of the cluster the datapoint belongs to.
+        """
+        self.pdb_id.append(pdb_id)
+        self.datapoint.append(datapoint)
+        n_prot, n_nuc, n_ligand = self.count_moltypes(moltypes)
+        self.n_prot.append(n_prot)
+        self.n_nuc.append(n_nuc)
+        self.n_ligand.append(n_ligand)
+        self.type.append(type)
+        self.n_clust.append(n_clust)
+
+    def count_moltypes(self, moltypes: str | tuple[str, str]) -> tuple[int, int, int]:
+        """Count the number of molecule types.
+
+        Args:
+            moltypes (str | tuple[str, str]):
+                Molecule type of the chain or types of the interface datapoint.
+
+        Returns:
+            tuple[int, int, int]:
+                Number of protein, nucleic acid and ligand molecules
+        """
+        moltypes = (
+            [MoleculeType[moltypes]]
+            if isinstance(moltypes, str)
+            else [MoleculeType[m] for m in moltypes]
+        )
+        moltype_count = Counter(moltypes)
+        return (
+            moltype_count.get(MoleculeType.PROTEIN, 0),
+            moltype_count.get(MoleculeType.RNA, 0)
+            + moltype_count.get(MoleculeType.DNA, 0),
+            moltype_count.get(MoleculeType.LIGAND, 0),
+        )
+
+    def convert_to_dataframe(self) -> None:
+        """Internally convert the tallies to a DataFrame."""
+        self.metadata = pd.DataFrame(
+            {
+                "pdb_id": self.pdb_id,
+                "preferred_chain_or_interface": self.datapoint,
+                "n_prot": self.n_prot,
+                "n_nuc": self.n_nuc,
+                "n_ligand": self.n_ligand,
+                "type": self.type,
+                "n_clust": self.n_clust,
+            }
+        )
+
+    def create_datapoint_cache(self, sample_weights) -> pd.DataFrame:
+        """Creates the datapoint_cache with chain/interface probabilities."""
+        datapoint_type_weight = {
+            DatapointType.CHAIN: sample_weights["w_chain"],
+            DatapointType.INTERFACE: sample_weights["w_interface"],
+        }
+
+        def calculate_datapoint_probability(row):
+            """Algorithm 1. from Section 2.5.1 of the AF3 SI."""
+            return (datapoint_type_weight[row["type"]] / row["n_clust"]) * (
+                sample_weights["a_prot"] * row["n_prot"]
+                + sample_weights["a_nuc"] * row["n_nuc"]
+                + sample_weights["a_ligand"] * row["n_ligand"]
+            )
+
+        self.metadata["datapoint_probabilities"] = self.metadata.apply(
+            calculate_datapoint_probability, axis=1
+        )
+
+        return self.metadata[
+            [
+                "pdb_id",
+                "preferred_chain_or_interface",
+                "datapoint_probabilities",
+                "n_clust",
+            ]
+        ]
+
+
+@register_dataset
+class WeightedPDBDataset(BaseOF3Dataset):
+    """Implements a Dataset class for the Weighted PDB training dataset for AF3."""
+
+    def __init__(self, dataset_config: dict) -> None:
+        """Initializes a WeightedPDBDataset.
+
+        Args:
+            dataset_config (dict):
+                Input config. See openfold3/examples/pdb_sample_dataset_config.yml for
+                an example.
+        """
+        super().__init__(dataset_config)
+
+        # Dataset configuration
+        self.sample_weights = dataset_config.sample_weights
+
+        # Datapoint cache
+        self.create_datapoint_cache()
+
+    def create_datapoint_cache(self) -> None:
+        """Creates the datapoint_cache with chain/interface probabilities.
+
+        Creates a Dataframe storing a flat list of chains and interfaces and
+        corresponding datapoint probabilities. Used for mapping FROM the dataset_cache
+        in the SamplerDataset and TO the dataset_cache in the getitem."""
+        datapoint_collection = DatapointCollection.create_empty()
+        for entry, entry_data in self.dataset_cache.structure_data.items():
+            # Append chains
+            for chain, chain_data in entry_data.chains.items():
+                datapoint_collection.append(
+                    entry,
+                    str(chain),
+                    chain_data.molecule_type,
+                    DatapointType.CHAIN,
+                    int(chain_data.cluster_size),
+                )
+
+            # Append interfaces
+            for interface_id, cluster_data in entry_data.interfaces.items():
+                interface_chains = interface_id.split("_")
+                cluster_size = int(cluster_data.cluster_size)
+                chain_moltypes = [
+                    entry_data.chains[chain].molecule_type for chain in interface_chains
+                ]
+
+                datapoint_collection.append(
+                    entry,
+                    interface_chains,
+                    chain_moltypes,
+                    DatapointType.INTERFACE,
+                    cluster_size,
+                )
+
+        datapoint_collection.convert_to_dataframe()
+        self.datapoint_cache = datapoint_collection.create_datapoint_cache(
+            self.sample_weights
+        )
+
+    def __getitem__(
+        self, index: int
+    ) -> dict[str : torch.Tensor | dict[str, torch.Tensor]]:
+        """Returns a single datapoint from the dataset.
+
+        Note: The data pipeline is modularized at the getitem level to enable
+        subclassing for profiling without code duplication. See
+        logging_datasets.py for an example."""
+
+        # Get PDB ID from the datapoint cache and the preferred chain/interface
+        datapoint = self.datapoint_cache.iloc[index]
+        pdb_id = datapoint["pdb_id"]
+        preferred_chain_or_interface = datapoint["preferred_chain_or_interface"]
+
+        if not self.debug_mode:
+            sample_data = self.create_all_features(
+                pdb_id=pdb_id,
+                preferred_chain_or_interface=preferred_chain_or_interface,
+                return_atom_arrays=False,
+                return_crop_strategy=False,
+            )
+            features = sample_data["features"]
+            features["pdb_id"] = pdb_id
+            features["preferred_chain_or_interface"] = f"{preferred_chain_or_interface}"
+            return features
+        else:
+            try:
+                getitem_debug_log("WeightedPDBDataset")
+                sample_data = self.create_all_features(
+                    pdb_id=pdb_id,
+                    preferred_chain_or_interface=preferred_chain_or_interface,
+                    return_atom_arrays=False,
+                    return_crop_strategy=False,
+                )
+
+                features = sample_data["features"]
+
+                features["pdb_id"] = pdb_id
+                features["preferred_chain_or_interface"] = (
+                    f"{preferred_chain_or_interface}"
+                )
+
+                check_invalid_feature_dict(features)
+
+                return features
+
+            except Exception as e:
+                tb = traceback.format_exc()
+                dataset_name = self.get_class_name()
+                logger.warning(
+                    "-" * 40
+                    + "\n"
+                    + f"Failed to process {dataset_name} entry {pdb_id} with preferred"
+                    + f" chain or interface {preferred_chain_or_interface}: {str(e)}\n"
+                    + f"Exception type: {type(e).__name__}\nTraceback: {tb}"
+                    + "-" * 40
+                )
+                index = random.randint(0, len(self) - 1)
+                return self.__getitem__(index)
+
+
+@register_dataset
+class DisorderedPDBDataset(WeightedPDBDataset):
+    """Implements a Dataset class for the Disordered PDB training dataset for AF3."""
+
+    def __init__(self, dataset_config: dict) -> None:
+        """Initializes a DisorderedPDBDataset.
+
+        Args:
+            dataset_config (dict):
+                Input config. See openfold3/examples/pdb_sample_dataset_config.yml for
+                an example.
+        """
+        super().__init__(dataset_config)
+        self.disable_non_protein_diffusion_weights = (
+            dataset_config.disable_non_protein_diffusion_weights
+        )
+
+    def create_loss_features(self, pdb_id: str) -> dict:
+        """Creates the loss features for the disordered PDB set."""
+
+        loss_features = {}
+        loss_features["loss_weights"] = set_loss_weights_for_disordered_set(
+            self.loss,
+            self.dataset_cache.structure_data[pdb_id].resolution,
+            self.disable_non_protein_diffusion_weights,
+        )
+        return loss_features

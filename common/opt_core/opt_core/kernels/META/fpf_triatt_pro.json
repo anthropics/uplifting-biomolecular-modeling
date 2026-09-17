@@ -1,0 +1,14 @@
+{
+ "exports": {},
+ "kind": "package",
+ "license": "Apache-2.0 (this repository's own code: common/opt_core/LICENSE); portions derive from Protenix (Apache-2.0, Copyright 2024 ByteDance and/or its affiliates): NOTICE in the package directory, licence text kernels/fpf_flashpairformer.PROTENIX_LICENSE",
+ "mechanism": "attn.triangle_attention_prologue",
+ "name": "fpf_triatt_pro",
+ "not_carried": {
+  "PREREG.md": "not in the package tree (design notes and prototypes, not included in this package: nothing imports or reads them at run time)"
+ },
+ "runtime_imports": [],
+ "runtime_imports_note": "triatt.py (the FPF registry op around the kernel) imports the engine lazily inside its functions; the core's serve layer (opt_core.attn.pair_fused) calls prologue.triatt_prologue / get_cache's cache schema only",
+ "served_note": "triatt_prologue(module, z, ending, ln_mode, x_ln, write_x, fma_flags, cfg): LN(+affine) -> q|k|v|g|bias projections in one kernel; z [N,N,C] bf16 (z^T by address math for the ending node); PINNED_CONFIG keyed (C, H*D, gpu); the carried bytes pin {(256,256,'H100')} — other cells are rows of the core's cell table (opt_core/attn/pair_fused_cells.json) passed as cfg=",
+ "version": "prologue v3 (FPF Fusion TriAttPro, FLASHPAIRFORMER v0.6.1 tree)"
+}

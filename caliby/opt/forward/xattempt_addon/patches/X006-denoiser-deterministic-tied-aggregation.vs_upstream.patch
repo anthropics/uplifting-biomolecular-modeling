@@ -1,0 +1,135 @@
+--- a/caliby/model/seq_denoiser/denoisers/atom_mpnn_denoiser.py
++++ b/caliby/model/seq_denoiser/denoisers/atom_mpnn_denoiser.py
+@@ -177,7 +177,8 @@
+ 
+         # Compute potts parameters.
+         potts_decoder_aux, batch, sampling_inputs = self.compute_potts_params(batch, sampling_inputs)
+-        aux["potts_decoder_aux"] = to(potts_decoder_aux, "cpu")
++        if _fast_potts_params_level() == 0:
++            aux["potts_decoder_aux"] = to(potts_decoder_aux, "cpu")  # FAST: dead copy (aux["potts_decoder_aux"] is never read); skipped at level >= 1
+ 
+         # Set up Potts sampling
+         potts_sampling_cfg = sampling_inputs["potts_sampling_cfg"]
+@@ -224,24 +225,31 @@
+         # Design sequences.
+         S = []  # keep track of sequences for each sample
+         aux["U"] = []  # keep track of energies for each sample
+-        for _ in tqdm(range(sampling_inputs["num_seqs_per_pdb"]), desc="Sampling sequences", leave=False):
+-            S_sample, U_sample = self.mpnn.decoder_S_potts.sample(
+-                potts_decoder_aux["h"],
+-                potts_decoder_aux["J"],
+-                potts_decoder_aux["edge_idx"],
+-                potts_decoder_aux["mask_i"],
+-                potts_decoder_aux["mask_ij"],
+-                S=S_init,
+-                mask_sample=mask_sample,
+-                temperature=potts_temperature,
+-                num_sweeps=potts_sweeps,
+-                penalty_func=penalty_func,
+-                proposal=potts_proposal,
+-                rejection_step=rejection_step,
+-                verbose=False,
+-                edge_idx_coloring=edge_idx_coloring,
+-                mask_ij_coloring=mask_ij_coloring,
+-            )
++        n_seqs = sampling_inputs["num_seqs_per_pdb"]
++        sampler_args = (
++            potts_decoder_aux["h"],
++            potts_decoder_aux["J"],
++            potts_decoder_aux["edge_idx"],
++            potts_decoder_aux["mask_i"],
++            potts_decoder_aux["mask_ij"],
++        )
++        sampler_kwargs = dict(
++            S=S_init,
++            mask_sample=mask_sample,
++            temperature=potts_temperature,
++            num_sweeps=potts_sweeps,
++            penalty_func=penalty_func,
++            proposal=potts_proposal,
++            rejection_step=rejection_step,
++            verbose=False,
++            edge_idx_coloring=edge_idx_coloring,
++            mask_ij_coloring=mask_ij_coloring,
++        )
++        if potts._x_multiseq_level() >= 1:  # X010: the n_seqs calls' sweeps issued concurrently, draw for draw the serial calls
++            draws = iter(self.mpnn.decoder_S_potts.sample_multiseq(n_seqs, *sampler_args, **sampler_kwargs))
++        else:
++            draws = (self.mpnn.decoder_S_potts.sample(*sampler_args, **sampler_kwargs) for _ in range(n_seqs))
++        for S_sample, U_sample in tqdm(draws, total=n_seqs, desc="Sampling sequences", leave=False):
+             if sampling_inputs.get("symmetry_pos", None) is not None:
+                 S_sample = _unfold_symmetry_pos(S_sample, sampling_inputs["symmetry_pos"])
+ 
+@@ -351,7 +359,7 @@
+         """
+         # Aggregate on CPU to avoid memory usage scaling with ensemble size.
+         batch_device = batch["restype"].device
+-        aggregate_device = "cpu"
++        aggregate_device = "cpu" if _fast_potts_params_level() == 0 else batch_device  # FAST: level>=1 aggregates on the GPU (no DtoH/HtoD round trip; values identical)
+ 
+         subbatch_size = sampling_inputs["batch_size"]
+         B = batch["restype"].shape[0]
+@@ -395,7 +403,10 @@
+ 
+         # Handle symmetric decoding by folding the Potts parameters.
+         if sampling_inputs.get("symmetry_pos", None) is not None:
+-            potts_decoder_aux = _fold_symmetry_pos(potts_decoder_aux, sampling_inputs["symmetry_pos"])
++            if _x_pp.keep_sparse(_fast_potts_params_level(), sampling_inputs["symmetry_pos"]):
++                pass  # FAST level 2: no symmetry groups -> keep the sparse (B,N,K,C,C) Potts parameters (skips N x N densification; changes the J_i reduction order -> Tier-2 candidate)
++            else:
++                potts_decoder_aux = _fold_symmetry_pos(potts_decoder_aux, sampling_inputs["symmetry_pos"])  # stock; under level 2 with symmetry groups keep_sparse has said the gate line ([caliby-opt] LEVER name=CALIBY_FAST_POTTS_PARAMS state=skipped reason=symmetry_dense_J ...)
+ 
+         # Move outputs back to batch device. Potts params stay in reduced state space.
+         potts_decoder_aux = to(potts_decoder_aux, batch_device)
+@@ -471,8 +482,21 @@
+ 
+     # handle 1D features
+     counts = torch.bincount(inverse)
+-    h_new = h.new_zeros(unique_ids.shape[0], *h.shape[1:]).index_add(0, inverse, h)
+-    node_counts = mask_i.new_zeros(unique_ids.shape[0], *mask_i.shape[1:]).index_add(0, inverse, mask_i)
++    if h.is_cuda and _x_tied_det_level() >= 1:
++        # XATTEMPT add-on lever L-E (env CALIBY_X_TIED_DET=1): CUDA index_add over a tied group (e.g. 32 conformers -> one group) sums
++        # with atomicAdd in a nondeterministic order, so with CALIBY_FAST_POTTS_PARAMS>=1 (GPU-side aggregation) h -- and hence U --
++        # was not run-to-run reproducible in ensemble mode.  Sequential per-member adds reproduce the CPU index_add_ order
++        # ((0 + h[0]) + h[1]) + ... exactly (IEEE adds), i.e. bitwise the stock (CPU) result.  J below is already accumulated one member
++        # per call (distinct slots within a call -> exact) and is therefore deterministic and equal to the CPU order.
++        h_new = h.new_zeros(unique_ids.shape[0], *h.shape[1:])
++        node_counts = mask_i.new_zeros(unique_ids.shape[0], *mask_i.shape[1:])
++        _inv = inverse.tolist()
++        for bi, g in enumerate(_inv):
++            h_new[g] += h[bi]
++            node_counts[g] += mask_i[bi]
++    else:
++        h_new = h.new_zeros(unique_ids.shape[0], *h.shape[1:]).index_add(0, inverse, h)
++        node_counts = mask_i.new_zeros(unique_ids.shape[0], *mask_i.shape[1:]).index_add(0, inverse, mask_i)
+     mask_i_new = (
+         node_counts == counts.view(-1, 1)
+     ).float()  # node i is unmasked only if node i is present across all inputs in the tied group
+@@ -573,6 +597,27 @@
+     # Mask out pad atoms and resolved atoms.
+     batch["coords"] = batch["coords"] * batch["atom_pad_mask"].unsqueeze(-1) * batch["atom_resolved_mask"].unsqueeze(-1)
+     return batch
++
++
++import os as _os
++
++import caliby_opt.potts_params as _x_pp  # CALIBY_FAST_POTTS_PARAMS level 2's input gate (symmetry-tied positions -> upstream's dense fold, said once per call): the predicate and the line live in caliby_opt
++
++
++def _x_tied_det_level() -> int:
++    """CALIBY_X_TIED_DET (XATTEMPT L-E): 0 = kit; 1 = deterministic (CPU-order) tied-group aggregation of h on the GPU."""
++    try:
++        return int(_os.environ.get("CALIBY_X_TIED_DET", "0"))
++    except ValueError:
++        return 0
++
++
++def _fast_potts_params_level() -> int:
++    """CALIBY_FAST_POTTS_PARAMS: 0 = stock; 1 = GPU-side aggregation + densification, no dead host copy (exact); 2 = 1 + no densification when there are no symmetry groups (Tier-2 candidate; a batch with symmetry groups densifies as stock does and says so: caliby_opt.potts_params)."""
++    try:
++        return int(_os.environ.get("CALIBY_FAST_POTTS_PARAMS", "0"))
++    except ValueError:
++        return 0
+ 
+ 
+ def _fold_symmetry_pos(

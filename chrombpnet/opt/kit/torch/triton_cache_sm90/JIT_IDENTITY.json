@@ -1,0 +1,382 @@
+{
+ "backend_hash": "ptxas: NVIDIA (R) Ptx optimizing assembler\nCopyright (c) 2005-2024 NVIDIA Corporation\nBuilt on Tue_Feb_27_16:15:50_PST_2024\nCuda compilation tools, release 12.4, V12.4.99\nBuild cuda_12.4.r12.4/compiler.33961263_0\n-90",
+ "build_artefact_note": "cubin/.so shas are a datum (ptxas/host gcc are not deterministic across boxes of one class); a difference is printed on the R8 line, never a refusal",
+ "build_artefacts": {
+  "095378f98043a2d7/_gap_serial_kernel.cubin": "d9dac01c89dd9472",
+  "150a47ba4a21e62e/__triton_launcher.so": "4cc4058fe961411a",
+  "1a009ea04ffb495c/_head_serial_kernel.cubin": "a6319be2f629aa7d",
+  "1bbca4215d9790d6/__triton_launcher.so": "c2bc0f4f59b65a61",
+  "2cbf88875070c452/_im2col_dot_kernel.cubin": "459299d464a56e33",
+  "36f311ed6c8aabb3/_im2col_dot_kernel.cubin": "ded7c6d86eb7bce7",
+  "3eb9e39e4716b162/_im2col_dot_kernel.cubin": "afebbe8fffbaa8b9",
+  "41ce1f58e0a8aa98/cuda_utils.so": "0069afaeaf20d287",
+  "474d4e68dc0c6cc8/_im2col_dot_kernel.cubin": "74a377b646f3b909",
+  "49efb3dc8f0cfb71/__triton_launcher.so": "b005d93a798aa45d",
+  "59c7d57262a00ef5/_im2col_dot_kernel.cubin": "05097dd9f054c33d",
+  "62e937db20d49c0c/_im2col_dot_kernel.cubin": "c85f63bc16f00b31",
+  "662accc89191fc01/_gap_serial_kernel.cubin": "3965b054a032ae4c",
+  "78d4ef8871fc8207/_dense_chains_kernel.cubin": "c3dc457f4d73d05b",
+  "865652c5028878d4/_im2col_dot_kernel.cubin": "746054ad4b99b40e",
+  "8d3137fdc1f2048d/_head_serial_kernel.cubin": "868289e6719ba965",
+  "94cf7bd57229ad80/_im2col_dot_kernel.cubin": "658b4100b2830cd2",
+  "9f1ffddd4adf964f/_im2col_dot_kernel.cubin": "d69d0df7c1abab2c",
+  "a20f6c8441d1f4c3/_im2col_dot_kernel.cubin": "93e34f9b56542705",
+  "a37d9e625fb442fe/_im2col_dot_kernel.cubin": "ded7c6d86eb7bce7",
+  "a7debca1180bd6ce/_im2col_dot_kernel.cubin": "74a377b646f3b909",
+  "addd46078697a41f/__triton_launcher.so": "3ac7822e61beec97",
+  "b3aedfdd8f3ab44f/_im2col_dot_kernel.cubin": "658b4100b2830cd2",
+  "b9e557d261a617d4/_im2col_dot_kernel.cubin": "c2f122fe328334a1",
+  "cd24682fd4b4d273/_dense_chains_kernel.cubin": "98a98d2d47d9e5cc",
+  "def5ebfe90c56b2f/_im2col_dot_kernel.cubin": "05097dd9f054c33d",
+  "e05c2037ff437da3/_im2col_dot_kernel.cubin": "93e34f9b56542705",
+  "e69a6b825f2b6ab1/__triton_launcher.so": "eaffafd41695289e",
+  "ecb2c3b85394b508/_im2col_dot_kernel.cubin": "afebbe8fffbaa8b9",
+  "f69b11aec29f7da3/_im2col_dot_kernel.cubin": "86dc9cec3ee21023"
+ },
+ "build_dir": "<kit>/torch/triton_cache_sm90",
+ "build_dir_note": "the frozen cache home (kit-relative); apply() relocates every group into the process dir",
+ "build_dir_populated": "/tmp/populate_sm90_canonical",
+ "canonical_populate_path": "/opt/cbp_build/chrombpnet_k1/kernels.py",
+ "cudnn": 90100,
+ "device": "NVIDIA H100 80GB HBM3",
+ "entries": [
+  {
+   "files": {
+    "__grp___gap_serial_kernel.json": "cb12cbbea2f8f07b1a267358dbb85c6cc7270d4dd8cf2c8e4bc701b649567c78",
+    "_gap_serial_kernel.cubin": "d9dac01c89dd9472ddfee87b1bdcacd50061e0247225789b66fbe0747bbcbf78",
+    "_gap_serial_kernel.json": "e2963037d8072e0afe1b76ec34397cae1c599c46982a1f11b62486b32cbff2c0",
+    "_gap_serial_kernel.llir": "25fc010fbcad924872c360a3bbd8c7b532f64d6cb427527f2239d603d057d1ad",
+    "_gap_serial_kernel.ptx": "885dc9fe35a267441310c61e8bb4beed7741fdaf5379021ce59d9b9ef15159c3",
+    "_gap_serial_kernel.ttgir": "193f8a0250b19d784cb12ca81eec9d3db4dd480d6cf882c6f7ba1483ab0f6fe4",
+    "_gap_serial_kernel.ttir": "52915c5f0440f9298fa9afdef23d29728ec6bb62d99da0f4e5f4db3183bed803"
+   },
+   "key": "095378f98043a2d7aa303f52bcc678969c4fdfe7c6bad66330ad12c166ca562e"
+  },
+  {
+   "files": {
+    "__triton_launcher.so": "4cc4058fe961411a0dfc7d619c2f7d65d2f31b6f7cc840bad101431beee0bbce"
+   },
+   "key": "150a47ba4a21e62e9d68ccb72efd61f92435d7eedd72d3fd9f13d671227bebc1"
+  },
+  {
+   "files": {
+    "__grp___head_serial_kernel.json": "85690b4b74c8a50a2f33ddfee8b22643760ec29c4687991f5363bfc1140ebcf1",
+    "_head_serial_kernel.cubin": "a6319be2f629aa7d09c80c15e34bfcf23b802389446bab362dd94254d2ae340f",
+    "_head_serial_kernel.json": "f4cfcda5b549b4ca16b95eb01d7465d0ff4e77253de8de7c6fadfb7216407b27",
+    "_head_serial_kernel.llir": "7a2d9649c84ffe1b12a247ac7f80b10aec2ffbfb1c13330e05cefd3fd4b982c7",
+    "_head_serial_kernel.ptx": "6caee80eefd0deb9f037c584ec2556c84e32c8a9baed7f1d2d2d61ae3b7229b3",
+    "_head_serial_kernel.ttgir": "7ea051d1bb41c822f4a9e33213df041c5fd46095bd8cc1bc83b96ef11e82b709",
+    "_head_serial_kernel.ttir": "c7600139fae5da4bdf6a1ffe5dcf7437c7b52b1f6d04f02f58d6b3fd561e7f76"
+   },
+   "key": "1a009ea04ffb495c85dc5b16f8c58a025565ba46c056eb7e8a8ca3903c9a5bbe"
+  },
+  {
+   "files": {
+    "__triton_launcher.so": "c2bc0f4f59b65a6142ac37896443bfc2a1e604cd1ab9e9e28dd138329c5924a4"
+   },
+   "key": "1bbca4215d9790d60902fe916691ea219ff2c3332c494f3a5649764b98b5017f"
+  },
+  {
+   "files": {
+    "__grp___im2col_dot_kernel.json": "2eca80ba8241272d89f12655050473519f2767264c9cee80e4da275a8a68a2e3",
+    "_im2col_dot_kernel.cubin": "459299d464a56e330ab740cbf8651994a1ea488dc794d789c86eb9f2dcd53f4e",
+    "_im2col_dot_kernel.json": "2f66c23534baf2d79bac87c8c6571d6a70b5f9be864d2db9c09f1c3318471a2b",
+    "_im2col_dot_kernel.llir": "83eaa225c6fd63d87c424348d46e8d762cea098233e1fc85b5d00e9f6a94bae5",
+    "_im2col_dot_kernel.ptx": "aa4e8ae6f431ad729a7e7c2c190314e0562a71581beed1df03e8b9eb378b59dd",
+    "_im2col_dot_kernel.ttgir": "fad97f11caa9206332a5549cdb5f06b73eb1cd787153edda262aaa2648653e56",
+    "_im2col_dot_kernel.ttir": "6395b5d4e11a0bc8d5ccfbbb6695e4fbc5c3af10b47b88133858b8400bab4b56"
+   },
+   "key": "2cbf88875070c452e44ddb73ebc9708f103491befca4129dacb473813b2ef6ab"
+  },
+  {
+   "files": {
+    "__grp___im2col_dot_kernel.json": "10810841cd73430950c4a70e8d25c169ace3f85e61575585d8d9bfc907d9a2ee",
+    "_im2col_dot_kernel.cubin": "ded7c6d86eb7bce7b0828fe60e97c3752e8d4efabffb27a9cfeafd5ee51a37ec",
+    "_im2col_dot_kernel.json": "d95e019399a76a5aab443859e9c51032ce9bdba9862061c8b404732a4b12bf75",
+    "_im2col_dot_kernel.llir": "75ff55aa240a24e42d25d85a0cd1262ad8c789a3d378d2d925852b801fe82423",
+    "_im2col_dot_kernel.ptx": "8953c9fb2b729e8e52007f3e18abe6803b1d3a7657ea759b17929dcf865413f3",
+    "_im2col_dot_kernel.ttgir": "f5865d297be45b2345c6240bc42bf8c233b70b4ddce8f14b07f4227491f96544",
+    "_im2col_dot_kernel.ttir": "37e2411003c5edacf6b3dce04d58334c24e110157703662d59cf124d8ca67dc1"
+   },
+   "key": "36f311ed6c8aabb3fb0f73067ca7f02d616b4224e5cee3f134053ff4b14490ce"
+  },
+  {
+   "files": {
+    "__grp___im2col_dot_kernel.json": "6a9419f675a45e4528d953753f3850fc1b5156dcb7b540f53320e71c4e579f21",
+    "_im2col_dot_kernel.cubin": "afebbe8fffbaa8b93c28c6c9ca040ae6e01f3891b9417956a9d007d984774229",
+    "_im2col_dot_kernel.json": "555e2b62ed75728f1fa25360a1f9b004cb6099f603f29b8456fdda4b143d141a",
+    "_im2col_dot_kernel.llir": "fd1bf2eff50c310c921170104a5f172b94f9a6850e246dce855350a00d89b3a7",
+    "_im2col_dot_kernel.ptx": "07997058729be7d4044452acff622673b77c71d7e64ffd2b1addc33258f80b0d",
+    "_im2col_dot_kernel.ttgir": "85c9322f8f304d24b7e244bc9bd371ebdabeabcdd2643df34d051ea46d97db77",
+    "_im2col_dot_kernel.ttir": "e3a21b4ad6479c160d43d023b7986dce1e594b10176a1ba646d1fe03cba9c94c"
+   },
+   "key": "3eb9e39e4716b162e8739d30ae72e4ab9ddec1adfa47ab47cf10267d4dfaae44"
+  },
+  {
+   "files": {
+    "cuda_utils.so": "0069afaeaf20d2876a672574113d93732eef1170d9670b75872d2f9907480938"
+   },
+   "key": "41ce1f58e0a8aa9865e66b90d58b3307bb64c5a006830e49543444faf56202fc"
+  },
+  {
+   "files": {
+    "__grp___im2col_dot_kernel.json": "9f21ff1d54e5b44b85ee386f6a97a62eea3b6f65861858c9e02bdbbbd324e665",
+    "_im2col_dot_kernel.cubin": "74a377b646f3b90966db9778c76a7167dfc649457d66206a6f8051541ced422a",
+    "_im2col_dot_kernel.json": "987b92be23936a21583dd83eb1249fffad346894ff9bb82c8eafbcd5c0d69050",
+    "_im2col_dot_kernel.llir": "0589021f6049a72f80c6c9bdc5980745dae0a36083885414c1b7f17dca1fd947",
+    "_im2col_dot_kernel.ptx": "3dd9f37caf4feea98526ab1e2095293edbc130808207a27e97a55083d41f9ccb",
+    "_im2col_dot_kernel.ttgir": "d99b717d815841968df2ee82102578e2d585c5094e6423b93f87afd221b91c8d",
+    "_im2col_dot_kernel.ttir": "b3cf6fae0c62eb2ecc567b0eb260917ed487a7517790519b891aefa7bd855e24"
+   },
+   "key": "474d4e68dc0c6cc86148d78f558065237d22b9fb8de6f365df3a280d65d79aa6"
+  },
+  {
+   "files": {
+    "__triton_launcher.so": "b005d93a798aa45dbf4eaa365644168a077f2528615b373e4576feee03488bc1"
+   },
+   "key": "49efb3dc8f0cfb71a0e4749a5d477630210bb3d196bfdb2dbb7a201426de5f84"
+  },
+  {
+   "files": {
+    "__grp___im2col_dot_kernel.json": "faabd7b46f6ed9cd8716d307ea21921094c4d2eb07899544cd8ca973fedffbc6",
+    "_im2col_dot_kernel.cubin": "05097dd9f054c33d6197a3707f1f011cf9cb441e2cea763ea5bee7be226e1442",
+    "_im2col_dot_kernel.json": "198381f653e4ec2f10eac875c4c36bc1eaef7825496c7d827be2c6b7cfd45f32",
+    "_im2col_dot_kernel.llir": "0bbf8c707563929e159546a0fc4800251fde2fc8d238dce30181d68f84836769",
+    "_im2col_dot_kernel.ptx": "64a212068c68ece96ff2a239fe3c6c52a7d0307a1847928263d84ac721d6e63f",
+    "_im2col_dot_kernel.ttgir": "ca0f646d8cfa4af70ca9fee1d0f4b96a8c7b99c76bc21cc736d794231096a4e7",
+    "_im2col_dot_kernel.ttir": "b3cf6fae0c62eb2ecc567b0eb260917ed487a7517790519b891aefa7bd855e24"
+   },
+   "key": "59c7d57262a00ef5104d4b7b2595af05e55c80842d5ef0108640be162424b117"
+  },
+  {
+   "files": {
+    "__grp___im2col_dot_kernel.json": "10652277578b8e62f1b48c1fac55f7b7fbbb1bb6391897c48c9c5da4c85960b2",
+    "_im2col_dot_kernel.cubin": "c85f63bc16f00b31efc8f11ef52953038458454eb13b8a37d1febae5056d1cee",
+    "_im2col_dot_kernel.json": "7c953318bff26153dd6ea45fab32a6507392a0e52901e646dccd4b89864b03f6",
+    "_im2col_dot_kernel.llir": "37c62a8e0fa7335e1c84c62c5b551275aa4a3cb99b0b829044e03dfc8f3c0a35",
+    "_im2col_dot_kernel.ptx": "b33edc76dbae318d7e1abbe0a855686cfc053280112fcc28245ab90371f75df7",
+    "_im2col_dot_kernel.ttgir": "b24df282d5b3c16283bf34383ecf9258aa0d88777ad135f180d5a5512ddd49b6",
+    "_im2col_dot_kernel.ttir": "8a0e1bb94bbc738022422168cbb50c7d98595354b9e63ceb4ddd660f7ccc39b9"
+   },
+   "key": "62e937db20d49c0c07e7ff6677bde50892ef33ae28f224674e66c1187c43bb32"
+  },
+  {
+   "files": {
+    "__grp___gap_serial_kernel.json": "faa2579151f04378f911f6e1d7ccd0e06e7b05fe9b81e95103bc1a9b41f0014a",
+    "_gap_serial_kernel.cubin": "3965b054a032ae4c727ab4c68319e34abc70fe666cff167936f2b9b050e11546",
+    "_gap_serial_kernel.json": "bfb2c2915016f296e575265498476a43e7251e24f8ccd2327d7fc81efc3fafbd",
+    "_gap_serial_kernel.llir": "c92a1114e9034c64ad9ffbcf74adf99f8fb59d55dcbfac19d19c26ed39adbe5a",
+    "_gap_serial_kernel.ptx": "9babbe9a86ab0c1cf5c836008ae6df3bfa6b1c0e263557e944727c6ac033de7b",
+    "_gap_serial_kernel.ttgir": "a3255ccae069819cb5a88a2f3ad37ad076664c5ba0d3344fce24d050422e0fe9",
+    "_gap_serial_kernel.ttir": "5185793284638fb6d551762e093039b5f8ed009d950b58af69108ff389d66295"
+   },
+   "key": "662accc89191fc01750a75839c42ff0a56fd8a346c6fae00169af24a865a8c07"
+  },
+  {
+   "files": {
+    "__grp___dense_chains_kernel.json": "759cdb4e10e48b33a2413345ca198bc008e4a716a5fe9fd3ca7151b9ab10e051",
+    "_dense_chains_kernel.cubin": "c3dc457f4d73d05b2f0fc41399f48ab1a04b04616f1aced472a568d754839f11",
+    "_dense_chains_kernel.json": "e894a371a7f1fd0fdcfa5c5a8d6f08975e4323be56c8ad4b1f2af068a7338188",
+    "_dense_chains_kernel.llir": "1e677af0f23b0bc43dd48c8120640c9cdd2f738825c1eaff293e7c6191e78333",
+    "_dense_chains_kernel.ptx": "1f3798c43d2ffedfdb4c9f6ee858bdcfb5f40a0a1be500af68ff144cd8f45865",
+    "_dense_chains_kernel.ttgir": "14977a1c3abfed833d2dedf4a8d548e02dc02aaed256698a6488f6ae8f3e19aa",
+    "_dense_chains_kernel.ttir": "39c55df4e2534c7ec73ab39d90d8eb19c211654c77cd7a676e80717e7b8d9beb"
+   },
+   "key": "78d4ef8871fc8207113515a5d32b73a2d0e21d3e0690423a99cad649c38a9fe1"
+  },
+  {
+   "files": {
+    "__grp___im2col_dot_kernel.json": "12f32e55f9aa4db5069be3f9408fdf532c1cf2d3c593456501565b0b479e44f7",
+    "_im2col_dot_kernel.cubin": "746054ad4b99b40ea00ff7de37bfd17b9dbf660aeb92916a68e83318ebc5632d",
+    "_im2col_dot_kernel.json": "ba197538274cfdfab977e3d2378a1a9380d5c65bf37e9aa097171d760aba9670",
+    "_im2col_dot_kernel.llir": "5e13f736d0a043cd73fb48012608716faea45212d2134d1acb6aca0f9ceeeaa0",
+    "_im2col_dot_kernel.ptx": "d8635dc4da60874c5d8c0cc81c3e27688882feb78e5b5ce03a180773d8f415e1",
+    "_im2col_dot_kernel.ttgir": "87e42486aba34e24c24f6d1ad2ac195d3f5dbf6580232a649e6af5061e6c1461",
+    "_im2col_dot_kernel.ttir": "2726278f7088659a4244c05d6553ce42ef17aae4c0e27a9c172a624f51d51045"
+   },
+   "key": "865652c5028878d456baa44ba3231cc3780660598fb87f3882511eb268359274"
+  },
+  {
+   "files": {
+    "__grp___head_serial_kernel.json": "9fd51bef4e4ead4fb1f54d859e2b56c29864356a62a0b97b73e2740d118aade9",
+    "_head_serial_kernel.cubin": "868289e6719ba965c572a4e7d59913842860f910b4a72f3bf75790eeb9016d52",
+    "_head_serial_kernel.json": "f712697a9e41ea7f0fe61c29f26238e35d7bd4e9331ef4a6f477b4bce2d71b05",
+    "_head_serial_kernel.llir": "9bae447424682b6aa79c87e8fd77e6a514ef1946cafeec2c6b827b0d15f2be96",
+    "_head_serial_kernel.ptx": "cf431f359f878ec3c51b837b173c97b3a62e1563b4870b26138126834c0e59b6",
+    "_head_serial_kernel.ttgir": "132630c835b6f0b54c5a8d2ae1a8b09a83930658fdfc4a4847a90470685d78b7",
+    "_head_serial_kernel.ttir": "b635f3ffffbc4458f8719cd4e78340bd83f5a281c06fbc35aaa7b43f371c3af2"
+   },
+   "key": "8d3137fdc1f2048d6ca52326fe237e9381544fc06e25026abdee3075a60305c6"
+  },
+  {
+   "files": {
+    "__grp___im2col_dot_kernel.json": "eabbd3ef6e738f5757976d2a2e23f5087c628bc650049bff69f1be738222c023",
+    "_im2col_dot_kernel.cubin": "658b4100b2830cd2126948e7f78d6f9714b1e4d562b7939fd970c70bae4a7c7e",
+    "_im2col_dot_kernel.json": "3978803d61c6cbf40d8090837e31c1ce9c71652c001f21283f80d6c24768c8f1",
+    "_im2col_dot_kernel.llir": "9c7947909963387ad5e0024b6fcdfe5a5b8d5a026e7f76087ecfb52f247609ec",
+    "_im2col_dot_kernel.ptx": "db028d3e48189ea8c5087e70a489db2a0363b537e39da27153cac6e5a4ebfc4e",
+    "_im2col_dot_kernel.ttgir": "40a59ef2a14c4e18ecc57a2f8d70980c313b28dcc1f2c21bc2fc610c31493f28",
+    "_im2col_dot_kernel.ttir": "f9a8c44014785bd4503f20b9979c1408abc1d211623eb2811f1a61f64e44f9c5"
+   },
+   "key": "94cf7bd57229ad807fce84c5761107b5a5a2ebfbbc4446caa034d0ea32aa4873"
+  },
+  {
+   "files": {
+    "__grp___im2col_dot_kernel.json": "f112997d9144e6cc19f20cf3f1111793d849e4844f96faa85c0b667748f06d9c",
+    "_im2col_dot_kernel.cubin": "d69d0df7c1abab2ccbb40eae0af761a5e3b5f24d090a42272f913046cb0218b8",
+    "_im2col_dot_kernel.json": "d85c618adf6713b7cd549b0efdb8b8079531743094cf0a6195f98a852c63da4a",
+    "_im2col_dot_kernel.llir": "593b4d7437aed7d21b2a1265115763d9ca934934fb5193fae0b2884d7514d778",
+    "_im2col_dot_kernel.ptx": "830559a871fa6dc3765837306dd4976be28dba4b1cf139dc58f903176acbdd67",
+    "_im2col_dot_kernel.ttgir": "86f89b83e7914b7354065f146aac5f8ce7a3e4b1b9428f8fa013f8335f6062dd",
+    "_im2col_dot_kernel.ttir": "00f9fd229901152bc3035b0c6ee778fd805c85b91127c2bb4a8bf8916827964d"
+   },
+   "key": "9f1ffddd4adf964fdd43c4ba17dda9f8018a3593f89614d2a940f2d70aa5b75c"
+  },
+  {
+   "files": {
+    "__grp___im2col_dot_kernel.json": "73e41d6435ddb9dacd0ea3cbbcf5cbdb46323fcb4b1f0ab48d50f232c56206be",
+    "_im2col_dot_kernel.cubin": "93e34f9b565427053f2984add0ea83e63675fd04dc565437a4faa83816b35c1f",
+    "_im2col_dot_kernel.json": "d7b63525b0be196eee0cbef5e2f292c4eb8bb63447f0cb08fb4f1f3852b098ed",
+    "_im2col_dot_kernel.llir": "98123f81c2dc303961b0460c922432a2398b7940cb028700654b33f5c4b37c7b",
+    "_im2col_dot_kernel.ptx": "61f1aa22bd4332744641b068a6cecd01a5288a53f19b93b5ddc024ed02663491",
+    "_im2col_dot_kernel.ttgir": "2bc1e44bb14c00d394101d6a33d8b6e6f516e5a4d697afccc3fceef0b85908b2",
+    "_im2col_dot_kernel.ttir": "8ee1a2dc590981b2ab067481008d6d8d008d4ae22603f2cccc55b1166eea5878"
+   },
+   "key": "a20f6c8441d1f4c35904df8eecbf5af091c41280487ad6aeaa7d6d6b7f8ebf38"
+  },
+  {
+   "files": {
+    "__grp___im2col_dot_kernel.json": "c56b5e475e2790bc6b87773b8149c0805c716668b163e722fbbddaa9243530e7",
+    "_im2col_dot_kernel.cubin": "ded7c6d86eb7bce7b0828fe60e97c3752e8d4efabffb27a9cfeafd5ee51a37ec",
+    "_im2col_dot_kernel.json": "4240d0771e0917f134ba5fcb262f8967786af15aebaf36a351eb01513e85bd41",
+    "_im2col_dot_kernel.llir": "75ff55aa240a24e42d25d85a0cd1262ad8c789a3d378d2d925852b801fe82423",
+    "_im2col_dot_kernel.ptx": "8953c9fb2b729e8e52007f3e18abe6803b1d3a7657ea759b17929dcf865413f3",
+    "_im2col_dot_kernel.ttgir": "d312341d68630df5b903418ef89b914d5c66050df4a39afdfff457a68518a671",
+    "_im2col_dot_kernel.ttir": "18d40e2e72928bdb64cda11f7dd047b413a21f2cc7775687a479dd0828962fd8"
+   },
+   "key": "a37d9e625fb442fe6ce84bfa73582cd029d5ba2347b068c78c78bde9410df8d7"
+  },
+  {
+   "files": {
+    "__grp___im2col_dot_kernel.json": "5e8cb8ef02605663fe0e820f8a1693ba096500c6f9486d1b1f2817d837cc5da3",
+    "_im2col_dot_kernel.cubin": "74a377b646f3b90966db9778c76a7167dfc649457d66206a6f8051541ced422a",
+    "_im2col_dot_kernel.json": "29409e6e9a5c7393d11c1aec83a38f76396f9427048a3ceade8a74015de18ee8",
+    "_im2col_dot_kernel.llir": "0589021f6049a72f80c6c9bdc5980745dae0a36083885414c1b7f17dca1fd947",
+    "_im2col_dot_kernel.ptx": "3dd9f37caf4feea98526ab1e2095293edbc130808207a27e97a55083d41f9ccb",
+    "_im2col_dot_kernel.ttgir": "b5c02f8939fc1dab308ee30b6d8712d8e1bb203082dedb2f321e36d08dadb105",
+    "_im2col_dot_kernel.ttir": "6f9a53c31ecd1ca97105c1392f661ba014f7f05cdb106940388a4c1dc39185e4"
+   },
+   "key": "a7debca1180bd6cefa1ed187761ee4f86f5217146c9a7a95979b11562dcb2ff0"
+  },
+  {
+   "files": {
+    "__triton_launcher.so": "3ac7822e61beec97811e7ec1e30d7a17d7e67ecbdb8dc1fa20df94e7f4883b6c"
+   },
+   "key": "addd46078697a41fd834d62c1105e44fbae1d1eff315fe703947ec36bf0db214"
+  },
+  {
+   "files": {
+    "__grp___im2col_dot_kernel.json": "7fdec5dc9e37200bd4c2a360fa2c8e9e92bcdf1e399b2eec4cb35cc5e3432634",
+    "_im2col_dot_kernel.cubin": "658b4100b2830cd2126948e7f78d6f9714b1e4d562b7939fd970c70bae4a7c7e",
+    "_im2col_dot_kernel.json": "ce25ddd99084aef1f68aea243d6222ea470d6728f4cd5891eebdb0d33916622a",
+    "_im2col_dot_kernel.llir": "9c7947909963387ad5e0024b6fcdfe5a5b8d5a026e7f76087ecfb52f247609ec",
+    "_im2col_dot_kernel.ptx": "db028d3e48189ea8c5087e70a489db2a0363b537e39da27153cac6e5a4ebfc4e",
+    "_im2col_dot_kernel.ttgir": "9b72a9b239d1bb61927bf0d2925d5e9365e782980c1efeef71a145b242d282d3",
+    "_im2col_dot_kernel.ttir": "7bb1ac87bfa6eb6e71ee1bd609074a75a6d2ea3840d17a5bc93270a049119b89"
+   },
+   "key": "b3aedfdd8f3ab44fd54277516adca39b81c3ee7375f5aca48f408f36496ab922"
+  },
+  {
+   "files": {
+    "__grp___im2col_dot_kernel.json": "f9633b175475524511a1ec2278bcdbd3dbd39cd1213f7f5f26c4544149d86968",
+    "_im2col_dot_kernel.cubin": "c2f122fe328334a115f86c242a4744c0b826b3010bb95454e6ed1ced4c3cf432",
+    "_im2col_dot_kernel.json": "c869eeaa8eb662d13725bb3954c21cf6a1f90200c9152c9a09b6ce8172acca5a",
+    "_im2col_dot_kernel.llir": "29f18ea7ec692cdf64603324d2df3bad2eb816aa270b1607fe0d9a1909ea4fcc",
+    "_im2col_dot_kernel.ptx": "bc4703cfab931aeab0c8ecf53ca132f485edd2b140c583333823016e19efcc5a",
+    "_im2col_dot_kernel.ttgir": "3e6b39edda3f9cfc39f95678fc1a17e8f392bf850da1966157a41f5baafdf1fe",
+    "_im2col_dot_kernel.ttir": "8c1bb32854a996003510e73f1289cdf5a7211db74761993c37f4b3272fa6b0f3"
+   },
+   "key": "b9e557d261a617d4396ada90941bfe0cb821de2d990df04c2b24b597dc65c970"
+  },
+  {
+   "files": {
+    "__grp___dense_chains_kernel.json": "a7326f994606f42c94d245646a9cfa3edff1f15cf0bff2056a7c2ebd0dc15d29",
+    "_dense_chains_kernel.cubin": "98a98d2d47d9e5cc454ff54aa3593eff32b8e9aa22444c5980440054f406110b",
+    "_dense_chains_kernel.json": "69adb60bbfebc5d8ec7ce58dd66c16a02b1e6aa58b0962a0625c3422b43c24a7",
+    "_dense_chains_kernel.llir": "41cdfddc1b309cd196871379a9ef410c23292f02bc69398cd5d89d85f8187447",
+    "_dense_chains_kernel.ptx": "d0fc6bbe54eb35d63df4c77b7928b08e1bdefee24a32651aaa2594ced0b8b80e",
+    "_dense_chains_kernel.ttgir": "f9ecea36510c277872a0787a6f7d5bd57379df95189b3f15a4321a350f0b0990",
+    "_dense_chains_kernel.ttir": "f7755a59bffb054d6439d4cce27b2a7aa520181ba727360e0181a0d9f141c7b4"
+   },
+   "key": "cd24682fd4b4d27322b5c57d8e4d9e2535ba6cf674dfd188823a36a0da128bdb"
+  },
+  {
+   "files": {
+    "__grp___im2col_dot_kernel.json": "a452c7510b7e976c9b8d5d9f3b18a9ee3fe3a3e45f8b0adc35eed378a5321425",
+    "_im2col_dot_kernel.cubin": "05097dd9f054c33d6197a3707f1f011cf9cb441e2cea763ea5bee7be226e1442",
+    "_im2col_dot_kernel.json": "d22991cddc92472c1fba17b1651075eb537ac8ef6ef661d21ee7587504d72ec6",
+    "_im2col_dot_kernel.llir": "0bbf8c707563929e159546a0fc4800251fde2fc8d238dce30181d68f84836769",
+    "_im2col_dot_kernel.ptx": "64a212068c68ece96ff2a239fe3c6c52a7d0307a1847928263d84ac721d6e63f",
+    "_im2col_dot_kernel.ttgir": "cc181d03cc79077484436c573b8dc803f35b4b87718173895cd503e53fa2e2ca",
+    "_im2col_dot_kernel.ttir": "6f9a53c31ecd1ca97105c1392f661ba014f7f05cdb106940388a4c1dc39185e4"
+   },
+   "key": "def5ebfe90c56b2fe017bbc5bf7ded89e253b3fdc5592d337392328527d86f2b"
+  },
+  {
+   "files": {
+    "__grp___im2col_dot_kernel.json": "13f41e1e91d89ea09a9cb7e1e03e0eb7efa48adba90ef5f1bb21e8daf2e696eb",
+    "_im2col_dot_kernel.cubin": "93e34f9b565427053f2984add0ea83e63675fd04dc565437a4faa83816b35c1f",
+    "_im2col_dot_kernel.json": "e8361dc101003d57e1e3925aeff520e93fc83154eb18321a8dd6e950cb4b4613",
+    "_im2col_dot_kernel.llir": "98123f81c2dc303961b0460c922432a2398b7940cb028700654b33f5c4b37c7b",
+    "_im2col_dot_kernel.ptx": "61f1aa22bd4332744641b068a6cecd01a5288a53f19b93b5ddc024ed02663491",
+    "_im2col_dot_kernel.ttgir": "f5a2110f6f05114c86baacae84e411242f7b6a2ed7d4ff5b85a46cead5875b8d",
+    "_im2col_dot_kernel.ttir": "d78a81dac28b1f7455891dbea4d96512fa7110f53219e2e19a116e6e26b6f0d3"
+   },
+   "key": "e05c2037ff437da3a4322a36b6737095a3d90ba8d04b74e2cee272a63a1293ca"
+  },
+  {
+   "files": {
+    "__triton_launcher.so": "eaffafd41695289edf044abb59f03b6f12003e6773f3abd9d8e90319cc4aa9c2"
+   },
+   "key": "e69a6b825f2b6ab11de35252b52022493baeb8ed465f0b2db06560a77e3e50b2"
+  },
+  {
+   "files": {
+    "__grp___im2col_dot_kernel.json": "509b5d36917f18a4a1f36a218bfe3575b9b3bb6a62d7f34a8c63c8b8b247fcee",
+    "_im2col_dot_kernel.cubin": "afebbe8fffbaa8b93c28c6c9ca040ae6e01f3891b9417956a9d007d984774229",
+    "_im2col_dot_kernel.json": "df35e62524ce624943ee39b5c47c512dd41b5a3cda226c9d5d9a2d7b3c0ac13b",
+    "_im2col_dot_kernel.llir": "fd1bf2eff50c310c921170104a5f172b94f9a6850e246dce855350a00d89b3a7",
+    "_im2col_dot_kernel.ptx": "07997058729be7d4044452acff622673b77c71d7e64ffd2b1addc33258f80b0d",
+    "_im2col_dot_kernel.ttgir": "72cbe267409c377e333dffdf3689ad1d23b575c966b53bb4fe71ae85407e3a38",
+    "_im2col_dot_kernel.ttir": "ea28be3f6708aec4c64c4e8e7c2244e172f25dc7b64ecfa284e172e017f278e0"
+   },
+   "key": "ecb2c3b85394b5081901c3cf66f0f6f9cc345f5ece31aae03b96c3127ecdde80"
+  },
+  {
+   "files": {
+    "__grp___im2col_dot_kernel.json": "c7a62390365c6e4722ddb1e12dc0b5c69ef33ceec1bb44e90a8d3b8e98a73dfc",
+    "_im2col_dot_kernel.cubin": "86dc9cec3ee210234edc2153fc74f499505c36a4dc8a6d4667f3067d2cfe6839",
+    "_im2col_dot_kernel.json": "fd7ab5f4ece90358b996a86e866d90dab0e0fe767653a43f32fd8f148af60382",
+    "_im2col_dot_kernel.llir": "83debc14bd961d246cb6be7bc9105c4a11d6c88189a74807db690efd494ef9ce",
+    "_im2col_dot_kernel.ptx": "ba5b7e2613668b2cbdbac04ee0c93ee390b06e4b0ccc70fbf5d7917dca9c9a95",
+    "_im2col_dot_kernel.ttgir": "f98b3bf98f8a063551d40e4eef4de2591ae7254fee87e8c96d80be3e084d1abf",
+    "_im2col_dot_kernel.ttir": "00f9fd229901152bc3035b0c6ee778fd805c85b91127c2bb4a8bf8916827964d"
+   },
+   "key": "f69b11aec29f7da33e872c7b12645f3f92607ca337d65fabedb0600bec4b8ed5"
+  }
+ ],
+ "identity_form": "sha256-16 over {IR/PTX/json shas per entry (ttir/ttgir/llir/ptx/json; __grp__ excluded) + triton_key + backend_hash + target}; cubin/.so excluded (build artefacts)",
+ "identity_key": "eccd9ca8cc4be234",
+ "ir_files": 120,
+ "kernels_jit_sha256_16": "6223b20cd268d4ac",
+ "kernels_sha256_16": "7026b40a233544fb",
+ "populate_path": "/opt/cbp_build/chrombpnet_k1/kernels.py",
+ "populated_by": "apply() + predict() at B=1,2,4,32,64,256 on NVIDIA H100 80GB HBM3 from the package at canonical_populate_path (kernels.py sha256[:16] b260804bbe9a18b2 = kernels_sha256_16)",
+ "recaptured": "captured for kernels.py sha256[:16] b260804bbe9a18b2; apply() uses a shipped cache only when kernels_sha256_16 equals the sha256[:16] of the installed package's kernels.py, else the kernels compile on first use (said on the printed line)",
+ "record_version": 2,
+ "target": "cuda-90-32",
+ "torch": "2.4.1+cu124",
+ "triton": "3.0.0",
+ "triton_env": {},
+ "triton_key": "3.0.0dc767c8fadcf23ea82d79e257c37d44077eae7f681cf967565fd43e9c017937b-835d4fc33500e1accafc5c5e00f4f73d87432c114860c04b68849bf6f942b8e5-dc767c8fadcf23ea82d79e257c37d44077eae7f681cf967565fd43e9c017937b-23d635e690d670bf61798e1259674b78c0ed5ba222ab6a455f329f27a758fc2d-e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855-20b017e9c4d858ab05e783f77df50b86c6d6eee5d79f3f4b158562b4a54f8443-f44338a31e0534290b08653050804c3fabbde403a6d3004ae04f0c28495f0802-e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855-a979896b9c0acfd41dd953b90bdc4b10968f7c0b45a286eae3f829aaddb2bb55-da771298f7bc45d24a61f35ef51742304421df1ab49d50bf1fc510dd5a46ea4b-0461f345216292fc32237b16d0f08f4ab17ecb31498752d5cab703f777f8785b-71330f394e584b0df29595d49f6ac8ac0c5503db9147090dc58ad888cebac7be-f24adfd52383f7866791ebaa5d45a5d2cc826e56ee2fd285f438e85d201fe643-a34be0d3ae4b3ac9aede195cfda42f8a0a097b2bc9642fb59673ce6b3b607f10-36130a37af1b19a0dec569aa08d30b00c74c8f02b6b632999d86dea169146792-36d42f0429aae027cb985b53b9abc616fae4dad9e0ea03953e1e9fb46d0fb9a0-e5d2cb724c08d0ef4130f3ba858d22cf21f834bfd970a5388aa6ad2a6bab91f9"
+}

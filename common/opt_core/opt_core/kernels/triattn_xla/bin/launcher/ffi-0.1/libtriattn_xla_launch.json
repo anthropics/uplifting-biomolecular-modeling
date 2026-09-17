@@ -1,0 +1,37 @@
+{
+ "build_s": 4.3,
+ "built_utc": "2026-09-12T05:12:10Z",
+ "bytes": 255360,
+ "cuda_include": "local",
+ "ffi_api_version": "0.1",
+ "file": "bin/launcher/ffi-0.1/libtriattn_xla_launch.so",
+ "gxx": "g++ (Ubuntu 13.3.0-6ubuntu2~24.04) 13.3.0",
+ "jaxlib_lines": [
+  "0.5.3",
+  "0.6.0"
+ ],
+ "kind": "launcher",
+ "needed": [
+  "libc.so.6",
+  "libcuda.so.1",
+  "libdl.so.2",
+  "libgcc_s.so.1",
+  "libm.so.6",
+  "libpthread.so.0",
+  "librt.so.1",
+  "libstdc++.so.6"
+ ],
+ "requires": {
+  "CXXABI_max": "1.3.9",
+  "GLIBCXX_max": "3.4.21",
+  "GLIBC_max": "2.14"
+ },
+ "sha256": "df93725ed04d0486823b615b3765f1141c42ae22239fe17aa9638cc61c5d63bb",
+ "sources_sha256": {
+  "cubin_launch.cc": "40f46938a14d404f21ee81646cc54e933238faf2818d43aad1a1ccb52f698729",
+  "triattn_cuda_abi.h": "1ddc93723760ceacae785fd0e089ad968359acdacbf2945ec5adef2e6f236dfe",
+  "triattn_m1_abi.h": "ac8a0bdea49bb68bc5e6c8408bb0d2a84cff745702c186cf10d4ba26c2d5de09",
+  "triattn_sm80_abi.h": "514bc383c23e9bf7d2f076beff3988ac19ac2c2d82d09f2a1af160f183dd1a25"
+ },
+ "tag": "ffi-0.1"
+}

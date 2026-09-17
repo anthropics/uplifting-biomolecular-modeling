@@ -1,0 +1,73 @@
+{
+ "expected": {
+  "cc90|triton3.7.1|torch2.13.0": {
+   "atom_tf32rn_N333": {
+    "dtype": "float32",
+    "finite": true,
+    "sha256": "191942b881b02de2efbc77075443632f36683186cf778fa9ab13795d40c654b5",
+    "shape": [
+     2,
+     333,
+     4,
+     32
+    ]
+   },
+   "dit_bf16in_N72": {
+    "dtype": "bfloat16",
+    "finite": true,
+    "sha256": "21028ab78d3f1dcc0f114d7c20f151691849349bc7e03df9838b1080836d7714",
+    "shape": [
+     5,
+     72,
+     16,
+     48
+    ]
+   },
+   "dit_fp16precast_N72": {
+    "dtype": "float32",
+    "finite": true,
+    "sha256": "1d6ba85e32c6bf633153f8deabea2bb54fcde6014c10ec986295dfe8f59f0ad5",
+    "shape": [
+     5,
+     72,
+     16,
+     48
+    ]
+   },
+   "dit_tf32x3_N72": {
+    "dtype": "float32",
+    "finite": true,
+    "sha256": "bfb2cf08bd146b7cda25eb86e61f9dca2d5cef43e381a856b7022f1e84ee81ab",
+    "shape": [
+     5,
+     72,
+     16,
+     48
+    ]
+   },
+   "pf_bias_N52": {
+    "dtype": "float32",
+    "finite": true,
+    "sha256": "bb6efccfda228b3c8830f5ea4692d6e05204514c5b9e2a15f385d4e21d54d2f6",
+    "shape": [
+     16,
+     52,
+     52
+    ]
+   },
+   "pf_core_bf16_N52": {
+    "dtype": "bfloat16",
+    "finite": true,
+    "sha256": "b9b8578394fcd5b41ef935c6677df81eda87d47b1abbca06230005ecc82f2e01",
+    "shape": [
+     1,
+     52,
+     16,
+     24
+    ]
+   }
+  }
+ },
+ "generator": "protenix_fpf_apb.loadcheck.det",
+ "schema": "fpf_vectors/v1"
+}

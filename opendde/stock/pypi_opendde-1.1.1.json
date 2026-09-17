@@ -1,0 +1,87 @@
+{
+ "info": {
+  "name": "opendde",
+  "version": "1.1.1",
+  "requires_python": "<3.14,>=3.11",
+  "requires_dist": [
+   "torch==2.7.1",
+   "click>=8.1.0",
+   "scipy>=1.9.0",
+   "ml_collections==1.1.0",
+   "tqdm==4.67.1",
+   "pandas==2.3.1",
+   "rdkit==2025.9.3",
+   "biopython==1.85",
+   "biotite==1.4.0",
+   "scikit-learn==1.7.1",
+   "pydantic>=2.0.0",
+   "optree==0.17.0",
+   "numpy==2.4.1",
+   "networkx>=3.4.2",
+   "packaging>=23.2",
+   "requests>=2.31.0",
+   "triton==3.3.1; (platform_system == \"Linux\" and platform_machine == \"x86_64\") and extra == \"gpu\"",
+   "cuequivariance==0.10.0; (platform_system == \"Linux\" and platform_machine == \"x86_64\") and extra == \"gpu\"",
+   "cuequivariance-torch==0.10.0; (platform_system == \"Linux\" and platform_machine == \"x86_64\") and extra == \"gpu\"",
+   "cuequivariance-ops-cu12==0.10.0; (platform_system == \"Linux\" and platform_machine == \"x86_64\") and extra == \"gpu\"",
+   "cuequivariance-ops-torch-cu12==0.10.0; (platform_system == \"Linux\" and platform_machine == \"x86_64\") and extra == \"gpu\""
+  ],
+  "project_urls": {
+   "Changelog": "https://github.com/aurekaresearch/OpenDDE/blob/main/CHANGELOG.md",
+   "Documentation": "https://github.com/aurekaresearch/OpenDDE/tree/main/docs",
+   "Homepage": "https://github.com/aurekaresearch/OpenDDE",
+   "Issues": "https://github.com/aurekaresearch/OpenDDE/issues",
+   "Repository": "https://github.com/aurekaresearch/OpenDDE"
+  },
+  "summary": "Open-Source Drug Design Engine"
+ },
+ "urls": [
+  {
+   "comment_text": null,
+   "core-metadata": {
+    "sha256": "b7b9bb58513824ce99e8512dd39e3137445b953b2ae037699d8f53dbdd101cf4"
+   },
+   "digests": {
+    "blake2b_256": "58ca4dc0bca000b84fb44dd45f2f17159ce3b2587d341ccb5f62b8755bf88a47",
+    "md5": "0102d5a1082e01a53c00103e944470d4",
+    "sha256": "94b193bd360e017c9cfab08d199ec9333cb2919a49fe1d9270c659c4b2efe544"
+   },
+   "downloads": -1,
+   "filename": "opendde-1.1.1-py3-none-any.whl",
+   "has_sig": false,
+   "md5_digest": "0102d5a1082e01a53c00103e944470d4",
+   "packagetype": "bdist_wheel",
+   "python_version": "py3",
+   "requires_python": "<3.14,>=3.11",
+   "size": 515483,
+   "upload_time": "2026-09-02T08:10:21",
+   "upload_time_iso_8601": "2026-09-02T08:10:21.063950Z",
+   "url": "https://files.pythonhosted.org/packages/58/ca/4dc0bca000b84fb44dd45f2f17159ce3b2587d341ccb5f62b8755bf88a47/opendde-1.1.1-py3-none-any.whl",
+   "yanked": false,
+   "yanked_reason": null
+  },
+  {
+   "comment_text": null,
+   "core-metadata": false,
+   "digests": {
+    "blake2b_256": "f02e3b4e973969366f89b4de431f2568cc81d7a88b4f42a7fc85ac7eaf6f0a51",
+    "md5": "5cb4c9a6dc9ab80f7b0d334c4e031121",
+    "sha256": "dd11791b3f33d609adbcaf4e7a21e3122797574b088bc8d62bf56e6d765434a0"
+   },
+   "downloads": -1,
+   "filename": "opendde-1.1.1.tar.gz",
+   "has_sig": false,
+   "md5_digest": "5cb4c9a6dc9ab80f7b0d334c4e031121",
+   "packagetype": "sdist",
+   "python_version": "source",
+   "requires_python": "<3.14,>=3.11",
+   "size": 467138,
+   "upload_time": "2026-09-02T08:10:22",
+   "upload_time_iso_8601": "2026-09-02T08:10:22.661977Z",
+   "url": "https://files.pythonhosted.org/packages/f0/2e/3b4e973969366f89b4de431f2568cc81d7a88b4f42a7fc85ac7eaf6f0a51/opendde-1.1.1.tar.gz",
+   "yanked": false,
+   "yanked_reason": null
+  }
+ ],
+ "fetched_from": "https://pypi.org/pypi/opendde/1.1.1/json"
+}

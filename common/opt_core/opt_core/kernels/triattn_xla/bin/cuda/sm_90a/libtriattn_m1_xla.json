@@ -1,0 +1,66 @@
+{
+ "abi_version": 1,
+ "arch": "sm_90a",
+ "build_s": 80.7,
+ "built_utc": "2026-09-12T06:52:46Z",
+ "bytes": 2200072,
+ "cudart": "static",
+ "cutlass_tag": "v4.7.1",
+ "entry": "triattn_m1_xla_fwd",
+ "file": "bin/cuda/sm_90a/libtriattn_m1_xla.so",
+ "instantiations": [
+  "Traits<0>",
+  "Traits<1024>"
+ ],
+ "kind": "cuda",
+ "needed": [
+  "libc.so.6",
+  "libgcc_s.so.1",
+  "libm.so.6",
+  "libstdc++.so.6"
+ ],
+ "nvcc": "Build cuda_13.0.r13.0/compiler.36424714_0",
+ "nvcc_flags": [
+  "-O3",
+  "-std=c++17",
+  "--expt-relaxed-constexpr",
+  "--expt-extended-lambda",
+  "--use_fast_math",
+  "-gencode",
+  "arch=compute_90a,code=sm_90a",
+  "-DNDEBUG",
+  "-DCUTE_SM90_EXTENDED_MMA_SHAPES_ENABLED",
+  "--ftemplate-backtrace-limit=0",
+  "-lineinfo",
+  "-Xcompiler",
+  "-Wno-psabi",
+  "-diag-suppress",
+  "177,550",
+  "-Xptxas",
+  "-v"
+ ],
+ "package_generation": "v11",
+ "ptxas": "Build cuda_13.0.r13.0/compiler.36424714_0",
+ "ptxas_registers": {
+  "20stage_bias_m1_kernelI13__nv_bfloat16EEvPKT_lllliifPKjiPfPi": 24,
+  "ZN10triattn_m120stage_bias_m1_kernelIfEEvPKT_lllliifPKjiPfPi": 24,
+  "_ZN10triattn_m116mask_rows_kernelEPKjS1_iiPhPiS3_S3_S3_S3_": 32,
+  "_ZN10triattn_m117mask_words_kernelEPKbllliiiPjS2_": 16,
+  "_m119uniform_rows_kernelEPK13__nv_bfloat16llllPS0_llllPKhiii": 29,
+  "riattn_m117triattn_m1_kernelINS_6TraitsILi0EEEEEvNT_6ParamsE": 128,
+  "ttn_m117triattn_m1_kernelINS_6TraitsILi1024EEEEEvNT_6ParamsE": 128
+ },
+ "requires": {
+  "CXXABI_max": "1.3",
+  "GLIBCXX_max": "3.4.11",
+  "GLIBC_max": "2.34"
+ },
+ "role": "m1_fwd",
+ "sha256": "9f9970752196c0c81d222a3790b10fa81e1976158212ac9f3e39ac9a33bb9dae",
+ "sources_sha256": {
+  "kernels/triattn/triattn_native/pkg/v11/triattn_pkg/cuda_b/csrc/fa3_utils.h": "776172706a741081ba0a32058ca6d0ce94bea976a5689d0965b162eaf7f5d9cc",
+  "kernels/triattn/triattn_native/pkg/v11/triattn_pkg/cuda_b/csrc/m1/triattn_m1_sm90.cuh": "55f5262071d0a26e74e6831610252d7795e81a06ca852bd6a92f5f555d3a1c75",
+  "triattn_m1_abi.h": "6eb838c95f7e1687ad6718ca79648c6f5605d0340229bf33bdf35f9a91a42e79",
+  "triattn_m1_xla.cu": "769bd4a7a2691de63867aec9165c4be9907863c56ff202ab8cda0f918737c782"
+ }
+}

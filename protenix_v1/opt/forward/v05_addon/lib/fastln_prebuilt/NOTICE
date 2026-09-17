@@ -1,0 +1,16 @@
+lib/fastln_prebuilt — Protenix 1.1.0's fast-LayerNorm CUDA extension, rebuilt so that its kernels launch on the current CUDA stream.
+
+Third-party files in this directory (portions derived from Protenix, https://github.com/bytedance/Protenix, Apache License 2.0,
+"Copyright 2024 ByteDance and/or its affiliates."; licence text: ../../../../../third_party_licenses/Protenix.Apache-2.0.txt):
+- patched_src/layer_norm_cuda_kernel.cu — MODIFIED copy of protenix/model/layer_norm/kernel/layer_norm_cuda_kernel.cu: its 25 kernel
+  launches take the current CUDA stream as launch argument; arithmetic unchanged. Its header lines also name The OneFlow Authors (2020)
+  and HPC-AI Technology Inc. (2021-), Apache License 2.0, as printed upstream.
+- patched_src/compat.h, patched_src/type_shim.h, patched_src/layer_norm_cuda.cpp — UNMODIFIED copies of the upstream files of the same
+  names (headers: HPC-AI Technology Inc., Apache License 2.0; compat.h and type_shim.h are marked "modified from
+  https://github.com/NVIDIA/apex", BSD-3-Clause, text: ../../../../../third_party_licenses/NVIDIA-apex.BSD-3-Clause.txt).
+- fast_layer_norm_cuda_v2_stream.so — built from the four sources above as a PyTorch C++/CUDA extension (PyTorch and pybind11 headers,
+  BSD-3-Clause; links the NVIDIA CUDA runtime); manifest.json records the torch build it serves and the source and binary digests,
+  SHA256SUMS the digest re-checked before the extension is loaded.
+Written for this kit (Apache License 2.0, LICENSE at the kit root): manifest.json, SHA256SUMS, this NOTICE, and the loader
+../fastln_prebuilt.py, which re-checks the torch version, the digest and the bitwise / side-stream properties in every process and
+refuses by name otherwise (the extension Protenix builds from source then serves; outputs identical).

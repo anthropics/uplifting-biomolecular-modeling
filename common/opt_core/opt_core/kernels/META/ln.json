@@ -1,0 +1,34 @@
+{
+ "carried_digests": {
+  "ef2/ef2_fused_ln.py": "49df04d0f5c8f1b53c1e34442c55c0bff5b027f0231fd5e2e8c543121a208846",
+  "exactln/exactln_fwd.cu": "8283eb74c962c96f8eb4b5f082cf5c7eaeb4ecdf3f2ebccd70f2424d89d79df1",
+  "exactln/triton_ln.py": "7f8b001e2dc89db2890dd1c2df227fe2d6bef9a73380c61def08d778aa56ee7f",
+  "fastln/fastln.py": "fa3b25c0c48bef74bda72fc36f86bfcc7853d3df1979558a0b8b52800278efea"
+ },
+ "carried_digests_note": "sha256 of every donor-byte file under kernels/ln/ (the face, the cells table, NOTICE / marker files and the entries of not_byte_identical are the core's own); tests/test_ln_provider_cells.py checks the carried copy against these digests always, and against any kit copy of the same NAME found in the release tree with the same digest -- a kit copy that is absent or was edited after the carry SKIPS with the reason named, never fails",
+ "exports": {},
+ "kind": "package",
+ "license": "exactln/ (carried package exactln 1.3.3: __init__.py, exactln_fwd.cu, triton_ln.py + this tree's cubind.py; original source, this repository -- an independent re-statement of the published LayerNorm arithmetic order, no ATen source copied); fastln/fastln.py (carried module fastln 0.2.0; original source) + fastln/lpout.py (this tree's own: its low-precision-output form); ef2/ef2_fused_ln.py (original source; its ln_bwd_dx mirrors the arithmetic order of the ESM-family fork's vendored Triton backward, none copied); the face and LN_CELLS.json are the core's own",
+ "mechanism": "kernels.ln.select / kernels.ln.layer_norm / layer_norm_backward_dx / ln_linear / exact_prologue",
+ "name": "ln",
+ "not_byte_identical": {
+  "ln/exactln/__init__.py": "five hunks, no arithmetic / source / compile-option / launch change: the four `from cuda.bindings import driver|nvrtc` statements resolve through `_bindings(name)` (cuda.bindings when importable, else the ctypes bindings in cubind.py; OPT_CORE_EXACTLN_BINDINGS=ctypes forces the latter), `facts()['bindings']` reports which served, the module docstring says so; plus the bundle lookup (_prebuilt_index / _prebuilt_function / _opts, consulted first in _compile; facts prebuilt_hits / prebuilt_off) -- no arithmetic / source / option change; plus the cache-directory rule (_private_cache_dir, consulted in _cache_dir: a cubin directory another account could have written is refused by name and a private one used; cubin files written 0644)",
+  "ln/exactln/build_prebuilt.py": "house-written builder of that payload (NVRTC cross-compiles both archs on any card; python -m opt_core.kernels.ln.exactln.build_prebuilt)",
+  "ln/exactln/cubind.py": "house-written addition (not in the donor): the CUDA driver API + NVRTC entry points exactln calls, bound through ctypes (libcuda.so.1; the libnvrtc torch ships / loads or the toolkit's) with cuda.bindings' return convention -- serves the images that lack the cuda-python wheel",
+  "ln/exactln/prebuilt/": "house-built payload (not in the donor): exactln_fwd-sm90.cubin + exactln_fwd-sm80.cubin + index.json -- the 40 (form, C, affine) instantiations the cells serve, one NVRTC program per arch from the shipped exactln_fwd.cu with the module's options; a serving process loads the module and compiles nothing (facts prebuilt_hits); OPT_CORE_EXACTLN_PREBUILT=0 = compile as before",
+  "ln/fastln/lpout.py": "house-written addition (not in the donor): the carried row kernel with fp32 arithmetic pinned and the OUTPUT dtype named (layer_norm_lp; the bf16o form: bf16 x, fp32 parameters and statistics, bf16 out)"
+ },
+ "not_carried": {
+  "a trunk's compiled fast_layernorm extension and its stream fix": "named in LN_CELLS.json rows.fast_layernorm (capture-UNSAFE evidence + the numerics-free launch-stream fix the owning kit applies); nothing of it is carried",
+  "exactln's pyproject / README / tests of the donor package": "package scaffolding; the module docstring carries the contract",
+  "the kits' LayerNorm patch sites, env words (LAYERNORM_TYPE, *_TORCH_LAYERNORM), stackx forwards and tests": "kit files: a kit binds a row through its own mechanism"
+ },
+ "runtime_imports": [
+  "ln_proj",
+  "rfd_layernorm",
+  "dtk_kernels"
+ ],
+ "runtime_imports_note": "rows served by core modules in place (kernels.ln_proj.layernorm_rows / ln_linear, kernels.rfd_layernorm, kernels.dtk_kernels.ln_modulate) are imported at call time; exactln imports torch at module level and serves the cells' (form, C, affine) set from shipped CUBIN modules (prebuilt/, sm_90 + sm_80: no compile in a serving process); any other instantiation compiles through NVRTC on first call (cuda.bindings when importable, else libcuda / libnvrtc through ctypes: cubind.py) -- refused by name where neither loads; exactln.triton_ln and fastln import triton (and numpy) at module level; the face is standard library at import",
+ "served_note": "LN_CELLS.json ln_cells/v1: 490 measured cells (cc 9.0 and 8.0, 8 stacks; forms fp32 | bf16 | bf16w | bf16o; passes fwd | bwd | fwdbwd), 60 target-coverage rows; exactln bitwise vs ATen 36/36 (+18/18 triton, 36/36 widen) per card and the exact-tier winner only at or above ATen's speed (N^2-row cells; ATen keeps the N-row / 8N-row / DiT cells in eager); fast_layernorm named capture-UNSAFE (replay-stale 16/16 probes)",
+ "version": "1.0.0"
+}

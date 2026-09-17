@@ -1,0 +1,1954 @@
+{
+ "schema": "trimul_xla/cells/v1",
+ "doc": "units = the tile table of the carried trimul_native sm_90a units, restated from the package's launch module (defaults + by_n buckets: the smallest bucket >= N applies; above the largest bucket its entry applies uncovered); lnm = the LayerNorm-numerics instantiation the package serves as its `fast` class (K1 l2 / K3 l1 for bf16 z, l1 / l1 for fp32-resident z). measured = this row (native_xla) against the JAX arms on the same box: cc, jax line, dtype, c_z x c_hidden, direction, N, arms' ms_median / quartiles, numerics vs the fp32 statement; selection in kernels.pallas' cells follows the default-flip rule (a tier word moves to this row only where it wins by >= 5 % outside the arms' IQR boxes; parity keeps the incumbent; the row stays selectable by word).",
+ "units": {
+  "128x128": {
+   "cubin": "build/sm_90a/tmn90_z128_h128.cubin",
+   "manifest_unit": "tmn90_z128_h128/sm_90a",
+   "c_z": 128,
+   "c_hidden": 128,
+   "lnm": {
+    "k1_b": 2,
+    "k1_f": 1,
+    "k3": 1
+   },
+   "b": {
+    "k1": [
+     2,
+     64,
+     8,
+     2
+    ],
+    "k3": [
+     2,
+     64,
+     8,
+     1
+    ],
+    "by_n": {
+     "1536": {
+      "k3": [
+       2,
+       64,
+       8,
+       2
+      ]
+     },
+     "4096": {
+      "k3": [
+       2,
+       64,
+       8,
+       1
+      ]
+     }
+    }
+   },
+   "f": {
+    "k1": [
+     2,
+     64,
+     8,
+     2
+    ],
+    "k3": [
+     2,
+     64,
+     8,
+     1
+    ],
+    "k3_mode": "f"
+   }
+  },
+  "64x64": {
+   "cubin": "build/sm_90a/tmn90_z64_h64.cubin",
+   "manifest_unit": "tmn90_z64_h64/sm_90a",
+   "c_z": 64,
+   "c_hidden": 64,
+   "lnm": {
+    "k1_b": 2,
+    "k1_f": 1,
+    "k3": 1
+   },
+   "b": {
+    "k1": [
+     2,
+     64,
+     4,
+     1
+    ],
+    "k3": [
+     2,
+     64,
+     4,
+     1
+    ]
+   },
+   "f": {
+    "k1": [
+     2,
+     64,
+     4,
+     1
+    ],
+    "k3": [
+     2,
+     64,
+     4,
+     1
+    ],
+    "k3_mode": "f"
+   }
+  }
+ },
+ "by_cc": {
+  "9.0": {
+   "rows": [
+    "native_xla"
+   ],
+   "doc": "served by word (impl / kernels.pallas row word native_xla); tier words reach it only through kernels.pallas cells that name it first"
+  },
+  "8.0": {
+   "rows": [],
+   "doc": "refused by name (arch): the package's sm_80 units are not carried in this version"
+  }
+ },
+ "measured": [
+  {
+   "cc": "9.0",
+   "stack": "H100:jax0.10.2+tokamax0.0.12",
+   "dtype": "bf16",
+   "family": "af3_pair_c128_ch128_incoming",
+   "N": 256,
+   "row": "native_xla",
+   "ms": {
+    "native_xla": 0.2771,
+    "cd_trimul": 0.2666,
+    "cd_trimul@t32w8": 0.3381,
+    "fpf_trimul": 0.2887,
+    "xla": 0.5797
+   },
+   "q1q3": {
+    "native_xla": [
+     0.2522,
+     0.318
+    ],
+    "cd_trimul": [
+     0.2469,
+     0.3477
+    ],
+    "cd_trimul@t32w8": [
+     0.3219,
+     0.3671
+    ],
+    "fpf_trimul": [
+     0.2718,
+     0.333
+    ],
+    "xla": [
+     0.5662,
+     0.6184
+    ]
+   },
+   "temp_mib": {
+    "native_xla": 80.0,
+    "cd_trimul": 64.0,
+    "cd_trimul@t32w8": 64.0,
+    "fpf_trimul": 64.0,
+    "xla": 224.0
+   },
+   "relrms_fp32": {
+    "native_xla": 0.004808,
+    "cd_trimul": 0.004808,
+    "cd_trimul@t32w8": 0.004808,
+    "fpf_trimul": 0.004807,
+    "xla": 0.00507
+   },
+   "vs_cd_trimul_pct": 3.9,
+   "iqr_disjoint": false,
+   "verdict": "parity"
+  },
+  {
+   "cc": "9.0",
+   "stack": "H100:jax0.10.2+tokamax0.0.12",
+   "dtype": "bf16",
+   "family": "af3_pair_c128_ch128_incoming",
+   "N": 400,
+   "row": "native_xla",
+   "ms": {
+    "native_xla": 0.455,
+    "cd_trimul": 0.5287,
+    "cd_trimul@t32w8": 0.5515,
+    "fpf_trimul": 0.6893,
+    "xla": 1.1727
+   },
+   "q1q3": {
+    "native_xla": [
+     0.4147,
+     0.5149
+    ],
+    "cd_trimul": [
+     0.5015,
+     0.8827
+    ],
+    "cd_trimul@t32w8": [
+     0.5251,
+     0.6797
+    ],
+    "fpf_trimul": [
+     0.6653,
+     0.7395
+    ],
+    "xla": [
+     1.128,
+     1.2496
+    ]
+   },
+   "temp_mib": {
+    "native_xla": 117.2,
+    "cd_trimul": 110.1,
+    "cd_trimul@t32w8": 110.1,
+    "fpf_trimul": 196.0,
+    "xla": 546.9
+   },
+   "relrms_fp32": {
+    "native_xla": 0.004727,
+    "cd_trimul": 0.004727,
+    "cd_trimul@t32w8": 0.004727,
+    "fpf_trimul": 0.004727,
+    "xla": 0.00496
+   },
+   "vs_cd_trimul_pct": -13.9,
+   "iqr_disjoint": false,
+   "verdict": "parity"
+  },
+  {
+   "cc": "9.0",
+   "stack": "H100:jax0.10.2+tokamax0.0.12",
+   "dtype": "bf16",
+   "family": "af3_pair_c128_ch128_incoming",
+   "N": 800,
+   "row": "native_xla",
+   "ms": {
+    "native_xla": 1.0127,
+    "cd_trimul": 1.298,
+    "cd_trimul@t32w8": 1.603,
+    "fpf_trimul": 1.7722,
+    "xla": 3.9433
+   },
+   "q1q3": {
+    "native_xla": [
+     0.9888,
+     1.0961
+    ],
+    "cd_trimul": [
+     1.2529,
+     1.3486
+    ],
+    "cd_trimul@t32w8": [
+     1.5714,
+     1.6534
+    ],
+    "fpf_trimul": [
+     1.7501,
+     1.8257
+    ],
+    "xla": [
+     3.9003,
+     4.0225
+    ]
+   },
+   "temp_mib": {
+    "native_xla": 468.8,
+    "cd_trimul": 344.5,
+    "cd_trimul@t32w8": 344.5,
+    "fpf_trimul": 676.0,
+    "xla": 2187.5
+   },
+   "relrms_fp32": {
+    "native_xla": 0.004784,
+    "cd_trimul": 0.004784,
+    "cd_trimul@t32w8": 0.004784,
+    "fpf_trimul": 0.004784,
+    "xla": 0.005028
+   },
+   "vs_cd_trimul_pct": -22.0,
+   "iqr_disjoint": true,
+   "verdict": "win"
+  },
+  {
+   "cc": "9.0",
+   "stack": "H100:jax0.10.2+tokamax0.0.12",
+   "dtype": "bf16",
+   "family": "af3_pair_c128_ch128_incoming",
+   "N": 1200,
+   "row": "native_xla",
+   "ms": {
+    "native_xla": 2.0184,
+    "cd_trimul": 2.6121,
+    "cd_trimul@t32w8": 3.3818,
+    "fpf_trimul": 3.5651,
+    "xla": 8.9952
+   },
+   "q1q3": {
+    "native_xla": [
+     1.9449,
+     2.0911
+    ],
+    "cd_trimul": [
+     2.5863,
+     2.6575
+    ],
+    "cd_trimul@t32w8": [
+     3.3214,
+     3.41
+    ],
+    "fpf_trimul": [
+     3.5317,
+     3.7174
+    ],
+    "xla": [
+     8.8691,
+     9.0749
+    ]
+   },
+   "temp_mib": {
+    "native_xla": 1054.7,
+    "cd_trimul": 735.1,
+    "cd_trimul@t32w8": 735.1,
+    "fpf_trimul": 1444.0,
+    "xla": 4921.9
+   },
+   "relrms_fp32": {
+    "native_xla": 0.004597,
+    "cd_trimul": 0.004598,
+    "cd_trimul@t32w8": 0.004598,
+    "fpf_trimul": 0.004597,
+    "xla": 0.004785
+   },
+   "vs_cd_trimul_pct": -22.7,
+   "iqr_disjoint": true,
+   "verdict": "win"
+  },
+  {
+   "cc": "9.0",
+   "stack": "H100:jax0.10.2+tokamax0.0.12",
+   "dtype": "bf16",
+   "family": "af3_pair_c128_ch128_incoming",
+   "N": 1536,
+   "row": "native_xla",
+   "ms": {
+    "native_xla": 3.1391,
+    "cd_trimul": 4.0724,
+    "cd_trimul@t32w8": 5.4447,
+    "fpf_trimul": 4.8855,
+    "xla": 15.0579
+   },
+   "q1q3": {
+    "native_xla": [
+     3.0821,
+     3.2331
+    ],
+    "cd_trimul": [
+     4.0319,
+     4.2504
+    ],
+    "cd_trimul@t32w8": [
+     5.2971,
+     5.6174
+    ],
+    "fpf_trimul": [
+     4.7911,
+     4.9445
+    ],
+    "xla": [
+     14.9284,
+     15.1293
+    ]
+   },
+   "temp_mib": {
+    "native_xla": 1728.0,
+    "cd_trimul": 1184.0,
+    "cd_trimul@t32w8": 1184.0,
+    "fpf_trimul": 1184.0,
+    "xla": 8064.0
+   },
+   "relrms_fp32": {
+    "native_xla": 0.004695,
+    "cd_trimul": 0.004695,
+    "cd_trimul@t32w8": 0.004695,
+    "fpf_trimul": 0.004695,
+    "xla": 0.004912
+   },
+   "vs_cd_trimul_pct": -22.9,
+   "iqr_disjoint": true,
+   "verdict": "win"
+  },
+  {
+   "cc": "9.0",
+   "stack": "H100:jax0.10.2+tokamax0.0.12",
+   "dtype": "bf16",
+   "family": "af3_pair_c128_ch128_outgoing",
+   "N": 256,
+   "row": "native_xla",
+   "ms": {
+    "native_xla": 0.2923,
+    "cd_trimul": 0.321,
+    "cd_trimul@t32w8": 0.3498,
+    "fpf_trimul": 0.31,
+    "xla": 0.7696
+   },
+   "q1q3": {
+    "native_xla": [
+     0.2294,
+     0.3994
+    ],
+    "cd_trimul": [
+     0.2798,
+     0.3477
+    ],
+    "cd_trimul@t32w8": [
+     0.3272,
+     0.4447
+    ],
+    "fpf_trimul": [
+     0.2847,
+     0.3656
+    ],
+    "xla": [
+     0.7592,
+     0.8057
+    ]
+   },
+   "temp_mib": {
+    "native_xla": 80.0,
+    "cd_trimul": 64.0,
+    "cd_trimul@t32w8": 64.0,
+    "fpf_trimul": 64.0,
+    "xla": 224.0
+   },
+   "relrms_fp32": {
+    "native_xla": 0.00481,
+    "cd_trimul": 0.00481,
+    "cd_trimul@t32w8": 0.00481,
+    "fpf_trimul": 0.004811,
+    "xla": 0.005069
+   },
+   "vs_cd_trimul_pct": -8.9,
+   "iqr_disjoint": false,
+   "verdict": "parity"
+  },
+  {
+   "cc": "9.0",
+   "stack": "H100:jax0.10.2+tokamax0.0.12",
+   "dtype": "bf16",
+   "family": "af3_pair_c128_ch128_outgoing",
+   "N": 400,
+   "row": "native_xla",
+   "ms": {
+    "native_xla": 0.4486,
+    "cd_trimul": 0.4917,
+    "cd_trimul@t32w8": 0.5654,
+    "fpf_trimul": 0.6649,
+    "xla": 1.5381
+   },
+   "q1q3": {
+    "native_xla": [
+     0.4328,
+     0.5024
+    ],
+    "cd_trimul": [
+     0.4669,
+     0.5414
+    ],
+    "cd_trimul@t32w8": [
+     0.5483,
+     0.5918
+    ],
+    "fpf_trimul": [
+     0.6484,
+     0.6868
+    ],
+    "xla": [
+     1.5196,
+     1.5749
+    ]
+   },
+   "temp_mib": {
+    "native_xla": 117.2,
+    "cd_trimul": 110.1,
+    "cd_trimul@t32w8": 110.1,
+    "fpf_trimul": 196.0,
+    "xla": 390.8
+   },
+   "relrms_fp32": {
+    "native_xla": 0.004726,
+    "cd_trimul": 0.004726,
+    "cd_trimul@t32w8": 0.004726,
+    "fpf_trimul": 0.004726,
+    "xla": 0.00496
+   },
+   "vs_cd_trimul_pct": -8.8,
+   "iqr_disjoint": false,
+   "verdict": "parity"
+  },
+  {
+   "cc": "9.0",
+   "stack": "H100:jax0.10.2+tokamax0.0.12",
+   "dtype": "bf16",
+   "family": "af3_pair_c128_ch128_outgoing",
+   "N": 800,
+   "row": "native_xla",
+   "ms": {
+    "native_xla": 1.036,
+    "cd_trimul": 1.3072,
+    "cd_trimul@t32w8": 1.6436,
+    "fpf_trimul": 1.7987,
+    "xla": 5.2677
+   },
+   "q1q3": {
+    "native_xla": [
+     0.976,
+     1.0819
+    ],
+    "cd_trimul": [
+     1.2594,
+     1.3418
+    ],
+    "cd_trimul@t32w8": [
+     1.6077,
+     1.6682
+    ],
+    "fpf_trimul": [
+     1.742,
+     1.8542
+    ],
+    "xla": [
+     5.1478,
+     5.3356
+    ]
+   },
+   "temp_mib": {
+    "native_xla": 468.8,
+    "cd_trimul": 344.5,
+    "cd_trimul@t32w8": 344.5,
+    "fpf_trimul": 676.0,
+    "xla": 1562.6
+   },
+   "relrms_fp32": {
+    "native_xla": 0.004785,
+    "cd_trimul": 0.004786,
+    "cd_trimul@t32w8": 0.004786,
+    "fpf_trimul": 0.004786,
+    "xla": 0.005029
+   },
+   "vs_cd_trimul_pct": -20.7,
+   "iqr_disjoint": true,
+   "verdict": "win"
+  },
+  {
+   "cc": "9.0",
+   "stack": "H100:jax0.10.2+tokamax0.0.12",
+   "dtype": "bf16",
+   "family": "af3_pair_c128_ch128_outgoing",
+   "N": 1200,
+   "row": "native_xla",
+   "ms": {
+    "native_xla": 1.9826,
+    "cd_trimul": 2.577,
+    "cd_trimul@t32w8": 3.3076,
+    "fpf_trimul": 3.5499,
+    "xla": 11.6412
+   },
+   "q1q3": {
+    "native_xla": [
+     1.9564,
+     2.011
+    ],
+    "cd_trimul": [
+     2.5497,
+     2.6145
+    ],
+    "cd_trimul@t32w8": [
+     3.2869,
+     3.3291
+    ],
+    "fpf_trimul": [
+     3.5018,
+     3.6159
+    ],
+    "xla": [
+     11.4953,
+     11.6832
+    ]
+   },
+   "temp_mib": {
+    "native_xla": 1054.7,
+    "cd_trimul": 735.1,
+    "cd_trimul@t32w8": 735.1,
+    "fpf_trimul": 1444.0,
+    "xla": 3515.8
+   },
+   "relrms_fp32": {
+    "native_xla": 0.004598,
+    "cd_trimul": 0.004598,
+    "cd_trimul@t32w8": 0.004598,
+    "fpf_trimul": 0.004598,
+    "xla": 0.004786
+   },
+   "vs_cd_trimul_pct": -23.1,
+   "iqr_disjoint": true,
+   "verdict": "win"
+  },
+  {
+   "cc": "9.0",
+   "stack": "H100:jax0.10.2+tokamax0.0.12",
+   "dtype": "bf16",
+   "family": "af3_pair_c128_ch128_outgoing",
+   "N": 1536,
+   "row": "native_xla",
+   "ms": {
+    "native_xla": 3.1186,
+    "cd_trimul": 4.1357,
+    "cd_trimul@t32w8": 5.362,
+    "fpf_trimul": 4.8578,
+    "xla": 19.0189
+   },
+   "q1q3": {
+    "native_xla": [
+     3.0609,
+     3.1919
+    ],
+    "cd_trimul": [
+     4.1025,
+     4.2107
+    ],
+    "cd_trimul@t32w8": [
+     5.2907,
+     5.5254
+    ],
+    "fpf_trimul": [
+     4.8112,
+     4.9551
+    ],
+    "xla": [
+     19.0007,
+     19.1622
+    ]
+   },
+   "temp_mib": {
+    "native_xla": 1728.0,
+    "cd_trimul": 1184.0,
+    "cd_trimul@t32w8": 1184.0,
+    "fpf_trimul": 1184.0,
+    "xla": 5760.1
+   },
+   "relrms_fp32": {
+    "native_xla": 0.004695,
+    "cd_trimul": 0.004695,
+    "cd_trimul@t32w8": 0.004695,
+    "fpf_trimul": 0.004695,
+    "xla": 0.004913
+   },
+   "vs_cd_trimul_pct": -24.6,
+   "iqr_disjoint": true,
+   "verdict": "win"
+  },
+  {
+   "cc": "9.0",
+   "stack": "H100:jax0.10.2+tokamax0.0.12",
+   "dtype": "bf16",
+   "family": "af3_tmpl_c64_ch64_outgoing",
+   "N": 256,
+   "row": "native_xla",
+   "ms": {
+    "native_xla": 0.2067,
+    "cd_trimul": 0.1926,
+    "cd_trimul@t32w8": 0.2678,
+    "fpf_trimul": 0.2281,
+    "xla": 0.481
+   },
+   "q1q3": {
+    "native_xla": [
+     0.1792,
+     0.3403
+    ],
+    "cd_trimul": [
+     0.1662,
+     0.2374
+    ],
+    "cd_trimul@t32w8": [
+     0.2487,
+     0.2971
+    ],
+    "fpf_trimul": [
+     0.2099,
+     0.2864
+    ],
+    "xla": [
+     0.4698,
+     0.5148
+    ]
+   },
+   "temp_mib": {
+    "native_xla": 56.0,
+    "cd_trimul": 48.0,
+    "cd_trimul@t32w8": 48.0,
+    "fpf_trimul": 48.0,
+    "xla": 160.0
+   },
+   "relrms_fp32": {
+    "native_xla": 0.004808,
+    "cd_trimul": 0.004808,
+    "cd_trimul@t32w8": 0.004808,
+    "fpf_trimul": 0.004807,
+    "xla": 0.005138
+   },
+   "vs_cd_trimul_pct": 7.3,
+   "iqr_disjoint": false,
+   "verdict": "loss"
+  },
+  {
+   "cc": "9.0",
+   "stack": "H100:jax0.10.2+tokamax0.0.12",
+   "dtype": "bf16",
+   "family": "af3_tmpl_c64_ch64_outgoing",
+   "N": 400,
+   "row": "native_xla",
+   "ms": {
+    "native_xla": 0.3274,
+    "cd_trimul": 0.321,
+    "cd_trimul@t32w8": 0.3851,
+    "fpf_trimul": 0.4148,
+    "xla": 0.9796
+   },
+   "q1q3": {
+    "native_xla": [
+     0.2934,
+     0.431
+    ],
+    "cd_trimul": [
+     0.2683,
+     0.3701
+    ],
+    "cd_trimul@t32w8": [
+     0.374,
+     0.44
+    ],
+    "fpf_trimul": [
+     0.3902,
+     0.4474
+    ],
+    "xla": [
+     0.9185,
+     1.0155
+    ]
+   },
+   "temp_mib": {
+    "native_xla": 90.6,
+    "cd_trimul": 71.1,
+    "cd_trimul@t32w8": 71.1,
+    "fpf_trimul": 130.0,
+    "xla": 227.3
+   },
+   "relrms_fp32": {
+    "native_xla": 0.004757,
+    "cd_trimul": 0.004757,
+    "cd_trimul@t32w8": 0.004757,
+    "fpf_trimul": 0.004757,
+    "xla": 0.004999
+   },
+   "vs_cd_trimul_pct": 2.0,
+   "iqr_disjoint": false,
+   "verdict": "parity"
+  },
+  {
+   "cc": "9.0",
+   "stack": "H100:jax0.10.2+tokamax0.0.12",
+   "dtype": "bf16",
+   "family": "af3_tmpl_c64_ch64_outgoing",
+   "N": 800,
+   "row": "native_xla",
+   "ms": {
+    "native_xla": 0.6714,
+    "cd_trimul": 0.6471,
+    "cd_trimul@t32w8": 0.8318,
+    "fpf_trimul": 0.8722,
+    "xla": 2.8024
+   },
+   "q1q3": {
+    "native_xla": [
+     0.6487,
+     0.6896
+    ],
+    "cd_trimul": [
+     0.6223,
+     0.6939
+    ],
+    "cd_trimul@t32w8": [
+     0.8015,
+     0.8841
+    ],
+    "fpf_trimul": [
+     0.8447,
+     0.8953
+    ],
+    "xla": [
+     2.768,
+     2.8423
+    ]
+   },
+   "temp_mib": {
+    "native_xla": 234.4,
+    "cd_trimul": 188.3,
+    "cd_trimul@t32w8": 188.3,
+    "fpf_trimul": 338.0,
+    "xla": 1093.8
+   },
+   "relrms_fp32": {
+    "native_xla": 0.004773,
+    "cd_trimul": 0.004774,
+    "cd_trimul@t32w8": 0.004774,
+    "fpf_trimul": 0.004773,
+    "xla": 0.005017
+   },
+   "vs_cd_trimul_pct": 3.8,
+   "iqr_disjoint": false,
+   "verdict": "parity"
+  },
+  {
+   "cc": "9.0",
+   "stack": "H100:jax0.10.2+tokamax0.0.12",
+   "dtype": "bf16",
+   "family": "af3_tmpl_c64_ch64_outgoing",
+   "N": 1200,
+   "row": "native_xla",
+   "ms": {
+    "native_xla": 1.1085,
+    "cd_trimul": 1.1046,
+    "cd_trimul@t32w8": 1.5886,
+    "fpf_trimul": 1.5899,
+    "xla": 6.0418
+   },
+   "q1q3": {
+    "native_xla": [
+     1.0666,
+     1.1493
+    ],
+    "cd_trimul": [
+     1.0789,
+     1.1473
+    ],
+    "cd_trimul@t32w8": [
+     1.5798,
+     1.6352
+    ],
+    "fpf_trimul": [
+     1.5566,
+     1.6361
+    ],
+    "xla": [
+     6.0164,
+     6.1812
+    ]
+   },
+   "temp_mib": {
+    "native_xla": 527.3,
+    "cd_trimul": 383.6,
+    "cd_trimul@t32w8": 383.6,
+    "fpf_trimul": 722.0,
+    "xla": 1757.8
+   },
+   "relrms_fp32": {
+    "native_xla": 0.00473,
+    "cd_trimul": 0.00473,
+    "cd_trimul@t32w8": 0.00473,
+    "fpf_trimul": 0.00473,
+    "xla": 0.004972
+   },
+   "vs_cd_trimul_pct": 0.4,
+   "iqr_disjoint": false,
+   "verdict": "parity"
+  },
+  {
+   "cc": "9.0",
+   "stack": "H100:jax0.10.2+tokamax0.0.12",
+   "dtype": "bf16",
+   "family": "af3_tmpl_c64_ch64_outgoing",
+   "N": 1536,
+   "row": "native_xla",
+   "ms": {
+    "native_xla": 1.7578,
+    "cd_trimul": 1.7532,
+    "cd_trimul@t32w8": 2.5099,
+    "fpf_trimul": 2.0994,
+    "xla": 9.8236
+   },
+   "q1q3": {
+    "native_xla": [
+     1.7352,
+     1.8336
+    ],
+    "cd_trimul": [
+     1.7251,
+     1.8046
+    ],
+    "cd_trimul@t32w8": [
+     2.4727,
+     2.5509
+    ],
+    "fpf_trimul": [
+     2.0644,
+     2.2285
+    ],
+    "xla": [
+     9.7273,
+     9.8971
+    ]
+   },
+   "temp_mib": {
+    "native_xla": 864.0,
+    "cd_trimul": 608.0,
+    "cd_trimul@t32w8": 608.0,
+    "fpf_trimul": 608.0,
+    "xla": 2880.0
+   },
+   "relrms_fp32": {
+    "native_xla": 0.004702,
+    "cd_trimul": 0.004702,
+    "cd_trimul@t32w8": 0.004702,
+    "fpf_trimul": 0.004702,
+    "xla": 0.004937
+   },
+   "vs_cd_trimul_pct": 0.3,
+   "iqr_disjoint": false,
+   "verdict": "parity"
+  },
+  {
+   "cc": "9.0",
+   "stack": "H100:jax0.10.2+tokamax0.0.12",
+   "dtype": "f32",
+   "family": "af3_pair_c128_ch128_incoming",
+   "N": 400,
+   "row": "native_xla",
+   "ms": {
+    "native_xla": 0.4674,
+    "cd_trimul": 0.8777,
+    "cd_trimul@t32w8": 0.9792,
+    "fpf_trimul": 0.9689,
+    "xla": 1.1484
+   },
+   "q1q3": {
+    "native_xla": [
+     0.4527,
+     0.5055
+    ],
+    "cd_trimul": [
+     0.8564,
+     0.9183
+    ],
+    "cd_trimul@t32w8": [
+     0.958,
+     1.0093
+    ],
+    "fpf_trimul": [
+     0.9482,
+     1.043
+    ],
+    "xla": [
+     1.1232,
+     1.1754
+    ]
+   },
+   "temp_mib": {
+    "native_xla": 71.1,
+    "cd_trimul": 188.3,
+    "cd_trimul@t32w8": 188.3,
+    "fpf_trimul": 392.0,
+    "xla": 468.8
+   },
+   "relrms_fp32": {
+    "native_xla": 0.005445,
+    "cd_trimul": 0.000123,
+    "cd_trimul@t32w8": 0.000123,
+    "fpf_trimul": 9.2e-05,
+    "xla": 0.0
+   },
+   "vs_cd_trimul_pct": -46.7,
+   "iqr_disjoint": true,
+   "verdict": "win"
+  },
+  {
+   "cc": "9.0",
+   "stack": "H100:jax0.10.2+tokamax0.0.12",
+   "dtype": "f32",
+   "family": "af3_pair_c128_ch128_incoming",
+   "N": 800,
+   "row": "native_xla",
+   "ms": {
+    "native_xla": 1.1,
+    "cd_trimul": 2.9075,
+    "cd_trimul@t32w8": 3.4801,
+    "fpf_trimul": 2.8126,
+    "xla": 4.0286
+   },
+   "q1q3": {
+    "native_xla": [
+     1.0723,
+     1.1936
+    ],
+    "cd_trimul": [
+     2.8714,
+     2.9577
+    ],
+    "cd_trimul@t32w8": [
+     3.4485,
+     3.5559
+    ],
+    "fpf_trimul": [
+     2.7796,
+     2.8471
+    ],
+    "xla": [
+     4.0165,
+     4.0708
+    ]
+   },
+   "temp_mib": {
+    "native_xla": 188.3,
+    "cd_trimul": 657.0,
+    "cd_trimul@t32w8": 657.0,
+    "fpf_trimul": 1352.0,
+    "xla": 1875.0
+   },
+   "relrms_fp32": {
+    "native_xla": 0.005526,
+    "cd_trimul": 0.000135,
+    "cd_trimul@t32w8": 0.000135,
+    "fpf_trimul": 0.000104,
+    "xla": 0.0
+   },
+   "vs_cd_trimul_pct": -62.2,
+   "iqr_disjoint": true,
+   "verdict": "win"
+  },
+  {
+   "cc": "9.0",
+   "stack": "H100:jax0.10.2+tokamax0.0.12",
+   "dtype": "f32",
+   "family": "af3_pair_c128_ch128_incoming",
+   "N": 1200,
+   "row": "native_xla",
+   "ms": {
+    "native_xla": 2.278,
+    "cd_trimul": 6.1968,
+    "cd_trimul@t32w8": 7.4196,
+    "fpf_trimul": 5.9128,
+    "xla": 9.2427
+   },
+   "q1q3": {
+    "native_xla": [
+     2.2555,
+     2.3481
+    ],
+    "cd_trimul": [
+     6.1111,
+     6.3595
+    ],
+    "cd_trimul@t32w8": [
+     7.3815,
+     7.5519
+    ],
+    "fpf_trimul": [
+     5.8448,
+     6.0874
+    ],
+    "xla": [
+     9.159,
+     9.2999
+    ]
+   },
+   "temp_mib": {
+    "native_xla": 383.6,
+    "cd_trimul": 1438.3,
+    "cd_trimul@t32w8": 1438.3,
+    "fpf_trimul": 2888.0,
+    "xla": 4218.8
+   },
+   "relrms_fp32": {
+    "native_xla": 0.005272,
+    "cd_trimul": 0.000127,
+    "cd_trimul@t32w8": 0.000127,
+    "fpf_trimul": 9.6e-05,
+    "xla": 0.0
+   },
+   "vs_cd_trimul_pct": -63.2,
+   "iqr_disjoint": true,
+   "verdict": "win"
+  },
+  {
+   "cc": "9.0",
+   "stack": "H100:jax0.10.2+tokamax0.0.12",
+   "dtype": "f32",
+   "family": "af3_pair_c128_ch128_outgoing",
+   "N": 400,
+   "row": "native_xla",
+   "ms": {
+    "native_xla": 0.4386,
+    "cd_trimul": 0.8595,
+    "cd_trimul@t32w8": 0.9772,
+    "fpf_trimul": 0.9438,
+    "xla": 1.532
+   },
+   "q1q3": {
+    "native_xla": [
+     0.4177,
+     0.4642
+    ],
+    "cd_trimul": [
+     0.8484,
+     0.9262
+    ],
+    "cd_trimul@t32w8": [
+     0.9605,
+     1.0085
+    ],
+    "fpf_trimul": [
+     0.9328,
+     1.0003
+    ],
+    "xla": [
+     1.5096,
+     1.5654
+    ]
+   },
+   "temp_mib": {
+    "native_xla": 71.1,
+    "cd_trimul": 188.3,
+    "cd_trimul@t32w8": 188.3,
+    "fpf_trimul": 392.0,
+    "xla": 344.6
+   },
+   "relrms_fp32": {
+    "native_xla": 0.005446,
+    "cd_trimul": 0.000128,
+    "cd_trimul@t32w8": 0.000128,
+    "fpf_trimul": 0.0001,
+    "xla": 0.0
+   },
+   "vs_cd_trimul_pct": -49.0,
+   "iqr_disjoint": true,
+   "verdict": "win"
+  },
+  {
+   "cc": "9.0",
+   "stack": "H100:jax0.10.2+tokamax0.0.12",
+   "dtype": "f32",
+   "family": "af3_pair_c128_ch128_outgoing",
+   "N": 800,
+   "row": "native_xla",
+   "ms": {
+    "native_xla": 1.1251,
+    "cd_trimul": 2.957,
+    "cd_trimul@t32w8": 3.4019,
+    "fpf_trimul": 2.865,
+    "xla": 5.3607
+   },
+   "q1q3": {
+    "native_xla": [
+     1.0882,
+     1.2268
+    ],
+    "cd_trimul": [
+     2.9131,
+     3.0214
+    ],
+    "cd_trimul@t32w8": [
+     3.3801,
+     3.4282
+    ],
+    "fpf_trimul": [
+     2.8254,
+     2.9113
+    ],
+    "xla": [
+     5.3393,
+     5.4563
+    ]
+   },
+   "temp_mib": {
+    "native_xla": 188.3,
+    "cd_trimul": 657.0,
+    "cd_trimul@t32w8": 657.0,
+    "fpf_trimul": 1352.0,
+    "xla": 1282.1
+   },
+   "relrms_fp32": {
+    "native_xla": 0.005526,
+    "cd_trimul": 0.00014,
+    "cd_trimul@t32w8": 0.00014,
+    "fpf_trimul": 0.000114,
+    "xla": 0.0
+   },
+   "vs_cd_trimul_pct": -62.0,
+   "iqr_disjoint": true,
+   "verdict": "win"
+  },
+  {
+   "cc": "9.0",
+   "stack": "H100:jax0.10.2+tokamax0.0.12",
+   "dtype": "f32",
+   "family": "af3_pair_c128_ch128_outgoing",
+   "N": 1200,
+   "row": "native_xla",
+   "ms": {
+    "native_xla": 2.2727,
+    "cd_trimul": 6.3039,
+    "cd_trimul@t32w8": 7.3141,
+    "fpf_trimul": 5.9635,
+    "xla": 11.9919
+   },
+   "q1q3": {
+    "native_xla": [
+     2.2549,
+     2.3218
+    ],
+    "cd_trimul": [
+     6.2148,
+     6.3994
+    ],
+    "cd_trimul@t32w8": [
+     7.2902,
+     7.4889
+    ],
+    "fpf_trimul": [
+     5.8645,
+     6.0492
+    ],
+    "xla": [
+     11.95,
+     12.0854
+    ]
+   },
+   "temp_mib": {
+    "native_xla": 383.6,
+    "cd_trimul": 1438.3,
+    "cd_trimul@t32w8": 1438.3,
+    "fpf_trimul": 2888.0,
+    "xla": 2844.6
+   },
+   "relrms_fp32": {
+    "native_xla": 0.005272,
+    "cd_trimul": 0.000132,
+    "cd_trimul@t32w8": 0.000132,
+    "fpf_trimul": 0.000105,
+    "xla": 0.0
+   },
+   "vs_cd_trimul_pct": -63.9,
+   "iqr_disjoint": true,
+   "verdict": "win"
+  },
+  {
+   "cc": "9.0",
+   "stack": "H100:jax0.5.3",
+   "dtype": "bf16",
+   "family": "af3_pair_c128_ch128_incoming",
+   "N": 256,
+   "row": "native_xla",
+   "ms": {
+    "native_xla": 0.2268,
+    "cd_trimul": 0.2634,
+    "cd_trimul@t32w8": 0.2877,
+    "fpf_trimul": 0.2919,
+    "xla": 0.6283
+   },
+   "q1q3": {
+    "native_xla": [
+     0.1969,
+     0.2981
+    ],
+    "cd_trimul": [
+     0.236,
+     0.279
+    ],
+    "cd_trimul@t32w8": [
+     0.278,
+     0.3132
+    ],
+    "fpf_trimul": [
+     0.2666,
+     0.3093
+    ],
+    "xla": [
+     0.6223,
+     0.6665
+    ]
+   },
+   "temp_mib": {
+    "native_xla": 80.0,
+    "cd_trimul": 64.0,
+    "cd_trimul@t32w8": 64.0,
+    "fpf_trimul": 64.0,
+    "xla": 96.0
+   },
+   "relrms_fp32": {
+    "native_xla": 0.004798,
+    "cd_trimul": 0.004799,
+    "cd_trimul@t32w8": 0.004799,
+    "fpf_trimul": 0.004798,
+    "xla": 0.006096
+   },
+   "vs_cd_trimul_pct": -13.9,
+   "iqr_disjoint": false,
+   "verdict": "parity"
+  },
+  {
+   "cc": "9.0",
+   "stack": "H100:jax0.5.3",
+   "dtype": "bf16",
+   "family": "af3_pair_c128_ch128_incoming",
+   "N": 400,
+   "row": "native_xla",
+   "ms": {
+    "native_xla": 0.3931,
+    "cd_trimul": 0.4602,
+    "cd_trimul@t32w8": 0.5117,
+    "fpf_trimul": 0.6236,
+    "xla": 1.6772
+   },
+   "q1q3": {
+    "native_xla": [
+     0.3788,
+     0.424
+    ],
+    "cd_trimul": [
+     0.4373,
+     0.4831
+    ],
+    "cd_trimul@t32w8": [
+     0.5034,
+     0.5363
+    ],
+    "fpf_trimul": [
+     0.6087,
+     0.6429
+    ],
+    "xla": [
+     1.6694,
+     1.7355
+    ]
+   },
+   "temp_mib": {
+    "native_xla": 117.2,
+    "cd_trimul": 110.1,
+    "cd_trimul@t32w8": 110.1,
+    "fpf_trimul": 196.0,
+    "xla": 351.6
+   },
+   "relrms_fp32": {
+    "native_xla": 0.004717,
+    "cd_trimul": 0.004717,
+    "cd_trimul@t32w8": 0.004717,
+    "fpf_trimul": 0.004717,
+    "xla": 0.00575
+   },
+   "vs_cd_trimul_pct": -14.6,
+   "iqr_disjoint": true,
+   "verdict": "win"
+  },
+  {
+   "cc": "9.0",
+   "stack": "H100:jax0.5.3",
+   "dtype": "bf16",
+   "family": "af3_pair_c128_ch128_incoming",
+   "N": 800,
+   "row": "native_xla",
+   "ms": {
+    "native_xla": 0.9522,
+    "cd_trimul": 1.2113,
+    "cd_trimul@t32w8": 1.5387,
+    "fpf_trimul": 1.7403,
+    "xla": 12.1749
+   },
+   "q1q3": {
+    "native_xla": [
+     0.9298,
+     0.9856
+    ],
+    "cd_trimul": [
+     1.2034,
+     1.2718
+    ],
+    "cd_trimul@t32w8": [
+     1.513,
+     1.5744
+    ],
+    "fpf_trimul": [
+     1.7195,
+     1.7783
+    ],
+    "xla": [
+     12.1568,
+     12.1981
+    ]
+   },
+   "temp_mib": {
+    "native_xla": 468.8,
+    "cd_trimul": 344.5,
+    "cd_trimul@t32w8": 344.5,
+    "fpf_trimul": 676.0,
+    "xla": 937.5
+   },
+   "relrms_fp32": {
+    "native_xla": 0.004775,
+    "cd_trimul": 0.004775,
+    "cd_trimul@t32w8": 0.004775,
+    "fpf_trimul": 0.004775,
+    "xla": 0.006054
+   },
+   "vs_cd_trimul_pct": -21.4,
+   "iqr_disjoint": true,
+   "verdict": "win"
+  },
+  {
+   "cc": "9.0",
+   "stack": "H100:jax0.5.3",
+   "dtype": "bf16",
+   "family": "af3_pair_c128_ch128_incoming",
+   "N": 1200,
+   "row": "native_xla",
+   "ms": {
+    "native_xla": 1.8931,
+    "cd_trimul": 2.5971,
+    "cd_trimul@t32w8": 3.2649,
+    "fpf_trimul": 3.6078,
+    "xla": 26.3338
+   },
+   "q1q3": {
+    "native_xla": [
+     1.8652,
+     1.941
+    ],
+    "cd_trimul": [
+     2.5738,
+     2.6148
+    ],
+    "cd_trimul@t32w8": [
+     3.2557,
+     3.3244
+    ],
+    "fpf_trimul": [
+     3.5928,
+     3.6676
+    ],
+    "xla": [
+     26.3023,
+     26.4028
+    ]
+   },
+   "temp_mib": {
+    "native_xla": 1054.7,
+    "cd_trimul": 735.1,
+    "cd_trimul@t32w8": 735.1,
+    "fpf_trimul": 1444.0,
+    "xla": 3164.1
+   },
+   "relrms_fp32": {
+    "native_xla": 0.004592,
+    "cd_trimul": 0.004592,
+    "cd_trimul@t32w8": 0.004592,
+    "fpf_trimul": 0.004592,
+    "xla": 0.005554
+   },
+   "vs_cd_trimul_pct": -27.1,
+   "iqr_disjoint": true,
+   "verdict": "win"
+  },
+  {
+   "cc": "9.0",
+   "stack": "H100:jax0.5.3",
+   "dtype": "bf16",
+   "family": "af3_pair_c128_ch128_incoming",
+   "N": 1536,
+   "row": "native_xla",
+   "ms": {
+    "native_xla": 3.1008,
+    "cd_trimul": 4.2431,
+    "cd_trimul@t32w8": 6.1614,
+    "fpf_trimul": 4.9102,
+    "xla": 47.9619
+   },
+   "q1q3": {
+    "native_xla": [
+     3.0484,
+     3.1259
+    ],
+    "cd_trimul": [
+     4.2187,
+     4.2924
+    ],
+    "cd_trimul@t32w8": [
+     6.1351,
+     6.3183
+    ],
+    "fpf_trimul": [
+     4.8808,
+     5.047
+    ],
+    "xla": [
+     47.8721,
+     48.0804
+    ]
+   },
+   "temp_mib": {
+    "native_xla": 1728.0,
+    "cd_trimul": 1184.0,
+    "cd_trimul@t32w8": 1184.0,
+    "fpf_trimul": 1184.0,
+    "xla": 3456.0
+   },
+   "relrms_fp32": {
+    "native_xla": 0.004686,
+    "cd_trimul": 0.004686,
+    "cd_trimul@t32w8": 0.004686,
+    "fpf_trimul": 0.004686,
+    "xla": 0.005926
+   },
+   "vs_cd_trimul_pct": -26.9,
+   "iqr_disjoint": true,
+   "verdict": "win"
+  },
+  {
+   "cc": "9.0",
+   "stack": "H100:jax0.5.3",
+   "dtype": "bf16",
+   "family": "af3_pair_c128_ch128_outgoing",
+   "N": 256,
+   "row": "native_xla",
+   "ms": {
+    "native_xla": 0.2847,
+    "cd_trimul": 0.2604,
+    "cd_trimul@t32w8": 0.303,
+    "fpf_trimul": 0.2703,
+    "xla": 0.7944
+   },
+   "q1q3": {
+    "native_xla": [
+     0.239,
+     0.3386
+    ],
+    "cd_trimul": [
+     0.2422,
+     0.2804
+    ],
+    "cd_trimul@t32w8": [
+     0.2727,
+     0.3333
+    ],
+    "fpf_trimul": [
+     0.256,
+     0.3037
+    ],
+    "xla": [
+     0.7783,
+     0.825
+    ]
+   },
+   "temp_mib": {
+    "native_xla": 80.0,
+    "cd_trimul": 64.0,
+    "cd_trimul@t32w8": 64.0,
+    "fpf_trimul": 64.0,
+    "xla": 96.0
+   },
+   "relrms_fp32": {
+    "native_xla": 0.004801,
+    "cd_trimul": 0.0048,
+    "cd_trimul@t32w8": 0.0048,
+    "fpf_trimul": 0.004801,
+    "xla": 0.006094
+   },
+   "vs_cd_trimul_pct": 9.3,
+   "iqr_disjoint": false,
+   "verdict": "loss"
+  },
+  {
+   "cc": "9.0",
+   "stack": "H100:jax0.5.3",
+   "dtype": "bf16",
+   "family": "af3_pair_c128_ch128_outgoing",
+   "N": 400,
+   "row": "native_xla",
+   "ms": {
+    "native_xla": 0.4317,
+    "cd_trimul": 0.4716,
+    "cd_trimul@t32w8": 0.5235,
+    "fpf_trimul": 0.6302,
+    "xla": 1.9094
+   },
+   "q1q3": {
+    "native_xla": [
+     0.4184,
+     0.4464
+    ],
+    "cd_trimul": [
+     0.4567,
+     0.4849
+    ],
+    "cd_trimul@t32w8": [
+     0.5139,
+     0.5319
+    ],
+    "fpf_trimul": [
+     0.6076,
+     0.6565
+    ],
+    "xla": [
+     1.8855,
+     1.9294
+    ]
+   },
+   "temp_mib": {
+    "native_xla": 117.2,
+    "cd_trimul": 110.1,
+    "cd_trimul@t32w8": 110.1,
+    "fpf_trimul": 196.0,
+    "xla": 234.4
+   },
+   "relrms_fp32": {
+    "native_xla": 0.004717,
+    "cd_trimul": 0.004717,
+    "cd_trimul@t32w8": 0.004717,
+    "fpf_trimul": 0.004717,
+    "xla": 0.005975
+   },
+   "vs_cd_trimul_pct": -8.5,
+   "iqr_disjoint": true,
+   "verdict": "win"
+  },
+  {
+   "cc": "9.0",
+   "stack": "H100:jax0.5.3",
+   "dtype": "bf16",
+   "family": "af3_pair_c128_ch128_outgoing",
+   "N": 800,
+   "row": "native_xla",
+   "ms": {
+    "native_xla": 0.9688,
+    "cd_trimul": 1.2289,
+    "cd_trimul@t32w8": 1.5561,
+    "fpf_trimul": 1.7308,
+    "xla": 13.2933
+   },
+   "q1q3": {
+    "native_xla": [
+     0.9444,
+     1.0043
+    ],
+    "cd_trimul": [
+     1.212,
+     1.275
+    ],
+    "cd_trimul@t32w8": [
+     1.5274,
+     1.5964
+    ],
+    "fpf_trimul": [
+     1.7257,
+     1.7767
+    ],
+    "xla": [
+     13.2765,
+     13.3149
+    ]
+   },
+   "temp_mib": {
+    "native_xla": 468.8,
+    "cd_trimul": 344.5,
+    "cd_trimul@t32w8": 344.5,
+    "fpf_trimul": 676.0,
+    "xla": 937.5
+   },
+   "relrms_fp32": {
+    "native_xla": 0.004775,
+    "cd_trimul": 0.004775,
+    "cd_trimul@t32w8": 0.004775,
+    "fpf_trimul": 0.004775,
+    "xla": 0.006054
+   },
+   "vs_cd_trimul_pct": -21.2,
+   "iqr_disjoint": true,
+   "verdict": "win"
+  },
+  {
+   "cc": "9.0",
+   "stack": "H100:jax0.5.3",
+   "dtype": "bf16",
+   "family": "af3_pair_c128_ch128_outgoing",
+   "N": 1200,
+   "row": "native_xla",
+   "ms": {
+    "native_xla": 1.8673,
+    "cd_trimul": 2.5652,
+    "cd_trimul@t32w8": 3.2518,
+    "fpf_trimul": 3.5499,
+    "xla": 28.9478
+   },
+   "q1q3": {
+    "native_xla": [
+     1.8628,
+     1.9243
+    ],
+    "cd_trimul": [
+     2.559,
+     2.5896
+    ],
+    "cd_trimul@t32w8": [
+     3.2358,
+     3.2813
+    ],
+    "fpf_trimul": [
+     3.5437,
+     3.5864
+    ],
+    "xla": [
+     28.9067,
+     29.0279
+    ]
+   },
+   "temp_mib": {
+    "native_xla": 1054.7,
+    "cd_trimul": 735.1,
+    "cd_trimul@t32w8": 735.1,
+    "fpf_trimul": 1444.0,
+    "xla": 3164.1
+   },
+   "relrms_fp32": {
+    "native_xla": 0.004593,
+    "cd_trimul": 0.004593,
+    "cd_trimul@t32w8": 0.004593,
+    "fpf_trimul": 0.004593,
+    "xla": 0.005555
+   },
+   "vs_cd_trimul_pct": -27.2,
+   "iqr_disjoint": true,
+   "verdict": "win"
+  },
+  {
+   "cc": "9.0",
+   "stack": "H100:jax0.5.3",
+   "dtype": "bf16",
+   "family": "af3_pair_c128_ch128_outgoing",
+   "N": 1536,
+   "row": "native_xla",
+   "ms": {
+    "native_xla": 3.1269,
+    "cd_trimul": 4.2297,
+    "cd_trimul@t32w8": 6.128,
+    "fpf_trimul": 4.9091,
+    "xla": 41.5063
+   },
+   "q1q3": {
+    "native_xla": [
+     3.0942,
+     3.1966
+    ],
+    "cd_trimul": [
+     4.2097,
+     4.416
+    ],
+    "cd_trimul@t32w8": [
+     6.0377,
+     6.226
+    ],
+    "fpf_trimul": [
+     4.8823,
+     4.9676
+    ],
+    "xla": [
+     41.4411,
+     41.5402
+    ]
+   },
+   "temp_mib": {
+    "native_xla": 1728.0,
+    "cd_trimul": 1184.0,
+    "cd_trimul@t32w8": 1184.0,
+    "fpf_trimul": 1184.0,
+    "xla": 5184.0
+   },
+   "relrms_fp32": {
+    "native_xla": 0.004686,
+    "cd_trimul": 0.004687,
+    "cd_trimul@t32w8": 0.004687,
+    "fpf_trimul": 0.004686,
+    "xla": 0.005697
+   },
+   "vs_cd_trimul_pct": -26.1,
+   "iqr_disjoint": true,
+   "verdict": "win"
+  },
+  {
+   "cc": "9.0",
+   "stack": "H100:jax0.5.3",
+   "dtype": "bf16",
+   "family": "af3_tmpl_c64_ch64_outgoing",
+   "N": 400,
+   "row": "native_xla",
+   "ms": {
+    "native_xla": 0.2854,
+    "cd_trimul": 0.2625,
+    "cd_trimul@t32w8": 0.3435,
+    "fpf_trimul": 0.3841,
+    "xla": 1.0953
+   },
+   "q1q3": {
+    "native_xla": [
+     0.2453,
+     0.3407
+    ],
+    "cd_trimul": [
+     0.2349,
+     0.2909
+    ],
+    "cd_trimul@t32w8": [
+     0.3252,
+     0.3739
+    ],
+    "fpf_trimul": [
+     0.3701,
+     0.4066
+    ],
+    "xla": [
+     1.0783,
+     1.1259
+    ]
+   },
+   "temp_mib": {
+    "native_xla": 90.6,
+    "cd_trimul": 71.1,
+    "cd_trimul@t32w8": 71.1,
+    "fpf_trimul": 130.0,
+    "xla": 117.2
+   },
+   "relrms_fp32": {
+    "native_xla": 0.004746,
+    "cd_trimul": 0.004746,
+    "cd_trimul@t32w8": 0.004746,
+    "fpf_trimul": 0.004746,
+    "xla": 0.006013
+   },
+   "vs_cd_trimul_pct": 8.7,
+   "iqr_disjoint": false,
+   "verdict": "loss"
+  },
+  {
+   "cc": "9.0",
+   "stack": "H100:jax0.5.3",
+   "dtype": "bf16",
+   "family": "af3_tmpl_c64_ch64_outgoing",
+   "N": 800,
+   "row": "native_xla",
+   "ms": {
+    "native_xla": 0.5966,
+    "cd_trimul": 0.5887,
+    "cd_trimul@t32w8": 0.7994,
+    "fpf_trimul": 0.8565,
+    "xla": 6.6095
+   },
+   "q1q3": {
+    "native_xla": [
+     0.5849,
+     0.6353
+    ],
+    "cd_trimul": [
+     0.5828,
+     0.6074
+    ],
+    "cd_trimul@t32w8": [
+     0.7831,
+     0.8403
+    ],
+    "fpf_trimul": [
+     0.8443,
+     0.8792
+    ],
+    "xla": [
+     6.5849,
+     6.6424
+    ]
+   },
+   "temp_mib": {
+    "native_xla": 234.4,
+    "cd_trimul": 188.3,
+    "cd_trimul@t32w8": 188.3,
+    "fpf_trimul": 338.0,
+    "xla": 468.8
+   },
+   "relrms_fp32": {
+    "native_xla": 0.004765,
+    "cd_trimul": 0.004765,
+    "cd_trimul@t32w8": 0.004765,
+    "fpf_trimul": 0.004764,
+    "xla": 0.006036
+   },
+   "vs_cd_trimul_pct": 1.3,
+   "iqr_disjoint": false,
+   "verdict": "parity"
+  },
+  {
+   "cc": "9.0",
+   "stack": "H100:jax0.5.3",
+   "dtype": "bf16",
+   "family": "af3_tmpl_c64_ch64_outgoing",
+   "N": 1200,
+   "row": "native_xla",
+   "ms": {
+    "native_xla": 1.0857,
+    "cd_trimul": 1.1129,
+    "cd_trimul@t32w8": 1.6183,
+    "fpf_trimul": 1.6604,
+    "xla": 15.0042
+   },
+   "q1q3": {
+    "native_xla": [
+     1.0685,
+     1.1271
+    ],
+    "cd_trimul": [
+     1.0966,
+     1.1251
+    ],
+    "cd_trimul@t32w8": [
+     1.5976,
+     1.6667
+    ],
+    "fpf_trimul": [
+     1.6466,
+     1.6863
+    ],
+    "xla": [
+     14.9735,
+     15.041
+    ]
+   },
+   "temp_mib": {
+    "native_xla": 527.3,
+    "cd_trimul": 383.6,
+    "cd_trimul@t32w8": 383.6,
+    "fpf_trimul": 722.0,
+    "xla": 1582.0
+   },
+   "relrms_fp32": {
+    "native_xla": 0.004721,
+    "cd_trimul": 0.004721,
+    "cd_trimul@t32w8": 0.004721,
+    "fpf_trimul": 0.004721,
+    "xla": 0.005762
+   },
+   "vs_cd_trimul_pct": -2.4,
+   "iqr_disjoint": false,
+   "verdict": "parity"
+  }
+ ]
+}

@@ -1,0 +1,9 @@
+id,pdb,binder,target,binder_len,n_target_chains,total_residues
+1brs_bb_1to1,1BRS,barstar chain D (first copy) as chain A,"barnase x1 + barstar x0, copies displaced 70 A along x",87,1,195
+5jds_nb_pdl1,5JDS,nanobody KN035 (chain B) as chain A,PD-L1 IgV domain (chain A) as chain B,127,1,242
+1brs_bb_2to2,1BRS,barstar chain D (first copy) as chain A,"barnase x2 + barstar x1, copies displaced 70 A along x",87,3,390
+6m0j_rbd_ace2n,6M0J,SARS-CoV-2 RBD (chain E) as chain A,ACE2 residues 19-330 (chain A) as chain B,194,1,506
+1brs_bb_3to3,1BRS,barstar chain D (first copy) as chain A,"barnase x3 + barstar x2, copies displaced 70 A along x",87,5,585
+1yy9_egfrd3_fab,1YY9,EGFR domain III residues 310-501 (chain A) as chain A,"cetuximab Fab light (C) + heavy (D) as chains B,C",192,2,623
+1brs_bb_4to4,1BRS,barstar chain D (first copy) as chain A,"barnase x4 + barstar x3, copies displaced 70 A along x",87,7,780
+6m0j_rbd_ace2,6M0J,SARS-CoV-2 RBD (chain E) as chain A,ACE2 peptidase domain (chain A) as chain B,194,1,791

@@ -1,0 +1,93 @@
+{
+ "what": "edm_ops.so \u2014 the enformer_deepmind kit's TensorFlow GPU ops (EdmScaleShiftGelu, EdmSoftmaxPool2, EdmPoolLogits, EdmBiasResidual, EdmBiasScaleShiftGelu, EdmBiasGelu, EdmSoftmaxPool2Gelu, EdmBias2Residual, EdmLayerNorm, EdmRelShiftSoftmax, EdmBiasAct, EdmQScaleBias), built by build.sh",
+ "tensorflow": "2.17.1",
+ "python": "3.11.12",
+ "nvcc": "Cuda compilation tools, release 12.3, V12.3.107",
+ "cxx": "g++ (Debian 12.2.0-14+deb12u1) 12.2.0",
+ "cuda_include": [
+  "/usr/local/lib/python3.11/site-packages/nvidia/cuda_runtime/include",
+  "/usr/local/lib/python3.11/site-packages/nvidia/cuda_nvcc/include"
+ ],
+ "archs": [
+  [
+   8,
+   0
+  ],
+  [
+   9,
+   0
+  ]
+ ],
+ "ptx": [
+  [
+   9,
+   0
+  ]
+ ],
+ "build": "sm_80+sm_90",
+ "flags": {
+  "nvcc": [
+   "-std=c++17",
+   "-O3",
+   "--ftz=true",
+   "--prec-div=true",
+   "--prec-sqrt=true",
+   "--fmad=true",
+   "-gencode",
+   "arch=compute_80,code=sm_80",
+   "-gencode",
+   "arch=compute_90,code=sm_90",
+   "-gencode",
+   "arch=compute_90,code=compute_90",
+   "-Xcompiler",
+   "-fPIC",
+   "-Xcompiler",
+   "-O3",
+   "-D_GLIBCXX_USE_CXX11_ABI=1",
+   "-DEIGEN_MAX_ALIGN_BYTES=64"
+  ],
+  "cxx": [
+   "-std=c++17",
+   "-O3",
+   "-fPIC",
+   "-DGOOGLE_CUDA=1",
+   "-DNDEBUG",
+   "-I/usr/local/lib/python3.11/site-packages/tensorflow/include",
+   "-D_GLIBCXX_USE_CXX11_ABI=1",
+   "--std=c++17",
+   "-DEIGEN_MAX_ALIGN_BYTES=64"
+  ]
+ },
+ "ops": [
+  "EdmScaleShiftGelu",
+  "EdmSoftmaxPool2",
+  "EdmPoolLogits",
+  "EdmBiasResidual",
+  "EdmBiasScaleShiftGelu",
+  "EdmBiasGelu",
+  "EdmSoftmaxPool2Gelu",
+  "EdmBias2Residual",
+  "EdmLayerNorm",
+  "EdmRelShiftSoftmax",
+  "EdmBiasAct",
+  "EdmQScaleBias"
+ ],
+ "sources": {
+  "edm_ops.cc": "bf951e516bd4aec9df61c77aa4fe9b7fefdf19482fbebecb7db246634f0ba48b",
+  "edm_softmax.cc": "e4b0267db8b8fa8cd666fd9e0e0cf9735cc32b415ae5edbe26aba298fb93087f",
+  "edm_biasact.cc": "1c79b0952846aa49b76dca2c7e1583b6028a2c83a556d1be75481e2db97082bb",
+  "edm_ops.cu.cc": "31f136156e6072d1e87e55e8c664a981ac784d51179dd4e3044ff2b69b3464a8",
+  "edm_layernorm.cu.cc": "e75d2dcd0a701ea5880207eb2b0b35e33b34b7ef1616fbe23e083165c7da5b5b",
+  "edm_pool_logits.cu.cc": "632e9555bf08d05295667121887db4fb2611e924336b4ab3e077d9169926706a",
+  "edm_softmax.cu.cc": "1cf4938681bdbf6af500db00d1fedfdbfb8ae23a81573c16a8e88cf0c81dd483",
+  "edm_biasact.cu.cc": "9faf5b187bb5df989e72dcab566d5ac2072ed385b11bb3fc3ff5149bfe1a497b",
+  "edm_ops.h": "53ae87c64b378cbdf8fededa58ad30555b174cab69b437892c4ff0968b7d1a70",
+  "edm_f32.cuh": "fdf7d2055f4c6cde6e810f0c951ff9ff1871f53b0219a05c9c194f100c4c297c"
+ },
+ "object": {
+  "file": "edm_ops.so",
+  "sha256": "49d160b2af6c1b66473b27723b640cc68831eac72b7ff85fa0e9e66f86cedf47",
+  "bytes": 596856
+ },
+ "built": "2026-09-10"
+}

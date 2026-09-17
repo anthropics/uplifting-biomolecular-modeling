@@ -1,0 +1,2 @@
+VENDORED from the blockfuse XL-prologue add-on, version 0.1; its sitecustomize.py is NOT vendored (the bundle hooks blockfuse_xl.install() from ptx_trunk2_levers)
+KIT-LOCAL MODIFICATION 0.1.1: blockfuse_xl/__init__.py pass 2 calls the block core's attention for the arm (ptx_trunk2_levers._blk_core_att: K2B under ARM T, the stock cuEq kernel under ARM E as in 0.1.0); counters k2b_chunks/cueq_chunks. bias_ln, F1 prologue, epilogue unchanged.

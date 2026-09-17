@@ -1,0 +1,30 @@
+# ProteinMPNN optimization kit — Apptainer / Singularity image made FROM the container image of proteinmpnn/environment/Dockerfile:
+# the same stack and the same /kit, no ProteinMPNN checkout and no weights, for hosts that run Apptainer instead of Docker. The source is the image
+# tagged proteinmpnn-kit:dev in the local Docker daemon (build it first: README.md 'Setup'); for a published tag the two header lines
+# read `Bootstrap: docker` / `From: <registry>/proteinmpnn-kit:<tag>`.
+#   apptainer build proteinmpnn.sif proteinmpnn/environment/apptainer.def
+#   apptainer run --nv --cleanenv --bind "$PWD/ProteinMPNN":/opt/ProteinMPNN proteinmpnn.sif install --weights /opt/ProteinMPNN   # once: the clone
+#   apptainer run --nv --cleanenv --bind "$PWD/ProteinMPNN":/opt/ProteinMPNN --bind "$PWD/out":/out proteinmpnn.sif \
+#     design --config h100 --mode exact --input /opt/ProteinMPNN/inputs/PDB_monomers/pdbs --out /out/exact --seed 37
+# The image is read-only and holds no weights: bind a writable host directory at /opt/ProteinMPNN (the image's MPNN_DIR; `install --weights`
+# fills it with the ProteinMPNN clone, code and weights) and give every pass an --out on a bound, writable path; %environment keeps a host user
+# site-packages (PEP 370) from shadowing the pinned stack, --cleanenv keeps the host's variables out.
+Bootstrap: docker-daemon
+From: proteinmpnn-kit:dev
+
+%post
+    mkdir -p /opt/culib && ln -s /.singularity.d/libs/libcuda.so.1 /opt/culib/libcuda.so && ln -s /.singularity.d/libs/libcuda.so.1 /opt/culib/libcuda.so.1
+
+%environment
+    export PYTHONNOUSERSITE=1
+    # Triton <= 3.5 links its launcher stub with -lcuda: offer the unversioned name when --nv bound only libcuda.so.1
+    if [ -z "${TRITON_LIBCUDA_PATH:-}" ] && [ -e /opt/culib/libcuda.so ]; then export TRITON_LIBCUDA_PATH=/opt/culib; fi
+
+%runscript
+    cd /kit/proteinmpnn && exec bash /kit/proteinmpnn/run.sh "$@"
+
+%help
+    ProteinMPNN optimization kit: drop-in modes that make stock ProteinMPNN (dauparas/ProteinMPNN; weight sets --variant soluble | vanilla)
+    design faster without changing the inputs or the files — off = stock exactly; exact = identical outputs at the same --seed, faster. `apptainer run --nv proteinmpnn.sif <verb> ...` = `bash /kit/proteinmpnn/run.sh
+    <verb> ...` (verbs: install, design, check, warm; /kit/proteinmpnn/README.md inside the image). No weights inside: bind a writable directory at
+    /opt/ProteinMPNN and run `install --weights /opt/ProteinMPNN` once. Requires an NVIDIA driver that runs CUDA 12.4 (550 or newer).

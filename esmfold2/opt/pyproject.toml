@@ -1,0 +1,39 @@
+# esmfold2_opt — explicit interface to the ESMFold2 inference optimizations.
+# Install editable from this directory: `pip install -e esmfold2/opt`. The kit code it wraps lives beside the package
+# (forward/ — the kit directory is found by its driver/ef2_server.py) and is resolved from the package location,
+# so the install must stay editable (or point ESMFOLD2_OPT_KIT / ESMFOLD2_OPT_HOME at the tree). No install-time dependency on the
+# upstream packages (esm / transformers forks: stock/PINS.json): their versions are checked at activation. The build backend is
+# the shared core's template (common/opt_core/kit_template/_build_backend.py, carried byte-for-byte): setuptools plus one step that
+# ships esmfold2_opt_autoload.pth at the wheel root, which is what makes `ESMFOLD2_OPT=<mode> ESMFOLD2_VARIANT=<variant>` activate
+# without code changes (esmfold2_opt/_autoload.py: this kit's AutoloadSpec on the core's finder, opt_core.autoload). Install = the core
+# and this kit: `pip install -e common/opt_core -e esmfold2/opt`. The shared core this kit runs on (common/opt_core) is pinned in
+# [tool.opt_core] by path and a minimum version; esmfold2_opt/_core_gate.py (the core's kit_template copy) is statement one of every entry.
+[build-system]
+requires = ["setuptools>=64", "wheel"]
+build-backend = "_build_backend"
+backend-path = ["."]
+
+[tool.opt_core]
+path = "../../common/opt_core"
+version = "0.5.218.1"
+
+[project]
+name = "esmfold2-opt"                                # the distribution name = the kit's line tag (the core gate prints [<project name>]); the import package is esmfold2_opt
+dynamic = ["version"]
+description = "ESMFold2 inference optimizations: modes off/exact/fast/big, variants fast/full_msa/full_nomsa, the upstream API's fold settings by name, lazy autoload, activation report"
+requires-python = ">=3.10"
+classifiers = ["Private :: Do Not Upload"]        # not a PyPI distribution: PyPI rejects uploads carrying this classifier
+dependencies = []
+
+[project.optional-dependencies]
+test = ["pytest", "numpy"]                           # the package's CPU tests (numpy: the output writer's npz reproducibility check)
+
+[project.scripts]
+esmfold2-opt = "esmfold2_opt.__main__:main"        # `esmfold2-opt install|pred|check|warm ...` == `python -m esmfold2_opt ...`
+
+[tool.setuptools]
+packages = ["esmfold2_opt", "esmfold2_opt.rowchunk", "esmfold2_opt.tests"]
+include-package-data = false
+
+[tool.setuptools.dynamic]
+version = {attr = "esmfold2_opt.__version__"}

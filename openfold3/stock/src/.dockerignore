@@ -1,0 +1,17 @@
+# Exclude everything
+*
+
+# Allow specific files
+!CITATION.cff
+!LICENSE
+!pyproject.toml
+!README.md
+
+# Allow specific directories
+!deepspeed_configs/**
+!devtools/**
+!environments/**
+!examples/**
+!openfold3/**
+!scripts/**
+!examples/**

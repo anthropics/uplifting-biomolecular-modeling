@@ -1,0 +1,8 @@
+##fileformat=VCFv4.2
+#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO
+chr1	5874827	chr1_5874827_C_T_b38	C	T	.	.	.
+chr2	5540132	chr2_5540132_G_T_b38	G	T	.	.	.
+chr3	5099582	chr3_5099582_C_T_b38	C	T	.	.	.
+chr5	6023169	chr5_6023169_T_C_b38	T	C	.	.	.
+chr8	5724953	chr8_5724953_G_A_b38	G	A	.	.	.
+chr12	5290537	chr12_5290537_C_G_b38	C	G	.	.	.

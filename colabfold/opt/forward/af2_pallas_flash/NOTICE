@@ -1,0 +1,7 @@
+AF2 Pallas flash-attention kit
+- The reference math in af2_flash_pallas.reference_attention mirrors alphafold/model/modules.py::Attention
+  (AlphaFold 2, Copyright 2021 DeepMind Technologies Limited, Apache-2.0).
+- af2_pallas_attn.py patches, at runtime, the `Attention` class of `alphafold.model.modules`
+  (alphafold-colabfold, github.com/sokrypton/alphafold, Apache-2.0). No upstream file is modified on disk.
+- AlphaFold 2 parameters are NOT included; they are subject to their own terms (CC BY 4.0) and must be obtained by the user.
+- Kit-level third-party notices and verbatim licence texts: colabfold/THIRD_PARTY_NOTICES.md and colabfold/third_party_licenses/.

@@ -1,0 +1,46 @@
+# opt_core — the core of the optimization kit (mechanisms only; no engine knowledge; standard library only).
+# The kit installs it beside itself and pins it in its own pyproject.toml [tool.opt_core] (path, minimum version):
+#   pip install -e common/opt_core -e <engine>/opt
+[build-system]
+requires = ["setuptools>=64"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "opt_core"
+dynamic = ["version"]
+description = "Model-independent layer of an optimization kit: activation, modes, gates, report lines, counters, process and JIT-cache helpers, determinism, memory levers and carried kernels"
+requires-python = ">=3.8"
+classifiers = ["Private :: Do Not Upload"]
+dependencies = []
+
+[project.optional-dependencies]
+test = ["pytest"]                                  # the core's CPU tests (no torch, no engine)
+
+[tool.setuptools]
+include-package-data = false
+
+[tool.setuptools.packages.find]
+include = ["opt_core*"]                            # opt_core, opt_core.kernels and the carried kernel packages under it
+
+[tool.setuptools.package-data]                     # every non-Python byte under opt_core/ ships (licences, sums, tables, READMEs): the wheel's
+"*" = ["*.json", "*.md", "*.txt", "*.cfg", "*.csv", "LICENSE*", "NOTICE*", "*.LICENSE", "*.NOTICE", "*_LICENSE", "META/*.json"]   # so a built wheel carries every non-Python byte the editable tree has
+"opt_core.kernels.fpf_trimul" = ["*"]
+"opt_core.kernels.fpf_trimul_v4" = ["*"]
+"opt_core.kernels.pallas_attn" = ["*"]
+"opt_core.kernels.fpf_triatt_pro" = ["*"]
+"opt_core.kernels.fpf_triatt_epi" = ["*"]
+"opt_core.kernels.fpf_transition" = ["*"]
+"opt_core.kernels.fpf_glue_v2" = ["*"]
+"opt_core.kernels.fpf_mkpf" = ["*"]
+"opt_core.kernels.fpf_triatt_k2b" = ["*"]
+"opt_core.kernels.fpf_pallas" = ["*"]
+"opt_core.kernels.triattn_xla" = ["*", "csrc/*", "bin/*/*/*"]      # binaries, build sources, sidecars
+"opt_core.kernels.triattn_exact" = ["*", "csrc/*/*"]      # cell table, checkpoint record, README, CUDA source
+"opt_core.kernels.trimul_xla" = ["*", "pkg/v1/*", "pkg/v1/build/*", "pkg/v1/build/*/*", "pkg/v1/csrc/*", "pkg/v1/csrc/common/*"]      # the sealed cubins + their sidecars
+"opt_core.kernels.pallas_triatt" = ["*"]
+
+[tool.setuptools.dynamic]
+version = {attr = "opt_core.__version__"}
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]                              # the carried kernels ship their own tests (torch); the core's own tests are tests/ only

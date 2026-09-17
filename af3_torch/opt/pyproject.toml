@@ -1,0 +1,36 @@
+# af3_torch_opt — explicit interface to the PyTorch AlphaFold 3 port running OpenFold3 weights.
+# Install: `pip install -e common/opt_core -e af3_torch/opt` (the tree's shared core, pinned below, plus this package) — into any Python >= 3.10; the package never imports torch or the
+# fork: it composes and launches three model processes per prediction under the image's two interpreters (configs/<gpu>.env: AF3_TORCH_PY,
+# AF3_TORCH_JAX_PY). The kit code it wraps lives beside the package (forward/af3t/, forward/dtk/) and is resolved from the package
+# location, so the install must stay editable (or point AF3_TORCH_OPT_HOME at the tree). The build backend is setuptools plus one step that
+# ships af3_torch_opt_autoload.pth at the wheel root (the core's template, carried byte-for-byte: common/opt_core/kit_template/_build_backend.py).
+[build-system]
+requires = ["setuptools>=64", "wheel"]
+build-backend = "_build_backend"
+backend-path = ["."]
+
+[project]
+name = "af3_torch_opt"
+dynamic = ["version"]
+description = "PyTorch AlphaFold 3 port (xfold) + OpenFold3 weights: modes off | exact | fast | big, kit lever sets, DTK FusedDiT, activation report"
+requires-python = ">=3.10"
+classifiers = ["Private :: Do Not Upload"]
+dependencies = []
+
+[project.optional-dependencies]
+test = ["pytest", "numpy", "setuptools"]           # the package's CPU tests: no torch, no jax — the model-process scripts are read or imported (featurise.py imports numpy), never run on a model; the build backend's test imports setuptools; the GPU-side tests skip by name without torch / triton / einops
+
+[project.scripts]
+af3-torch-opt = "af3_torch_opt.__main__:main"      # `af3-torch-opt pred|check|stock ...` == `python -m af3_torch_opt ...`
+
+[tool.setuptools]
+packages = ["af3_torch_opt", "af3_torch_opt.tests"]
+include-package-data = false
+
+[tool.setuptools.dynamic]
+version = {attr = "af3_torch_opt.__version__"}
+
+# The tree's one core, relative to this file (installed beside the kit); af3_torch_opt/_core_gate.py (the core's kit template, carried) judges it first at every entry.
+[tool.opt_core]
+path = "../../common/opt_core"
+version = "0.5.114.0"

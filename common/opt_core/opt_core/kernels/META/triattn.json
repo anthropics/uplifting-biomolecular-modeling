@@ -1,0 +1,21 @@
+{
+ "exports": {},
+ "kind": "package",
+ "license": "Apache-2.0 (this repository's own code: common/opt_core/LICENSE). cuda_sm90a/NOTICE.md (original source; no third-party code or vendor binary), headsplit (pure Python route over the stock op), triattn_native/ (original source; inside the sealed package, pkg/v11/triattn_pkg/cuda/csrc/fa3_utils.h and pkg/v11/triattn_pkg/cuda_b/csrc/fa3_utils.h are trimmed portions of FlashAttention-3 (hopper/utils.h, hopper/softmax.h: reductions, accumulator-layout views, the wgmma wrapper) -- Copyright (c) 2024, Tri Dao; BSD-3-Clause, the notice kept at the top of each file, licence text common/opt_core/third_party_licenses/Dao-AILab-flash-attention.LICENSE.txt; the cuda and cuda_b kernel directories are CUDA C++ on the NVIDIA CUTLASS / CuTe headers (BSD-3-Clause, Copyright (c) 2017 - 2025 NVIDIA CORPORATION & AFFILIATES; text common/opt_core/third_party_licenses/NVIDIA-CUTLASS.LICENSE.txt; no CUTLASS file carried), so the prebuilt extensions triattn_sm90_ext.so and triattn_m1_ext.so under pkg/v11/triattn_pkg/prebuilt/<stack>/ contain object code compiled from those portions and from CUTLASS / CuTe templates; triattn_mw_ext_g3x4.so and triattn_sm80_ext.so are compiled from this repository's source only); third-party components and the binaries built against them: common/opt_core/THIRD_PARTY_NOTICES.md; the face and TRIATTN_CELLS.json are the core's own",
+ "mechanism": "kernels.triattn.select / kernels.triattn.triangle_attention",
+ "name": "triattn",
+ "not_byte_identical": {
+  "cuda_sm90a/NOTICE.md": "line 4 only: the kernel-lineage clause restated in release-tree vocabulary (the kit's notice names a development branch and commit); attribution, provenance and licence statements unchanged"
+ },
+ "not_carried": {
+  "the kits' adapters, lever words, registries, tests and as-built records around these kernels": "kit files: a kit binds a row through its own mechanism",
+  "the kits' private cell tables for the Triton rows": "the Triton rows keep their own core tables (fpf_triatt_k2b K2B_CELLS.json, flash_triattn _CONFIG_TABLE_BY_CC); TRIATTN_CELLS.json records which row wins which cell"
+ },
+ "runtime_imports": [
+  "fpf_triatt_k2b",
+  "flash_triattn"
+ ],
+ "runtime_imports_note": "the face imports the Triton rows through opt_core.attn.pair_fused._carried (the core route) at call time; cuda_sm90a / headsplit are sub-packages imported at call time; torch only inside functions of the face (the carried sub-packages import torch at their own module level)",
+ "served_note": "cuda_sm90a 1.2.0 (prebuilt stacks under cuda_sm90a/prebuilt/<stack key>/, read live by stacks_built(): torch2.10.0+cu128-cpython-311-x86_64-linux-gnu-sm90, torch2.11.0+cu128-cpython-312-x86_64-linux-gnu-sm90, torch2.12.0+cu130-cpython-311-x86_64-linux-gnu-sm90, torch2.13.0+cu130-cpython-311-x86_64-linux-gnu-sm90, torch2.13.0+cu130-cpython-312-x86_64-linux-gnu-sm90, torch2.7.1+cu126-cpython-311-x86_64-linux-gnu-sm90, torch2.7.1+cu128-cpython-311-x86_64-linux-gnu-sm90; each directory's manifest.json -- written by build_prebuilt.py, read by the package's install() -- holds that build's extension sha256, source sha256 and load-check hashes, and install() verifies the extension and the sources against it and runs the bitwise load-check before serving; every prebuilt is compiled from the same csrc bytes and gives the same load-check hashes (a test reads the manifests live); other stacks refuse by name at install), headsplit 1.0.2 (TESTED_CC (9,0) in the carried package; the table's tested_cc = 9.0 and 8.0 is the core's record); triattn_native: the sealed package v11 = generation 11 (router + Gluon / Triton kernels + extensions triattn_sm90_ext / triattn_m1_ext / triattn_mw_ext_g3x4 + the sm_80 member triattn_sm80_ext) under triattn_native/pkg/v11/, ACTIVE_PKG = v11 (generation 10's cc-9.0 words, routes and output bytes HONOURED; the inert generation-10 directory triattn_native/pkg/v10/ left the tree in 0.5.130.1), prebuilt keys read live off triattn_native/pkg/v11/triattn_pkg/prebuilt/ (each record's so / source digests verified and the package's byte-gate vectors re-run at install)",
+ "version": "1.1.0"
+}

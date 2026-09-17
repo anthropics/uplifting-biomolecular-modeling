@@ -1,0 +1,24 @@
+# OpenFold3 0.5.0 STOCK configuration of this tree (modes.STOCK_YAML = STOCK_DET_YAML): the `predict` preset + NVIDIA cuEquivariance triangle attention and
+# triangle multiplication (use_cueq_triangle_kernels true; upstream's Triton kernels serve the rest; DeepSpeed DS4Sci attention off), trainer precision bf16-mixed,
+# pair-stack chunking pinned (tune_chunk_size false, chunk_size 1024 = modes.CHUNK_SIZE_PINNED). What `pred --mode off` runs, the base of `exact`, the arm every
+# kit arm is timed against; bitwise run-to-run reproducible under `--det 1`.
+# Keys (upstream 0.5.0): pl_trainer_args.precision (entry_points/validator.py InferenceExperimentConfig.pl_trainer_args -> lightning.Trainer);
+# model_update.custom.settings.memory.eval.* merges into the model config over the `predict` preset (projects/of3_all_atom/project_entry.py
+# ModelUpdate; the eval block: projects/of3_all_atom/config/model_config.py:114-133). The three kernel flags are independent booleans upstream resolves
+# per op by precedence (attention: cuEq > DS4Sci > Triton > LMA > torch, core/model/primitives/attention.py:433-467, Triton auto-off for <=16 rows :406-407;
+# triangle multiplication: cuEq > Triton-fused > torch, core/model/layers/triangular_multiplicative_update.py:1124-1169); the kernel that actually ran per op
+# is read from the run's <output>/model_config.json and the run's census, never from this file.
+pl_trainer_args:
+  precision: bf16-mixed
+model_update:
+  presets:
+    - predict
+  custom:
+    settings:
+      memory:
+        eval:
+          use_triton_triangle_kernels: true
+          use_cueq_triangle_kernels: true
+          use_deepspeed_evo_attention: false
+          tune_chunk_size: false
+          chunk_size: 1024

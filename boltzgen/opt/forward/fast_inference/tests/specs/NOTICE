@@ -1,0 +1,30 @@
+PDL1_IgV_Q9NZQ7_18-132.pdb (this directory) is third-party data, carried under the
+Creative Commons Attribution 4.0 International licence (CC BY 4.0,
+https://creativecommons.org/licenses/by/4.0/; legal code reproduced in
+boltzgen/third_party_licenses/AlphaFold-DB.CC-BY-4.0.txt).
+
+Source: AlphaFold Protein Structure Database (DeepMind and EMBL-EBI), entry
+AF-Q9NZQ7-F1, file https://alphafold.ebi.ac.uk/files/AF-Q9NZQ7-F1-model_v6.pdb
+(human PD-L1, UniProt Q9NZQ7). It is a computed structure model (theoretical
+modelling), not an experimentally determined wwPDB entry.
+
+Changes made: the file is trimmed to chain A, residues 18-132, with UniProt residue
+numbering kept; the source file's header section is not carried and line 1 of the
+trimmed file (REMARK 1) states the trim. No coordinates were altered.
+
+Notice printed in the source file, verbatim:
+"ALPHAFOLD DATA, COPYRIGHT (2021) DEEPMIND TECHNOLOGIES LIMITED. THE INFORMATION
+PROVIDED IS THEORETICAL MODELLING ONLY AND CAUTION SHOULD BE EXERCISED IN ITS USE. IT
+IS PROVIDED "AS-IS" WITHOUT ANY WARRANTY OF ANY KIND, WHETHER EXPRESSED OR IMPLIED. NO
+WARRANTY IS GIVEN THAT USE OF THE INFORMATION SHALL NOT INFRINGE THE RIGHTS OF ANY
+THIRD PARTY. THE INFORMATION IS NOT INTENDED TO BE A SUBSTITUTE FOR PROFESSIONAL
+MEDICAL ADVICE, DIAGNOSIS, OR TREATMENT, AND DOES NOT CONSTITUTE MEDICAL OR OTHER
+PROFESSIONAL ADVICE. IT IS AVAILABLE FOR ACADEMIC AND COMMERCIAL PURPOSES, UNDER CC-BY
+4.0 LICENCE."
+
+Reference: Jumper et al., "Highly accurate protein structure prediction with
+AlphaFold", Nature 596, 583 (2021), doi:10.1038/s41586-021-03819-2; Varadi et al.,
+"AlphaFold Protein Structure Database in 2024", Nucleic Acids Research 52, D368 (2024).
+
+pdl1_ref.yaml in this directory is original to this package (Apache-2.0, see
+boltzgen/LICENSE); it names the file above as the design target.

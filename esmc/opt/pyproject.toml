@@ -1,0 +1,35 @@
+# esmc_opt — explicit interface to the ESM C inference optimizations; the levers are its subpackages (esmc_opt/kits/<lever>/).
+# Install from this directory: `pip install -e esmc/opt` (README 'Setup'). No install-time dependency on the upstream package (the
+# esm SDK: stock/PINS.json): its version is checked at activation. The build backend is setuptools plus one step that ships
+# esmc_opt_autoload.pth at the wheel root, which is what makes `ESMC_OPT=<mode>` activate without code changes (see
+# esmc_opt/_autoload.py).
+[build-system]
+requires = ["setuptools>=64"]
+build-backend = "_build_backend"
+backend-path = ["."]
+
+[project]
+name = "esmc_opt"
+dynamic = ["version"]
+description = "ESM C inference optimizations: modes off/exact (fast: none for this model), variants 300m/600m/6b, lazy autoload, activation report"
+requires-python = ">=3.10"
+classifiers = ["Private :: Do Not Upload"]        # not a PyPI package: the index rejects uploads carrying this classifier
+dependencies = []
+
+[project.optional-dependencies]
+test = ["pytest", "numpy"]                           # the package's CPU tests (numpy: the output writer's npz reproducibility check)
+
+[project.scripts]
+esmc-opt = "esmc_opt.__main__:main"        # `esmc-opt check ...` == `python -m esmc_opt check ...`
+
+[tool.setuptools]
+packages = ["esmc_opt", "esmc_opt.tests", "esmc_opt.kits", "esmc_opt.kits.boot", "esmc_opt.kits.fused", "esmc_opt.kits.pipe", "esmc_opt.kits.qk_rotary", "esmc_opt.kits.residual_ln", "esmc_opt.kits.thin"]
+include-package-data = false
+
+[tool.setuptools.package-data]
+"esmc_opt.kits.fused" = ["SERVED.json"]
+"esmc_opt.kits.pipe" = ["pins.json"]
+"esmc_opt.kits.residual_ln" = ["EXTENSION.json", "kernels.cu"]
+
+[tool.setuptools.dynamic]
+version = {attr = "esmc_opt.__version__"}

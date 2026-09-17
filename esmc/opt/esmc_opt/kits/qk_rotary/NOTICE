@@ -1,0 +1,14 @@
+qk_rotary (esmc_opt/kits/qk_rotary: qk_ln_rope.py, qk_rotary.py) — third-party attributions. Kit-level table:
+../../../../THIRD_PARTY_NOTICES.md (esmc/THIRD_PARTY_NOTICES.md); verbatim licence texts: esmc/third_party_licenses/.
+
+qk_ln_rope.py restates, and does not copy, the arithmetic and reduction order of two third-party kernels so that its results are
+bit-identical to theirs:
+- the CUDA LayerNorm forward of PyTorch (aten/src/ATen/native/cuda/layer_norm_kernel.cu at v2.11.0) — PyTorch,
+  https://github.com/pytorch/pytorch, BSD-style licence, "Copyright (c) 2016-     Facebook, Inc            (Adam Paszke)" and the
+  further holders listed in the text; text: esmc/third_party_licenses/PyTorch.LICENSE.txt;
+- the Triton rotary-embedding kernel of FlashAttention (flash_attn/ops/triton/rotary.py) — FlashAttention,
+  https://github.com/Dao-AILab/flash-attention, BSD 3-Clause License, "Copyright (c) 2022, the respective contributors, as shown by the
+  AUTHORS file."; text: esmc/third_party_licenses/Dao-AILab-flash-attention.LICENSE.txt.
+No PyTorch or FlashAttention source file is included in this directory; both packages are installed by the user at the versions pinned in
+esmc/environment/requirements.lock and keep their own licences. The kernel is compiled at run time by OpenAI Triton (MIT), which is called
+and not included.

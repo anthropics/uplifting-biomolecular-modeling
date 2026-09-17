@@ -1,0 +1,38 @@
+# protenix_opt — explicit interface to the Protenix v2 inference optimizations.
+# Install editable with the shared core beside it: `pip install -e common/opt_core -e protenix_v2/opt`. The kit code it wraps lives beside the package
+# (forward/) and is resolved from the package location, so the install must stay editable (or name the tree through
+# PROTENIX_OPT_HOME / MODEL_OPT, which the package's stack module reads). No install-time dependency on protenix: the stock
+# pin (2.0.0) is checked at activation. The build backend is setuptools plus one step that ships protenix_opt_autoload.pth at the wheel
+# root, which is what makes `PROTENIX_OPT=<mode>` activate without code changes (protenix_opt/_autoload.py: this kit's AutoloadSpec on the
+# core's finder, opt_core.autoload).
+[build-system]
+requires = ["setuptools>=64", "wheel"]
+build-backend = "_build_backend"
+backend-path = ["."]
+
+[project]
+name = "protenix_opt"
+dynamic = ["version"]
+description = "Protenix v2 inference optimizations: modes exact/fast/big/off, lazy autoload, activation report"
+requires-python = ">=3.10"
+classifiers = ["Private :: Do Not Upload"]
+dependencies = []
+
+[project.optional-dependencies]
+test = ["pytest", "click"]                          # the package's CPU tests (click: the stock CLI's framework, stubbed in the tests)
+
+[project.scripts]
+protenix-opt = "protenix_opt.__main__:main"        # `protenix-opt pred|check|warm ...` == `python -m protenix_opt ...`
+
+[tool.setuptools]
+packages = ["protenix_opt", "protenix_opt.tests", "protenix_opt.tp_bind"]
+include-package-data = false
+
+[tool.setuptools.dynamic]
+version = {attr = "protenix_opt.__version__"}
+
+# the shared core the package imports (common/opt_core): pinned by path + minimum version, gated at activation
+# (protenix_opt/_core_gate.py: gate()) and made importable from this path when the distribution is not installed (protenix_opt/_core.py)
+[tool.opt_core]
+path = "../../common/opt_core"
+version = "0.5.228.0"

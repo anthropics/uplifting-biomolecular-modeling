@@ -1,0 +1,47 @@
+{
+ "_doc": "Genie 3's fpf_trimul_v4 (cc|triton) cell table. Row '9.0|*' (cc 9.0 \u2014 H100 / H200 \u2014 on any triton: the pinned stack torch 2.7.1+cu126 / triton 3.3.1, stock/PINS.json pinned_stack, and triton 3.7.1 serve the same tiles) is transcribed from the kernel's own cc 9.0 cell table (the shared core's fixture common/opt_core/tests/fixtures/fpf_trimul_v4_cells_fixture.json, sha256 a64d08c013f7b3237a7f02068158745d664558cc37fbcb9a466c08adbe22747f); row '8.0|*' (NVIDIA A100-SXM4-80GB, any triton >= 3.3 on cc 8.0: fpf_trimul_v4 4.2.0 pointer-load cells) is transcribed from the shared core's A100 sweep table a100_trimul_v4_rows.json (evidence a100_trimul_v4_evidence.md). Base k1/k3 rows are dimension-independent for (C, D) in {128,256}^2 (opt_core kernels/fpf_trimul_v4/cells.py:4); a row's 'overrides' (k1_C<C>_D<D> / k3_C<C>_D<D>, opt_core kernels/fpf_trimul_v4/kernels.py resolve_cfg) are speed-only tiles for that (C, D) class \u2014 this model's pair track is C=128, D=128. Exported as FPF_TRIMUL_V4_CELLS before the kernel's first import (opt_core kernels/SUMS/fpf_trimul_v4.json exports; genie3_opt/trimul.py route).",
+ "9.0|*": {
+  "status": "CERTIFIED_OP (v4.0.3 ptr cell on cc 9.0, any triton: the pinned stack torch 2.7.1 / triton 3.3.1 (IOR torch2.7.1/triton3.3.1) and triton 3.7.1)",
+  "k1": {
+   "BM": 128,
+   "BN": 128,
+   "num_warps": 8,
+   "num_stages": 1
+  },
+  "k3": {
+   "BM": 64,
+   "BN": 64,
+   "num_warps": 4,
+   "num_stages": 1
+  }
+ },
+ "8.0|*": {
+  "status": "CERTIFIED_OP (A100-SXM-80GB cc 8.0, torch 2.13.0+cu130 / triton 3.7.1, fpf_trimul_v4 4.2.0 pointer-load cells (any triton >= 3.3 on cc 8.0; measured on triton 3.7.1) from the A100 sweep 2026-09-06: battery 92/92 admitted [TIER2_SAME_CLASS ratio v4/torch-bf16-autocast worst rms 1.000 max 1.000; r2r 5/5 all rows; CUDA-graph replay == eager {'n': 10, 'all_eq': True}; mask none==ones {'n': 4, 'all_eq': True}] on synthetic pair activations (C,D) in {256,128}^2, N 128..3000, out/in, bias on/off, mask on/off; timing vs torch bf16-autocast module math: 48/48 rows not slower)",
+  "k1": {
+   "BM": 128,
+   "BN": 64,
+   "num_warps": 8,
+   "num_stages": 2
+  },
+  "k3": {
+   "BM": 64,
+   "BN": 64,
+   "num_warps": 4,
+   "num_stages": 1
+  },
+  "overrides": {
+   "k1_C128_D128": {
+    "BM": 128,
+    "BN": 32,
+    "num_warps": 4,
+    "num_stages": 1
+   },
+   "k3_C128_D128": {
+    "BM": 128,
+    "BN": 64,
+    "num_warps": 4,
+    "num_stages": 1
+   }
+  }
+ }
+}

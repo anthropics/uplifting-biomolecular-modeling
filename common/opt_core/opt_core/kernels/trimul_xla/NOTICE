@@ -1,0 +1,11 @@
+kernels/trimul_xla -- provenance and licences
+
+pkg/v1/  A SUBSET of the sealed release `trimul_native` 1.0.1 of this repository (its VERSION, CELLS.json, README.md, build/manifest.json; its
+         SHA256SUMS reduced to the lines of the files carried here;
+         build/sm_90a/tmn90_z128_h128.cubin and tmn90_z64_h64.cubin with their ptxas reports; the sources those two units compile: csrc/tmn90_z128_h128.cu,
+         csrc/tmn90_z64_h64.cu, csrc/tmn_kernels.cuh, csrc/tmn_ptx.cuh, csrc/tmn_sm90_unit.cuh, csrc/common/tmn_math.cuh, csrc/INTERFACE.md).  Every carried
+         file is byte-identical to the release (digests in pkg/v1/SHA256SUMS, asserted by tests/test_trimul_xla_pkg.py); nothing is rebuilt here.  The
+         release's other units (c_z 64x128, 256, 384, the wide K3, the sm_80 units, the backward sources, the Python binding, the test vectors) are not
+         carried.  Licence: Apache-2.0 (SPDX headers in the sources), original work of this repository.
+__init__.py  The launch recipes (tile table, kernel names, shared-memory sizes, the K1Params / K3Params field layout and the tensor-map geometry) restate the
+         release's python/trimul_native/kernel.py for the XLA-FFI launcher of kernels/triattn_xla (generic target xla_cubin_call); this repository's own work.

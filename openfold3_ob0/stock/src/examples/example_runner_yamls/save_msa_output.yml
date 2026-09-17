@@ -1,0 +1,4 @@
+msa_computation_settings:
+  save_openfold_outputs: true
+  save_colabfold_outputs: true
+  save_mappings: true

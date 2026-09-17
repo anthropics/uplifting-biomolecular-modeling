@@ -1,0 +1,117 @@
+{
+ "model": "RoseTTAFold3 (foundry rf3)",
+ "upstream": {
+  "repository": "https://github.com/RosettaCommons/foundry",
+  "commit": "4010e3e2e7350edada3e25a45c908c6bf407df4d",
+  "commit_subject": "Add inference speed optimization (#371)",
+  "tag": null,
+  "dist_name": "rc-foundry",
+  "pinned_version": "0.2.1.dev13+g4010e3e2e",
+  "version_note": "hatch-vcs (pyproject.toml:105-108, fallback-version 0.0.0): a git install at the commit reports 0.2.1.dev13+g4010e3e2e; an install from stock/foundry-4010e3e2e.tar.gz (no .git) reports 0.0.0 — check_pins.py gates the commit or the archive sha, never the version string",
+  "package_dir": "models/rf3/src/rf3",
+  "shared_dir": "src/foundry",
+  "cli": "rf3 fold (models/rf3/src/rf3/cli.py:12-69; hydra config inference + inference_engine=rf3 -> rf3.inference_engines.rf3.RF3InferenceEngine)",
+  "install": [
+   "pip install \"rc-foundry[rf3] @ git+https://github.com/RosettaCommons/foundry.git@4010e3e2e7350edada3e25a45c908c6bf407df4d\"",
+   "pip install \"stock/foundry-4010e3e2e.tar.gz[rf3]\""
+  ],
+  "extra": "rf3 (pyproject.toml:60-64: cuequivariance_ops_cu12 / cuequivariance_ops_torch_cu12 / cuequivariance_torch >= 0.6.1)"
+ },
+ "archive": {
+  "filename": "foundry-4010e3e2e.tar.gz",
+  "bytes": 3016795,
+  "entries": 600,
+  "recipe": "git archive --format=tar --prefix=foundry-4010e3e2e/ 4010e3e2e7350edada3e25a45c908c6bf407df4d <paths> | gzip -n -9 > foundry-4010e3e2e.tar.gz",
+  "paths": [
+   "pyproject.toml",
+   "README.md",
+   "LICENSE.md",
+   "ci-constraints.txt",
+   "src/foundry",
+   "src/foundry_cli",
+   "models/rf3/src/rf3",
+   "models/rf3/configs",
+   "models/rfd3/src/rfd3",
+   "models/rfd3/configs",
+   "models/rfd3na/src/rfd3na",
+   "models/rfd3na/configs",
+   "models/mpnn/src/mpnn",
+   "models/rf3/docs/examples/3en2_from_json_with_msa.json",
+   "models/rf3/docs/examples/msas/3en2_A.a3m.gz"
+  ],
+  "note": "the importable packages the root pyproject lists (tool.hatch.build.targets.wheel.packages, pyproject.toml:117-130) with their configs, the packaging files, the licence, and upstream's one documented example (models/rf3/README.md:114); no tests, no docs assets; the bytes regenerate identically",
+  "src_note": "stock/src/ unpacks, at their repository paths, the 5 files the kits touch or replace (4 rf3 files + src/foundry/utils/torch.py) and the files this tree's documents cite (cli.py, inference_engines/rf3.py, the inference configs, checkpoint_registry.py, pyproject.toml, ci-constraints.txt, LICENSE.md)"
+ },
+ "weights": {
+  "rf3": {
+   "filename": "rf3_foundry_01_24_latest_remapped.ckpt",
+   "url": "https://files.ipd.uw.edu/pub/rf3/rf3_foundry_01_24_latest_remapped.ckpt",
+   "sha256": "364ef592fd8042a9cf4176d045015190f8322f961ccca38d891b20ca578d3bb0",
+   "bytes": 3038876446,
+   "registry": "src/foundry/inference_engines/checkpoint_registry.py:91-93 (name rf3; `foundry install base-models`)",
+   "note": "the one checkpoint every mode uses; passed as ckpt_path=<file> (ROSETTAFOLD3_OPT_CKPT)"
+  }
+ },
+ "settings": {
+  "cli_defaults": {
+   "n_recycles": 10,
+   "diffusion_batch_size": 5,
+   "num_steps": 50,
+   "early_stopping_plddt_threshold": 0.5,
+   "seed": null,
+   "source": "models/rf3/configs/inference_engine/rf3.yaml:12-21"
+  },
+  "msa_featurization": {
+   "n_msa": 1024,
+   "max_msa_sequences": 10000,
+   "dense_pairing": true,
+   "note": "the checkpoint's own validation transform (not a CLI key); MSAs are read from the input JSON's msa_path per component, or from LOCAL_MSA_DIRS"
+  },
+  "note": "pred states no sampling setting of its own: rf3 fold runs at upstream's documented defaults (cli_defaults) plus one fixed seed per run (seed=<s>, the CLI's own key), and any key=value override the caller passes goes to rf3 fold verbatim (opt/rosettafold3_opt/settings.py)"
+ },
+ "pinned_stack": {
+  "tested_on": "the pinned stack below (python 3.12, torch 2.13.0+cu130, triton 3.7.1, cuequivariance 0.11.1) on H100 80GB HBM3 and A100-SXM4-80GB / A100 80GB PCIe; a documentation line, nothing compares against it",
+  "python": "3.12",
+  "torch": "2.13.0+cu130",
+  "triton": "3.7.1",
+  "cuequivariance": "0.11.1",
+  "cuequivariance_ops": "cuequivariance-ops-cu13 / cuequivariance-ops-torch-cu13 0.11.1, the ops build of torch.version.cuda 13.0 (PyPI wheels cuequivariance_ops_cu13-0.11.1-py3-none-manylinux_2_24_x86_64.manylinux_2_28_x86_64.whl sha256 2dc36684116ac1eb7ee835b7c58c7000df992f996d91566d033f2aab71263396, cuequivariance_ops_torch_cu13-0.11.1-cp312-cp312-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl sha256 57fa7d057ea3cfbc8c8f85ce8d24e6ff12cc49073759bf8ff789608d6cd7752d); the cu12 pair of the same version installs the same import packages and must be absent",
+  "lightning": "2.6.5",
+  "atomworks": "2.2.1",
+  "numpy": "2.4.4",
+  "biotite": "1.4.0",
+  "torchmetrics": "1.9.0",
+  "hydra-core": "1.3.5",
+  "gpu": "H100 80GB HBM3",
+  "freeze": "environment/requirements.lock",
+  "freeze_note": "environment/requirements.lock is the pip freeze of the image (148 distributions: every line the tested interpreter reports except its own pip, this kit and the shared core), the file environment/Dockerfile installs; kit v1's MANIFEST.json (pruned) records kit v1's image's stack as a 16-entry subset (\"pip_freeze_subset\"; its results/pip_freeze.txt, pruned, 14 lines); no freeze of the add-on's measured runs is in the kits",
+  "stack_shift": "not needed: upstream declares ranges only (pyproject.toml:6,37,38,46,27,60-63), no lock file, an unpinned Dockerfile; ci-constraints.txt:21 torch==2.7.1 is a CI-only constraint (its header, l.3-7)"
+ },
+ "package_prefix": "ROSETTAFOLD3_OPT",
+ "stock_environment": {
+  "must_be_absent_prefixes": [
+   "RF3_",
+   "RFD3_",
+   "FPF_RF3_",
+   "FPF_TRIMUL_",
+   "CUDA_MPS_",
+   "ROSETTAFOLD3_OPT"
+  ],
+  "reads": [
+   "LOCAL_MSA_DIRS",
+   "FOUNDRY_CHECKPOINT_DIRS",
+   "TRITON_CACHE_DIR",
+   "TORCHINDUCTOR_CACHE_DIR"
+  ],
+  "note": "the stock child (stock_fold.py) strips every name under these prefixes and prints the ENV-CLEAN line; every other variable of the caller reaches rf3 fold as given"
+ },
+ "tree_states": {
+  "stock": "the 4 rf3 files == stock/src/models/rf3/src/<file> (the pinned upstream's), rf3/graph_flags.py absent",
+  "patched": "the 5 rf3 files == opt/forward/rf3_xattempt_addon/patched/<file>",
+  "interpreters": {
+   "stock": "stock/venv (ROSETTAFOLD3_OPT_STOCK_PYTHON): state stock only; never touched by install.sh",
+   "opt": "opt/venv (ROSETTAFOLD3_OPT_PYTHON): state patched only; the add-on's install.sh applied once by `rosettafold3-opt install`"
+  },
+  "note": "the file set is opt/rosettafold3_opt/tree.py RF3_FILES (install.sh's five files); the reference digests are computed live from this checkout's patched/ and stock/src/"
+ }
+}

@@ -1,0 +1,211 @@
+{
+ "model": "chrombpnet",
+ "kind": "CLI tool: `chrombpnet pred_bw` (TensorFlow 2.8 / Keras h5 model; one prediction = one regions BED under one model)",
+ "upstream": {
+  "chrombpnet": {
+   "repo": "https://github.com/kundajelab/chrombpnet",
+   "tag": "v1.0.1",
+   "commit": "eaa0fe58b6a43da62ea23b75cfc2bef4ecd3550c",
+   "version": "1.0.1",
+   "version_source": "setup.py:17 ('version': '1.0.1'); no wheel is published for the tag \u2014 the checkout is the pin (tag == commit)",
+   "archive": "stock/chrombpnet-eaa0fe58.tar.gz",
+   "archive_recipe": "git archive --format=tar --prefix=chrombpnet-eaa0fe58/ eaa0fe58b6a43da62ea23b75cfc2bef4ecd3550c | gzip  (the whole tree at the tag: chrombpnet/, setup.py, requirements.txt, dockerfile, README.md, CHANGELOG.md, CITATION.cff, LICENSE, MANIFEST.in, images/)",
+   "install": "pip install -r requirements.txt && pip install -e chrombpnet   (dockerfile:49-54; an editable install of the checkout)",
+   "cli": "chrombpnet = chrombpnet.CHROMBPNET:main (setup.py:27 console_scripts)",
+   "python_requires": ">=3.8 (setup.py:19)"
+  }
+ },
+ "requirements_txt": {
+  "source": "requirements.txt at the tag (setup.py:5 reads it as install_requires); trailing whitespace stripped",
+  "lines": [
+   "h5py>=2.10.0",
+   "matplotlib>=3.3.1",
+   "matplotlib-venn==0.11.6",
+   "numpy==1.23.4",
+   "pandas>=1.3.4",
+   "pyfaidx==0.6.1",
+   "scikit-learn>=1.1.2",
+   "scipy>=1.4.1",
+   "tensorflow==2.8.0",
+   "tensorflow-estimator==2.8.0",
+   "tensorflow-probability==0.15.0",
+   "protobuf==3.20",
+   "tqdm==4.48.2",
+   "deepdish==0.3.7",
+   "deeplift==0.6.13.0",
+   "modisco==0.5.16.0",
+   "modisco-lite==2.0.7",
+   "weasyprint==52.5",
+   "kundajelab-shap==1",
+   "#shap @ git+https://github.com/kundajelab/shap@master#egg=shap",
+   ""
+  ]
+ },
+ "docker_base": "tensorflow/tensorflow:2.8.2-gpu (dockerfile:2)",
+ "python": "3.8.10",
+ "stack": {
+  "note": "pins read from the two stacks below (importlib.metadata; CUDA per tf.sysconfig.get_build_info; the three CUDA libraries by ldconfig path + sha256, first 16 hex); the two stacks' Python package sets are identical (pip freeze byte-identical)",
+  "python": "3.8.10",
+  "tensorflow": "2.8.0",
+  "keras": "2.8.0",
+  "cuda": "11.2",
+  "cudnn": "8",
+  "cuda_libs_sha256_16": {
+   "libcudnn.so.8": "f0ff47532899cf33",
+   "libcublas.so.11": "f6799499855f94c0",
+   "libcudart.so.11.0": "72c5e614dfb0b7a1"
+  },
+  "stacks": {
+   "s1": {
+    "role": "the port's stack: the stock stack (s2) plus torch/triton at the pins_s1_only versions under the pins_s1_only root (not on the default sys.path; the kit inserts it)",
+    "torch_cuda": "12.4",
+    "torch_cudnn": "90100"
+   },
+   "s2": {
+    "role": "the stock stack: the dockerfile base + requirements.txt + the checkout; no torch"
+   }
+  },
+  "certified_on": "the s1 and s2 stacks below on H100 / H200 \u2014 a record; nothing compares against it"
+ },
+ "pins": {
+  "tensorflow": "2.8.0",
+  "keras": "2.8.0",
+  "numpy": "1.23.4",
+  "h5py": "3.11.0",
+  "pyfaidx": "0.6.1",
+  "pyBigWig": "0.3.22",
+  "protobuf": "3.20.0",
+  "tensorflow-probability": "0.15.0",
+  "tensorflow-estimator": "2.8.0",
+  "pandas": "2.0.3",
+  "scipy": "1.10.1",
+  "scikit-learn": "1.3.2",
+  "matplotlib": "3.7.5",
+  "tqdm": "4.48.2",
+  "deepdish": "0.3.7",
+  "typing_extensions": "4.2.0",
+  "chrombpnet": "1.0.1"
+ },
+ "pins_s1_only": {
+  "torch": "2.4.1+cu124",
+  "triton": "3.0.0",
+  "root": "/opt/torch"
+ },
+ "weights": {
+  "root": "$CHROMBPNET_OPT_WEIGHTS (configs/*.env, README.md Variables): the files below sit under it at these relative paths, one sha256 each",
+  "GM12878_ATAC/fold_0": {
+   "chrombpnet_recompiled.h5": {
+    "sha256": "c600c23119973c0d88d834ed352103ae8515997faab91ccb7e71ca24df4f4431",
+    "size_bytes": 26447944,
+    "role": "the -cm model (the `pred_bw` model the tree pins): the two members below recombined, built by run.sh install --weights DIR (opt/chrombpnet_opt/weights.py recombine) when absent"
+   },
+   "bias_scaled.h5": {
+    "sha256": "29f7d2c5f2e6df2b9d4e05107478a548e40cd5a315c9151f206c2db171766399",
+    "size_bytes": 2688440,
+    "role": "component model beside -cm (the kit's K1 route reads it)"
+   },
+   "nobias.h5": {
+    "sha256": "ad281a8bc4915a993114aa04b5815bc005327cab6f22bd49354d4b34aa581d24",
+    "size_bytes": 25583536,
+    "role": "component model beside -cm (the kit's K1 route reads it; the stock's -cmb input)"
+   }
+  }
+ },
+ "entry_point": {
+  "cli": "chrombpnet pred_bw -g <genome.fa> -r <regions.bed> -c <chrom.sizes> -cm <model.h5> -op <prefix> [-os <stats>] [-bs 64] [-t 1] [-d <chr> ...] [-bw <observed.bw>] [-bm <bias.h5>] [-cmb <nobias.h5>]",
+  "parser": "chrombpnet/parsers.py:37 (subparser `pred_bw`), :211-226 (its arguments); dispatch chrombpnet/CHROMBPNET.py:51-56 -> chrombpnet/evaluation/make_bigwigs/predict_to_bigwig.py main(args)",
+  "arguments": {
+   "-bm/--bias-model": {
+    "default": null,
+    "line": "parsers.py:215"
+   },
+   "-cm/--chrombpnet-model": {
+    "default": null,
+    "line": "parsers.py:216"
+   },
+   "-cmb/--chrombpnet-model-nb": {
+    "default": null,
+    "line": "parsers.py:217"
+   },
+   "-r/--regions": {
+    "required": true,
+    "line": "parsers.py:218"
+   },
+   "-g/--genome": {
+    "required": true,
+    "line": "parsers.py:219"
+   },
+   "-c/--chrom-sizes": {
+    "required": true,
+    "line": "parsers.py:220"
+   },
+   "-op/--output-prefix": {
+    "required": true,
+    "line": "parsers.py:221"
+   },
+   "-os/--output-prefix-stats": {
+    "default": null,
+    "line": "parsers.py:222"
+   },
+   "-bs/--batch-size": {
+    "default": 64,
+    "type": "int",
+    "line": "parsers.py:223"
+   },
+   "-t/--tqdm": {
+    "default": 1,
+    "type": "int",
+    "line": "parsers.py:224"
+   },
+   "-d/--debug-chr": {
+    "default": null,
+    "nargs": "+",
+    "line": "parsers.py:225"
+   },
+   "-bw/--bigwig": {
+    "default": null,
+    "line": "parsers.py:226"
+   }
+  },
+  "model_requirement": "at least one of -bm, -cm, -cmb (CHROMBPNET.py:53 assert)",
+  "outputs_cm_bw": {
+   "<op>_chrombpnet_preds.bed": "predict_to_bigwig.py:180",
+   "<op>_chrombpnet.bw": "predict_to_bigwig.py:194-200 -> bigwig_helper.py:48-113 (write_bigwig)",
+   "<os>": "bigwig_helper.py:116-126 (the stats file, only with -os)",
+   "<op>_chrombpnet_predictions.h5": "predict_to_bigwig.py:65 -> :18-50 (write_predictions_h5py), only with -bw",
+   "<op>_chrombpnet_metrics.json": "predict_to_bigwig.py:86-87, only with -bw",
+   "<op>_chrombpnet.counts_pearsonr.png": "predict_to_bigwig.py:70 -> chrombpnet/training/metrics.py:39, only with -bw",
+   "<op>_chrombpnet.profile_jsd.png": "predict_to_bigwig.py:84 -> chrombpnet/training/metrics.py:117, only with -bw"
+  }
+ },
+ "library_defaults": {
+  "batch_size": 64,
+  "predict_call": "model.predict([seqs], batch_size=args.batch_size, verbose=True) (predict_to_bigwig.py:186-188)",
+  "model_load": "load_model_wrapper (predict_to_bigwig.py:115-122): get_custom_objects().update({'multinomial_nll': losses.multinomial_nll, 'tf': tf}) then tensorflow.keras.models.load_model(path, compile=False)",
+  "custom_objects": {
+   "multinomial_nll": "chrombpnet/training/utils/losses.py:6-16",
+   "tf": "the tensorflow module"
+  },
+  "input_regions": "10-column narrowPeak BED read with NARROWPEAK_SCHEMA (predict_to_bigwig.py:16, :173); window = start+summit +/- inputlen/2 from the model's input_shape (:169, bigwig_helper.py:20); a region whose window is not fully inside the genome is dropped (bigwig_helper.py:21-25) and the kept rows written to _preds.bed (:180)",
+  "seed": "none in the pred_bw path (no seed argument; the -s seed exists only on the train/prep parsers, parsers.py:67,:97)"
+ },
+ "stock_environment": {
+  "reads": [
+   "TF_* (TensorFlow's own variables, e.g. TF_DETERMINISTIC_OPS, TF_CPP_MIN_LOG_LEVEL)",
+   "CUDA_VISIBLE_DEVICES",
+   "CUDA_CACHE_PATH / CUDA_CACHE_MAXSIZE (the driver's JIT cache, read by libcuda)"
+  ],
+  "must_be_absent_prefixes": [
+   "CHROMBPNET_OPT",
+   "CHROMBPNET_FASTKIT_",
+   "CHROMBPNET_K1",
+   "CHROMBPNET_JIT_CACHE_TAR",
+   "CHROMBPNET_LP_DIR",
+   "CHROMBPNET_DET_",
+   "K1_",
+   "OWNER_FASTDEFAULT",
+   "TRITON_CACHE_DIR"
+  ],
+  "note": "the prefixes are every os.environ name the kit's tf/ and torch/ code reads (grep of opt/kit_ho/tf and opt/kit/torch); the deterministic recipe names (TF_DETERMINISTIC_OPS, CHROMBPNET_DET_SUBPROCESS, CHROMBPNET_DET_SEED, PYTHONPATH -> opt/kit_ho/tf/det_subprocess/sitecustomize.py) are composed by the package's --det on every arm and are the only tolerated exceptions there"
+ }
+}

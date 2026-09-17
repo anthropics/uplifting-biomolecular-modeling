@@ -1,0 +1,38 @@
+# gpnstar_opt — the GPN-Star exact kit as a package. Install editable from this directory beside the shared core (`bash run.sh install`, or
+# `pip install -e ../common/opt_core -e gpnstar/opt`): the lever tree (gpnstar_opt/accel) and stock/PINS.json are resolved from the package's own
+# location, so the install must stay editable. No install-time dependency on the upstream package (gpn): its commit and transformers' pin are
+# checked at activation. The build backend is setuptools plus one step that ships gpnstar_opt_autoload.pth at the wheel root, which is what makes
+# `GPNSTAR_OPT=exact` engage the kit without code changes (gpnstar_opt/_autoload.py).
+[build-system]
+requires = ["setuptools>=64"]
+build-backend = "_build_backend"
+backend-path = ["."]
+
+[project]
+name = "gpnstar_opt"
+dynamic = ["version"]
+description = "GPN-Star inference optimizations: one exact mode, engaged by GPNSTAR_OPT=exact or gpnstar_opt.enable()"
+requires-python = ">=3.10"
+classifiers = ["Private :: Do Not Upload"]        # not for PyPI: uploads carrying this classifier are rejected
+dependencies = []
+
+[project.optional-dependencies]
+test = ["pytest"]                                    # the package's CPU tests (stdlib + the core; no torch, no GPU)
+
+[project.scripts]
+gpnstar-opt = "gpnstar_opt.__main__:main"        # `gpnstar-opt check` == `python -m gpnstar_opt check`
+
+[tool.setuptools]
+packages = ["gpnstar_opt", "gpnstar_opt.accel", "gpnstar_opt.tests", "gpnstar_opt.tests.gpu"]
+include-package-data = true
+
+[tool.setuptools.package-data]
+"gpnstar_opt" = ["ACCEL_MANIFEST.json"]
+"gpnstar_opt.tests" = ["fixtures/*.npz"]
+
+[tool.setuptools.dynamic]
+version = {attr = "gpnstar_opt.__version__"}
+
+[tool.opt_core]                                      # the core this kit imports (opt_core.modes / report / autoload): path in the release tree, minimum version
+path = "../../common/opt_core"
+version = "0.5.224.0"

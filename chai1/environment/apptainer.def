@@ -1,0 +1,27 @@
+# Chai-1 optimization kit — Apptainer / Singularity image made FROM the container image of chai1/environment/Dockerfile: the same stack and the
+# same /kit, for hosts that run Apptainer instead of Docker. The source is the image tagged chai1-kit:dev in the local Docker daemon (build it
+# first: README.md 'Setup', route A); for a published tag the two header lines read `Bootstrap: docker` / `From: <registry>/chai1-kit:<tag>`.
+#   apptainer build chai1.sif chai1/environment/apptainer.def
+#   apptainer run --nv --cleanenv --bind /path/to/chai_downloads:/weights --env CHAI_DOWNLOADS_DIR=/weights --bind "$PWD/out":/out chai1.sif \
+#     pred --config h100 --mode fast --input /kit/chai1/opt/forward/fast_inference/tests/public_inputs/1BRS_1to1.fasta --out_dir /out/fast --seeds 0
+# The image is read-only: give every verb an --out_dir on a bound, writable path; the JIT caches go under $HOME/.cache (bound by default);
+# %environment keeps a host user site-packages (PEP 370) from shadowing the pinned stack, --cleanenv keeps the host's variables out.
+Bootstrap: docker-daemon
+From: chai1-kit:dev
+
+%post
+    mkdir -p /opt/culib && ln -s /.singularity.d/libs/libcuda.so.1 /opt/culib/libcuda.so && ln -s /.singularity.d/libs/libcuda.so.1 /opt/culib/libcuda.so.1
+
+%environment
+    export PYTHONNOUSERSITE=1
+    # Triton <= 3.5 links its launcher stub with -lcuda: offer the unversioned name when --nv bound only libcuda.so.1
+    if [ -z "${TRITON_LIBCUDA_PATH:-}" ] && [ -e /opt/culib/libcuda.so ]; then export TRITON_LIBCUDA_PATH=/opt/culib; fi
+
+%runscript
+    cd /kit/chai1 && exec bash /kit/chai1/run.sh "$@"
+
+%help
+    Chai-1 optimization kit: drop-in modes that make stock Chai-1 (chai_lab 0.6.1) faster and lighter on GPU memory without changing how it
+    is called — off = stock exactly; exact = identical outputs, faster; fast = small documented numeric differences, faster still (the default);
+    big = lowest memory. `apptainer run --nv chai1.sif <verb> ...` = `bash /kit/chai1/run.sh <verb> ...` (verbs: install, pred, check, warm;
+    /kit/chai1/README.md inside the image). Requires an NVIDIA driver that runs CUDA 13.0 (580 or newer) and CHAI_DOWNLOADS_DIR naming the weights.

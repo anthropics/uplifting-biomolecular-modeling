@@ -1,0 +1,27 @@
+{
+ "arch": "sm_90a",
+ "build": {
+  "built_utc": "2026-09-11T15:48:25Z",
+  "host": "Linux-x86_64",
+  "nvrtc": "13.0",
+  "python": "3.12.14",
+  "versions": {
+   "cuda-bindings": "13.3.1",
+   "nvidia-cuda-cccl": "13.0.85",
+   "nvidia-cuda-nvrtc": "13.0.88",
+   "nvidia-cuda-runtime": "13.0.96",
+   "nvidia-cutlass": "4.2.0.0",
+   "torch": null
+  }
+ },
+ "check": {
+  "cuda_bindings": "13.3.1",
+  "driver": "13.0",
+  "gpu": "NVIDIA H100 80GB HBM3",
+  "torch": "2.13.0+cu130",
+  "utc": "2026-09-11T13:04:00Z"
+ },
+ "cubins": {},
+ "helper": "ef2_nvjit",
+ "kit": "esmfold2"
+}

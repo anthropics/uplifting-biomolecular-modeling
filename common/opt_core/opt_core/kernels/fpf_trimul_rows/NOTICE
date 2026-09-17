@@ -1,0 +1,10 @@
+fpf_trimul_rows -- attribution
+
+kernels.py (_k1r, _k3r, the LayerNorm helpers _ln_rows / _ln_cols and the host launchers) is a derivative work, written in this repository, of
+(1) the FlashPairformer fpf_trimul_v4 kernels _k1c / _k3c carried at kernels/fpf_trimul_v4 (statement for statement at one channel chunk:
+LN_in + gated projection -> channel-major bf16 planes; LN_out + gated output projection + residual; NOTICE there; Apache-2.0 lineage text at
+kernels/fpf_flashpairformer.PROTENIX_LICENSE) and (2) the channel-chunk walk (two-pass LayerNorm over resident power-of-two chunks, chunked
+dot-accumulate) of kernels/trimul_esm_shapes/kernels.py (the core's own, NOTICE there), itself derived from (1).  The changes made here: one
+projection per launch, the z row block / the K3 column window / the K1 destination planes addressed through explicit strides (channel-last z
+read in place, a- or b-layout planes, the epilogue in place on the shard), optional biases as in (1).  No other third-party source is copied
+into this directory.  Dependencies: torch, triton (MIT).

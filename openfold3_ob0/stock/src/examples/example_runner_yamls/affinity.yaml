@@ -1,0 +1,10 @@
+# Model changes for low memory 
+model_update:
+  presets: 
+    - predict
+    - low_mem
+
+# Model changes for affinity
+experiment_settings:
+  seeds:
+    - 42    

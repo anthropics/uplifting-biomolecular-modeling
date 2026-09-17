@@ -1,0 +1,40 @@
+# boltzgen_opt — the BoltzGen optimization kit's package: modes, activation, the `design` / `check` / `warm` commands.
+# Install editable with the core: `run.sh install` (= `pip install -e common/opt_core -e boltzgen/opt`). The kit code it wraps lives beside the
+# package (forward/xattempt_addon, forward/fast_inference, forward/fast_levers, forward/size_levers, host/writer_levers) and is resolved from the package location (or from $MODEL_OPT, the
+# boltzgen/ directory, or BOLTZGEN_OPT_HOME, this directory), so the install must stay editable — and the core pin gate reads [tool.opt_core]
+# from this file, above the package: a regular wheel install refuses on every entry (core_pin_unreadable, exit 3). No install-time dependency on upstream
+# (boltzgen: stock/PINS.json): its version is checked at activation. The build backend is setuptools plus one step that generates and ships
+# boltzgen_opt_autoload.pth at the wheel root (`python _build_backend.py boltzgen_opt BOLTZGEN_OPT boltzgen-opt` prints its text), which is what
+# makes `BOLTZGEN_OPT=<mode>` activate without code changes (see boltzgen_opt/_autoload.py); it is the core's template copy, byte for byte
+# (common/opt_core/kit_template/_build_backend.py).
+[build-system]
+requires = ["setuptools>=64", "wheel"]
+build-backend = "_build_backend"
+backend-path = ["."]
+
+# the shared core this kit stands on (common/opt_core): pinned by path and minimum version; the core pin gate (boltzgen_opt/_core_gate.py,
+# statement one of every entry) refuses by name with exit 3 on an absent or older core before anything of the core is imported
+[tool.opt_core]
+path = "../../common/opt_core"
+version = "0.5.228.0"
+
+[project]
+name = "boltzgen_opt"
+dynamic = ["version"]
+description = "BoltzGen inference optimizations: modes exact/fast/big/off, lazy autoload, activation report, accelerator census, MPS packing"
+requires-python = ">=3.11"                          # the upstream wheel's own floor (stock/PINS.json wheel_requires)
+classifiers = ["Private :: Do Not Upload"]        # not a PyPI package: the index rejects uploads carrying this classifier (the install is editable, from this tree)
+dependencies = []
+
+[project.optional-dependencies]
+test = ["pytest", "pyyaml", "setuptools>=64"]                          # the package's CPU tests (pyyaml: steps.yaml of the stub pipeline); setuptools: the tests exec opt/_build_backend.py (the build requirement, same floor as [build-system])
+
+[project.scripts]
+boltzgen-opt = "boltzgen_opt.__main__:main"        # `boltzgen-opt design|check|warm ...` == `python -m boltzgen_opt ...`
+
+[tool.setuptools]
+packages = ["boltzgen_opt", "boltzgen_opt.tests"]
+include-package-data = false
+
+[tool.setuptools.dynamic]
+version = {attr = "boltzgen_opt.__version__"}

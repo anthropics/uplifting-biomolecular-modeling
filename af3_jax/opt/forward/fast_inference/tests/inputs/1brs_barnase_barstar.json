@@ -1,0 +1,32 @@
+{
+ "name": "1brs_barnase_barstar",
+ "modelSeeds": [
+  1,
+  2,
+  3,
+  4,
+  5
+ ],
+ "sequences": [
+  {
+   "protein": {
+    "id": "A",
+    "sequence": "AQVINTFDGVADYLQTYHKLPDNYITKSEAQALGWVASKGNLADVAPGKSIGGDIFSNREGKLPGKSGRTWREADINYTSGFRNSDRILYSSDWLIYKTTDHYQTFTKIR",
+    "unpairedMsa": "",
+    "pairedMsa": "",
+    "templates": []
+   }
+  },
+  {
+   "protein": {
+    "id": "B",
+    "sequence": "KKAVINGEQIRSISDLHQTLKKELALPEYYGENLDALWDALTGWVEYPLVLEWRQFEQSKQLTENGAESVLQVFREAKAEGADITIILS",
+    "unpairedMsa": "",
+    "pairedMsa": "",
+    "templates": []
+   }
+  }
+ ],
+ "dialect": "alphafold3",
+ "version": 2
+}

@@ -1,0 +1,9 @@
+{
+ "decode_kit": {
+  "dir": "plm_transfer_t1_v0",
+  "module": "kit_t1",
+  "level": "t3s",
+  "levers": ["resident_rotary", "static_kv"]
+ },
+ "stock": "salesforce/progen @ c27a419c234a0997923761e1fe7daffcebf0eaf5 (progen2/sample.py, likelihood.py)"
+}

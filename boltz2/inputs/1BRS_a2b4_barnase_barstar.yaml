@@ -1,0 +1,13 @@
+# PDB 1BRS barnase (chains A, B; 110 aa) x2 + barstar (chains C, D, E, F; 89 aa) x4, single-sequence mode: 2*110 + 4*89 = 576 tokens
+# = 36*16 — the token count's OTHER integer-specialization class (N = 0 mod 16; the 398-token input beside it is N != 0 mod 16), above the
+# 384-token chunking threshold and every fused kernel's token floor. The `warm` verb's second input: one process meets both classes once.
+version: 1
+sequences:
+  - protein:
+      id: [A, B]
+      sequence: AQVINTFDGVADYLQTYHKLPDNYITKSEAQALGWVASKGNLADVAPGKSIGGDIFSNREGKLPGKSGRTWREADINYTSGFRNSDRILYSSDWLIYKTTDHYQTFTKIR
+      msa: empty
+  - protein:
+      id: [C, D, E, F]
+      sequence: KKAVINGEQIRSISDLHQTLKKELALPEYYGENLDALWDALTGWVEYPLVLEWRQFEQSKQLTENGAESVLQVFREAKAEGADITIILS
+      msa: empty

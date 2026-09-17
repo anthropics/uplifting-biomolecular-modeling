@@ -1,0 +1,17 @@
+{
+ "exports": {},
+ "files_note": "__init__.py is empty: the kit ships trimul_pallas.py and triattn_pallas.py inside its adapter package (whose __init__ installs the framework module rebinding on import); the empty package init makes the carried directory importable without that adapter (as pallas_attn's)",
+ "kind": "package",
+ "license": "Apache-2.0 (this repository's own code: common/opt_core/LICENSE); extends the AlphaFold 3 source (Apache-2.0, Copyright 2024 DeepMind Technologies Limited) — no upstream file carried",
+ "mechanism": "attn.triangle_multiplication + attn.triangle_attention (fused Pallas blocks: prologue / core / epilogue) + pair.transition_swiglu (transition_pallas: LN -> W_a|W_b -> swish(a)*b -> W_2 in one Pallas-Triton kernel per row tile)",
+ "name": "fpf_pallas",
+ "not_carried": {
+  "__init__.py (the adapter's), setup.py, the launcher script, README.md, tests/": "the adapter package's install-on-import switchboard, its launcher, its README and its parity / in-model bracket tests: kit evidence, cited from the kit",
+  "diffusion_hoist.py": "the kit's step-invariant diffusion-conditioning hoist: a transcription of one model's sampler (module rebinding), not a kernel",
+  "patch.py": "the kit's Haiku adapter (rebinds the model modules' TriangleMultiplication / GridSelfAttention classes, reads the modules' own parameters, counts served/fallback call sites): framework-module surgery, stays in the kit; its pinned tile tables and served-shape predicate are re-expressed as generic core code in fpf_pallas_serve (TILE_TABLES, tables_for, served_reason)"
+ },
+ "runtime_imports": [],
+ "runtime_imports_note": "transition_pallas: jax/pallas at import; haiku + the model's modules imported lazily INSIDE install()/make_class() only (the kit's installer entry); fused_transition/supported/transition_reference are engine-free",
+ "served_note": "transition_pallas.fused_transition(x, ln_scale, ln_offset, w1 [C,2F] | (C,2,F), w2 [F,C], b2=None, eps, cfg): x [...,C] bf16, C%16==0, 16<=C<=256, F%tf==0, rows%T==0; supported(x,C,F,cfg)->(ok,reason: dtype:|c:|f:|rows:); install(modules)/uninstall()/report() rebind the model's haiku TransitionBlock class (the kit's entry)",
+ "version": "flashpairformer-pallas-1.2.0@6eb87536+af929056"
+}

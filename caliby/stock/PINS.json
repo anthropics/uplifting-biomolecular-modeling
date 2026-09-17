@@ -1,0 +1,214 @@
+{
+ "model": "caliby",
+ "upstream": {
+  "caliby": {
+   "repo": "https://github.com/ProteinDesignLab/caliby",
+   "commit": "41d31560c3c73d7980d94f40f3c852b90bfab5c0",
+   "version": "0.1",
+   "tag": null,
+   "install": "caliby @ git+https://github.com/ProteinDesignLab/caliby.git@41d31560c3c73d7980d94f40f3c852b90bfab5c0",
+   "archive": "stock/caliby-41d31560.tar.gz"
+  },
+  "atomworks-caliby": {
+   "repo": "https://github.com/richardshuai/atomworks-caliby",
+   "commit": "ea2c998a593af05a47dd972ad6e72b89f87d4e14",
+   "version": "1.0.0",
+   "tag": "atomworks-caliby-v1.0.0",
+   "install": "atomworks-caliby @ git+https://github.com/richardshuai/atomworks-caliby.git@ea2c998a593af05a47dd972ad6e72b89f87d4e14",
+   "archive": "stock/atomworks-caliby-ea2c998a.tar.gz"
+  },
+  "protpardelle": {
+   "repo": "https://github.com/ProteinDesignLab/protpardelle-1c",
+   "commit": "7962da091a335251fa8e5ddef5d2c937fbd9d9ae",
+   "version": "1.3.2",
+   "tag": null,
+   "install": "protpardelle @ git+https://github.com/ProteinDesignLab/protpardelle-1c.git@7962da091a335251fa8e5ddef5d2c937fbd9d9ae",
+   "archive": "stock/protpardelle-1c-7962da09.tar.gz"
+  }
+ },
+ "archive_recipe": "git archive --format=tar --prefix=<name>-<commit8>/ <commit> <paths> | gzip -n -9  (caliby: caliby chroma pyproject.toml LICENSE README.md python_api.md env_setup.sh download_model_params.sh; atomworks-caliby: src pyproject.toml LICENSE.md README.md; protpardelle-1c: src pyproject.toml LICENSE README.md)",
+ "python": "3.12.10",
+ "pinned_stack": {
+  "python": "3.12.10",
+  "torch": "2.6.0+cu124",
+  "triton": "3.2.0",
+  "cuda": "12.4",
+  "cudnn": "9.1.0",
+  "freeze": "environment/requirements.lock",
+  "tested_on": "NVIDIA H100 80GB HBM3 with the freeze above installed (documentation: where the kit rows were tested; nothing reads or compares this field)"
+ },
+ "pins": {
+  "torch": "2.6.0",
+  "triton": "3.2.0",
+  "numpy": "2.1.3",
+  "biotite": "1.6.0",
+  "gemmi": "0.7.1",
+  "lightning": "2.6.5",
+  "pandas": "2.2.3",
+  "scipy": "1.15.3",
+  "hydra-core": "1.3.5",
+  "omegaconf": "2.3.1",
+  "torchtyping": "0.1.5",
+  "dm-tree": "0.1.9",
+  "einops": "0.8.2",
+  "biopython": "1.85"
+ },
+ "torch_build": {
+  "dist_version": "2.6.0",
+  "runtime_version": "2.6.0+cu124",
+  "cuda": "12.4",
+  "source": "the +cu124 wheel (nvidia-*-cu12 runtime wheels per the freeze)"
+ },
+ "system": {
+  "compiler": "gcc/cc required at run time by the exact mode (Triton JIT of the fused LCP kernel, CALIBY_X_LCP=1); stock needs none",
+  "optional_absent": [
+   "flash_attn",
+   "xformers",
+   "cuequivariance_torch",
+   "pyrosetta"
+  ]
+ },
+ "weights": {
+  "hf_repo": "ProteinDesignLab/caliby-weights",
+  "hf_revision": "a51f011f4ec7ffe2daad3ab9b2bfb67ff628a096",
+  "hf_revision_source": "opt/forward/fast_inference/YOU_MUST_SUPPLY.md:6 (the sha256 and bytes below are the files at that revision)",
+  "env": "MODEL_PARAMS_DIR",
+  "layout_note": "upstream resolves <MODEL_PARAMS_DIR>/caliby/<ckpt_name>.ckpt (caliby/api.py:358-362 load_model; env_setup.sh:14 sets MODEL_PARAMS_DIR=model_params) and <MODEL_PARAMS_DIR>/protpardelle-1c/{weights,configs}/ for ensemble generation (caliby/api.py:499-549)",
+  "files": {
+   "caliby/soluble_caliby.ckpt": {
+    "sha256": "49a720458cb86625a74e73ad2a3351c9b91b06c0371040b85896aad507820c98",
+    "size_bytes": 47462481,
+    "used_by": [
+     "single",
+     "ensemble32"
+    ],
+    "ckpt": "soluble_caliby"
+   },
+   "caliby/soluble_caliby_v1.ckpt": {
+    "sha256": "af08ccf22b59f222b7f4442bf8fa90efec363f6474794e6c22a40043b709af3a",
+    "size_bytes": 36064593,
+    "used_by": [
+     "single",
+     "ensemble32"
+    ],
+    "ckpt": "soluble_caliby_v1"
+   },
+   "caliby/caliby.ckpt": {
+    "sha256": "4a1c22c5f1c62c62a3aa9c1e6bec65e63a37faeccad5cd6b7d94536cedb1ee74",
+    "size_bytes": 47462225,
+    "used_by": [
+     "single",
+     "ensemble32"
+    ],
+    "ckpt": "caliby"
+   },
+   "protpardelle-1c/weights/cc95_epoch3490.pth": {
+    "sha256": "965ef846976e28d05adbf6aad7d32f1ddd1ceee22791757b8848b6a7f2348543",
+    "size_bytes": 301458372,
+    "used_by": [
+     "ensemble32"
+    ]
+   },
+   "protpardelle-1c/configs/cc95.yaml": {
+    "sha256": "5c19dc0005d6f7dc2246143caba3f4001350a4091e704f5ee2b713cfd0095fa1",
+    "size_bytes": 2514,
+    "used_by": [
+     "ensemble32"
+    ]
+   }
+  },
+  "weight_set": "caliby"
+ },
+ "entry_point": {
+  "cli": "README.md:115 ('The examples below use bash scripts with the Hydra CLI') and :134 -> examples/scripts/seq_des.sh:5-9: python3 caliby/eval/sampling/seq_des.py ckpt_name_or_path=soluble_caliby_v1 input_cfg.pdb_dir=<dir> sampling_cfg_overrides.num_seqs_per_pdb=4 out_dir=<dir> (Hydra configs/eval/sampling/seq_des.yaml: seed 0 [:2], batch_size 4, num_workers 2; seq_des.py:22-24 seed_everything + cudnn.deterministic=True, benchmark=False); ensemble: examples/scripts/generate_ensembles.sh:5-9 (generate_ensembles.py model_params_path=model_params input_cfg.pdb_dir=<dir> num_samples_per_pdb=8 out_dir=<dir>) then seq_des_ensemble.sh:8-12 (seq_des_ensemble.py ckpt_name_or_path=caliby input_cfg.conformer_dir=<generator out>/<protocol dir> sampling_cfg_overrides.num_seqs_per_pdb=4 out_dir=<dir>). examples/ is not in the vendored archive (archive_recipe); the kit drives the Python API (below), whose keywords `run.sh design` forwards under upstream's names",
+  "defaults": "three upstream defaults disagree: the README script designs 4 sequences with soluble_caliby_v1 (examples/scripts/seq_des.sh:6-8); the YAML 16 with caliby (configs/eval/sampling/seq_des.yaml:6,26); the API 1 with caliby (caliby/api.py:359 model_name, :100 num_seqs_per_pdb); the kit's route is the API's: a knob not given on `run.sh design` is not passed, so caliby/api.py's defaults apply (1 sequence, model_name caliby, batch 4, 2 workers, temperature 0.01, verbose, no constraints; generate_ensembles 32 conformers in batches of 8)",
+  "api": "caliby.clean_pdbs(inputs, out_dir, num_workers=1) [caliby/api.py:401-405] -> caliby.load_model(model_name='caliby', device=None) [caliby/api.py:358-362] -> constraints (caliby.make_constraints / a positional-constraint DataFrame, or None) -> lightning.seed_everything(seed) -> model.sample(inputs, out_dir, pos_constraint_df=None, num_seqs_per_pdb=1, batch_size=4, num_workers=2, temperature=0.01, omit_aas=None, ...) [caliby/api.py:81-112]; ensemble: caliby.generate_ensembles(...) then model.ensemble_sample(...) (python_api.md §Ensemble-conditioned sequence design)",
+  "order_note": "the call order above (clean -> load_model -> constraints -> seed -> sample) is the order of opt/forward/xattempt_addon/tests/xcaliby_design.py (main), the tree's design writer",
+  "script": "opt/caliby_opt/stock_design.py (the tree's one stock caller: environment proof + tree-digest proof, then the design writer above in the same process)",
+  "quickstart": "python_api.md §Quick start: model = load_model(\"caliby\"); model.sample([\"examples/example_data/native_pdbs/7xhz.cif\"], num_seqs_per_pdb=4, out_dir=\"outputs/seq_des\")"
+ },
+ "library_defaults": {
+  "sample": {
+   "num_seqs_per_pdb": 1,
+   "batch_size": 4,
+   "num_workers": 2,
+   "temperature": 0.01,
+   "omit_aas": null,
+   "pos_constraint_df": null,
+   "source": "caliby/api.py:100-105 (docstring defaults) == caliby/configs/seq_des/inference.yaml:4-7,10,19-24"
+  },
+  "sampler": {
+   "num_sweeps": 500,
+   "proposal": "dlmc",
+   "rejection_step": false,
+   "regularization": "lcp",
+   "temperature": 0.01,
+   "source": "caliby/configs/seq_des/inference.yaml:19-24 (sampling_cfg)"
+  },
+  "clean_pdbs": {
+   "num_workers": 1,
+   "source": "caliby/api.py:401-405"
+  },
+  "ensemble": {
+   "num_samples_per_pdb": 32,
+   "source": "python_api.md §Generating ensembles with Protpardelle-1c; caliby/api.py:499-549 (generate_ensembles)"
+  },
+  "precision": "PyTorch defaults (matmul TF32 off, float32_matmul_precision highest, cudnn TF32 on); the sampler is float32"
+ },
+ "variants": {
+  "single": {
+   "weights": "caliby/soluble_caliby.ckpt",
+   "kit_label": "fb",
+   "action": "clean -> sample",
+   "default": true
+  },
+  "ensemble32": {
+   "weights": [
+    "caliby/soluble_caliby.ckpt",
+    "protpardelle-1c/weights/cc95_epoch3490.pth",
+    "protpardelle-1c/configs/cc95.yaml"
+   ],
+   "kit_label": "e32",
+   "action": "clean -> generate_ensembles(32 conformers) -> ensemble_sample",
+   "n_conformers": 32
+  }
+ },
+ "stock_environment": {
+  "reads": [
+   "MODEL_PARAMS_DIR",
+   "HF_HUB_OFFLINE",
+   "PDB_MIRROR_PATH",
+   "CCD_MIRROR_PATH"
+  ],
+  "must_be_absent_prefixes": [
+   "CALIBY_FAST_",
+   "CALIBY_X_",
+   "CALIBY_OPT",
+   "CALIBY_VARIANT"
+  ],
+  "allowed_exceptions": []
+ },
+ "tree_digest_upstream": {
+  "sha256": "f59cfc9bc9293c0903fc76b35ac2e2346d4e0409823106e4bfb4447f3b04e2ac",
+  "tool": "caliby_opt.stack.tree_digest (a sha256 over the installed caliby/, chroma/ and protpardelle/ site-packages trees: per tree, sorted relative path + sha256 of every file, __pycache__ and .pyc excluded; then the three tree digests in name order)",
+  "per_tree": {
+   "caliby": {
+    "n_files": 71,
+    "sha256": "61e690545e3485485b4323fb5c3e70f59fed76ce84d90a93f5d09c177998d1af"
+   },
+   "chroma": {
+    "n_files": 7,
+    "sha256": "143c002c41802c634f3f75ac377489539a0dd800546df590ff3c7c6d1e8b1b84"
+   },
+   "protpardelle": {
+    "n_files": 40,
+    "sha256": "50b4d09c0a9223e20fab87f8d104aa05a888c70cf6464e71b2aff64051157fdf"
+   }
+  }
+ },
+ "never_replaced_files": {
+  "caliby/data/preprocessing/atomworks/clean_pdbs.py": {
+   "source": "stock/src/caliby/caliby/data/preprocessing/atomworks/clean_pdbs.py"
+  }
+ }
+}

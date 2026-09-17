@@ -1,0 +1,262 @@
+{
+ "model": "opendde",
+ "opendde_version": "1.1.1",
+ "upstream": {
+  "repo": "https://github.com/aurekaresearch/OpenDDE",
+  "commit": "ddfa1df8aff1babf1fddac4247b7d2351bd0ce9f",
+  "tag": "v1.1.1",
+  "version": "1.1.1",
+  "version_file": "opendde/version.py",
+  "archive": {
+   "url": "https://github.com/aurekaresearch/OpenDDE/archive/ddfa1df8aff1babf1fddac4247b7d2351bd0ce9f.tar.gz",
+   "sha256": "b240db00052edb9d37325b02fe090df572026a2368c2704573fb117d7da2c7fd",
+   "n_files": 235
+  },
+  "project_urls": "https://github.com/aurekaresearch/OpenDDE (pyproject.toml:67-72)",
+  "install": "pip install --no-deps stock/opendde-1.1.1-py3-none-any.whl"
+ },
+ "wheel": {
+  "file": "stock/opendde-1.1.1-py3-none-any.whl",
+  "bytes": 515483,
+  "url": "https://files.pythonhosted.org/packages/58/ca/4dc0bca000b84fb44dd45f2f17159ce3b2587d341ccb5f62b8755bf88a47/opendde-1.1.1-py3-none-any.whl",
+  "source": "https://pypi.org/project/opendde/1.1.1/",
+  "uploaded": "2026-09-02T08:10:21.063950Z",
+  "n_package_files": 117
+ },
+ "sdist": {
+  "file": "stock/opendde-1.1.1.tar.gz",
+  "bytes": 467138,
+  "url": "https://files.pythonhosted.org/packages/f0/2e/3b4e973969366f89b4de431f2568cc81d7a88b4f42a7fc85ac7eaf6f0a51/opendde-1.1.1.tar.gz",
+  "uploaded": "2026-09-02T08:10:22.661977Z",
+  "n_package_files": 117
+ },
+ "pypi_release_json": "stock/pypi_opendde-1.1.1.json (https://pypi.org/pypi/opendde/1.1.1/json)",
+ "source_snapshot": {
+  "dir": "stock/src",
+  "recipe": "the GitHub archive of the commit (https://github.com/aurekaresearch/OpenDDE/archive/<commit>.tar.gz) minus assets/, benchmarks/, every *.pdf and *.png, and the example subdirectories (examples/*/ \u2014 MSA files); the top-level examples/*.json are kept",
+  "n_files": 200
+ },
+ "console_script": {
+  "opendde": "runner.cli:opendde_cli",
+  "pyproject_line": 75
+ },
+ "python": "3.11",
+ "python_requires": ">=3.11,<3.14 (pyproject.toml:10)",
+ "pinned_stack": {
+  "tested_on": "one NVIDIA H100 80GB in a container from nvidia/cuda:12.6.3-cudnn-devel-ubuntu24.04 (python 3.11, torch 2.7.1+cu126, triton 3.3.1, cuequivariance 0.10.0, CUDA 12.6); documentation only, nothing compares against it",
+  "build": "base image nvidia/cuda:12.6.3-cudnn-devel-ubuntu24.04 + python 3.11 + apt build-essential ca-certificates curl git hmmer kalign libglib2.0-0 libgl1 libxrender1 pkg-config tzdata + uv 0.8.15 + `uv pip install --system --compile-bytecode --torch-backend cu126 \"opendde[gpu]==1.1.1\" \"pytest>=8\"` (upstream README \"Installation\" GPU-from-PyPI line, stock/src/README.md; base = upstream Dockerfile:1)",
+  "python": "3.11.5",
+  "torch": "2.7.1+cu126",
+  "triton": "3.3.1",
+  "cuequivariance": "0.10.0",
+  "cuequivariance-torch": "0.10.0",
+  "cuequivariance-ops-cu12": "0.10.0",
+  "cuequivariance-ops-torch-cu12": "0.10.0",
+  "cuda": "12.6",
+  "base_image_upstream": "nvidia/cuda:12.6.3-cudnn-devel-ubuntu24.04 (Dockerfile:1, --torch-backend cu126 at Dockerfile:48)",
+  "opendde_install": "from the index (opendde==1.1.1); the installed opendde/ + runner/ files are the wheel's 117 bytes-for-bytes (stock/check_pins.py judges bytes, so this form and `pip install --no-deps stock/opendde-1.1.1-py3-none-any.whl` both pass)",
+  "absent": "torchvision, torchaudio, gemmi, matplotlib (dropped from upstream's dependencies at 1.1.x); ninja is not in the image on its own — the kit package requires it (opt/pyproject.toml dependencies: LAYERNORM_TYPE=fast_layernorm, the stock's precision base, builds fast_layer_norm_cuda_v2 with ninja + nvcc at first use)"
+ },
+ "pins": {
+  "torch": "2.7.1",
+  "click": ">=8.1.0",
+  "scipy": ">=1.9.0",
+  "ml_collections": "1.1.0",
+  "tqdm": "4.67.1",
+  "pandas": "2.3.1",
+  "rdkit": "2025.9.3",
+  "biopython": "1.85",
+  "biotite": "1.4.0",
+  "scikit-learn": "1.7.1",
+  "pydantic": ">=2.0.0",
+  "optree": "0.17.0",
+  "numpy": "2.4.1",
+  "networkx": ">=3.4.2",
+  "packaging": ">=23.2",
+  "requests": ">=2.31.0",
+  "gpu_extra": {
+   "triton": "3.3.1",
+   "cuequivariance": "0.10.0",
+   "cuequivariance-torch": "0.10.0",
+   "cuequivariance-ops-cu12": "0.10.0",
+   "cuequivariance-ops-torch-cu12": "0.10.0"
+  }
+ },
+ "image_freeze_subset": {
+  "opendde": "1.1.1",
+  "torch": "2.7.1+cu126",
+  "triton": "3.3.1",
+  "cuequivariance": "0.10.0",
+  "cuequivariance-torch": "0.10.0",
+  "cuequivariance-ops-cu12": "0.10.0",
+  "cuequivariance-ops-torch-cu12": "0.10.0",
+  "numpy": "2.4.1",
+  "scipy": "1.17.1",
+  "rdkit": "2025.9.3",
+  "source": "the versions installed on the pinned image (pinned_stack)"
+ },
+ "checkpoint": {
+  "file": "checkpoint/opendde.pt",
+  "sha256": "7b826620390afad877ee2babc6a4d0df81b94d3a0be030959853d6a7da0807cc",
+  "bytes": 2625249069,
+  "hf": "https://huggingface.co/aurekaresearch/OpenDDE/resolve/main/opendde.pt",
+  "hf_commit": "eddd563ce96571f784012edd8f045181c8f8627d",
+  "root_env": "OPENDDE_ROOT_DIR"
+ },
+ "common": {
+  "dir": "common/",
+  "files": [
+   "components.cif",
+   "components.cif.rdkit_mol.pkl",
+   "release_date_cache.json",
+   "obsolete_to_successor.json"
+  ],
+  "managed_assets": {
+   "components.cif": {
+    "bytes": 490777362,
+    "sha256": "bb31ae5cf6c8bc669924313077cb4231ee5ffefd3a20118cd14f3ec89f8bb6a5"
+   },
+   "components.cif.rdkit_mol.pkl": {
+    "bytes": 142498117,
+    "sha256": "d1cfb71f5993a3ebea7c47877022d7f597bbfbaf86e28a4770e957da6c50cd35"
+   },
+   "obsolete_to_successor.json": {
+    "bytes": 86882,
+    "sha256": "2bc08348d0efba438c109bb27be6fa25b611d371c60b8a8da3de387a4a0698ad"
+   },
+   "release_date_cache.json": {
+    "bytes": 12754898,
+    "sha256": "8b1ef12ddc01a0d5eb2d388c77ded91aa906eebce7440726c57b6f8d1a3ec142"
+   }
+  }
+ },
+ "cli_defaults": {
+  "seeds": null,
+  "cycle": 10,
+  "step": 200,
+  "sample": 5,
+  "dtype": "fp32",
+  "device": "auto",
+  "model_name": "opendde_v1",
+  "load_checkpoint_path": "",
+  "use_msa": true,
+  "use_default_params": false,
+  "trimul_kernel": "auto",
+  "triatt_kernel": "auto",
+  "enable_cache": true,
+  "enable_fusion": true,
+  "enable_tf32": true,
+  "deterministic": false,
+  "use_template": false,
+  "use_rna_msa": false,
+  "msa_server_mode": null,
+  "need_atom_confidence": true,
+  "foldcp_mode": "single",
+  "foldcp_size_dp": 1,
+  "foldcp_size_cp": 1,
+  "foldcp_devices": "",
+  "foldcp_metrics_jsonl": "",
+  "use_tfg_guidance": false,
+  "source": "runner/batch_inference.py:692-913 (click options of `pred` = `predict`, :914; dtype choices bf16|fp32 and device choices auto|cuda|mps|cpu: opendde/config/schema.py:20-27; the search-binary/database path options :842-913 default to None)"
+ },
+ "stock_environment": {
+  "reads": [
+   "OPENDDE_ROOT_DIR",
+   "LAYERNORM_TYPE",
+   "OPENDDE_FORCE_SAMPLE_DIFFUSION_AMP",
+   "OPENDDE_FORCE_CONFIDENCE_AMP",
+   "OPENDDE_PAIR_BIAS_ROW_CHUNK",
+   "OPENDDE_FOLDCP_MODE",
+   "OPENDDE_FOLDCP_SIZE_DP",
+   "OPENDDE_FOLDCP_SIZE_CP",
+   "OPENDDE_FOLDCP_DEVICES",
+   "OPENDDE_FOLDCP_METRICS_JSONL",
+   "CUDA_VISIBLE_DEVICES",
+   "CUDA_DEVICE_ORDER",
+   "RANK",
+   "LOCAL_RANK",
+   "WORLD_SIZE",
+   "LOCAL_WORLD_SIZE",
+   "OPENDDE_DEPENDENCY_URL",
+   "OPENDDE_COMMON_URL",
+   "OPENDDE_SEARCH_DATABASE_URL",
+   "OPENDDE_PDB_SEQRES_URL",
+   "OPENDDE_RFAM_DB_URL",
+   "OPENDDE_NT_RNA_DB_URL",
+   "OPENDDE_RNACENTRAL_DB_URL",
+   "MMSEQS_SERVICE_HOST_URL",
+   "XDG_CACHE_HOME",
+   "TRITON_CACHE_DIR",
+   "TORCH_EXTENSIONS_DIR",
+   "CUBLAS_WORKSPACE_CONFIG",
+   "OPENDDE_FOLDCP_ATOM_WINDOW_PAIR_ROW_CHUNK",
+   "OPENDDE_FOLDCP_ATTN_PAIR_BIAS_SOURCE_GRID_MAX_BYTES",
+   "OPENDDE_FOLDCP_COMPACT_BF16_384_SOURCE_CHUNK",
+   "OPENDDE_FOLDCP_COMPACT_BF16_384_SOURCE_GRID",
+   "OPENDDE_FOLDCP_COMPACT_TRIMUL_OUTPUT_GATE",
+   "OPENDDE_FOLDCP_CONFIDENCE_COL_CHUNK",
+   "OPENDDE_FOLDCP_CONFIDENCE_DISTANCE_ROW_CHUNK",
+   "OPENDDE_FOLDCP_CONFIDENCE_GPU_OUTPUT_MAX_BYTES",
+   "OPENDDE_FOLDCP_CONFIDENCE_SOURCE_SLAB_MAX_BYTES",
+   "OPENDDE_FOLDCP_CONFIDENCE_TRANSPOSE_CPU_OFFLOAD_MIN_BYTES",
+   "OPENDDE_FOLDCP_DIFFUSION_BIAS_CACHE_MAX_BYTES",
+   "OPENDDE_FOLDCP_DIFFUSION_BIAS_ROW_CHUNK",
+   "OPENDDE_FOLDCP_DIFFUSION_CACHE_PAIR_Z_PROJECTION_MAX_BYTES",
+   "OPENDDE_FOLDCP_DIFFUSION_CACHE_PAIR_Z_ROW_CHUNK",
+   "OPENDDE_FOLDCP_DIFFUSION_CACHE_RELP_ROW_CHUNK",
+   "OPENDDE_FOLDCP_DIFFUSION_CACHE_RELP_SLAB_MAX_BYTES",
+   "OPENDDE_FOLDCP_DIFFUSION_CACHE_SOURCE_GRID_MAX_BYTES",
+   "OPENDDE_FOLDCP_DIFFUSION_CACHE_TRUNK_ROW_CHUNK",
+   "OPENDDE_FOLDCP_DIFFUSION_SOURCE_GRID_MAX_ROWS",
+   "OPENDDE_FOLDCP_DISTOGRAM_COL_CHUNK",
+   "OPENDDE_FOLDCP_DISTOGRAM_SOURCE_SLAB_MAX_BYTES",
+   "OPENDDE_FOLDCP_OPM_CHANNEL_CHUNK",
+   "OPENDDE_FOLDCP_PAIRFORMER_BLOCK_CACHE_RELEASE",
+   "OPENDDE_FOLDCP_PAIRFORMER_BLOCK_CACHE_RELEASE_MIN_ALLOCATED_MIB",
+   "OPENDDE_FOLDCP_PAIRFORMER_BLOCK_CACHE_RELEASE_MIN_FREE_MIB",
+   "OPENDDE_FOLDCP_PAIR_TRANSITION_FLAT_CHUNK",
+   "OPENDDE_FOLDCP_SOURCE_GRID_LINEAR_OUTPUT_CHUNK",
+   "OPENDDE_FOLDCP_TEMPLATE_REPLICATED_SERIAL_MAX_PAIR_ELEMENTS",
+   "OPENDDE_FOLDCP_TRIATT_ATTENTION_SCORE_BUDGET_BYTES",
+   "OPENDDE_FOLDCP_TRIATT_PROJECTION_SOURCE_GRID_MAX_BYTES",
+   "OPENDDE_FOLDCP_TRIATT_WRAP_ROW_CHUNK",
+   "OPENDDE_FOLDCP_TRIATT_WRAP_SOURCE_GRID_MAX_BYTES",
+   "OPENDDE_FOLDCP_TRIMUL_BMM_BLOCK_SIZE",
+   "OPENDDE_FOLDCP_TRIMUL_BMM_COL_BLOCK_SIZE",
+   "OPENDDE_FOLDCP_TRIMUL_BMM_ROW_BLOCK_SIZE",
+   "OPENDDE_FOLDCP_TRIMUL_CHANNEL_CHUNK",
+   "OPENDDE_FOLDCP_TRIMUL_DIRECT_B_OWNED_ROWS",
+   "OPENDDE_FOLDCP_TRIMUL_LAYERNORM_ROW_SLAB_MAX_BYTES",
+   "OPENDDE_FOLDCP_TRIMUL_LAYERNORM_SOURCE_GRID_MAX_BYTES",
+   "OPENDDE_FOLDCP_TRIMUL_OUTPUT_GATE_FLAT_CHUNK",
+   "OPENDDE_FOLDCP_TRIMUL_OUTPUT_SOURCE_GRID_MAX_BYTES",
+   "OPENDDE_FOLDCP_TRIMUL_PROJECTION_SOURCE_GRID_MAX_BYTES",
+   "OPENDDE_FOLDCP_TRIMUL_PROJECT_CHANNEL_CHUNK",
+   "OPENDDE_FOLDCP_TRIMUL_REPLICATED_SERIAL_MAX_BYTES"
+  ],
+  "reads_prefixes": [
+   "OPENDDE_FOLDCP_"
+  ],
+  "must_be_absent_prefixes": [
+   "OPENDDE_FORCE_",
+   "MODEL_OPT_TEST_",
+   "ODDE_",
+   "DIT_",
+   "CUEQ_",
+   "OO_",
+   "XL_",
+   "K2B_",
+   "OF3T_",
+   "FPF_",
+   "PF_",
+   "PTX_",
+   "OPENDDE_OPT",
+   "OPENDDE_WEIGHTS_DIR",
+   "CUBLAS_WORKSPACE_CONFIG",
+   "PYTORCH_CUDA_ALLOC_CONF"
+  ],
+  "allowed_under_det": [
+   "CUBLAS_WORKSPACE_CONFIG"
+  ]
+ }
+}

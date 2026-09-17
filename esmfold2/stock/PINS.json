@@ -1,0 +1,375 @@
+{
+ "model": "esmfold2",
+ "upstream": {
+  "esm": {
+   "repo": "https://github.com/Biohub/esm",
+   "commit": "26b0bc2b771e3e419ea74f445a5f35cc094a1509",
+   "version": "3.3.0",
+   "tag": null,
+   "install": "esm @ git+https://github.com/Biohub/esm.git@26b0bc2b771e3e419ea74f445a5f35cc094a1509",
+   "archive": "stock/esm-26b0bc2b.tar.gz",
+   "note": "no tag at this commit; the commit is the pin. pyproject declares transformers @ main (floating): install the transformers pin first, then esm with --no-deps"
+  },
+  "transformers": {
+   "repo": "https://github.com/huggingface/transformers",
+   "origin": "the Biohub fork of transformers; the Biohub/transformers repository is no longer public, and github.com/huggingface/transformers serves the same commit unchanged",
+   "commit": "ef32577f55da19a4989cd7b22e004dc43a4998cb",
+   "version": "4.57.6",
+   "tag": null,
+   "install": "transformers @ git+https://github.com/huggingface/transformers.git@ef32577f55da19a4989cd7b22e004dc43a4998cb",
+   "archive": "stock/transformers-ef32577f.tar.gz"
+  }
+ },
+ "archive_recipe": "git archive --format=tar --prefix=<name>-<commit8>/ <commit> <paths> | gzip -n -9  (esm: esm pyproject.toml LICENSE.md THIRD_PARTY_NOTICE.md; transformers: src/transformers setup.py pyproject.toml LICENSE README.md)",
+ "python": "3.12.10",
+ "pinned_stack": {
+  "python": "3.12.10",
+  "torch": "2.13.0+cu130",
+  "triton": "3.7.1",
+  "cuda": "13.0",
+  "flash_attn": "2.8.3.post1",
+  "xformers": "0.0.35+03b91d7.d20260904",
+  "transformer_engine": "2.15.0+42b8400",
+  "freeze": "environment/requirements.lock",
+  "tested_on": "H100 80GB HBM3 (sm_90) on the pinned stack (python 3.12.10 / torch 2.13.0+cu130 / triton 3.7.1 / flash_attn 2.8.3.post1 / xformers 0.0.35+03b91d7.d20260904 / transformer_engine 2.15.0+42b8400): the freeze plus the \"image\" layer below — a documentation line, compared against by nothing (check_pins.py pins the installed distributions, esmfold2_opt/attn.py the live kernel paths)",
+  "note": "the stack = environment/requirements.lock: every distribution of the tested environment, the accelerated layer included (\"image\": flash-attn, xformers, transformer-engine and transformer-engine's pinned pure-Python dependencies — the three extension wheels install from stock/wheels/, every other line from the index or git)"
+ },
+ "pins": {
+  "torch": "2.13.0",
+  "triton": "3.7.1",
+  "numpy": "2.3.5",
+  "safetensors": "0.8.0",
+  "huggingface_hub": "0.36.2",
+  "hf_transfer": "0.1.9",
+  "hf-xet": "1.6.0",
+  "tokenizers": "0.22.2",
+  "accelerate": "1.14.0",
+  "einops": "0.8.2",
+  "biotite": "1.7.1",
+  "biopython": "1.87",
+  "rdkit": "2026.3.5",
+  "scipy": "1.18.0",
+  "pandas": "3.0.5",
+  "msgpack-numpy": "0.4.8",
+  "nvidia-cudnn-cu13": "9.20.0.48",
+  "nvidia-cublas": "13.1.1.3",
+  "nvidia-nccl-cu13": "2.29.7",
+  "cuda-toolkit": "13.0.3.0"
+ },
+ "torch_build": {
+  "dist_version": "2.13.0",
+  "runtime_version": "2.13.0+cu130",
+  "cuda": "13.0",
+  "source": "PyPI default wheel (CUDA 13.0 build; nvidia-*-cu13 runtime wheels per the freeze)"
+ },
+ "image": {
+  "base": "the accelerated layer = an environment holding the kit's freeze (python 3.12.10, torch 2.13.0+cu130, triton 3.7.1, the CUDA 13.0 runtime wheels, both pinned forks installed at their pinned commits) plus the environment variables of \"env\" and ONE install step: the three wheels below (flash-attn, xformers, transformer-engine — Biohub's fastest documented environment for this model), each checked against its sha256 then installed --no-deps --no-index, then transformer-engine's pure-Python runtime dependencies at the exact versions of \"python_deps\" (--no-deps; every one a new install, nothing of the freeze up- or downgraded: the pip-freeze difference is these additions only). Without the layer upstream's FLASH_ATTN_AVAILABLE / _te_available are False, the atom transformers run SDPA and the LM the pure-PyTorch LayerNorm+MLP — stock/check_pins.py refuses it by name",
+  "layer": "sha256sum -c <the three wheels' lines> && python -m pip install --no-deps --no-index <flash-attn whl> <xformers whl> <transformer-engine whl> && python -m pip install --no-deps <python_deps, pinned ==>",
+  "env": {
+   "NVTE_FRAMEWORK": "pytorch",
+   "XFORMERS_IGNORE_FLASH_VERSION_CHECK": "1"
+  },
+  "python_packages": {
+   "flash_attn": "2.8.3.post1",
+   "xformers": "0.0.35+03b91d7.d20260904",
+   "transformer_engine": "2.15.0+42b8400"
+  },
+  "wheels": [
+   {
+    "name": "flash_attn-2.8.3.post1-cp312-cp312-linux_x86_64.whl",
+    "sha256": "a02310666be7bab55c520355d6a424dd5f4055bb595d67d897b7bbf75f45fde7",
+    "package": "flash_attn 2.8.3.post1",
+    "built_from": "PyPI sdist flash_attn-2.8.3.post1.tar.gz sha256=55d5103ed846da8b56e0797acf4bde07dee4b1c7e8907fcfc6699c203030c348 (pip download --no-deps --no-binary :all: flash-attn==2.8.3.post1; no prebuilt wheel exists for torch 2.13 / CUDA 13 / cp312)",
+    "build": "on the base image (its python 3.12.10 / torch 2.13.0+cu130 / gcc 12.2.0, cxx11 ABI), nvcc 13.0.88 from NVIDIA's debian12 apt repository (cuda-compiler-13-0 cuda-libraries-dev-13-0 cuda-cudart-dev-13-0 cuda-profiler-api-13-0; build box only, not in the image), ninja 1.13.0, FLASH_ATTN_CUDA_ARCHS=90 TORCH_CUDA_ARCH_LIST=9.0 MAX_JOBS=40 NVCC_THREADS=1 FLASH_ATTENTION_FORCE_BUILD=TRUE: python -m pip wheel --no-build-isolation --no-deps flash_attn-2.8.3.post1.tar.gz",
+    "cuda_archs": [
+     "sm_90"
+    ]
+   },
+   {
+    "name": "xformers-0.0.35+03b91d7.d20260904-py39-none-linux_x86_64.whl",
+    "sha256": "de7ca8b7fe75594637cdb7ef902b9a37cc8ece5caab96f26ada1fe565cbbed28",
+    "package": "xformers 0.0.35+03b91d7.d20260904",
+    "built_from": "github.com/facebookresearch/xformers tag v0.0.35 (03b91d7); memory_efficient_attention dispatches to torch's in-tree CUTLASS / FA2 kernels, the wheel compiles only its own sm_90 kernels",
+    "cuda_archs": [
+     "sm_90"
+    ]
+   },
+   {
+    "name": "transformer_engine-2.15.0+42b8400-cp312-cp312-linux_x86_64.whl",
+    "sha256": "732d64dbf46c1a96ce00b7073013800ebb9afb99087af8838aac033c1d797024",
+    "package": "transformer_engine 2.15.0+42b8400 (one monolithic wheel: core + the PyTorch framework binding)",
+    "built_from": "github.com/NVIDIA/TransformerEngine tag v2.15.0 (42b840051647)",
+    "cuda_archs": [
+     "sm_90"
+    ]
+   }
+  ],
+  "python_deps": {
+   "for": "transformer_engine's pure-Python runtime imports absent from the base; installed --no-deps at exactly these versions",
+   "pins": [
+    "pydantic==2.13.5",
+    "pydantic-core==2.46.5",
+    "annotated-types==0.8.0",
+    "typing-inspection==0.4.4",
+    "nvdlfw-inspect==0.2.2",
+    "onnx==1.22.0",
+    "onnxscript==0.7.1",
+    "onnx_ir==1.0.0",
+    "ml_dtypes==0.6.0",
+    "protobuf==7.36.1",
+    "importlib-metadata==9.0.1",
+    "zipp==4.1.0"
+   ]
+  },
+  "note": "sm_90 cubins only (H100 / H200, the target hardware): on another architecture the packages import, upstream takes its accelerated branches and the first kernel launch raises (no kernel image) — loud, never a silent slow run. Observed in the image on a CPU box: flash_attn, xformers.ops, transformer_engine.pytorch, flash_attn.ops.triton.rotary import; FLASH_ATTN_AVAILABLE and _te_available / _xformers_available True; pip check clean"
+ },
+ "image_variants": {
+  "a100": {
+   "for": "compute capability 8.0 (A100 80GB): the same base, the same \"env\", the same \"layer\" step and \"python_deps\", with the three wheels below in place of \"image\".wheels — the SAME sources and versions (\"python_packages\" unchanged, so stock/check_pins.py judges both images alike) compiled for sm_80 and sm_90 (FLASH_ATTN_CUDA_ARCHS / NVTE_CUDA_ARCHS \"80;90\", TORCH_CUDA_ARCH_LIST \"8.0;9.0\"); the freezes of the two images differ only in these three wheels' file lines",
+   "wheels": [
+    {
+     "name": "flash_attn-2.8.3.post1-cp312-cp312-linux_x86_64.whl",
+     "sha256": "81eee74f74d25be1670d949cfb0c18aae2432bdb9274285b93c67c6950ba68e0",
+     "cuda_archs": [
+      "sm_80",
+      "sm_90"
+     ],
+     "source": "PyPI sdist flash_attn-2.8.3.post1.tar.gz (sha256 55d5103e…c348), FLASH_ATTENTION_FORCE_BUILD=TRUE"
+    },
+    {
+     "name": "xformers-0.0.35+03b91d7.d20260904-py39-none-linux_x86_64.whl",
+     "sha256": "2ed4c2bd0a3dd092c25d29c73552503e5760fc79593cf17e38e8b2b5a4c611ad",
+     "cuda_archs": [
+      "sm_80",
+      "sm_90"
+     ],
+     "source": "github.com/facebookresearch/xformers tag v0.0.35 (03b91d7), BUILD_VERSION=0.0.35+03b91d7.d20260904"
+    },
+    {
+     "name": "transformer_engine-2.15.0+42b8400-cp312-cp312-linux_x86_64.whl",
+     "sha256": "fe567267d79935749b868c650dcf7828d3f9d3488916a84480a1989eda0ca6ba",
+     "cuda_archs": [
+      "sm_80",
+      "sm_90"
+     ],
+     "source": "github.com/NVIDIA/TransformerEngine tag v2.15 (42b8400), NVTE_FRAMEWORK=pytorch NVTE_WITH_NCCL_EP=0"
+    }
+   ],
+   "tested_on": "A100-SXM4-80GB and A100 80GB PCIe (an image assembled by exactly this recipe): flash_attn_func / xformers memory_efficient_attention / te.LayerNormMLP launch on sm_80 and agree with SDPA / plain LayerNorm+MLP math (max |d| 2.1e-3 / 1.7e-3 / rel 4.3e-3, run-to-run equal); upstream's FLASH_ATTN_AVAILABLE, TE_AVAILABLE, TRITON_KERNELS_AVAILABLE True; check_pins clean",
+   "configuration": "configs/a100.env (MODEL_OPT_TARGET_GPU=A100; every other line as configs/h100.env)"
+  }
+ },
+ "full_freeze": "environment/requirements.lock (128 lines: every distribution of the tested environment, read back from it with pip freeze --all)",
+ "system": {
+  "compiler": "gcc/cc + Python headers required at run time (Triton JIT)",
+  "accelerated": "flash_attn 2.8.3.post1, xformers 0.0.35, transformer_engine 2.15.0 — the pinned image's one layer (\"image\"): upstream's modeling_esmfold2_common.FLASH_ATTN_AVAILABLE is True (the atom transformers run flash_attn_varlen_func), modeling_esmc._te_available is True (the LM binds te.LayerNormMLP / LayerNormLinear / Linear) and its rotary runs flash-attn's Triton kernel; xformers is importable and unreachable from ESMFold2 (the LM attention stays F.scaled_dot_product_attention with the chain-aware mask). The package prints atom_attn / esmc_mlp / esmc_attn / esmc_rope on every route (opt/esmfold2_opt/attn.py) and ESMFOLD2_OPT_REQUIRE_FAST_ENV=1 (configs/h100.env) refuses a box where a required one is not live",
+  "optional_absent": [
+   "cuequivariance_torch"
+  ]
+ },
+ "weights": {
+  "biohub/ESMC-6B": {
+   "snapshot_commit": "45b0fa5d7fb06faefbd5e3b89bdcef35d564e79a",
+   "files": {
+    "config.json": {
+     "sha256": "c5566fab6a17fd674141331fe75de917b7904d99fb7a410d2b1593c21e576913",
+     "size_bytes": 341
+    },
+    "model-00001-of-00006.safetensors": {
+     "sha256": "bd90149ff223e6ac1a0cac6147a5ae0df20d3a21df4f65356a1f19cd14f4aa8a",
+     "size_bytes": 4864457920
+    },
+    "model-00002-of-00006.safetensors": {
+     "sha256": "f75e2144d8269fe2eb4b3e0823fb089b94f176d8024153e85b8fb573a42294fa",
+     "size_bytes": 4971211344
+    },
+    "model-00003-of-00006.safetensors": {
+     "sha256": "f699f01ecc9691d9c6470492765fe54b8b5d2e9f277c139e89427433ffdfe0b2",
+     "size_bytes": 4863752992
+    },
+    "model-00004-of-00006.safetensors": {
+     "sha256": "46add1b7be098bbfdc3073884851ba3057f1b33ea23a158b650a37007dabd13d",
+     "size_bytes": 4971211344
+    },
+    "model-00005-of-00006.safetensors": {
+     "sha256": "1e1cb62f060a34e18f54a31a76683ef888b8cec59e73315f5b31d25d45a1f88c",
+     "size_bytes": 4863752992
+    },
+    "model-00006-of-00006.safetensors": {
+     "sha256": "56c73e13ae96e777ce65eee99364056069ef93b646470f352f83c5f1037b1b18",
+     "size_bytes": 873762296
+    },
+    "model.safetensors.index.json": {
+     "sha256": "6846456e20e6ee2c37461f7bfc21d316d69bdaf165b925691afcb39e583244da",
+     "size_bytes": 97349
+    },
+    "special_tokens_map.json": {
+     "sha256": "0b7245ec86c8c3aeaf61523ba70dfa79be137e6283f127bd651adc30b4f15c74",
+     "size_bytes": 171
+    },
+    "tokenizer.json": {
+     "sha256": "8d3447b278176e65fb3ef0224472927bf5fee3be46ea2bd77fad0111423cee1f",
+     "size_bytes": 2879
+    },
+    "tokenizer_config.json": {
+     "sha256": "e8d8e40c9f92b334f0272e80bb65ed4043cb9836523cbae899e9859e8cbb8833",
+     "size_bytes": 1392
+    }
+   }
+  },
+  "biohub/ESMFold2": {
+   "snapshot_commit": "1ebf0e3481a5184eb6171d40615c79e384b48796",
+   "files": {
+    "ccd.pkl": {
+     "sha256": "9ff44b1927c6b9198e38ffe0928706827a09a350c15530beeeabebfa88038fc5",
+     "size_bytes": 417306584
+    },
+    "config.json": {
+     "sha256": "e9ec2496ec433a1dce18627ed4bf3785b4ce0c1d69e4bb4663dad1ab895da012",
+     "size_bytes": 2337
+    },
+    "model.safetensors": {
+     "sha256": "138fd4350d6892b81ce6be7ff9bf5a93ae9d4d3751f46a27438a3f9f0dcefa0e",
+     "size_bytes": 939505228
+    }
+   }
+  },
+  "biohub/ESMFold2-Fast": {
+   "snapshot_commit": "b28d8ace5e05e61e5bec1e6820cfd3e221819d12",
+   "files": {
+    "config.json": {
+     "sha256": "d24456b797ddcfb60ac6c53621b550db5e14b1575ee2d9ab5a380eb5b09902f2",
+     "size_bytes": 2338
+    },
+    "model.safetensors": {
+     "sha256": "60ca19f2898188beba92944365f7b909efd9c99212f5018af75cc47cd9a6184a",
+     "size_bytes": 755416924
+    }
+   }
+  }
+ },
+ "ccd": {
+  "repo": "biohub/ESMFold2",
+  "file": "ccd.pkl",
+  "sha256": "9ff44b1927c6b9198e38ffe0928706827a09a350c15530beeeabebfa88038fc5",
+  "env": "ESMCFOLD_CCD_PATH"
+ },
+ "entry_point": {
+  "cli": null,
+  "model": "transformers.models.esmfold2.modeling_esmfold2.ESMFold2Model.from_pretrained(<hf_repo>, load_esmc=True, esmc_precision='bf16').cuda().eval()",
+  "fold": "esm.models.esmfold2.ESMFold2InputBuilder().fold(model, StructurePredictionInput(...), num_loops=, num_sampling_steps=, num_diffusion_samples=, seed=, msa_max_depth=, lm_dropout=, msa_column_mask_rate=, complex_id=)",
+  "msa_input": "esm.utils.msa.MSA.from_a3m(path, remove_insertions=, max_sequences=) attached as ProteinInput(msa=...)",
+  "result": "MolecularComplexResult(complex, plddt, ptm, iptm, pae, pde, distogram, pair_chains_iptm, ...); structure file = result.complex.to_mmcif()",
+  "script": "opt/esmfold2_opt/stock_fold.py (the tree's one stock caller: the calls above plus the settings preset's two model calls set_kernel_backend / set_chunk_size, nothing else on the path; settings presets: opt/esmfold2_opt/settings.py SETTINGS_PRESETS)"
+ },
+ "library_defaults": {
+  "fold": {
+   "num_loops": 20,
+   "num_sampling_steps": 200,
+   "num_diffusion_samples": 1,
+   "seed": null,
+   "lm_dropout": 0.3,
+   "msa_max_depth": 1024,
+   "msa_column_mask_rate": 0.1,
+   "complex_id": "pred"
+  },
+  "model": {
+   "kernel_backend": null,
+   "chunk_size": 64,
+   "load_esmc": true,
+   "esmc_precision": "bf16",
+   "esmc_id": "biohub/ESMC-6B",
+   "note": "kernel_backend / chunk_size: the model's own state after from_pretrained (the reference kernel path, pair-block chunk 64); the fold() keywords above override the config values at call time"
+  },
+  "precision": "PyTorch defaults (matmul TF32 off, float32_matmul_precision highest, cudnn TF32 on)",
+  "msa_read": {
+   "remove_insertions": false,
+   "max_sequences": null,
+   "note": "esm.utils.msa.MSA.from_a3m keyword defaults (insertions kept, the whole file read)"
+  },
+  "config_class_defaults": {
+   "num_loops": 20,
+   "structure_head.inference_num_steps": 68,
+   "num_diffusion_samples": 8,
+   "structure_head.inference_p": 8.0,
+   "note": "the transformers ESMFold2 config CLASS defaults (configuration_esmfold2.py:251, :138, :252, :137), not what the shipped checkpoints carry (see config_json_shipped)"
+  },
+  "config_json_shipped": {
+   "hf_revision": "8fc3ff471022fdce52c77030685eb775de0c00a3",
+   "biohub/ESMFold2": {
+    "config.json_sha256": "e9ec2496ec433a1dce18627ed4bf3785b4ce0c1d69e4bb4663dad1ab895da012",
+    "num_loops": 3,
+    "structure_head.inference_num_steps": 14,
+    "num_diffusion_samples": 32,
+    "structure_head.inference_p": 7.0,
+    "structure_head.inference_s_max": 160.0,
+    "structure_head.inference_s_min": 0.0004,
+    "structure_head.diffusion_module.sigma_data": 16.0,
+    "lm_encoder.lm_dropout": 0.25,
+    "lm_encoder.per_loop_lm_dropout": true
+   },
+   "biohub/ESMFold2-Fast": {
+    "config.json_sha256": "d24456b797ddcfb60ac6c53621b550db5e14b1575ee2d9ab5a380eb5b09902f2",
+    "num_loops": 3,
+    "structure_head.inference_num_steps": 14,
+    "num_diffusion_samples": 32,
+    "structure_head.inference_p": 7.0,
+    "structure_head.inference_s_max": 160.0,
+    "structure_head.inference_s_min": 0.0004,
+    "structure_head.diffusion_module.sigma_data": 16.0,
+    "lm_encoder.lm_dropout": 0.25,
+    "lm_encoder.per_loop_lm_dropout": true
+   },
+   "note": "what the checkpoints' own config.json files carry (the same keys and values in both; byte-identical across the HF revisions read, including the snapshots pinned under \"weights\"); fold() keyword arguments (num_loops=, num_sampling_steps=, num_diffusion_samples=, lm_dropout=) override them at call time, so every settings preset states them explicitly"
+  },
+  "executed_steps": {
+   "200": 134,
+   "100": 68,
+   "68": 46,
+   "14": 10,
+   "note": "denoising steps executed for num_sampling_steps=N: sample() truncates the N-entry schedule at max_inference_sigma=256 (modeling_esmfold2_common.py:1788, :1809-1818) with the checkpoint's schedule constants above; recorded, not computed"
+  }
+ },
+ "variants": {
+  "fast": {
+   "hf_repo": "biohub/ESMFold2-Fast",
+   "snapshot_commit": "b28d8ace5e05e61e5bec1e6820cfd3e221819d12",
+   "weights_sha256": "60ca19f2898188beba92944365f7b909efd9c99212f5018af75cc47cd9a6184a",
+   "msa": false,
+   "kit_variant": "fast"
+  },
+  "full_msa": {
+   "hf_repo": "biohub/ESMFold2",
+   "snapshot_commit": "1ebf0e3481a5184eb6171d40615c79e384b48796",
+   "weights_sha256": "138fd4350d6892b81ce6be7ff9bf5a93ae9d4d3751f46a27438a3f9f0dcefa0e",
+   "msa": true,
+   "kit_variant": "full"
+  },
+  "full_nomsa": {
+   "hf_repo": "biohub/ESMFold2",
+   "snapshot_commit": "1ebf0e3481a5184eb6171d40615c79e384b48796",
+   "weights_sha256": "138fd4350d6892b81ce6be7ff9bf5a93ae9d4d3751f46a27438a3f9f0dcefa0e",
+   "msa": false,
+   "kit_variant": "full"
+  },
+  "note": "every variant loads biohub/ESMC-6B as the language model (from_pretrained load_esmc=True); one variant per process"
+ },
+ "stock_environment": {
+  "reads": [
+   "HF_HOME",
+   "HF_HUB_OFFLINE",
+   "TRANSFORMERS_OFFLINE",
+   "ESMCFOLD_CCD_PATH"
+  ],
+  "must_be_absent_prefixes": [
+   "EF2_",
+   "ESMFOLD2_DETERMINISTIC_SCATTER",
+   "CUBLAS_WORKSPACE_CONFIG",
+   "NVIDIA_TF32_OVERRIDE",
+   "FPF_TRIMUL_V4_CELLS",
+   "CUDA_MPS_",
+   "ESMFOLD2_OPT",
+   "ESMFOLD2_VARIANT"
+  ]
+ }
+}

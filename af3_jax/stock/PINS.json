@@ -1,0 +1,127 @@
+{
+ "model": "af3_jax",
+ "upstream": {
+  "name": "alphafold3-open",
+  "repo": "https://github.com/sokrypton/alphafold3",
+  "tag": "v3.1.4",
+  "commit": "bc32b22ff5902e3daffd5d1f7203d7f2ab6cb997",
+  "license": "Apache-2.0 (LICENSE in the archive; weights terms in WEIGHTS_TERMS_OF_USE.md apply to AlphaFold 3 parameters only, which this tree never uses)",
+  "archive": {
+   "file": "alphafold3-bc32b22f.tar.gz",
+   "bytes": 5986099,
+   "recipe": "git archive --format=tar.gz --prefix=alphafold3-bc32b22f/ bc32b22ff5902e3daffd5d1f7203d7f2ab6cb997"
+  },
+  "src_dir": {
+   "path": "src/",
+   "excludes": [
+    "src/alphafold3/test_data/"
+   ]
+  },
+  "build": "docker/Dockerfile: FROM nvidia/cuda:12.6.3-base-ubuntu24.04; python3.12; uv 0.9.24; uv sync --frozen --all-groups --no-editable (uv.lock, 105 packages); uv run build_data; HMMER 3.4",
+  "patches": [
+   {
+    "file": "patches/04_of3_empty_template_restype_gap.diff",
+    "what": "with --of3_weights, absent (padding) template slots are featurised as GAP (OpenFold3's convention) instead of restype 0 (ALA) in SingleTemplateEmbedding; gated on global_config.of3_weights",
+    "kind": "correctness (OF3-weights port; not a speed optimization)",
+    "note": "declared exception to stock==upstream: applied at image build AND present in stock/src, so every arm (off included) carries it \u2014 upstream AF3-JAX never runs OF3 weights and so never needs this fix",
+    "source": "STOCK.md 'The stock exception' (issue, fix, measured effect, upstream PR text); Apache-2.0",
+    "applies": "patch -p1 in the archive root (alphafold3-bc32b22f/), alone on the pinned commit",
+    "touches": [
+     "src/alphafold3/model/network/template_modules.py"
+    ]
+   }
+  ],
+  "wheel": {
+   "file": "alphafold3_open-3.1.4-cp312-cp312-linux_x86_64.whl",
+   "version": "3.1.4",
+   "tag": "cp312-cp312-linux_x86_64",
+   "bytes": 248099433,
+   "sha256": "8c1ebb24b1c2c9be31b0982d770ce8b50aa173bf594b888c667ea9840f51e19e",
+   "what": "the stock distribution as installed in the tested stack, packed as a wheel: this archive's source at the pinned commit with upstream.patches applied, its C++ extension alphafold3/cpp.cpython-312-x86_64-linux-gnu.so compiled by upstream's own build (scikit-build-core + CMake, gcc 13.3.0, Ubuntu 24.04; abseil-cpp, pybind11, pybind11_abseil, libcifpp v7.0.3 and dssp v4.4.7 fetched at the tags CMakeLists.txt pins) and the wwPDB Chemical Component Dictionary snapshot libcifpp fetched at that build (share/libcifpp/components.cif, 2026-08-09, sha256 8aba80443a10f38f972f55260b6acc64d8bf5a5320ddf7d5b49716c9b69088aa; 50,885 CCD codes) \u2014 environment/Dockerfile installs it with --no-deps into /alphafold3_venv and runs upstream's build_data after it; not in git: placed in stock/wheels/ (STOCK.md 'Install')",
+   "build_yourself": "upstream's documented build makes an equivalent wheel from stock/src (patch applied): `pip wheel --no-deps .` (or `uv build --wheel`) in the checkout on the environment/ stack \u2014 its CCD snapshot is then the one wwPDB serves on your build day, and the compiled extension's bytes differ; every mode runs either, the digests here describe the tested one"
+  }
+ },
+ "stock_files": [
+  "convert_of3_weights.py",
+  "run_alphafold.py",
+  "src/alphafold3/data/msa_server.py",
+  "src/alphafold3/model/model_config.py",
+  "src/alphafold3/model/network/confidence_head.py",
+  "src/alphafold3/model/network/diffusion_transformer.py",
+  "src/alphafold3/model/network/modules.py",
+  "src/alphafold3/model/network/template_modules.py",
+  "src/alphafold3/model/of3_weight_converter.py"
+ ],
+ "image": {
+  "tested_on": "the image environment/Dockerfile builds \u2014 upstream's docker/Dockerfile layout (Ubuntu 24.04, the CUDA 12.6.3 base image, Python 3.12.1, uv 0.9.24, the stock environment /alphafold3_venv, the checkout /app/alphafold) with upstream.wheel as the installed stock (upstream.patches inside it and applied to the checkout); NVIDIA H100 80GB HBM3, driver 580.95.05 \u2014 a documentation line, nothing compares against it",
+  "python": "/alphafold3_venv/bin/python",
+  "python_version": "3.12.1",
+  "repo_dir": "/app/alphafold",
+  "env": {
+   "XLA_FLAGS": "--xla_gpu_enable_triton_gemm=false",
+   "XLA_PYTHON_CLIENT_PREALLOCATE": "true",
+   "XLA_CLIENT_MEM_FRACTION": "0.95"
+  },
+  "driver": "580.95.05",
+  "gpu": "NVIDIA H100 80GB HBM3"
+ },
+ "freeze": {
+  "file": "environment/requirements.lock",
+  "packages": 81,
+  "what": "the pinned stack: every distribution of the stock interpreter but stock itself (upstream.wheel), `name==version` lines; stock/check_pins.py compares the interpreter with it"
+ },
+ "check_packages": [
+  "jax",
+  "jaxlib",
+  "jax-cuda12-plugin",
+  "jax-cuda12-pjrt",
+  "dm-haiku",
+  "tokamax",
+  "rdkit",
+  "numpy",
+  "zstandard",
+  "absl-py",
+  "nvidia-cudnn-cu12",
+  "nvidia-cuda-runtime-cu12",
+  "torch"
+ ],
+ "variants": {
+  "p2": {
+   "name": "OpenFold3-preview2",
+   "layout": "of3-preview2",
+   "native_reference": "openfold-3 tag 0.4.1",
+   "checkpoint": {
+    "file": "of3-p2-155k.pt",
+    "url": "https://openfold.s3.amazonaws.com/staging/of3-p2-155k.pt",
+    "sha256": "3ae79a701f55dbc184002d010c92d347a35faabb981314c2fd1325211af40b77",
+    "bytes": 2287928519,
+    "license": "Apache-2.0"
+   },
+   "converted": {
+    "file": "of3_ported_weights.bin.zst",
+    "sha256": "0c9a00607352395486e33a98367810e1ad56c87459289f40974579525d3959cf",
+    "bytes": 1369240911,
+    "converter_run": "convert_of3_weights.py (the stock script; stock/PINS.json stock_files) on the public checkpoint, in the pinned image (torch 2.7.1+cpu)"
+   }
+  }
+ },
+ "converter": "convert_of3_weights.py --of3_checkpoint <checkpoint> --output_dir <dir> \u2014 the stock script of the checkout (stock/PINS.json stock_files), run by python -m af3_jax_opt.convert",
+ "stock_proof": {
+  "must_be_absent_prefixes": [
+   "AF3_JAX_",
+   "AF3P_",
+   "AF3_FLASHPAIRFORMER",
+   "AF3_DIFFUSION_HOIST"
+  ],
+  "argv_script": "run_alphafold.py",
+  "prefix_owners": {
+   "AF3_JAX_": "af3_jax_opt (the package's switches and paths)",
+   "AF3P_": "the Pallas add-on's lever switches (opt/forward/pallas_addon)",
+   "AF3_FLASHPAIRFORMER": "the FlashPairformer add-on's kernel switch (opt/forward/flashpairformer)",
+   "AF3_DIFFUSION_HOIST": "the FlashPairformer add-on's hoist switch"
+  }
+ },
+ "hardware": {
+  "gate": "device memory >= 24 GB and compute capability >= 8.0 (bf16 flash attention; the kit's tested GPUs are H100/H200/A100 80 GB, opt/forward/fast_inference/HOWTO.md \u00a71); the constants live in af3_jax_opt/stack.py"
+ }
+}

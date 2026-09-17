@@ -1,0 +1,71 @@
+--- a/esm/models/esmfold2/paired_msa.py
++++ b/esm/models/esmfold2/paired_msa.py
+@@ -39,7 +39,68 @@
+     return int(m.group(1)) if m else -1
+ 
+ 
++_INSERTION = np.zeros(256, dtype=bool)
++_INSERTION[ord("a") : ord("z") + 1] = True  # str.islower() on ASCII
++_INSERTION[ord(".")] = True  # is_a3m_insertion: ch == "." or ch.islower()
++_INSERTION_BYTES = bytes(range(ord("a"), ord("z") + 1)) + b"."
++
++
+ def msa_to_res_type_and_deletions(
++    msa: MSA, letter_to_res_type: dict[str, int]
++) -> tuple[np.ndarray, np.ndarray]:
++    """Convert an :class:`MSA` to ``(res_type[M, L], deletion_count[M, L])``.
++
++    Same contract as before (a3m insertion convention; ``L`` = query length
++    after stripping insertions from row 0; stored ``msa.deletions`` returned
++    directly), computed over one bytes view of the MSA instead of a Python
++    loop per character. Rows that are not pure ASCII, or whose match-column
++    count differs from ``L`` (never produced by :meth:`MSA.from_a3m`, which
++    rejects ragged a3m), take the per-character path below.
++    """
++    if msa.depth and all(e.sequence.isascii() for e in msa.entries):
++        seqs = [e.sequence for e in msa.entries]
++        M = len(seqs)
++        raw = "".join(seqs).encode("ascii")
++        flat = np.frombuffer(raw, dtype=np.uint8)
++        q = np.frombuffer(seqs[0].encode("ascii"), dtype=np.uint8)
++        L = int(q.size - np.count_nonzero(_INSERTION[q]))
++        lens = np.fromiter((len(s) for s in seqs), dtype=np.int64, count=M)
++        ins = _INSERTION[flat]
++        n_ins = int(np.count_nonzero(ins))
++        regular = bool((lens > 0).all())
++        if regular and n_ins:
++            starts = np.zeros(M, dtype=np.int64)
++            np.cumsum(lens[:-1], out=starts[1:])
++            regular = bool(((lens - np.add.reduceat(ins, starts)) == L).all())
++        elif regular:
++            regular = bool((lens == L).all())
++        if regular:
++            lut = np.empty(256, dtype=np.int64)
++            for c in range(256):
++                lut[c] = letter_to_res_type.get(chr(c).upper(), PROTEIN_UNK_RES_TYPE)
++            lut[ord("-")] = MSA_GAP_TOKEN_ID
++            grid = raw.translate(None, _INSERTION_BYTES) if n_ins else raw
++            res_type = lut[np.frombuffer(grid, dtype=np.uint8).reshape(M, L)]
++            if msa.deletions is not None:
++                msg = f"stored deletions {msa.deletions.shape} != expected {(M, L)}"
++                assert msa.deletions.shape == (M, L), msg
++                deletions = msa.deletions.astype(np.float32)
++            elif n_ins == 0:
++                deletions = np.zeros((M, L), dtype=np.float32)
++            else:
++                cins = np.cumsum(ins, dtype=np.int32)
++                at_match = cins[~ins].reshape(M, L)
++                before_row = np.zeros(M, dtype=np.int32)
++                before_row[1:] = cins[starts[1:] - 1]
++                deletions = np.diff(
++                    at_match, axis=1, prepend=before_row[:, None]
++                ).astype(np.float32)
++            return res_type, deletions
++
++    return _msa_to_res_type_and_deletions_loop(msa, letter_to_res_type)
++
++
++def _msa_to_res_type_and_deletions_loop(
+     msa: MSA, letter_to_res_type: dict[str, int]
+ ) -> tuple[np.ndarray, np.ndarray]:
+     """Convert an :class:`MSA` to ``(res_type[M, L], deletion_count[M, L])``.

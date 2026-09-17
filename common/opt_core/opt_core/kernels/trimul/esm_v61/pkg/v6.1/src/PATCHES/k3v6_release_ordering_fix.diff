@@ -1,0 +1,45 @@
+--- v6/src/k3v6.cu
++++ v6.1/src/k3v6.cu
+@@ -30,6 +30,9 @@
+ __device__ __forceinline__ void mbar_init(uint64_t* bar, uint32_t count) { asm volatile("mbarrier.init.shared::cta.b64 [%0], %1;" :: "r"(smem_u32(bar)), "r"(count) : "memory"); }
+ __device__ __forceinline__ void mbar_expect_tx(uint64_t* bar, uint32_t bytes) { asm volatile("mbarrier.arrive.expect_tx.shared::cta.b64 _, [%0], %1;" :: "r"(smem_u32(bar)), "r"(bytes) : "memory"); }
+ __device__ __forceinline__ void mbar_arrive(uint64_t* bar) { asm volatile("mbarrier.arrive.shared::cta.b64 _, [%0];" :: "r"(smem_u32(bar)) : "memory"); }
++__device__ __forceinline__ uint32_t zero_dep(uint32_t dep) {      // == 0 at run time for any dep; opaque to ptxas (dynamic smem size is a launch parameter)
++  uint32_t ds; asm volatile("mov.u32 %0, %%dynamic_smem_size;" : "=r"(ds)); return dep & (ds >> 20); }
++__device__ __forceinline__ void mbar_arrive_dep(uint64_t* bar, uint32_t dep_zero) { asm volatile("mbarrier.arrive.shared::cta.b64 _, [%0];" :: "r"(smem_u32(bar) + dep_zero) : "memory"); }
+ __device__ __forceinline__ bool mbar_try_wait(uint64_t* bar, uint32_t phase) {
+   uint32_t ok;
+   asm volatile("{\n .reg .pred p;\n mbarrier.try_wait.parity.shared::cta.b64 p, [%1], %2;\n selp.u32 %0, 1, 0, p;\n}" : "=r"(ok) : "r"(smem_u32(bar)), "r"(phase) : "memory");
+@@ -252,8 +255,14 @@
+       PCLK(c1);
+       copy(cpX, tXs, tXr);
+       copy(cpZ, tZs, tZr);
+-      __syncwarp();
+-      if (lane == 0) mbar_arrive(empty_stage);
++      {   // release the x^T / z stage only once every ldmatrix instruction of both operands has returned its data (one register per x4 atom)
++        uint32_t dep = 0;
++        { Tensor rXu = recast<uint32_t>(rX); CUTE_UNROLL for (int e = 0; e < size(rXu); e += 4) dep ^= rXu(e); }
++        { Tensor rZu = recast<uint32_t>(rZ); CUTE_UNROLL for (int e = 0; e < size(rZu); e += 4) dep ^= rZu(e); }
++        dep = zero_dep(__reduce_or_sync(0xffffffffu, dep));
++        fence_async_smem();
++        if (lane == 0) mbar_arrive_dep(empty_stage, dep);
++      }
+       PCLK(c2); PACC(0, c0, c1); PACC(1, c1, c2);
+ #if DO_LN
+       {
+@@ -351,8 +360,13 @@
+         uint32_t fr[2][4];
+         ldsm_x4(res_addr0 + rs * RB_BYTES, fr[0][0], fr[0][1], fr[0][2], fr[0][3]);
+         ldsm_x4(res_addr1 + rs * RB_BYTES, fr[1][0], fr[1][1], fr[1][2], fr[1][3]);
+-        __syncwarp();
+-        if (lane == 0) mbar_arrive(empty_res + cw * NRES + rs);
++        {   // release the residual slot only once both ldmatrix instructions have returned their data (one destination register of each carries its
++            // scoreboard) — WAR vs the producer's next TMA fill of this slot; the warp reduction makes lane 0's arrive depend on every lane; the proxy
++            // fence orders these generic-proxy reads before the async-proxy (TMA) write that the release permits
++          const uint32_t dep = zero_dep(__reduce_or_sync(0xffffffffu, fr[0][0] ^ fr[1][0]));
++          fence_async_smem();
++          if (lane == 0) mbar_arrive_dep(empty_res + cw * NRES + rs, dep);
++        }
+         const int nbase = b * BNO;
+         CUTE_UNROLL
+         for (int v2 = 0; v2 < BNO / 8; ++v2) {

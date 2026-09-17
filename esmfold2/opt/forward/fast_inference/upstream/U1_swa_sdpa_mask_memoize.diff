@@ -1,0 +1,74 @@
+diff --git a/src/transformers/models/esmfold2/modeling_esmfold2_common.py b/src/transformers/models/esmfold2/modeling_esmfold2_common.py
+index 4c27da182..3fb8f4119 100644
+--- a/src/transformers/models/esmfold2/modeling_esmfold2_common.py
++++ b/src/transformers/models/esmfold2/modeling_esmfold2_common.py
+@@ -544,6 +544,42 @@ class SwiGLUFFN(nn.Module):
+ # ===========================================================================
+ 
+ 
++import collections as _collections
++
++_SWA_SDPA_MASK_CACHE: "_collections.OrderedDict" = _collections.OrderedDict()
++_SWA_SDPA_MASK_CACHE_SIZE = 8
++
++
++def _swa_sdpa_mask(attention_params, B: int, N: int, half_window: int, device) -> "tuple[Tensor, Tensor]":
++    """Memoized (allowed[B,1,N,N], valid[B,N]) boolean masks for the SDPA fallback of SWA3DRoPEAttention.
++
++    Keyed on the identity of the `indices` tensor (attention_params[2]) plus shapes; entries hold strong
++    references so a key cannot be recycled while cached. Bitwise identical to the inline construction.
++    NOTE: not safe to combine with external CUDA-graph capture of callers unless the cache outlives the graphs.
++    """
++    idx = attention_params[2] if len(attention_params) > 2 else None
++    key = (id(idx), None if idx is None else idx.data_ptr(), None if idx is None else tuple(idx.shape), B, N, half_window, str(device))
++    hit = _SWA_SDPA_MASK_CACHE.get(key)
++    if hit is not None and (idx is None or hit[2] is idx):
++        _SWA_SDPA_MASK_CACHE.move_to_end(key)
++        return hit[0], hit[1]
++    if idx is not None:
++        valid = torch.zeros(B * N, dtype=torch.bool, device=device)
++        valid[idx] = True
++        valid = valid.view(B, N)
++    else:
++        valid = torch.ones(B, N, dtype=torch.bool, device=device)
++    rank = torch.cumsum(valid, dim=1) - 1
++    within = (rank.unsqueeze(2) - rank.unsqueeze(1)).abs() <= half_window
++    allowed = within & valid.unsqueeze(1) & valid.unsqueeze(2)
++    allowed |= torch.eye(N, dtype=torch.bool, device=device)
++    allowed = allowed.unsqueeze(1)
++    while len(_SWA_SDPA_MASK_CACHE) >= _SWA_SDPA_MASK_CACHE_SIZE:
++        _SWA_SDPA_MASK_CACHE.popitem(last=False)
++    _SWA_SDPA_MASK_CACHE[key] = (allowed, valid, idx)
++    return allowed, valid
++
++
+ class SWA3DRoPEAttention(nn.Module):
+     """Sliding window attention with 3D RoPE. Has Wqkv, gate_proj, out_proj."""
+ 
+@@ -611,21 +647,15 @@ class SWA3DRoPEAttention(nn.Module):
+                 window_size=(self.half_window, self.half_window),
+             )
+         else:
+-            if len(attention_params) > 2:
+-                valid = torch.zeros(B * N, dtype=torch.bool, device=q.device)
+-                valid[attention_params[2]] = True
+-                valid = valid.view(B, N)
+-            else:
+-                valid = torch.ones(B, N, dtype=torch.bool, device=q.device)
+-            rank = torch.cumsum(valid, dim=1) - 1
+-            within = (rank.unsqueeze(2) - rank.unsqueeze(1)).abs() <= self.half_window
+-            allowed = within & valid.unsqueeze(1) & valid.unsqueeze(2)
+-            allowed |= torch.eye(N, dtype=torch.bool, device=q.device)
++            # The boolean window mask depends only on (indices, B, N, half_window); it is identical for every
++            # SWA block and every diffusion step of a sample() call, but was rebuilt here on each call
++            # (n_blocks x n_steps times per fold: ~15% of sampler wall at 700 tokens on H100). Memoize it.
++            allowed, valid = _swa_sdpa_mask(attention_params, B, N, self.half_window, q.device)
+             out = F.scaled_dot_product_attention(
+                 q.transpose(1, 2),
+                 k.transpose(1, 2),
+                 v.transpose(1, 2),
+-                attn_mask=allowed.unsqueeze(1),
++                attn_mask=allowed,
+                 scale=self.scale,
+             ).transpose(1, 2)
+             out = out * valid.unsqueeze(-1).unsqueeze(-1)

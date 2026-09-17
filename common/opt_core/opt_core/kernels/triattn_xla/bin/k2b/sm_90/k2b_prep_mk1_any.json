@@ -1,0 +1,83 @@
+{
+ "arch": "sm_90",
+ "bytes": 39608,
+ "compile_s": 0.17,
+ "constexprs": {
+  "MAKE16": true,
+  "PB": 32,
+  "PK": 128,
+  "sbk": 1
+ },
+ "div16": [
+  "SKp"
+ ],
+ "file": "bin/k2b/sm_90/k2b_prep_mk1_any.cubin",
+ "ints": [
+  "sbb",
+  "sbh",
+  "sbq",
+  "sbk",
+  "H",
+  "SQ",
+  "SK",
+  "SKp",
+  "NQB"
+ ],
+ "kernel": {
+  "global_scratch_size": 0,
+  "n_regs": null,
+  "n_spills": null,
+  "name": "_bias_prep",
+  "num_warps": 4,
+  "profile_scratch_size": 0,
+  "shared": 4096
+ },
+ "key": "k2b_prep_mk1_any",
+ "kind": "k2b_cubin",
+ "n_trailing_null": 2,
+ "ones": [
+  "sbk"
+ ],
+ "options": {
+  "num_stages": 2,
+  "num_warps": 4
+ },
+ "params": [
+  "Bias",
+  "Out32",
+  "Out16",
+  "Flags",
+  "sbb",
+  "sbh",
+  "sbq",
+  "H",
+  "SQ",
+  "SK",
+  "SKp",
+  "NQB"
+ ],
+ "ptxas": "Build cuda_12.8.r12.8/compiler.35583870_0",
+ "role": "prep",
+ "sha256": "8a2bb19baae02848a200bb7cee9c34b4d39e986ae8b072b16a44bf30f5e6076e",
+ "signature": {
+  "Bias": "*fp32",
+  "Flags": "*i32",
+  "H": "i32",
+  "MAKE16": "constexpr",
+  "NQB": "i32",
+  "Out16": "*bf16",
+  "Out32": "*fp32",
+  "PB": "constexpr",
+  "PK": "constexpr",
+  "SK": "i32",
+  "SKp": "i32",
+  "SQ": "i32",
+  "sbb": "i32",
+  "sbh": "i32",
+  "sbk": "constexpr",
+  "sbq": "i32"
+ },
+ "source": "kernels/fpf_triatt_k2b/triatt_k2b.py::_bias_prep",
+ "source_sha256": "e222964304040555ab7b8f67bbd932f0000e4ba77abc9371ca0c875e13f5da45",
+ "triton": "3.7.1"
+}

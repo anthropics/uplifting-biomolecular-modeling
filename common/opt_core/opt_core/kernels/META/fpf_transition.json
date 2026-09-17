@@ -1,0 +1,12 @@
+{
+ "exports": {},
+ "kind": "package",
+ "license": "Apache-2.0 (this repository's own code: common/opt_core/LICENSE); portions derive from Protenix (Apache-2.0, Copyright 2024 ByteDance and/or its affiliates): NOTICE in the package directory, licence text kernels/fpf_flashpairformer.PROTENIX_LICENSE",
+ "mechanism": "pair.transition_swiglu",
+ "name": "fpf_transition",
+ "not_carried": {},
+ "runtime_imports": [],
+ "runtime_imports_note": "none at import; fn*/post_ln take the engine's Transition module (attribute names layernorm1, linear_no_bias_a, linear_no_bias_b, linear_no_bias, c_in); the core's serve layer builds the same cache schema from canonical weight keys and calls _launch/_fused_transition_kernel",
+ "served_note": "y = W_out(silu(W_a y) * W_b y) [+ residual] after LN (stock LN call = the exact path; LN_MODE 1 = in-kernel two-pass LN, tier-2); PINNED_CONFIGS in the carried bytes = the sm90 rows {(256,1024),(128,512),(384,1536)} + the sm80 row (128,512) (its CANDIDATE_CONFIGS_UNVERIFIED and MEASURED_OFF cells run the stock body by name; an unknown (c_in, hidden, gpu) cell is fused with the capability's SAFE settings of opt_core.kernels.safe_settings, named once); every cell the core serves is a row of opt_core/attn/pair_fused_cells.json launched by pair_fused._launch_fpf_transition",
+ "version": "TransExact (FPF Fusion transition, FLASHPAIRFORMER v0.6.1 tree)"
+}

@@ -1,0 +1,23 @@
+LNSTREAM (levers/LNSTREAM: prebuilt/<stack>/fast_layer_norm_cuda_v2_cs.so, src/layer_norm_cuda_kernel.cu) — third-party attributions. Kit-level table:
+../../../../../THIRD_PARTY_NOTICES.md (opendde/THIRD_PARTY_NOTICES.md); verbatim licence texts: opendde/third_party_licenses/ and, for NVIDIA apex,
+also NVIDIA-apex.BSD-3-Clause.txt in this directory.
+
+prebuilt/torch2.7.1-cu126-cp311-cxx11abi1/fast_layer_norm_cuda_v2_cs.so is OpenDDE 1.1.1's fused-LayerNorm extension
+(opendde/model/layer_norm/kernel/: layer_norm_cuda.cpp, layer_norm_cuda_kernel.cu, compat.h, type_shim.h; in this tree under
+opendde/stock/src/opendde/model/layer_norm/kernel/) compiled for sm_80 and sm_90 against PyTorch's C++ extension headers and the CUDA toolkit.
+layer_norm_cuda.cpp, compat.h and type_shim.h are compiled unmodified. layer_norm_cuda_kernel.cu is compiled with one change made by this
+package: each of its 25 kernel-launch statements that name no CUDA stream is given the current stream (`<<<grid, block>>>` becomes
+`<<<grid, block, 0, at::cuda::getCurrentCUDAStream().stream()>>>`); device code, every other statement and the file's own notices are unchanged.
+src/layer_norm_cuda_kernel.cu is that modified file exactly as compiled; opendde/opt/opendde_opt/lnstream.py (to_current_stream) makes the change
+and `python -m opendde_opt.lnstream prebuild` rebuilds the binary from the four sources.
+
+Licence of the four source files: Apache License, Version 2.0 (opendde/third_party_licenses/OpenDDE.Apache-2.0.txt). Their notices, exactly as
+printed there: "Copyright 2024 ByteDance and/or its affiliates." / "Copyright 2020 The OneFlow Authors." / "Copyright 2021- HPC-AI Technology Inc."
+(layer_norm_cuda_kernel.cu); "Copyright 2021- HPC-AI Technology Inc." (layer_norm_cuda.cpp); "modified from
+https://github.com/NVIDIA/apex/blob/master/csrc/compat.h" and "modified from https://github.com/NVIDIA/apex", each followed by "Copyright 2021-
+HPC-AI Technology Inc." (compat.h, type_shim.h).
+
+NVIDIA apex (https://github.com/NVIDIA/apex): compat.h and type_shim.h are modified copies of apex files, as their headers state, and are compiled
+into the binary; the apex revision they were taken from is not recorded upstream. apex is distributed under the BSD 3-Clause licence; its
+LICENSE prints no copyright line at the top (it opens "All rights reserved."). The full text is NVIDIA-apex.BSD-3-Clause.txt beside this file;
+its conditions and disclaimer apply to those portions of the source and of the binary.

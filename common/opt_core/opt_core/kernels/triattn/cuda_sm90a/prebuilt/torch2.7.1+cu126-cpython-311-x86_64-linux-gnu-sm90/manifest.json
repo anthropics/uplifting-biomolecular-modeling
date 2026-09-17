@@ -1,0 +1,43 @@
+{
+ "build_s": 45.6,
+ "built_utc": "2026-09-11T12:56:08Z",
+ "capability": [
+  9,
+  0
+ ],
+ "cuda": "12.6",
+ "gpu": "NVIDIA H100 80GB HBM3",
+ "loadcheck_cases": [
+  "nomask_S200",
+  "mask_B2_S150",
+  "rows2to6_S260_prefix"
+ ],
+ "loadcheck_sha256_16": {
+  "mask_B2_S150": "9678bf3ccfea4269",
+  "nomask_S200": "4206a7327578db20",
+  "rows2to6_S260_prefix": "70585af2be2fbe3c"
+ },
+ "module_name": "triattn_cuda_sm90",
+ "note": "built by build_prebuilt.py inside the torch 2.7.1+cu126 image of the pair stack that runs it (Build cuda_12.6.r12.6/compiler.35059454_0); load-check bitwise equal to the reference build",
+ "nvcc": "Build cuda_12.6.r12.6/compiler.35059454_0",
+ "nvcc_flags": [
+  "-O3",
+  "-std=c++17",
+  "-gencode",
+  "arch=compute_90a,code=sm_90a",
+  "--expt-relaxed-constexpr",
+  "-DNDEBUG",
+  "-Xptxas",
+  "-v"
+ ],
+ "python": "3.11.5",
+ "python_soabi": "cpython-311-x86_64-linux-gnu",
+ "so": "triattn_cuda_sm90.so",
+ "so_sha256": "9dd943b2c6ce72155b62259aeecebb43c1f3066d6a2678c67ff2d24f628bbd56",
+ "source_sha256": {
+  "mw_ptx.h": "aa22a8a237f1915f467b2091de84c7060790c1641f6c4d8b3758c33172cf1e33",
+  "triattn_mw.cu": "14eb59c6a2028df19fdc7ff34c180bd9acf0c292484bf3bb7ec013f447be33a5"
+ },
+ "stack_key": "torch2.7.1+cu126-cpython-311-x86_64-linux-gnu-sm90",
+ "torch": "2.7.1+cu126"
+}

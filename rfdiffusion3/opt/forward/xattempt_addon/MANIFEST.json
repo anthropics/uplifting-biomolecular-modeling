@@ -1,0 +1,56 @@
+{
+ "name": "RFD3_XATTEMPT_ADDON",
+ "version": "1.8",
+ "what": "ten-file overlay on the installed rfd3/model package of RosettaCommons foundry at the pinned commit: eight upstream files with guarded hunks, two new modules (hoist.py, cudagraph_sampler.py); every added branch is keyed on a switch below and falls through to upstream's statement when the switch is unset",
+ "class": "EXACT (type-A: identical designs)",
+ "upstream": {
+  "repo": "RosettaCommons/foundry",
+  "pinned_commit": "4010e3e2e7350edada3e25a45c908c6bf407df4d",
+  "later_head": "faf42996a3cfc5f2caa726777c5745dd74c9b040: layer_utils.py differs from the pin by one line (a static RMSNorm size for torch.compile); install.sh accepts that file as stock-head and installs the pin's version",
+  "licence": "BSD-3-Clause"
+ },
+ "flags": {
+  "RFD3_HOIST": "0|1 (default 0): the roll-out cache, five parts (pll, downcast, valid, where, dedup: hoist.py PARTS)",
+  "RFD3_CUDAGRAPH": "0|1 (default 0): the CUDA-graph roll-out of cudagraph_sampler.py installed at the sampler's construction (inference_sampler.py); composes with RFD3_HOIST (the roll-out cache lives in the graph entry and is refreshed in place when an entry is reused)",
+  "RFD3_FZT": "0|1 (default 0): Transition._forward_impl (patched/rfd3/model/layers/layer_utils.py) routed through opt_core.attn.pair_fused.transition for the (c, n*c) cells (128,256),(128,512),(256,512),(256,1024) on CUDA under bf16 autocast in eval mode at a row count inside the running card's served range (FZT_ROWS_BY_CC, read against the tensor device's compute capability: every row count on 9.0; on 8.0 128x256 from 16384 rows, the other cells from 4096, all up to 1048544 — outside it the stock body by name, cells_stock[rows<MIN|rows>MAX:<cell>], not a fallback); needs opt_core importable in the interpreter",
+  "RFD3_COMPILE": "0|1 (default 0): at the first roll-out the four diffusion submodules of upstream's own compile switch (rfd3.engine.RFD3InferenceEngine._COMPILE_TARGETS: encoder, diffusion_token_encoder, diffusion_transformer, decoder) are wrapped in torch.compile (automatic dynamic shapes) by opt_core.capture.compile (CompileRecord, cache_size_limit 64) on the module the sampler receives; the roll-out cache accessors (hoist_get/call_get/call_get_fifo/is_const), the graph sampler's memo helpers, use_dense_sdpa_pairbias, create_attention_indices and the RFD3_FZT fused call are dynamo boundaries (torch.compiler.disable) so dynamo never guards on cache state; under RFD3_CUDAGRAPH=1 the compiled step is what the graph captures. Inductor numerics (tolerance tier); needs opt_core importable",
+  "RFD3_TOKEN_SDPA": "0|1 (default 0): the 18-block token transformer's pair-bias attention (upstream: full=True -> pairbias_attention_, einsum + masked_fill + softmax) runs through upstream's dense_sdpa_pairbias_attention (F.scaled_dot_product_attention over the same key set, the same -inf mask of the same indices, q/k in bf16) at inference on CUDA; SDPA's summation order (tolerance tier)",
+  "RFD3_INIT_CHUNK": "0|1 (default 0): SinusoidalDistEmbed.forward (patched/rfd3/model/layers/blocks.py, the row-blocked body in patched/rfd3/model/layers/layer_utils.py) — the token initialiser's two all-atom-pair embeddings (motif positions, reference positions; once per design batch) — runs over row blocks of at most INIT_CHUNK_PAIRS = 2**20 atom pairs: the same statements on the same operands (pointwise distance / sinusoid / mask arithmetic; both projections contract over the last axis only), so P_LL is the stock tensor bit for bit while the fp32 intermediates ([rows, L_atom, 64] and friends: ~36 GiB at 7 000 atoms when rows = L_atom) stay under 1 GiB; an item of at most 1 024 atoms runs stock's one block unchanged"
+ },
+ "compile_frames_skipped": {
+  "what": "frames dynamo attempts and does not convert under RFD3_COMPILE (census frames_skipped = frames_total - frames_ok; they run in the interpreter); this is the count measured on the pinned stack (patched hoist.COMPILE_FRAMES_SKIPPED) — a higher count (another torch / dynamo) is named on one `COMPILE frames_skipped=<n> above the <allowed> measured ...` line and the lever stays engaged: those frames run eager, nothing is refused",
+  "allowed": {
+   "auto": 11
+  },
+  "measured_on": "the pinned stack (torch 2.13.0+cu130; stock/PINS.json pinned_stack), L200 B8 frames=95/106, L400 B16 95/106, binder item (3 lengths) 152/163",
+  "reason": "every skipped frame is one whose Python for-loop body contains a graph break; dynamo declines such a frame whole ('graph breaks in loops are not supported; skipping the frame and falling back to eager') and compiles the loop body's callees as separate frames",
+  "frames": [
+   "rfd3/model/layers/blocks.py:664 LocalAtomTransformer.forward (block loop calls the kit boundaries is_const / use_dense_sdpa_pairbias / cg_valid_mask)",
+   "rfd3/model/layers/blocks.py:754 CompactStreamingDecoder.forward (block loop: upcast + atom transformer)",
+   "rfd3/model/layers/blocks.py:623 resume frame of LocalTokenTransformer.forward after the create_attention_indices boundary (token block loop, fused-transition boundary inside)",
+   "rfd3/model/layers/encoders.py:379 DiffusionTokenEncoder.forward.token_embed (pairformer loop, fused-transition boundary inside)",
+   "opt_einsum contract / _core_contract / contract_path and its parser/helpers generator expressions (upstream attention.py:11 imports opt_einsum.contract as einsum; its sharing cache calls the builtin _thread.get_ident inside the planner loop; the contraction runs as eager torch ops, as under upstream's compile_model=true)"
+  ]
+ },
+ "files": [
+  "KNOWN_ISSUES.md",
+  "LICENSE",
+  "LICENSE_foundry_BSD-3-Clause.md",
+  "NOTICE",
+  "README.md",
+  "STOCK_SHA256_upstream_4010e3e.txt",
+  "STOCK_SHA256_upstream_faf4299_extra.txt",
+  "docs/INVARIANCE_NOTES.md",
+  "install.sh",
+  "patched/rfd3/model/RFD3_diffusion_module.py",
+  "patched/rfd3/model/cudagraph_sampler.py",
+  "patched/rfd3/model/hoist.py",
+  "patched/rfd3/model/inference_sampler.py",
+  "patched/rfd3/model/layers/attention.py",
+  "patched/rfd3/model/layers/block_utils.py",
+  "patched/rfd3/model/layers/blocks.py",
+  "patched/rfd3/model/layers/encoders.py",
+  "patched/rfd3/model/layers/layer_utils.py",
+  "patched/rfd3/model/layers/pairformer_layers.py"
+ ]
+}

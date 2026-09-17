@@ -1,0 +1,30 @@
+# OpenFold3 0.5.0 (OpenBind-0) optimization kit — Apptainer / Singularity image made FROM the container image of openfold3_ob0/environment/Dockerfile:
+# the same stack and the same /kit, for hosts that run Apptainer instead of Docker. The source is the image tagged openfold3_ob0-kit:dev in the local
+# Docker daemon (build it first: README.md 'Setup', route A); for a published tag the two header lines read `Bootstrap: docker` /
+# `From: <registry>/openfold3_ob0-kit:<tag>`.
+#   apptainer build openfold3_ob0.sif openfold3_ob0/environment/apptainer.def
+#   apptainer run --nv --cleanenv --bind /path/to/weights:/weights --env OPENFOLD3_OB0_CKPT=/weights/of3-ob-2025-06-30-174k.pt --bind "$PWD/out":/out openfold3_ob0.sif \
+#     pred --config h100 --mode fast --query-json /kit/openfold3_ob0/stock/src/examples/example_inference_inputs/query_ubiquitin.json --output-dir /out/fast --use-msa-server false
+# The image is read-only: give every verb an output directory on a bound, writable path; the caches go under $HOME/.cache and $HOME/.triton (bound by
+# default); %environment keeps a host user site-packages (PEP 370) from shadowing the pinned stack, --cleanenv keeps the host's variables out.
+Bootstrap: docker-daemon
+From: openfold3_ob0-kit:dev
+
+%post
+    mkdir -p /opt/culib && ln -s /.singularity.d/libs/libcuda.so.1 /opt/culib/libcuda.so && ln -s /.singularity.d/libs/libcuda.so.1 /opt/culib/libcuda.so.1
+
+%environment
+    export PYTHONNOUSERSITE=1
+    # Triton <= 3.5 links its launcher stub with -lcuda: offer the unversioned name when --nv bound only libcuda.so.1
+    if [ -z "${TRITON_LIBCUDA_PATH:-}" ] && [ -e /opt/culib/libcuda.so ]; then export TRITON_LIBCUDA_PATH=/opt/culib; fi
+
+%runscript
+    cd /kit/openfold3_ob0 && exec bash /kit/openfold3_ob0/run.sh "$@"
+
+%help
+    OpenFold3 0.5.0 (OpenBind-0) optimization kit: drop-in modes that make stock OpenFold3 0.5.0 (`run_openfold predict`, OpenBind-0 weights)
+    faster and lighter on GPU memory on an NVIDIA H100 without changing how it is called — off = stock exactly; exact = identical outputs, faster;
+    fast = small documented numeric differences, faster still (the default); big = lowest memory for large inputs.
+    `apptainer run --nv openfold3_ob0.sif <verb> ...` = `bash /kit/openfold3_ob0/run.sh <verb> ...` (verbs: install, pred, check, warm;
+    /kit/openfold3_ob0/README.md inside the image). Requires an NVIDIA driver that runs CUDA 12.8 (570 or newer) and OPENFOLD3_OB0_CKPT naming the
+    checkpoint that `install --weights DIR` fetched.

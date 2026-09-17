@@ -1,0 +1,45 @@
+diff --git a/xfold/fastnn/attention.py b/xfold/fastnn/attention.py
+--- a/xfold/fastnn/attention.py
++++ b/xfold/fastnn/attention.py
+@@ -19,7 +19,7 @@
+                     BLOCK_M: tl.constexpr, BLOCK_DMODEL: tl.constexpr, BLOCK_N: tl.constexpr,
+                     use_mask_1d: tl.constexpr, use_mask_2d: tl.constexpr, use_bias: tl.constexpr):
+     start_m = tl.program_id(0)
+-    off_hz = tl.program_id(1)
++    off_hz = tl.program_id(1).to(tl.int64)   # int64 BEFORE `* stride_qh` / `* stride_oh` / `* (N_CTX * N_CTX)`: over q [N, 4, N, 32] (triangle attention) the head offset passes 2**31 - 1 past 4096 tokens (upstream issue XFOLD-003)
+     # initialize offsets
+     offs_m = start_m * BLOCK_M + tl.arange(0, BLOCK_M)
+     offs_n = tl.arange(0, BLOCK_N)
+diff --git a/xfold/fastnn/gated_linear_unit.py b/xfold/fastnn/gated_linear_unit.py
+--- a/xfold/fastnn/gated_linear_unit.py
++++ b/xfold/fastnn/gated_linear_unit.py
+@@ -53,7 +53,7 @@
+     pid_m = first_pid_m + ((pid % num_pid_in_group) % group_size_m)
+     pid_n = (pid % num_pid_in_group) // group_size_m
+ 
+-    offs_am = (pid_m * BLOCK_SIZE_M + tl.arange(0, BLOCK_SIZE_M)) % M
++    offs_am = ((pid_m * BLOCK_SIZE_M + tl.arange(0, BLOCK_SIZE_M)) % M).to(tl.int64)   # int64 BEFORE `* stride_xm`: rows * 128 passes 2**31 - 1 past 4096 tokens (upstream issue XFOLD-003)
+     offs_bn = (pid_n * BLOCK_SIZE_N + tl.arange(0, BLOCK_SIZE_N)) % N
+     offs_k = tl.arange(0, BLOCK_SIZE_K)
+     x_ptrs = x_ptr + (offs_am[:, None] * stride_xm +
+@@ -82,7 +82,7 @@
+ 
+     out = (acc0 * tl.sigmoid(acc0) * acc1)
+ 
+-    offs_cm = pid_m * BLOCK_SIZE_M + tl.arange(0, BLOCK_SIZE_M)
++    offs_cm = (pid_m * BLOCK_SIZE_M + tl.arange(0, BLOCK_SIZE_M)).to(tl.int64)          # int64 BEFORE `stride_om *`: rows * 512 passes 2**31 - 1 past 2048 tokens (XFOLD-003)
+     offs_cn = pid_n * BLOCK_SIZE_N + tl.arange(0, BLOCK_SIZE_N)
+     out_ptrs = out_ptr + stride_om * \
+         offs_cm[:, None] + stride_on * offs_cn[None, :]
+diff --git a/xfold/fastnn/layer_norm.py b/xfold/fastnn/layer_norm.py
+--- a/xfold/fastnn/layer_norm.py
++++ b/xfold/fastnn/layer_norm.py
+@@ -28,7 +28,7 @@
+     USE_BIAS: tl.constexpr = True,
+ ):
+     # Map the program id to the row of X and Y it should compute.
+-    row = tl.program_id(0)
++    row = tl.program_id(0).to(tl.int64)   # int64 BEFORE `row * N`: N*N rows of 267 (the diffusion pair conditioning) pass 2**31 - 1 past 2836 tokens, of 128 past 4096 (upstream issue XFOLD-003)
+     Y += row * N
+     X += row * N
+     # Compute mean

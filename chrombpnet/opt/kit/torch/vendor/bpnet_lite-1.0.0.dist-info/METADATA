@@ -1,0 +1,27 @@
+Metadata-Version: 2.4
+Name: bpnet-lite
+Version: 1.0.0
+Summary: bpnet-lite is a minimal implementation of Chrom/BPNet, a neural network aimed at interpreting regulatory activity of the genome.
+Home-page: https://github.com/jmschrei/bpnet-lite
+Author: Jacob Schreiber
+Author-email: jmschreiber91@gmail.com
+License: LICENSE.txt
+License-File: LICENSE
+Requires-Dist: numpy>=1.14.2
+Requires-Dist: scipy>=1.0.0
+Requires-Dist: pandas>=1.3.3
+Requires-Dist: torch>=1.9.0
+Requires-Dist: h5py>=3.7.0
+Requires-Dist: tqdm>=4.64.1
+Requires-Dist: seaborn>=0.11.2
+Requires-Dist: modisco>=2.0.0
+Requires-Dist: tangermeme>=0.2.3
+Requires-Dist: macs3
+Requires-Dist: bam2bw
+Dynamic: author
+Dynamic: author-email
+Dynamic: home-page
+Dynamic: license
+Dynamic: license-file
+Dynamic: requires-dist
+Dynamic: summary

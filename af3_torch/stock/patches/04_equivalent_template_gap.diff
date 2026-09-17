@@ -1,0 +1,62 @@
+--- a/af3_torch/xfold/nn/template.py
++++ b/af3_torch/xfold/nn/template.py
+@@ -16,6 +16,7 @@
+ 
+ from xfold import features, scoring, protein_data_processing
+ from xfold import geometry
++from xfold import of3
+ from xfold.constants import residue_names
+ from xfold.nn import pairformer
+ 
+@@ -115,6 +116,41 @@
+     return rigid, rigid_mask.to(dtype=torch.float32)
+ 
+ 
++def template_restype_for_one_hot(
++    aatype: torch.Tensor, dense_atom_mask: torch.Tensor
++) -> torch.Tensor:
++    """Restype indices of ONE template slot as its two one-hot pair features
++    embed them (template_pair_embedding_2 / _3 in construct_input).
++
++    Under the OpenFold3 weights (xfold.of3.OF3, the fork's
++    global_config.of3_weights) a template slot whose dense atom mask is zero
++    everywhere — an absent slot, zero-padded by the featuriser — presents GAP
++    ('-', index 21 of POLYMER_TYPES_WITH_UNKNOWN_AND_GAP) on every token in
++    place of the padding value 0 (= ALA): OpenFold3 featurises absent templates
++    as GAP and, like this network, always runs the embedder over every template
++    slot, so the ported aatype weights expect GAP one-hots on all N^2 pairs of
++    an empty slot. A slot with any atom present is unchanged (its restypes are
++    the template's own); under the AlphaFold 3 weight layout nothing changes.
++    The reference fork's statement (sokrypton/alphafold3
++    template_modules.SingleTemplateEmbedding, AF3_WEIGHT_PORT patch 04),
++    mirrored one-to-one: the whole-slot predicate, the gap index, the select.
++    Only the one-hot features read this value; pseudo_beta_fn and the backbone
++    frames read templates.aatype as featurised, as in the fork.
++
++    Args:
++      aatype: (num_res,) integer restypes of one template slot.
++      dense_atom_mask: (num_res, num_dense) atom mask of the same slot.
++
++    Returns:
++      (num_res,) restypes, same dtype and device as `aatype`.
++    """
++    if not of3.OF3:
++        return aatype
++    template_is_empty = torch.all(dense_atom_mask == 0)
++    gap_idx = residue_names.PROTEIN_TYPES_ONE_LETTER_WITH_UNKNOWN_AND_GAP.index('-')
++    return torch.where(template_is_empty, torch.full_like(aatype, gap_idx), aatype)
++
++
+ class TemplateEmbedding(nn.Module):
+     """Embed a set of templates."""
+ 
+@@ -224,6 +260,9 @@
+         pseudo_beta_mask_2d = pseudo_beta_mask_2d.to(dtype=dtype)
+         to_concat = [(dgram, 1), (pseudo_beta_mask_2d, 0)]
+ 
++        # OpenFold3 weights: an all-empty (padding) template slot presents GAP
++        # one-hots, not restype 0 (the fork's patch 04; xfold.of3.OF3 only).
++        aatype = template_restype_for_one_hot(aatype, dense_atom_mask)
+         aatype = torch.nn.functional.one_hot(
+             aatype.to(dtype=torch.int64),
+             residue_names.POLYMER_TYPES_NUM_WITH_UNKNOWN_AND_GAP

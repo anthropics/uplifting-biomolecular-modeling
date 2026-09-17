@@ -1,0 +1,75 @@
+# Enformer optimization kit — the tested stack: `python -m pip freeze --all` of its interpreter, Python 3.11.12 (/usr/local/bin/python, the
+# CPython of the official python:3.11.12-slim-bookworm container image: Debian 12, glibc 2.36) with gcc 12.2 (build-essential) beside it, less this
+# kit (enformer/opt), which installs editable on top (README.md 'Setup'). torch 2.13.0 is PyPI's CUDA 13.0 build (torch.__version__
+# 2.13.0+cu130): it loads the CUDA 13.0 runtime, cuBLAS 13.1, cuDNN 9.20 and NCCL 2.29 from the nvidia-* wheels below (no CUDA toolkit is installed
+# anywhere; the GPU driver is the host's and must run CUDA 13.0 — driver 580 or newer). enformer-pytorch 0.8.12 (stock) is the wheel in enformer/stock/
+# (the PyPI file); nvidia-cudnn-frontend 1.27.0 — the one distribution the kit adds over the stock stack (STOCK.md) — is named by its PyPI file and
+# sha256 so pip checks the bytes. environment/Dockerfile first brings pip, wheel and uv to the versions below with the base image's own pip, then
+# installs every other line from the index (setuptools included), then the two named wheels, all with --no-deps.
+accelerate==1.14.0
+certifi==2026.7.22
+charset-normalizer==3.5.1
+cuda-bindings==13.3.1
+cuda-pathfinder==1.7.0
+cuda-toolkit==13.0.3.0
+discrete-key-value-bottleneck-pytorch==0.1.1
+einops==0.8.2
+einx==0.4.3
+enformer-pytorch==0.8.12
+filelock==3.32.4
+frozendict==2.4.7
+fsspec==2026.7.0
+hf-xet==1.6.0
+huggingface_hub==0.36.2
+idna==3.19
+Jinja2==3.1.6
+lightning-utilities==0.15.3
+MarkupSafe==3.0.3
+mpmath==1.3.0
+networkx==3.6.1
+numpy==2.4.6
+nvidia-cublas==13.1.1.3
+nvidia-cuda-cupti==13.0.85
+nvidia-cuda-nvrtc==13.0.88
+nvidia-cuda-runtime==13.0.96
+nvidia-cudnn-cu13==9.20.0.48
+nvidia-cudnn-frontend @ https://files.pythonhosted.org/packages/83/f6/60e4b4b52af0af85b479fca058357ce64fde1c69acf32c01dd8cbb514859/nvidia_cudnn_frontend-1.27.0-cp311-cp311-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl#sha256=5cf124a0fbce9c49417122ba6de903858c766e3d8690d8809372d40a0a6c9256
+nvidia-cufft==12.0.0.61
+nvidia-cufile==1.15.1.6
+nvidia-curand==10.4.0.35
+nvidia-cusolver==12.0.4.66
+nvidia-cusparse==12.6.3.3
+nvidia-cusparselt-cu13==0.8.1
+nvidia-nccl-cu13==2.29.7
+nvidia-nvjitlink==13.3.33
+nvidia-nvshmem-cu13==3.4.5
+nvidia-nvtx==13.0.85
+packaging==26.2
+pandas==3.0.5
+pip==26.1.1
+polars==1.44.0
+polars-runtime-32==1.44.0
+psutil==7.2.2
+pyarrow==25.0.1
+pyfaidx==0.9.0.4
+python-dateutil==2.9.0.post0
+PyYAML==6.0.3
+regex==2026.7.19
+requests==2.34.2
+safetensors==0.8.0
+setuptools==84.0.0
+six==1.17.0
+sympy==1.14.0
+tokenizers==0.22.2
+torch==2.13.0
+torch-einops-utils==0.1.21
+torchmetrics==1.9.0
+tqdm==4.70.0
+transformers==4.56.2
+triton==3.7.1
+typing_extensions==4.16.0
+urllib3==2.7.0
+uv==0.11.17
+vector-quantize-pytorch==1.31.1
+wheel==0.47.0
+zstandard==0.25.0

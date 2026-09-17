@@ -1,0 +1,61 @@
+[project]
+authors = [{name = "Profluent Team"}]
+maintainers = [{name = "Sarthak Jain", email = "sjain@profluent.bio"}]
+name = "E1"
+requires-python = ">= 3.12, <3.14"
+version = "1.0.0"
+
+dependencies = [
+    "transformers<4.57.0",
+    "tokenizers",
+    "kernels",
+    "click",
+    "pandas",
+    "polars",
+    "tqdm",
+    "biotite",
+    "psutil",
+    "scipy",
+    "einops",
+    "torch>=2.7.0,<2.9.0",
+    "ipykernel"
+]
+
+[build-system]
+build-backend = "hatchling.build"
+requires = ["hatchling"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/E1"]
+
+[tool.pixi.project]
+channels = ["conda-forge"]
+platforms = ["linux-64", "osx-arm64"]
+requires-pixi = ">=0.52.0"
+
+[tool.pixi.pypi-dependencies]
+E1 = { path = ".", editable = true }
+
+[tool.pixi.feature.dev.dependencies]
+pre-commit = "*"
+pytest-xdist = "*"
+mypy = ">=1.17.1,<2"
+
+[tool.pixi.environments]
+default = {features = [], solve-group = "default"}
+dev = {features = ["dev"], solve-group = "default"}
+
+[tool.ruff]
+line-length = 120
+extend-include = ["*.ipynb"]
+
+[tool.ruff.format]
+docstring-code-format = true
+docstring-code-line-length = "dynamic"
+skip-magic-trailing-comma = true
+
+[tool.ruff.lint.isort]
+split-on-trailing-comma = false
+
+[tool.ruff.lint]
+select = ["E4", "E7", "E9", "F", "I"]

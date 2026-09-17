@@ -1,0 +1,384 @@
+{
+ "model": "enformer",
+ "upstream": {
+  "enformer-pytorch": {
+   "repo": "https://github.com/lucidrains/enformer-pytorch",
+   "commit": "29cd2529f31cc41456da7511e720d730f0bdd19d",
+   "version": "0.8.12",
+   "tag": null,
+   "install": "enformer-pytorch==0.8.12",
+   "sdist": "stock/enformer_pytorch-0.8.12.tar.gz",
+   "wheel": "stock/enformer_pytorch-0.8.12-py3-none-any.whl",
+   "sdist_size_bytes": 100922,
+   "wheel_size_bytes": 101713,
+   "files": {
+    "enformer_pytorch/__init__.py": {
+     "size_bytes": 275
+    },
+    "enformer_pytorch/config_enformer.py": {
+     "size_bytes": 1238
+    },
+    "enformer_pytorch/data.py": {
+     "size_bytes": 6691
+    },
+    "enformer_pytorch/finetune.py": {
+     "size_bytes": 12764
+    },
+    "enformer_pytorch/metrics.py": {
+     "size_bytes": 2257
+    },
+    "enformer_pytorch/modeling_enformer.py": {
+     "size_bytes": 15729
+    },
+    "enformer_pytorch/precomputed/tf_gammas.pt": {
+     "size_bytes": 393841
+    }
+   },
+   "license": {
+    "spdx": "MIT",
+    "file": "stock/src/LICENSE"
+   },
+   "requires": {
+    "transformers[torch]": "==4.56.2",
+    "torch": ">=1.6",
+    "einops": ">=0.3",
+    "discrete-key-value-bottleneck-pytorch": ">=0.0.8",
+    "numpy": "",
+    "polars": "",
+    "pyfaidx": "",
+    "pyyaml": "",
+    "torchmetrics": ""
+   },
+   "note": "no tag at this commit (upstream's last tag is 0.8.11); the commit is the pin: the repository at it holds the sdist's 11 source files byte for byte (PKG-INFO is the build's), and the wheel's package files equal the sdist's, so any of PyPI (wheel), stock/<wheel> or stock/<sdist> installs the same bytes; check_pins.py checks the installed files against `files`. pyproject.toml:34 pins transformers[torch]==4.56.2 (Enformer subclasses transformers.PreTrainedModel)."
+  }
+ },
+ "python": "3.11.12",
+ "pinned_stack": {
+  "id": "kit",
+  "tested_on": "the stock stack (debian_slim, python 3.11.12, enformer-pytorch 0.8.12, torch 2.13.0+cu130, CUDA 13.0, cuDNN 92000: stacks.stock) plus nvidia-cudnn-frontend 1.27.0 (stacks.kit), on H100 SXM — documentation only: nothing compares this line; the gates read this block's version keys and stacks.<id>.packages",
+  "python": "3.11.12",
+  "torch": "2.13.0+cu130",
+  "triton": "3.7.1",
+  "cuda": "13.0",
+  "cudnn": 92000,
+  "freeze": "stacks.kit.packages (this file; check_pins.py --freeze kit prints it as requirement lines)",
+  "note": "the stock image plus one package, nvidia-cudnn-frontend==1.27.0 (the kit's conv-tower route imports it); the stock's declared stack is stacks.stock. The runtime key the kit pins: torch 2.13.0+cu130 / cuda 13.0 / cudnn 92000."
+ },
+ "stacks": {
+  "stock": {
+   "id": "stock",
+   "label": "the stock image: debian_slim py3.11 + enformer-pytorch==0.8.12 (torch 2.13.0+cu130 and its runtime wheels by dependency)",
+   "python": "3.11.12",
+   "torch": "2.13.0+cu130",
+   "torch_dist": "2.13.0",
+   "cuda": "13.0",
+   "cudnn": 92000,
+   "torch_git_version": "cf30153c4c131c8164ee7798e5022d810682e2cb",
+   "triton": "3.7.1",
+   "triton_major": "3.7",
+   "enformer_pytorch": "0.8.12",
+   "transformers": "4.56.2",
+   "os": "Debian GNU/Linux 12 (bookworm)",
+   "nvcc": null,
+   "packages": {
+    "accelerate": "1.14.0",
+    "certifi": "2026.7.22",
+    "charset-normalizer": "3.5.1",
+    "cuda-bindings": "13.3.1",
+    "cuda-pathfinder": "1.7.0",
+    "cuda-toolkit": "13.0.3.0",
+    "discrete-key-value-bottleneck-pytorch": "0.1.1",
+    "einops": "0.8.2",
+    "einx": "0.4.3",
+    "enformer-pytorch": "0.8.12",
+    "filelock": "3.32.4",
+    "frozendict": "2.4.7",
+    "fsspec": "2026.7.0",
+    "hf-xet": "1.6.0",
+    "huggingface_hub": "0.36.2",
+    "idna": "3.19",
+    "Jinja2": "3.1.6",
+    "lightning-utilities": "0.15.3",
+    "MarkupSafe": "3.0.3",
+    "mpmath": "1.3.0",
+    "networkx": "3.6.1",
+    "numpy": "2.4.6",
+    "nvidia-cublas": "13.1.1.3",
+    "nvidia-cuda-cupti": "13.0.85",
+    "nvidia-cuda-nvrtc": "13.0.88",
+    "nvidia-cuda-runtime": "13.0.96",
+    "nvidia-cudnn-cu13": "9.20.0.48",
+    "nvidia-cufft": "12.0.0.61",
+    "nvidia-cufile": "1.15.1.6",
+    "nvidia-curand": "10.4.0.35",
+    "nvidia-cusolver": "12.0.4.66",
+    "nvidia-cusparse": "12.6.3.3",
+    "nvidia-cusparselt-cu13": "0.8.1",
+    "nvidia-nccl-cu13": "2.29.7",
+    "nvidia-nvjitlink": "13.3.33",
+    "nvidia-nvshmem-cu13": "3.4.5",
+    "nvidia-nvtx": "13.0.85",
+    "packaging": "26.2",
+    "pandas": "3.0.5",
+    "polars": "1.44.0",
+    "polars-runtime-32": "1.44.0",
+    "psutil": "7.2.2",
+    "pyarrow": "25.0.1",
+    "pyfaidx": "0.9.0.4",
+    "python-dateutil": "2.9.0.post0",
+    "PyYAML": "6.0.3",
+    "regex": "2026.7.19",
+    "requests": "2.34.2",
+    "safetensors": "0.8.0",
+    "six": "1.17.0",
+    "sympy": "1.14.0",
+    "tokenizers": "0.22.2",
+    "torch": "2.13.0",
+    "torch-einops-utils": "0.1.21",
+    "torchmetrics": "1.9.0",
+    "tqdm": "4.70.0",
+    "transformers": "4.56.2",
+    "triton": "3.7.1",
+    "typing_extensions": "4.16.0",
+    "urllib3": "2.7.0",
+    "uv": "0.11.17",
+    "vector-quantize-pytorch": "1.31.1",
+    "zstandard": "0.25.0"
+   },
+   "pinned": false,
+   "role": "the stock's declared stack"
+  },
+  "kit": {
+   "id": "kit",
+   "label": "the stock image + nvidia-cudnn-frontend==1.27.0 (its PyPI wheel, named with its sha256 in environment/requirements.lock)",
+   "python": "3.11.12",
+   "torch": "2.13.0+cu130",
+   "torch_dist": "2.13.0",
+   "cuda": "13.0",
+   "cudnn": 92000,
+   "torch_git_version": "cf30153c4c131c8164ee7798e5022d810682e2cb",
+   "triton": "3.7.1",
+   "triton_major": "3.7",
+   "enformer_pytorch": "0.8.12",
+   "transformers": "4.56.2",
+   "os": "Debian GNU/Linux 12 (bookworm)",
+   "nvcc": null,
+   "packages": {
+    "accelerate": "1.14.0",
+    "certifi": "2026.7.22",
+    "charset-normalizer": "3.5.1",
+    "cuda-bindings": "13.3.1",
+    "cuda-pathfinder": "1.7.0",
+    "cuda-toolkit": "13.0.3.0",
+    "discrete-key-value-bottleneck-pytorch": "0.1.1",
+    "einops": "0.8.2",
+    "einx": "0.4.3",
+    "enformer-pytorch": "0.8.12",
+    "filelock": "3.32.4",
+    "frozendict": "2.4.7",
+    "fsspec": "2026.7.0",
+    "hf-xet": "1.6.0",
+    "huggingface_hub": "0.36.2",
+    "idna": "3.19",
+    "Jinja2": "3.1.6",
+    "lightning-utilities": "0.15.3",
+    "MarkupSafe": "3.0.3",
+    "mpmath": "1.3.0",
+    "networkx": "3.6.1",
+    "numpy": "2.4.6",
+    "nvidia-cublas": "13.1.1.3",
+    "nvidia-cuda-cupti": "13.0.85",
+    "nvidia-cuda-nvrtc": "13.0.88",
+    "nvidia-cuda-runtime": "13.0.96",
+    "nvidia-cudnn-cu13": "9.20.0.48",
+    "nvidia-cudnn-frontend": "1.27.0",
+    "nvidia-cufft": "12.0.0.61",
+    "nvidia-cufile": "1.15.1.6",
+    "nvidia-curand": "10.4.0.35",
+    "nvidia-cusolver": "12.0.4.66",
+    "nvidia-cusparse": "12.6.3.3",
+    "nvidia-cusparselt-cu13": "0.8.1",
+    "nvidia-nccl-cu13": "2.29.7",
+    "nvidia-nvjitlink": "13.3.33",
+    "nvidia-nvshmem-cu13": "3.4.5",
+    "nvidia-nvtx": "13.0.85",
+    "packaging": "26.2",
+    "pandas": "3.0.5",
+    "polars": "1.44.0",
+    "polars-runtime-32": "1.44.0",
+    "psutil": "7.2.2",
+    "pyarrow": "25.0.1",
+    "pyfaidx": "0.9.0.4",
+    "python-dateutil": "2.9.0.post0",
+    "PyYAML": "6.0.3",
+    "regex": "2026.7.19",
+    "requests": "2.34.2",
+    "safetensors": "0.8.0",
+    "six": "1.17.0",
+    "sympy": "1.14.0",
+    "tokenizers": "0.22.2",
+    "torch": "2.13.0",
+    "torch-einops-utils": "0.1.21",
+    "torchmetrics": "1.9.0",
+    "tqdm": "4.70.0",
+    "transformers": "4.56.2",
+    "triton": "3.7.1",
+    "typing_extensions": "4.16.0",
+    "urllib3": "2.7.0",
+    "uv": "0.11.17",
+    "vector-quantize-pytorch": "1.31.1",
+    "zstandard": "0.25.0"
+   },
+   "pinned": true,
+   "role": "the pinned stack (the kit's)",
+   "added_over_stock": {
+    "nvidia-cudnn-frontend": {
+     "version": "1.27.0",
+     "wheel": "nvidia_cudnn_frontend-1.27.0-cp311-cp311-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl",
+     "sha256": "5cf124a0fbce9c49417122ba6de903858c766e3d8690d8809372d40a0a6c9256",
+     "source": "the PyPI wheel of that name and sha256: environment/requirements.lock names its PyPI URL with the digest, so pip checks the bytes (pip freeze shows the URL reference)"
+    }
+   }
+  },
+  "diff": {
+   "stock_to_kit": {
+    "added": {
+     "nvidia-cudnn-frontend": "1.27.0"
+    },
+    "removed": {},
+    "changed": {}
+   },
+   "identical": [
+    "python",
+    "torch (version, cuda, cudnn, git_version)",
+    "every other distribution and version of the freeze",
+    "os_release"
+   ],
+   "note": "package by package: the same pip freeze on both images but for the one addition"
+  },
+  "key_rule": "<cc>|<triton major.minor>, e.g. 9.0|3.7 on H100/H200 and 10.0|3.7 on B200"
+ },
+ "pins": {
+  "torch": "2.13.0",
+  "triton": "3.7.1",
+  "numpy": "2.4.6",
+  "transformers": "4.56.2",
+  "einops": "0.8.2",
+  "huggingface_hub": "0.36.2",
+  "safetensors": "0.8.0",
+  "tokenizers": "0.22.2",
+  "accelerate": "1.14.0",
+  "polars": "1.44.0",
+  "pyfaidx": "0.9.0.4",
+  "torchmetrics": "1.9.0",
+  "discrete-key-value-bottleneck-pytorch": "0.1.1",
+  "PyYAML": "6.0.3",
+  "pandas": "3.0.5",
+  "nvidia-cudnn-cu13": "9.20.0.48",
+  "nvidia-cublas": "13.1.1.3",
+  "nvidia-nccl-cu13": "2.29.7",
+  "cuda-toolkit": "13.0.3.0"
+ },
+ "torch_build": {
+  "dist_version": "2.13.0",
+  "runtime_version": "2.13.0+cu130",
+  "cuda": "13.0",
+  "cudnn": 92000,
+  "git_version": "cf30153c4c131c8164ee7798e5022d810682e2cb",
+  "source": "PyPI torch==2.13.0 (its default Linux wheel is the CUDA 13.0 build and reports 2.13.0+cu130; the nvidia-* / *-cu13 runtime wheels per the freeze)",
+  "wheel_cp311_manylinux_2_28_x86_64_sha256": "60fcdcb2f3876e21146cb4524ef06397d727ca9ad5f020818547e25075fe3cb7"
+ },
+ "dependency_pins": {
+  "transformers": {
+   "version": "4.56.2",
+   "pinned_by": "stock/src/pyproject.toml:34 (transformers[torch]==4.56.2)",
+   "wheel": "transformers-4.56.2-py3-none-any.whl",
+   "wheel_sha256": "79c03d0e85b26cb573c109ff9eafa96f3c8d4febfd8a0774e8bba32702dd6dde",
+   "wheel_size_bytes": 11608055,
+   "carried": false,
+   "traces": {
+    "from_pretrained": "transformers/modeling_utils.py:4503",
+    "revision_kwarg": "transformers/modeling_utils.py:4513 (revision: str = 'main')",
+    "model.eval()": "transformers/modeling_utils.py:5200",
+    "dtype_default": "transformers/modeling_utils.py:1397-1402 (no dtype passed -> torch.get_default_dtype(), float32)"
+   }
+  },
+  "nvidia-cudnn-frontend": {
+   "version": "1.27.0",
+   "role": "kit stack only (stacks.kit.added_over_stock); not imported by the stock forward"
+  }
+ },
+ "weights": {
+  "EleutherAI/enformer-official-rough": {
+   "snapshot_commit": "affe5713ae9017460706a44108289b13c5fee16c",
+   "license": "cc-by-4.0",
+   "files": {
+    "pytorch_model.bin": {
+     "sha256": "99b09d602e195d89c7d4debe144bb2f43907ba0d74006e97098e99d9171c439c",
+     "size_bytes": 1005149571
+    },
+    "config.json": {
+     "size_bytes": 439
+    },
+    "README.md": {
+     "size_bytes": 1125
+    },
+    ".gitattributes": {
+     "sha256": "be1dfa175012b2d5da7ed0030508e4b3b25a62fa26169855cffc7197616d51e7",
+     "size_bytes": 1227
+    }
+   },
+   "carried": {
+    "config.json": "stock/snapshot/config.json",
+    "README.md": "stock/snapshot/README.md"
+   },
+   "hf_cache_layout": "hub/models--EleutherAI--enformer-official-rough/snapshots/affe5713ae9017460706a44108289b13c5fee16c/{config.json,pytorch_model.bin} under HF_HOME, plus refs/main naming the snapshot (an offline resolve of the repository id reads it)",
+   "config": {
+    "architectures": [
+     "Enformer"
+    ],
+    "attn_dim_key": 64,
+    "attn_dropout": 0.05,
+    "depth": 11,
+    "dim": 1536,
+    "dim_divisible_by": 128,
+    "dropout_rate": 0.4,
+    "heads": 8,
+    "model_type": "enformer",
+    "num_downsamples": 7,
+    "output_heads": {
+     "human": 5313,
+     "mouse": 1643
+    },
+    "pos_dropout": 0.01,
+    "target_length": 896,
+    "torch_dtype": "float32",
+    "transformers_version": "4.16.2",
+    "use_checkpointing": false
+   },
+   "use_tf_gamma": {
+    "value": true,
+    "set_by": "stock/src/enformer_pytorch/modeling_enformer.py:494-499 — the name-literal branch of from_pretrained; not a config.json key (class default False, stock/src/enformer_pytorch/config_enformer.py:21): a load by directory path leaves it False unless use_tf_gamma=True is passed"
+   },
+   "checkpoint": {
+    "format": "torch pickle (pytorch_model.bin), loaded with weights_only=True",
+    "tensors": 570,
+    "float32_tensors": 542,
+    "int64_tensors": 28,
+    "heads": {
+     "_heads.human.0.weight": [
+      5313,
+      3072
+     ],
+     "_heads.mouse.0.weight": [
+      1643,
+      3072
+     ]
+    }
+   }
+  }
+ },
+ "library_defaults": {
+  "note": "the stock call the kit reproduces: enformer_pytorch.from_pretrained(<id>) -> .cuda().eval() -> model(x) under torch.no_grad(), x = str_to_one_hot(window) ((196608, 4) float32; a list of windows -> (B, 196608, 4)); torch's default numerics, none set by the kit (matmul TF32 off, cuDNN TF32 on, cudnn.benchmark off, float32_matmul_precision highest)"
+ }
+}

@@ -1,0 +1,27 @@
+[
+ {
+  "name": "1BRS_barnase_barstar_5to5",
+  "sequences": [
+   {
+    "proteinChain": {
+     "sequence": "AQVINTFDGVADYLQTYHKLPDNYITKSEAQALGWVASKGNLADVAPGKSIGGDIFSNREGKLPGKSGRTWREADINYTSGFRNSDRILYSSDWLIYKTTDHYQTFTKIR",
+     "count": 5,
+     "msa": {
+      "precomputed_msa_dir": "opt/forward/v05_addon/inputs/msa/barnase",
+      "pairing_db": "uniref100"
+     }
+    }
+   },
+   {
+    "proteinChain": {
+     "sequence": "KKAVINGEQIRSISDLHQTLKKELALPEYYGENLDALWDALTGWVEYPLVLEWRQFEQSKQLTENGAESVLQVFREAKAEGADITIILS",
+     "count": 5,
+     "msa": {
+      "precomputed_msa_dir": "opt/forward/v05_addon/inputs/msa/barstar",
+      "pairing_db": "uniref100"
+     }
+    }
+   }
+  ]
+ }
+]

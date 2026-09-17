@@ -1,0 +1,16 @@
+{
+ "what": "sha256 of every file of the lever tree (opt/gpnstar_opt/accel); the CPU test test_accel_tree.py holds the files to these digests and to its own copy of them",
+ "files": {
+  "__init__.py": "fbd792ac25165d2ebbfa4cf9c7fb45537a14f804f84765ec5f5abd664498ce7c",
+  "api.py": "a63e82db2da54cbc12e51520634d3aa63b4a0e96d681d3e1234849acf62d315c",
+  "colattn.py": "7533a3875f0d28706ad49155cac230f613002f697ffa8ca2bb836a3986f1a7c4",
+  "fused_col.py": "0ec257fe01cca7fdadd145ccb0090af5d97a22ec36079b5f4d413aefdfaaaf04",
+  "graphs.py": "0db6688eeaf3c494e200602719d6e3147227625927ca17417339a8839b4e7f4a",
+  "patches.py": "f50ce8b11e665f51d0ba9474bdf5a4dabfd615e318637965348d98b47f3a3ac4",
+  "runtime.py": "7aad4aad5fbb01077925e5d08209a18bb5bdb0f2e2efd3055ecb9112d48e01a6",
+  "inputs.py": "481d4b16ddabd0c76e9c78ed6f1c453a05f8dc0e6edcfe519a8fcddaa206f0a7"
+ },
+ "fixture": {
+  "tests/fixtures/fixture_v100.npz": "3e0a627626ce319932add04bd683d2151af7badfe3dc0e122f39c5e8492600c0"
+ }
+}

@@ -1,0 +1,150 @@
+{
+ "affine": [
+  3,
+  0
+ ],
+ "bindings": "ctypes",
+ "built_utc": "2026-09-11T22:22:44Z",
+ "built_with_torch": "2.7.1+cu126",
+ "bundles": {
+  "sm80": {
+   "bytes": 940576,
+   "compile_s": 3.7,
+   "file": "exactln_fwd-sm80.cubin",
+   "kernels": {
+    "exactln::exactln_fwd<exactln::bf16_t, exactln::bf16_t, exactln::bf16_t, 128, 0, 1>": "_ZN7exactln11exactln_fwdINS_6bf16_tES1_S1_Li128ELi0ELi1EEEvPKT_PKT0_S7_PT1_iixxdi",
+    "exactln::exactln_fwd<exactln::bf16_t, exactln::bf16_t, exactln::bf16_t, 128, 3, 1>": "_ZN7exactln11exactln_fwdINS_6bf16_tES1_S1_Li128ELi3ELi1EEEvPKT_PKT0_S7_PT1_iixxdi",
+    "exactln::exactln_fwd<exactln::bf16_t, exactln::bf16_t, exactln::bf16_t, 256, 0, 1>": "_ZN7exactln11exactln_fwdINS_6bf16_tES1_S1_Li256ELi0ELi1EEEvPKT_PKT0_S7_PT1_iixxdi",
+    "exactln::exactln_fwd<exactln::bf16_t, exactln::bf16_t, exactln::bf16_t, 256, 3, 1>": "_ZN7exactln11exactln_fwdINS_6bf16_tES1_S1_Li256ELi3ELi1EEEvPKT_PKT0_S7_PT1_iixxdi",
+    "exactln::exactln_fwd<exactln::bf16_t, exactln::bf16_t, exactln::bf16_t, 384, 0, 1>": "_ZN7exactln11exactln_fwdINS_6bf16_tES1_S1_Li384ELi0ELi1EEEvPKT_PKT0_S7_PT1_iixxdi",
+    "exactln::exactln_fwd<exactln::bf16_t, exactln::bf16_t, exactln::bf16_t, 384, 3, 1>": "_ZN7exactln11exactln_fwdINS_6bf16_tES1_S1_Li384ELi3ELi1EEEvPKT_PKT0_S7_PT1_iixxdi",
+    "exactln::exactln_fwd<exactln::bf16_t, exactln::bf16_t, exactln::bf16_t, 64, 0, 2>": "_ZN7exactln11exactln_fwdINS_6bf16_tES1_S1_Li64ELi0ELi2EEEvPKT_PKT0_S7_PT1_iixxdi",
+    "exactln::exactln_fwd<exactln::bf16_t, exactln::bf16_t, exactln::bf16_t, 64, 3, 2>": "_ZN7exactln11exactln_fwdINS_6bf16_tES1_S1_Li64ELi3ELi2EEEvPKT_PKT0_S7_PT1_iixxdi",
+    "exactln::exactln_fwd<exactln::bf16_t, exactln::bf16_t, exactln::bf16_t, 768, 0, 1>": "_ZN7exactln11exactln_fwdINS_6bf16_tES1_S1_Li768ELi0ELi1EEEvPKT_PKT0_S7_PT1_iixxdi",
+    "exactln::exactln_fwd<exactln::bf16_t, exactln::bf16_t, exactln::bf16_t, 768, 3, 1>": "_ZN7exactln11exactln_fwdINS_6bf16_tES1_S1_Li768ELi3ELi1EEEvPKT_PKT0_S7_PT1_iixxdi",
+    "exactln::exactln_fwd<exactln::bf16_t, float, exactln::bf16_t, 128, 0, 1>": "_ZN7exactln11exactln_fwdINS_6bf16_tEfS1_Li128ELi0ELi1EEEvPKT_PKT0_S7_PT1_iixxdi",
+    "exactln::exactln_fwd<exactln::bf16_t, float, exactln::bf16_t, 128, 3, 1>": "_ZN7exactln11exactln_fwdINS_6bf16_tEfS1_Li128ELi3ELi1EEEvPKT_PKT0_S7_PT1_iixxdi",
+    "exactln::exactln_fwd<exactln::bf16_t, float, exactln::bf16_t, 256, 0, 1>": "_ZN7exactln11exactln_fwdINS_6bf16_tEfS1_Li256ELi0ELi1EEEvPKT_PKT0_S7_PT1_iixxdi",
+    "exactln::exactln_fwd<exactln::bf16_t, float, exactln::bf16_t, 256, 3, 1>": "_ZN7exactln11exactln_fwdINS_6bf16_tEfS1_Li256ELi3ELi1EEEvPKT_PKT0_S7_PT1_iixxdi",
+    "exactln::exactln_fwd<exactln::bf16_t, float, exactln::bf16_t, 384, 0, 1>": "_ZN7exactln11exactln_fwdINS_6bf16_tEfS1_Li384ELi0ELi1EEEvPKT_PKT0_S7_PT1_iixxdi",
+    "exactln::exactln_fwd<exactln::bf16_t, float, exactln::bf16_t, 384, 3, 1>": "_ZN7exactln11exactln_fwdINS_6bf16_tEfS1_Li384ELi3ELi1EEEvPKT_PKT0_S7_PT1_iixxdi",
+    "exactln::exactln_fwd<exactln::bf16_t, float, exactln::bf16_t, 64, 0, 2>": "_ZN7exactln11exactln_fwdINS_6bf16_tEfS1_Li64ELi0ELi2EEEvPKT_PKT0_S7_PT1_iixxdi",
+    "exactln::exactln_fwd<exactln::bf16_t, float, exactln::bf16_t, 64, 3, 2>": "_ZN7exactln11exactln_fwdINS_6bf16_tEfS1_Li64ELi3ELi2EEEvPKT_PKT0_S7_PT1_iixxdi",
+    "exactln::exactln_fwd<exactln::bf16_t, float, exactln::bf16_t, 768, 0, 1>": "_ZN7exactln11exactln_fwdINS_6bf16_tEfS1_Li768ELi0ELi1EEEvPKT_PKT0_S7_PT1_iixxdi",
+    "exactln::exactln_fwd<exactln::bf16_t, float, exactln::bf16_t, 768, 3, 1>": "_ZN7exactln11exactln_fwdINS_6bf16_tEfS1_Li768ELi3ELi1EEEvPKT_PKT0_S7_PT1_iixxdi",
+    "exactln::exactln_fwd<exactln::bf16_t, float, float, 128, 0, 1>": "_ZN7exactln11exactln_fwdINS_6bf16_tEffLi128ELi0ELi1EEEvPKT_PKT0_S7_PT1_iixxdi",
+    "exactln::exactln_fwd<exactln::bf16_t, float, float, 128, 3, 1>": "_ZN7exactln11exactln_fwdINS_6bf16_tEffLi128ELi3ELi1EEEvPKT_PKT0_S7_PT1_iixxdi",
+    "exactln::exactln_fwd<exactln::bf16_t, float, float, 256, 0, 1>": "_ZN7exactln11exactln_fwdINS_6bf16_tEffLi256ELi0ELi1EEEvPKT_PKT0_S7_PT1_iixxdi",
+    "exactln::exactln_fwd<exactln::bf16_t, float, float, 256, 3, 1>": "_ZN7exactln11exactln_fwdINS_6bf16_tEffLi256ELi3ELi1EEEvPKT_PKT0_S7_PT1_iixxdi",
+    "exactln::exactln_fwd<exactln::bf16_t, float, float, 384, 0, 1>": "_ZN7exactln11exactln_fwdINS_6bf16_tEffLi384ELi0ELi1EEEvPKT_PKT0_S7_PT1_iixxdi",
+    "exactln::exactln_fwd<exactln::bf16_t, float, float, 384, 3, 1>": "_ZN7exactln11exactln_fwdINS_6bf16_tEffLi384ELi3ELi1EEEvPKT_PKT0_S7_PT1_iixxdi",
+    "exactln::exactln_fwd<exactln::bf16_t, float, float, 64, 0, 2>": "_ZN7exactln11exactln_fwdINS_6bf16_tEffLi64ELi0ELi2EEEvPKT_PKT0_S7_PT1_iixxdi",
+    "exactln::exactln_fwd<exactln::bf16_t, float, float, 64, 3, 2>": "_ZN7exactln11exactln_fwdINS_6bf16_tEffLi64ELi3ELi2EEEvPKT_PKT0_S7_PT1_iixxdi",
+    "exactln::exactln_fwd<exactln::bf16_t, float, float, 768, 0, 1>": "_ZN7exactln11exactln_fwdINS_6bf16_tEffLi768ELi0ELi1EEEvPKT_PKT0_S7_PT1_iixxdi",
+    "exactln::exactln_fwd<exactln::bf16_t, float, float, 768, 3, 1>": "_ZN7exactln11exactln_fwdINS_6bf16_tEffLi768ELi3ELi1EEEvPKT_PKT0_S7_PT1_iixxdi",
+    "exactln::exactln_fwd<float, float, float, 128, 0, 1>": "_ZN7exactln11exactln_fwdIfffLi128ELi0ELi1EEEvPKT_PKT0_S6_PT1_iixxdi",
+    "exactln::exactln_fwd<float, float, float, 128, 3, 1>": "_ZN7exactln11exactln_fwdIfffLi128ELi3ELi1EEEvPKT_PKT0_S6_PT1_iixxdi",
+    "exactln::exactln_fwd<float, float, float, 256, 0, 1>": "_ZN7exactln11exactln_fwdIfffLi256ELi0ELi1EEEvPKT_PKT0_S6_PT1_iixxdi",
+    "exactln::exactln_fwd<float, float, float, 256, 3, 1>": "_ZN7exactln11exactln_fwdIfffLi256ELi3ELi1EEEvPKT_PKT0_S6_PT1_iixxdi",
+    "exactln::exactln_fwd<float, float, float, 384, 0, 1>": "_ZN7exactln11exactln_fwdIfffLi384ELi0ELi1EEEvPKT_PKT0_S6_PT1_iixxdi",
+    "exactln::exactln_fwd<float, float, float, 384, 3, 1>": "_ZN7exactln11exactln_fwdIfffLi384ELi3ELi1EEEvPKT_PKT0_S6_PT1_iixxdi",
+    "exactln::exactln_fwd<float, float, float, 64, 0, 2>": "_ZN7exactln11exactln_fwdIfffLi64ELi0ELi2EEEvPKT_PKT0_S6_PT1_iixxdi",
+    "exactln::exactln_fwd<float, float, float, 64, 3, 2>": "_ZN7exactln11exactln_fwdIfffLi64ELi3ELi2EEEvPKT_PKT0_S6_PT1_iixxdi",
+    "exactln::exactln_fwd<float, float, float, 768, 0, 1>": "_ZN7exactln11exactln_fwdIfffLi768ELi0ELi1EEEvPKT_PKT0_S6_PT1_iixxdi",
+    "exactln::exactln_fwd<float, float, float, 768, 3, 1>": "_ZN7exactln11exactln_fwdIfffLi768ELi3ELi1EEEvPKT_PKT0_S6_PT1_iixxdi"
+   },
+   "n_kernels": 40,
+   "sha256": "3f6ca035bdefda2ab5b8045ed914a26eae96fa286b48dcd73952c2573be11d88"
+  },
+  "sm90": {
+   "bytes": 925296,
+   "compile_s": 4.0,
+   "file": "exactln_fwd-sm90.cubin",
+   "kernels": {
+    "exactln::exactln_fwd<exactln::bf16_t, exactln::bf16_t, exactln::bf16_t, 128, 0, 1>": "_ZN7exactln11exactln_fwdINS_6bf16_tES1_S1_Li128ELi0ELi1EEEvPKT_PKT0_S7_PT1_iixxdi",
+    "exactln::exactln_fwd<exactln::bf16_t, exactln::bf16_t, exactln::bf16_t, 128, 3, 1>": "_ZN7exactln11exactln_fwdINS_6bf16_tES1_S1_Li128ELi3ELi1EEEvPKT_PKT0_S7_PT1_iixxdi",
+    "exactln::exactln_fwd<exactln::bf16_t, exactln::bf16_t, exactln::bf16_t, 256, 0, 1>": "_ZN7exactln11exactln_fwdINS_6bf16_tES1_S1_Li256ELi0ELi1EEEvPKT_PKT0_S7_PT1_iixxdi",
+    "exactln::exactln_fwd<exactln::bf16_t, exactln::bf16_t, exactln::bf16_t, 256, 3, 1>": "_ZN7exactln11exactln_fwdINS_6bf16_tES1_S1_Li256ELi3ELi1EEEvPKT_PKT0_S7_PT1_iixxdi",
+    "exactln::exactln_fwd<exactln::bf16_t, exactln::bf16_t, exactln::bf16_t, 384, 0, 1>": "_ZN7exactln11exactln_fwdINS_6bf16_tES1_S1_Li384ELi0ELi1EEEvPKT_PKT0_S7_PT1_iixxdi",
+    "exactln::exactln_fwd<exactln::bf16_t, exactln::bf16_t, exactln::bf16_t, 384, 3, 1>": "_ZN7exactln11exactln_fwdINS_6bf16_tES1_S1_Li384ELi3ELi1EEEvPKT_PKT0_S7_PT1_iixxdi",
+    "exactln::exactln_fwd<exactln::bf16_t, exactln::bf16_t, exactln::bf16_t, 64, 0, 2>": "_ZN7exactln11exactln_fwdINS_6bf16_tES1_S1_Li64ELi0ELi2EEEvPKT_PKT0_S7_PT1_iixxdi",
+    "exactln::exactln_fwd<exactln::bf16_t, exactln::bf16_t, exactln::bf16_t, 64, 3, 2>": "_ZN7exactln11exactln_fwdINS_6bf16_tES1_S1_Li64ELi3ELi2EEEvPKT_PKT0_S7_PT1_iixxdi",
+    "exactln::exactln_fwd<exactln::bf16_t, exactln::bf16_t, exactln::bf16_t, 768, 0, 1>": "_ZN7exactln11exactln_fwdINS_6bf16_tES1_S1_Li768ELi0ELi1EEEvPKT_PKT0_S7_PT1_iixxdi",
+    "exactln::exactln_fwd<exactln::bf16_t, exactln::bf16_t, exactln::bf16_t, 768, 3, 1>": "_ZN7exactln11exactln_fwdINS_6bf16_tES1_S1_Li768ELi3ELi1EEEvPKT_PKT0_S7_PT1_iixxdi",
+    "exactln::exactln_fwd<exactln::bf16_t, float, exactln::bf16_t, 128, 0, 1>": "_ZN7exactln11exactln_fwdINS_6bf16_tEfS1_Li128ELi0ELi1EEEvPKT_PKT0_S7_PT1_iixxdi",
+    "exactln::exactln_fwd<exactln::bf16_t, float, exactln::bf16_t, 128, 3, 1>": "_ZN7exactln11exactln_fwdINS_6bf16_tEfS1_Li128ELi3ELi1EEEvPKT_PKT0_S7_PT1_iixxdi",
+    "exactln::exactln_fwd<exactln::bf16_t, float, exactln::bf16_t, 256, 0, 1>": "_ZN7exactln11exactln_fwdINS_6bf16_tEfS1_Li256ELi0ELi1EEEvPKT_PKT0_S7_PT1_iixxdi",
+    "exactln::exactln_fwd<exactln::bf16_t, float, exactln::bf16_t, 256, 3, 1>": "_ZN7exactln11exactln_fwdINS_6bf16_tEfS1_Li256ELi3ELi1EEEvPKT_PKT0_S7_PT1_iixxdi",
+    "exactln::exactln_fwd<exactln::bf16_t, float, exactln::bf16_t, 384, 0, 1>": "_ZN7exactln11exactln_fwdINS_6bf16_tEfS1_Li384ELi0ELi1EEEvPKT_PKT0_S7_PT1_iixxdi",
+    "exactln::exactln_fwd<exactln::bf16_t, float, exactln::bf16_t, 384, 3, 1>": "_ZN7exactln11exactln_fwdINS_6bf16_tEfS1_Li384ELi3ELi1EEEvPKT_PKT0_S7_PT1_iixxdi",
+    "exactln::exactln_fwd<exactln::bf16_t, float, exactln::bf16_t, 64, 0, 2>": "_ZN7exactln11exactln_fwdINS_6bf16_tEfS1_Li64ELi0ELi2EEEvPKT_PKT0_S7_PT1_iixxdi",
+    "exactln::exactln_fwd<exactln::bf16_t, float, exactln::bf16_t, 64, 3, 2>": "_ZN7exactln11exactln_fwdINS_6bf16_tEfS1_Li64ELi3ELi2EEEvPKT_PKT0_S7_PT1_iixxdi",
+    "exactln::exactln_fwd<exactln::bf16_t, float, exactln::bf16_t, 768, 0, 1>": "_ZN7exactln11exactln_fwdINS_6bf16_tEfS1_Li768ELi0ELi1EEEvPKT_PKT0_S7_PT1_iixxdi",
+    "exactln::exactln_fwd<exactln::bf16_t, float, exactln::bf16_t, 768, 3, 1>": "_ZN7exactln11exactln_fwdINS_6bf16_tEfS1_Li768ELi3ELi1EEEvPKT_PKT0_S7_PT1_iixxdi",
+    "exactln::exactln_fwd<exactln::bf16_t, float, float, 128, 0, 1>": "_ZN7exactln11exactln_fwdINS_6bf16_tEffLi128ELi0ELi1EEEvPKT_PKT0_S7_PT1_iixxdi",
+    "exactln::exactln_fwd<exactln::bf16_t, float, float, 128, 3, 1>": "_ZN7exactln11exactln_fwdINS_6bf16_tEffLi128ELi3ELi1EEEvPKT_PKT0_S7_PT1_iixxdi",
+    "exactln::exactln_fwd<exactln::bf16_t, float, float, 256, 0, 1>": "_ZN7exactln11exactln_fwdINS_6bf16_tEffLi256ELi0ELi1EEEvPKT_PKT0_S7_PT1_iixxdi",
+    "exactln::exactln_fwd<exactln::bf16_t, float, float, 256, 3, 1>": "_ZN7exactln11exactln_fwdINS_6bf16_tEffLi256ELi3ELi1EEEvPKT_PKT0_S7_PT1_iixxdi",
+    "exactln::exactln_fwd<exactln::bf16_t, float, float, 384, 0, 1>": "_ZN7exactln11exactln_fwdINS_6bf16_tEffLi384ELi0ELi1EEEvPKT_PKT0_S7_PT1_iixxdi",
+    "exactln::exactln_fwd<exactln::bf16_t, float, float, 384, 3, 1>": "_ZN7exactln11exactln_fwdINS_6bf16_tEffLi384ELi3ELi1EEEvPKT_PKT0_S7_PT1_iixxdi",
+    "exactln::exactln_fwd<exactln::bf16_t, float, float, 64, 0, 2>": "_ZN7exactln11exactln_fwdINS_6bf16_tEffLi64ELi0ELi2EEEvPKT_PKT0_S7_PT1_iixxdi",
+    "exactln::exactln_fwd<exactln::bf16_t, float, float, 64, 3, 2>": "_ZN7exactln11exactln_fwdINS_6bf16_tEffLi64ELi3ELi2EEEvPKT_PKT0_S7_PT1_iixxdi",
+    "exactln::exactln_fwd<exactln::bf16_t, float, float, 768, 0, 1>": "_ZN7exactln11exactln_fwdINS_6bf16_tEffLi768ELi0ELi1EEEvPKT_PKT0_S7_PT1_iixxdi",
+    "exactln::exactln_fwd<exactln::bf16_t, float, float, 768, 3, 1>": "_ZN7exactln11exactln_fwdINS_6bf16_tEffLi768ELi3ELi1EEEvPKT_PKT0_S7_PT1_iixxdi",
+    "exactln::exactln_fwd<float, float, float, 128, 0, 1>": "_ZN7exactln11exactln_fwdIfffLi128ELi0ELi1EEEvPKT_PKT0_S6_PT1_iixxdi",
+    "exactln::exactln_fwd<float, float, float, 128, 3, 1>": "_ZN7exactln11exactln_fwdIfffLi128ELi3ELi1EEEvPKT_PKT0_S6_PT1_iixxdi",
+    "exactln::exactln_fwd<float, float, float, 256, 0, 1>": "_ZN7exactln11exactln_fwdIfffLi256ELi0ELi1EEEvPKT_PKT0_S6_PT1_iixxdi",
+    "exactln::exactln_fwd<float, float, float, 256, 3, 1>": "_ZN7exactln11exactln_fwdIfffLi256ELi3ELi1EEEvPKT_PKT0_S6_PT1_iixxdi",
+    "exactln::exactln_fwd<float, float, float, 384, 0, 1>": "_ZN7exactln11exactln_fwdIfffLi384ELi0ELi1EEEvPKT_PKT0_S6_PT1_iixxdi",
+    "exactln::exactln_fwd<float, float, float, 384, 3, 1>": "_ZN7exactln11exactln_fwdIfffLi384ELi3ELi1EEEvPKT_PKT0_S6_PT1_iixxdi",
+    "exactln::exactln_fwd<float, float, float, 64, 0, 2>": "_ZN7exactln11exactln_fwdIfffLi64ELi0ELi2EEEvPKT_PKT0_S6_PT1_iixxdi",
+    "exactln::exactln_fwd<float, float, float, 64, 3, 2>": "_ZN7exactln11exactln_fwdIfffLi64ELi3ELi2EEEvPKT_PKT0_S6_PT1_iixxdi",
+    "exactln::exactln_fwd<float, float, float, 768, 0, 1>": "_ZN7exactln11exactln_fwdIfffLi768ELi0ELi1EEEvPKT_PKT0_S6_PT1_iixxdi",
+    "exactln::exactln_fwd<float, float, float, 768, 3, 1>": "_ZN7exactln11exactln_fwdIfffLi768ELi3ELi1EEEvPKT_PKT0_S6_PT1_iixxdi"
+   },
+   "n_kernels": 40,
+   "sha256": "076c4858d764d604494a5c1d30f3e97006e3f9c486a6511f9af14916be478203"
+  }
+ },
+ "forms": {
+  "bf16": [
+   "bfloat16",
+   "bfloat16",
+   "bfloat16"
+  ],
+  "bf16o": [
+   "bfloat16",
+   "float32",
+   "bfloat16"
+  ],
+  "bf16w": [
+   "bfloat16",
+   "float32",
+   "float32"
+  ],
+  "fp32": [
+   "float32",
+   "float32",
+   "float32"
+  ]
+ },
+ "nvrtc": "12.6",
+ "opts": [
+  "--std=c++17",
+  "-default-device",
+  "--ftz=false",
+  "--prec-div=true",
+  "--fmad=true"
+ ],
+ "python": "3.11.5",
+ "schema": "exactln_prebuilt/v1",
+ "source": "exactln_fwd.cu",
+ "source_sha256": "8283eb74c962c96f8eb4b5f082cf5c7eaeb4ecdf3f2ebccd70f2424d89d79df1",
+ "widths": [
+  64,
+  128,
+  256,
+  384,
+  768
+ ]
+}

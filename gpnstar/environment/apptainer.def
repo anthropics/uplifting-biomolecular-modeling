@@ -1,0 +1,29 @@
+# GPN-Star optimization kit — Apptainer / Singularity image made FROM the container image of gpnstar/environment/Dockerfile: the same stack and
+# the same /kit, for hosts that run Apptainer instead of Docker. The source is the image tagged gpnstar-kit:dev in the local Docker daemon (build
+# it first: README.md 'Setup'); for a published tag the two header lines read `Bootstrap: docker` / `From: <registry>/gpnstar-kit:<tag>`.
+#   apptainer build gpnstar-kit.sif gpnstar/environment/apptainer.def
+#   apptainer run --nv --cleanenv --bind /path/to/hf_home:/weights --env HF_HOME=/weights gpnstar-kit.sif check
+#   apptainer exec --nv --cleanenv --bind /path/to/hf_home:/weights --env HF_HOME=/weights --env HF_HUB_OFFLINE=1 --env GPNSTAR_OPT=exact --bind "$PWD/out":/out gpnstar-kit.sif \
+#     gpn star vep … --output-path /out/scores.parquet --tf32
+# The image is read-only: give upstream's commands output paths on a bound, writable path; %environment keeps a host user site-packages (PEP 370)
+# from shadowing the pinned stack, --cleanenv keeps the host's variables out (pass GPNSTAR_OPT / HF_HOME with --env).
+Bootstrap: docker-daemon
+From: gpnstar-kit:dev
+
+%post
+    mkdir -p /opt/culib && ln -s /.singularity.d/libs/libcuda.so.1 /opt/culib/libcuda.so && ln -s /.singularity.d/libs/libcuda.so.1 /opt/culib/libcuda.so.1
+
+%environment
+    export PYTHONNOUSERSITE=1
+    # Triton <= 3.5 links its launcher stub with -lcuda: offer the unversioned name when --nv bound only libcuda.so.1
+    if [ -z "${TRITON_LIBCUDA_PATH:-}" ] && [ -e /opt/culib/libcuda.so ]; then export TRITON_LIBCUDA_PATH=/opt/culib; fi
+
+%runscript
+    cd /kit/gpnstar && exec bash /kit/gpnstar/run.sh "$@"
+
+%help
+    GPN-Star optimization kit: one drop-in mode, exact, that makes stock GPN-Star inference (gpn 0.9.0: the `gpn star vep | logits | embedding`
+    commands over the released checkpoints) faster without changing how it is called — the same outputs, bit for bit, under the caller's own
+    numerics flags (`--tf32` included). `apptainer run --nv gpnstar-kit.sif <verb>` = `bash /kit/gpnstar/run.sh <verb>` (verbs: install, check);
+    the kit itself is `apptainer exec --nv --env GPNSTAR_OPT=exact gpnstar-kit.sif gpn star …` (/kit/gpnstar/README.md inside the image).
+    Requires an NVIDIA driver that runs CUDA 13.0 (580 or newer) and HF_HOME naming the staged weights.

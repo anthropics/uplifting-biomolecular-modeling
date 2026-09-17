@@ -1,0 +1,34 @@
+Profluent-E1 Attribution Guidelines
+-----------------------------------
+
+These Profluent-E1 Attribution Guidelines (the “Guidelines”) set forth certain terms, conditions and restrictions relating to how You can use, share and distribute Profluent-E1 and any Derivative Works thereof in a manner that ensures transparent acknowledgement of Profluent-E1. The terms, conditions and restrictions set forth in these Guidelines are in addition to those set forth in the Profluent-E1 Clickthrough License Agreement, available at https://github.com/Profluent-AI/E1/blob/main/LICENSE, as may be updated or amended from time to time (the “Agreement”) and in the event of any conflict between any provision of these Guidelines and any provision of the Agreement, the provision that is more protective of Profluent Bio, Inc. (“Profluent”) and Profluent-E1 shall control. Any capitalized terms used but not defined herein shall have the meanings set forth in the Agreement. Profluent may update, modify or amend these Guidelines from time to time and Profluent will use reasonable efforts to provide You with notice of any material changes that may negatively impact Your use of Profluent-E1 by posting an updated version of these Guidelines, for example. Any violation of these Guidelines may result in the suspension or termination of Your access to and use of Profluent-E1.
+
+1. Attribution Requirements. You may use and redistribute Profluent-E1 and Derivative Works in Source and Object forms, with or without modification, in accordance with the terms of the Agreement provided that the following conditions are met:
+
+    1.1 You must include a prominently displayed attribution to “Profluent-E1” in any distribution, documentation or public use of Profluent-E1 or any Derivative Works built, developed, improved, or modified through the use of Profluent-E1 by any Commercial Entity, including, without limitation, in any publication, report, white paper, article, product documentation, slide deck or other media that incorporates Profluent-E1 or any Derivative Works; and
+
+    1.2 You must identify any drug, drug candidate, medication or pharmaceutical of any kind and any molecular or biological target, hit or lead identification that is created, identified, discovered, developed, modified or improved using Profluent-E1 as “Built with Profluent-E1,” including, without limitation, in public disclosures to the United States Food and Drug Administration and similar regulatory authorities.
+
+The term “Commercial Entity” as used in this Section 1 shall mean any entity engaged in any activity intended for or directed toward commercial advantage or monetary compensation, including, without limitation, the development of any product or service intended to be sold or made available for a fee, expressly excluding any university, non-profit organization, research institute, educational or government body and any not-for-profit Legal Entity.
+
+2. No Endorsement. You may not use or allow the use of the Profluent name nor any Profluent trade name, trademark, service mark or product name to endorse or promote, or imply that Profluent endorses or promotes, any products or other offerings derived from Profluent-E1 without Profluent's specific prior written permission.
+
+3. Format of Derivative Works. All attribution notices should be easy to find and easy to understand. The attribution requirements set forth in these Guidelines applies to both textual and visual materials where Profluent-E1 contributes materially to the resulting product or output. Any uses, distributions or documentation in Source form must incorporate a prominent display of text that reads “Profluent-E1” in verifiable form, while redistributions in Object form must be accompanied by a prominent display of “Profluent-E1” text in any documentation and each time the resulting executable program or a program dependent thereon is launched, You must also launch a prominent display (e.g., splash screen or banner text) of such text.
+
+4. Placement and Prominence. any entity engaged in any activity intended for or directed toward commercial advantage or monetary compensation, including, without limitation, the development of any product or service intended to be sold or made available for a fee, expressly excluding any university, non-profit organization, research institute, educational or government body and any not-for-profit Legal Entity. The attribution must appear within the main body of any publication, report, white paper or article. For product documentation or software tool or interface references, the attribution must be listed on the title page or in the introductory section, near other third-party license notices. In slide decks or conference presentations, the attribution must appear on a title slide, or a slide within the first three slides of the presentation. For webpages, software interfaces, or interactive demos, attribution must be visible on-screen in a footer, “About” section, or a prominently accessible credits area without requiring extra actions like scrolling or menu navigation.
+
+5. Formatting. You must use the exact “Profluent-E1” model name as provided by Profluent, and the font size must be at least equal to the main body text or at least 75% of the largest text on the page where the attribution is incorporated (whichever is greater). The text must be visually legible and in a color that contrasts sufficiently with its background. Graphic or visual logos provided by the Profluent may be used in place of plain-text attribution if approved, but they must remain clearly readable at normal viewing sizes.
+
+6. Illustrative Examples. The following are examples of how attribution to Profluent-E1 may be implemented in accordance with the requirements of these guidelines:
+
+    6.1 Example 1: A research article that incorporates data derived from outputs of Profluent-E1 includes reference to “Profluent-E1” in or beneath the paragraph of text first introducing these outputs.
+
+    6.2 Example 2: A company releases a model fine-tuned from Profluent-E1 and the website's footer includes “Built with Profluent-E1.”
+
+    6.3 Example 3: A presentation at a conference includes “This work incorporates works derived from use of Profluent-E1” on the title slide.
+
+    6.4 Example 4: An open-source repository “README” file includes a visible statement near the top: “This project builds upon Profluent-E1 under the terms of the Profluent-E1 Clickthrough License Agreement.”
+
+7. Non-Obscuration. The attribution must not be hidden or disguised by other visual or textual elements. It should remain readable at standard display resolutions and must not be abbreviated, truncated or replaced with unofficial branding.
+
+8. Exceptions. Written exceptions to these attribution requirements may be granted by the Licensor upon request, provided that alternative acknowledgment conveys equivalent visibility and transparency.

@@ -1,0 +1,24 @@
+{
+ "carried_digests": {
+  "attbwd_dkdv.py": {
+   "carried": "4cf88326dc9cc06d76c4d3fcb39c33c75e16472a12e39f59439a69b48abb05a9",
+   "upstream": "62654fbb87021550c1d3aca85a576ba7563ef94113178d4b537f7ea1e544bd55"
+  },
+  "triatt_attn.py": {
+   "carried": "9c4657fc76f7168f5e0405aef5f272952cc5b3a21aa836441bbbd4061396cc4d",
+   "upstream": "70b34c6b98fd2dd24d02359c1ab8bdb68cb3c8002256256d25c04835d04797cb"
+  }
+ },
+ "exports": {},
+ "files_note": "__init__.py is a docstring only; importing triatt_attn imports jax and jax.experimental.pallas (GPU lowering at first call)",
+ "kind": "package",
+ "license": "this repository's own work (written in the AF2-design kit); attributions and both digests of each carried file in the package NOTICE",
+ "mechanism": "triangle attention with per-head pair bias and key mask, forward + backward (jax.custom_vjp), Pallas (Triton lowering): triatt_attn.make_attention(**knobs) -> op(q, k, v, bias, key_mask, scale) (heads-major [B,H,S,D], bias [H,Sq,Sk] shared over B, d(bias) summed over B); attbwd_dkdv._bwd = the two backward kernels (dK/dV over key blocks; dQ + d(bias) partials over query blocks); kernels/triattn_xla's differentiable row runs attbwd_dkdv._bwd behind its pre-compiled forward",
+ "name": "pallas_triatt",
+ "not_carried": {
+  "the sibling-import line of each module": "rewritten to a package-relative import; plus comment/docstring wording on 3 lines restated in release vocabulary (kit digest and carried digest of each file in NOTICE); no code line differs from the kit's",
+  "triatt_lever.py, the registry / modes wiring, the kit's tests": "the kit's lever adapter (haiku Attention patching, census, LEVER line) and its tests: kit code, cited from the kit"
+ },
+ "runtime_imports": [],
+ "version": "af2design-triatt-0.6.0@94a83bd1"
+}

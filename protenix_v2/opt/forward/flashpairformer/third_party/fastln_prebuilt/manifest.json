@@ -1,0 +1,55 @@
+{
+ "so": "fast_layer_norm_cuda_v2_stream.so",
+ "so_sha256": "c295028752de1efc9a714d371f9ef8b467f60943ad3183bcee0afd925290a0a4",
+ "module_name": "fast_layer_norm_cuda_v2_stream",
+ "torch": "2.7.1+cu126",
+ "cuda": "12.6",
+ "python": "3.11.5",
+ "image": "torch 2.7.1 / CUDA 12.6 build image",
+ "gpu": "NVIDIA H100 80GB HBM3",
+ "built_utc": "2026-08-22T13:45:02Z",
+ "build_s": 109.0,
+ "total_s": 110.5,
+ "source_sha256": {
+  "compat.h": "24da65d5e0a58c6483abd60e7a6d6fca7e4abc9303f08c902975c77bdeacbc08",
+  "layer_norm_cuda.cpp": "b03d995042fede126b1e36a8e9c9e73433a598f523ad914789d7aeaeb8ac842d",
+  "layer_norm_cuda_kernel.cu": "ad75251f6fabbf59bbc83637a9600204c62a20c6ac563a742694bbfc8c0c180a",
+  "type_shim.h": "824a0dfdb5bfb1316187b3a3f7c10c9b41496b97259ddf84c882152ccec66a7a"
+ },
+ "patched_source_sha256": {
+  "compat.h": "24da65d5e0a58c6483abd60e7a6d6fca7e4abc9303f08c902975c77bdeacbc08",
+  "layer_norm_cuda.cpp": "b03d995042fede126b1e36a8e9c9e73433a598f523ad914789d7aeaeb8ac842d",
+  "layer_norm_cuda_kernel.cu": "fc1540b4410728ffd8c0b761fd4c3494290c5a6256e40d84a928f608c6cbbc36",
+  "type_shim.h": "824a0dfdb5bfb1316187b3a3f7c10c9b41496b97259ddf84c882152ccec66a7a"
+ },
+ "patched_launches": {
+  "layer_norm_cuda_kernel.cu": 25
+ },
+ "bitwise_at_build": true,
+ "n_cases": 21,
+ "side_stream_at_build": {
+  "side_stream_equal": true,
+  "graph_replay_equal": true,
+  "graph_replay_finite": true
+ },
+ "public_symbols_orig": [
+  "backward_none_affine",
+  "backward_with_bias_affine",
+  "backward_with_both_affine",
+  "backward_with_weight_affine",
+  "forward_none_affine",
+  "forward_with_bias_affine",
+  "forward_with_both_affine",
+  "forward_with_weight_affine"
+ ],
+ "public_symbols_new": [
+  "backward_none_affine",
+  "backward_with_bias_affine",
+  "backward_with_both_affine",
+  "backward_with_weight_affine",
+  "forward_none_affine",
+  "forward_with_bias_affine",
+  "forward_with_both_affine",
+  "forward_with_weight_affine"
+ ]
+}

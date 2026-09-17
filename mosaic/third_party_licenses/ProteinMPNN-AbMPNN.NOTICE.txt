@@ -1,0 +1,47 @@
+ProteinMPNN
+-----------
+The model code (torch_mpnn.py, mpnn.py) and the weight files weights/v_48_020.pt
+and weights/soluble_v_48_020.pt are derived from ProteinMPNN
+(https://github.com/dauparas/ProteinMPNN), used under the MIT License:
+
+    MIT License
+
+    Copyright (c) 2022 Justas Dauparas
+
+    Permission is hereby granted, free of charge, to any person obtaining a copy
+    of this software and associated documentation files (the "Software"), to deal
+    in the Software without restriction, including without limitation the rights
+    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+    copies of the Software, and to permit persons to whom the Software is
+    furnished to do so, subject to the following conditions:
+
+    The above copyright notice and this permission notice shall be included in all
+    copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+    SOFTWARE.
+
+Citation: Dauparas et al., "Robust deep learning-based protein sequence design
+using ProteinMPNN", Science 378, 49-56 (2022). doi:10.1126/science.add2187
+
+
+AbMPNN
+------
+The weight file weights/abmpnn.pt is from Zenodo record 8164693, licensed under
+the Creative Commons Attribution 4.0 International (CC BY 4.0) license:
+https://creativecommons.org/licenses/by/4.0/
+
+Copyright (c) 2023 Frederic A. Dreyer, Daniel Cutting, Constantin Schneider,
+Henry Kenlay, Charlotte M. Deane (Exscientia).
+
+Changes: the file has been re-serialized from the original Zenodo release; the
+weights are otherwise unmodified.
+
+Citation: Dreyer et al., "Inverse folding for antibody sequence design using
+deep learning", ICML 2023 Workshop on Computational Biology. arXiv:2310.19513,
+doi:10.5281/zenodo.8164693

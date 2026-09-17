@@ -1,0 +1,12 @@
+trimul_esm_shapes -- attribution
+
+kernels.py / kernels_desc.py (_k1s, _k1s_tma, _k3s, the LayerNorm / epilogue helpers and the host launchers) are a derivative work,
+written in this repository, of the ESM-family TriangleMultiplication Triton kernels carried at kernels/trimul/esm_v5/ef2_trimul_v5.py
+(_k1x / _k3x: LN_in + gated dual projection to channel-major planes, cuBLAS contraction, LN_out + gated output projection + residual;
+levers sigmoid / incnt / formtab / stagger), which are themselves derived from the FlashPairformer fpf_trimul_v4 kernels (_k1t / _k3c)
+carried at kernels/fpf_trimul_v4 (NOTICE there; Apache-2.0 lineage text at
+kernels/fpf_flashpairformer.PROTENIX_LICENSE).  With one channel chunk, bf16 activations and a descriptor K1 cell the kernels here
+produce the same bytes as that carried copy.  The changes made here: channel-chunked reductions (pair widths 64..512 including 384
+without padding), bf16-or-fp32 activations, pointer-load and tensor-descriptor K1 as two kernels over shared helpers, the no-residual
+epilogue, an fp32 contraction-output option, and the measured launch-cell table TILE_TABLES.json.  No other third-party source is
+copied into this directory.  Dependencies: torch, triton (MIT), cuBLAS through torch.

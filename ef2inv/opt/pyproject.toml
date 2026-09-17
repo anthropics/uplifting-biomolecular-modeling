@@ -1,0 +1,69 @@
+# ef2inv_opt — explicit interface to the ESMFold2 binder-inversion optimizations (the EF2 inversion-acceleration kit's lever sets).
+# Install editable from this directory: `pip install -e ef2inv/opt`. The kit code it drives lives beside the package (forward/ — the
+# design kit's k/ modules) and is resolved from the package location, so the install must stay editable
+# (or point MODEL_OPT at the tree). No install-time dependency on esm / transformers / torch (stock/PINS.json): the pins are checked by
+# stock/check_pins.py and at every launch. No autoload .pth: the upstream is a script, the kit's switch is an environment variable the
+# launcher sets per arm (ef2inv_opt/launch.py). Install = the shared core and this package: `pip install -e common/opt_core -e ef2inv/opt`.
+# The core (common/opt_core) is pinned in [tool.opt_core] by path and minimum core version; the package's `_core_gate.gate(__file__)`
+# (the template's pre-import gate, byte-identical: ef2inv_opt/_core_gate.py) is statement one of every verb (ef2inv_opt/cli.py main). The build backend is the core's template (common/opt_core/kit_template/_build_backend.py,
+# carried byte-for-byte): plain setuptools wheels for this argv-only kit (no *_autoload.pth beside it).
+[build-system]
+requires = ["setuptools>=64", "wheel"]
+build-backend = "_build_backend"
+backend-path = ["."]
+
+[tool.opt_core]
+path = "../../common/opt_core"
+version = "0.5.45.0"
+# The files whose bytes decide a design step's forward + backward arithmetic in every mode (paths relative to ef2inv/; a result is only
+# comparable across two commits when this list is unchanged between them). The list is the arm process's import graph inside this tree — the loop caller and every package
+# module it imports (tests/test_core_pin.py computes that graph and fails on an uncovered module), the carried design kit's runtime
+# modules with the patches they derive from, the kit's cookbook-level integration (fastkit.py), the `modal` stand-in module, the stock file and the pins.
+# The model arithmetic itself (the transformers fork's
+# modeling_esmfold2_*.py and kernels, esm) lives OUTSIDE the tree: it is pinned in stock/PINS.json and checked by stock/check_pins.py at
+# every launch, not by these globs.
+forward_numerics = [
+    "opt/ef2inv_opt/__init__.py",
+    "opt/ef2inv_opt/stock_design.py",
+    "opt/ef2inv_opt/modes.py",
+    "opt/ef2inv_opt/settings.py",
+    "opt/ef2inv_opt/det.py",
+    "opt/ef2inv_opt/patches.py",
+    "opt/ef2inv_opt/envproof.py",
+    "opt/ef2inv_opt/evidence.py",
+    "opt/ef2inv_opt/launch.py",
+    "opt/ef2inv_opt/_absent_sdk_stub.py",
+    "opt/ef2inv_opt/hardware.py",
+    "opt/ef2inv_opt/outputs.py",
+    "opt/ef2inv_opt/report.py",
+    "opt/ef2inv_opt/attention.py",
+    "opt/ef2inv_opt/upstream_fix.py",
+    "opt/ef2inv_opt/fastkit.py",
+    "upstream_issues/*.py",
+    "opt/forward/ESMFOLD2_DESIGN_FAST_INFERENCE_KIT_v1/k/*.py",
+    "opt/forward/ESMFOLD2_DESIGN_FAST_INFERENCE_KIT_v1/k/ef2_t16/ef2_transition_cute.cuh",
+    "opt/forward/ESMFOLD2_DESIGN_FAST_INFERENCE_KIT_v1/k/ef2_t16/sm_90a/*",
+    "stock/src/cookbook/tutorials/binder_design.py",
+    "stock/PINS.json",
+]
+
+[project]
+name = "ef2inv_opt"
+dynamic = ["version"]
+description = "ESMFold2 binder-inversion optimizations: modes off/exact/fast, the kit's lever sets, the shipped settings, named fallbacks, activation report"
+requires-python = ">=3.10"
+classifiers = ["Private :: Do Not Upload"]
+dependencies = []
+
+[project.optional-dependencies]
+test = ["pytest", "setuptools>=64"]                # the package's CPU tests (standard library otherwise; setuptools = the [build-system] floor, for the backend template the tests read on a bare venv)
+
+[project.scripts]
+ef2inv-opt = "ef2inv_opt.__main__:main"            # `ef2inv-opt design|check|warm ...` == `python -m ef2inv_opt ...`
+
+[tool.setuptools]
+packages = ["ef2inv_opt", "ef2inv_opt.tests"]
+include-package-data = false
+
+[tool.setuptools.dynamic]
+version = {attr = "ef2inv_opt.__version__"}

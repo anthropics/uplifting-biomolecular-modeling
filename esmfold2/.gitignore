@@ -1,0 +1,8 @@
+# build products of the package (setuptools), never committed
+opt/build/
+opt/*.egg-info/
+
+# the three CUDA-extension wheels of the tested stack (stock/PINS.json "image"): built by the container build or placed here for its
+# WHEELS_FROM=prebuilt route, never committed (README.md Setup, STOCK.md Stack); .keep keeps the directory in the tree
+stock/wheels/*
+!stock/wheels/.keep

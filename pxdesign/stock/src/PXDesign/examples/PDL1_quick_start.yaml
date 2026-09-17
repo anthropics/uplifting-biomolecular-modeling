@@ -1,0 +1,16 @@
+target:
+  # Path to the target structure (PDB or CIF)
+  file: "./examples/5o45.cif"
+  # Specify the target chain(s)
+  chains:
+    # Configuration for Target Chain A
+    A:
+      # Crop regions (Optional)
+      crop: ["1-116"]
+      # Binding hotspot residues (Optional)
+      hotspots: [40, 99, 107]
+      # Path to pre-computed MSA (Optional but recommended)
+      msa: "./examples/msa/PDL1/0"
+
+# Number of amino acids of the binder to be designed
+binder_length: 80

@@ -1,0 +1,31 @@
+# Protenix v2 optimization kit — Apptainer / Singularity image made FROM the container image of protenix_v2/environment/Dockerfile: the same stack
+# and the same /kit, for hosts that run Apptainer instead of Docker. The source is the image tagged protenix_v2-kit:dev in the local Docker daemon
+# (build it first: README.md 'Setup'); for an image held in a registry the two header lines read `Bootstrap: docker` / `From: <image reference>`.
+#   apptainer build protenix_v2.sif protenix_v2/environment/apptainer.def
+#   apptainer run --nv --cleanenv --bind /path/to/protenix_root:/weights --env PROTENIX_ROOT_DIR=/weights --bind "$PWD/out":/out \
+#     protenix_v2.sif pred --config h100 --mode fast --input /out/p199.json --out_dir /out/fast --model_name protenix-v2
+#   (the input: sed "s#__KIT__#/kit/protenix_v2/opt/forward/flashpairformer#" protenix_v2/opt/forward/flashpairformer/public_inputs/p199.json > out/p199.json)
+# The image is read-only: give every verb an --out_dir on a bound, writable path; the JIT caches go under $HOME/.cache (bound by default) or under
+# MODEL_OPT_JIT_ROOT when you export it; %environment keeps a host user site-packages (PEP 370) from shadowing the pinned stack, --cleanenv keeps
+# the host's variables out.
+Bootstrap: docker-daemon
+From: protenix_v2-kit:dev
+
+%environment
+    export PYTHONNOUSERSITE=1
+    # Triton <= 3.5 links its launcher stub with -lcuda: offer the unversioned name when --nv bound only libcuda.so.1
+    if [ -z "${TRITON_LIBCUDA_PATH:-}" ] && [ -e /opt/culib/libcuda.so ]; then export TRITON_LIBCUDA_PATH=/opt/culib; fi
+
+%post
+    mkdir -p /opt/culib && ln -s /.singularity.d/libs/libcuda.so.1 /opt/culib/libcuda.so && ln -s /.singularity.d/libs/libcuda.so.1 /opt/culib/libcuda.so.1
+
+%runscript
+    cd /kit/protenix_v2 && exec bash /kit/protenix_v2/run.sh "$@"
+
+%help
+    Protenix v2 optimization kit: drop-in modes that make stock Protenix 2.0.0 (`protenix pred --model_name protenix-v2`) faster and lighter on
+    GPU memory without changing how it is called — off = stock exactly; exact = stock's arithmetic, faster (byte-identical outputs under the
+    deterministic recipe, --det 1); fast = small documented numeric differences, faster still; big = lowest memory, plus --n_gpu P to shard one
+    prediction over P GPUs. `apptainer run --nv protenix_v2.sif <verb> ...` = `bash /kit/protenix_v2/run.sh <verb> ...` (verbs: install, pred,
+    check, warm; /kit/protenix_v2/README.md inside the image). Requires an NVIDIA driver that runs CUDA 13.0 (580 or newer), PROTENIX_ROOT_DIR
+    naming the weights root.

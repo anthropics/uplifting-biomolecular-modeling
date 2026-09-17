@@ -1,0 +1,37 @@
+[
+ {
+  "name": "pub_ins_195",
+  "pdb": "../inputs_public/insulin_target.pdb",
+  "contigs": "[A1-115/0 80-80]",
+  "hotspots": "[A59,A83,A91]",
+  "num_designs": 3
+ },
+ {
+  "name": "pub_ins_230",
+  "pdb": "../inputs_public/insulin_target.pdb",
+  "contigs": "[A1-150/0 80-80]",
+  "hotspots": "[A59,A83,A91]",
+  "num_designs": 3
+ },
+ {
+  "name": "pub_5tpn_301",
+  "pdb": "../inputs_public/5TPN.pdb",
+  "contigs": "[A300-500/0 100-100]",
+  "hotspots": "[A415,A417,A455]",
+  "num_designs": 3
+ },
+ {
+  "name": "pub_5tpn_451",
+  "pdb": "../inputs_public/5TPN.pdb",
+  "contigs": "[A150-500/0 100-100]",
+  "hotspots": "[A415,A417,A455]",
+  "num_designs": 2
+ },
+ {
+  "name": "pub_5tpn_619",
+  "pdb": "../inputs_public/5TPN.pdb",
+  "contigs": "[A27-105/0 A134-544/0 100-100]",
+  "hotspots": "[A415,A417,A455]",
+  "num_designs": 2
+ }
+]

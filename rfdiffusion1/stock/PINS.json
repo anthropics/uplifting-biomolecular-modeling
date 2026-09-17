@@ -1,0 +1,149 @@
+{
+ "model": "rfdiffusion1",
+ "upstream": {
+  "rfdiffusion": {
+   "repo": "https://github.com/RosettaCommons/RFdiffusion",
+   "commit": "86507b6538f51fce57b5a72477165f03999ed7ae",
+   "tag": null,
+   "tag_note": "no tag at the pin; the head of main at the time of the kits (commit message 'Fix github workflow tests (#458)'); setup.py declares version 1.1.0 (tag v1.1.0 is a different commit, 9273ef67)",
+   "version": "1.1.0",
+   "archive": "stock/rfdiffusion-86507b65.tar.gz",
+   "install": "an editable checkout at $RFD_ROOT: `pip install --no-deps env/SE3Transformer` then `pip install --no-deps -e .` (environment/Dockerfile, README.md 'Setup'); pip records the checkout as {\"dir_info\": {\"editable\": true}, \"url\": \"file://<RFD_ROOT>\"}",
+   "entry_point": "scripts/run_inference.py (hydra; config/inference/base.yaml)",
+   "vendored": {
+    "se3-transformer": {
+     "version": "1.0.0",
+     "path": "env/SE3Transformer",
+     "licence": "MIT (env/SE3Transformer/LICENSE, NVIDIA CORPORATION & AFFILIATES)"
+    }
+   }
+  }
+ },
+ "archive_recipe": {
+  "command": "git archive --format=tar --prefix=rfdiffusion-86507b65/ 86507b6538f51fce57b5a72477165f03999ed7ae -- LICENSE README.md setup.py rfdiffusion scripts config env docker | gzip -n -9",
+  "paths": [
+   "LICENSE",
+   "README.md",
+   "setup.py",
+   "rfdiffusion",
+   "scripts",
+   "config",
+   "env",
+   "docker"
+  ],
+  "excluded": [
+   "examples",
+   "img",
+   "tutorials",
+   "tests",
+   "helper_scripts",
+   ".github",
+   ".rosetta-ci",
+   ".gitignore"
+  ],
+  "excluded_note": "example inputs, images, tutorials, upstream CI and helper scripts: nothing a run reads (the kit ships its own copies of the two example PDBs it uses, opt/forward/fast_inference/inputs_public/)",
+  "members": 75
+ },
+ "weights": {
+  "checkpoint": "Complex_base_ckpt.pt",
+  "Complex_base_ckpt.pt": {
+   "sha256": "76e4e260aefee3b582bd76b77ab95d2592e64f00c51bf344968ab9239f3250bc",
+   "size_bytes": 483619179,
+   "role": "the pinned checkpoint: auto-selected by upstream for hotspot (ppi.hotspot_res) runs (rfdiffusion/inference/model_runners.py); every mode",
+   "url_kit_installer": "https://files.ipd.uw.edu/pub/RFdiffusion/e29311f6f1bf1af907f9ef9f44b8328b/Complex_base_ckpt.pt",
+   "url_doc": "upstream README.md:77-78 and scripts/download_models.sh (wget, http); the kit fetches the same file over https and checks its sha256 (opt/rfdiffusion1_opt/weights.py)"
+  },
+  "Base_ckpt.pt": {
+   "sha256": "0fcf7d7c32b4848030aca3a051e6768de194616f96ba6c38186351a33bfc6eca",
+   "size_bytes": 483616107,
+   "role": "upstream's default checkpoint for runs without hotspots (the README's first example); not measured by either kit",
+   "url_kit_installer": "https://files.ipd.uw.edu/pub/RFdiffusion/6f5902ac237024bdd0c176cb93063dc4/Base_ckpt.pt",
+   "url_doc": "upstream README.md:77-78 and scripts/download_models.sh (wget, http); the kit fetches the same file over https and checks its sha256 (opt/rfdiffusion1_opt/weights.py)"
+  }
+ },
+ "weights_note": "sha256 values and sizes as `run.sh install --weights DIR` checks them (opt/rfdiffusion1_opt/weights.py: each file is fetched from its url_kit_installer when absent, then its size and sha256 are compared with these values; a mismatch is named, exit 1); WEIGHTS = the directory holding the files (inference.model_directory_path)",
+ "pinned_stack": {
+  "id": "rfd1stackb",
+  "tested_on": "NVIDIA H100 80GB HBM3 (sm90) and NVIDIA A100-SXM4-80GB (sm80) with this stack as environment/Dockerfile lays it down (python 3.11.5, torch 2.4.0+cu121, dgl 2.4.0+cu124, triton 3.0.0); documentation only — nothing compares against this line",
+  "base_image": "nvidia/cuda:12.4.1-runtime-ubuntu22.04 + python 3.11.5 (python-build-standalone 20230826), environment/Dockerfile",
+  "install": "environment/Dockerfile: environment/requirements.lock installed with `pip install --no-deps -r`, then stock and the kit (README.md 'Setup', routes A-C)",
+  "python": "3.11.5",
+  "torch": "2.4.0",
+  "cuda": "12.1",
+  "nvcc": "12.4",
+  "triton": "3.0.0",
+  "dgl": "2.4.0+cu124",
+  "e3nn": "0.5.1",
+  "numpy": "1.26.4",
+  "scipy": "1.13.1",
+  "opt_einsum": "3.3.0",
+  "hydra-core": "1.3.2",
+  "omegaconf": "2.3.1",
+  "pyrsistent": "0.20.0",
+  "stack_check": {
+   "torch": "2.4.0",
+   "dgl": "2.4.0+cu124",
+   "note": "stock/check_pins.py compares the installed distribution versions of these two with these values, local tags (+cu121 / +cu124) stripped on both sides: torch's pip metadata version reads 2.4.0 for the 2.4.0+cu121 wheel while torch.__version__ reads 2.4.0+cu121; the CUDA-graph levers refuse below dgl 2.0 on their own (opt/forward/fast_inference/drivers/rfd_fullgraph.py supported())"
+  },
+  "torch_index": "PyPI: torch 2.4.0's default Linux wheel is the CUDA 12.1 build (the pip metadata version reads 2.4.0, torch.__version__ reads 2.4.0+cu121); its CUDA / cuDNN / NCCL runtime libraries are the nvidia-*-cu12 lines of environment/requirements.lock"
+ },
+ "upstream_declared": {
+  "docker/Dockerfile": {
+   "base": "nvcr.io/nvidia/cuda:11.6.2-cudnn8-runtime-ubuntu20.04",
+   "python": "3.9",
+   "torch": "1.12.1+cu116",
+   "dgl": "1.0.2+cu116",
+   "e3nn": "0.3.3",
+   "lines": "stock/src/docker/Dockerfile:20-36"
+  },
+  "env/SE3nv.yml": {
+   "python": "3.9",
+   "pytorch": "1.9",
+   "cudatoolkit": "11.1",
+   "dgl": "dgl-cuda11.1 (unversioned)",
+   "e3nn": "0.3.3 (env/SE3Transformer/requirements.txt)",
+   "lines": "stock/src/env/SE3nv.yml"
+  },
+  "note": "neither declared environment is the pinned stack"
+ },
+ "cli_defaults": {
+  "source": "stock/src/config/inference/base.yaml",
+  "values": {
+   "inference.num_designs": 10,
+   "inference.design_startnum": 0,
+   "inference.output_prefix": "samples/design",
+   "inference.write_trajectory": true,
+   "inference.cautious": true,
+   "inference.final_step": 1,
+   "inference.deterministic": false,
+   "diffuser.T": 50
+  },
+  "lines": {
+   "inference.num_designs": 5,
+   "inference.design_startnum": 6,
+   "inference.output_prefix": 12,
+   "inference.write_trajectory": 13,
+   "inference.cautious": 17,
+   "inference.final_step": 20,
+   "inference.deterministic": 21,
+   "diffuser.T": 78
+  }
+ },
+ "stock_environment": {
+  "reads": [
+   "RFD_ROOT",
+   "WEIGHTS",
+   "DGLBACKEND"
+  ],
+  "must_be_absent_prefixes": [
+   "RFD_",
+   "RFDIFFUSION1_",
+   "ALLOW_ANY_GPU"
+  ],
+  "allowed_exceptions": [
+   "RFD_ROOT",
+   "WEIGHTS"
+  ],
+  "note": "must_be_absent_prefixes: an entry ending in '_' is a prefix, any other entry an exact name — the kit namespace only: the kits' switches (RFD_*), this package's own (RFDIFFUSION1_*) and the base driver's card override (ALLOW_ANY_GPU); torch's, CUDA's and the caller's own environment (NVIDIA_TF32_OVERRIDE, TORCH_ALLOW_TF32_CUBLAS_OVERRIDE, CUDA_MPS_*, BLAS / ISA words, …) reaches the stock process as the caller set it and is the caller's to record; allowed_exceptions name the two data paths the stock CLI is given"
+ }
+}

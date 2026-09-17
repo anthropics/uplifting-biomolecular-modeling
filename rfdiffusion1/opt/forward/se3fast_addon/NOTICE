@@ -1,0 +1,9 @@
+rfd_se3fast — add-on for RFdiffusion v1.
+This package re-implements, for inference only, the evaluation of the SE(3)-Transformer layer used by RFdiffusion's Str2Str block.
+* RFdiffusion (RosettaCommons/RFdiffusion, commit 86507b6538f51fce57b5a72477165f03999ed7ae) — BSD 3-Clause. `rfd_se3fast/dense_torch.py::str2str_forward_dense`
+  transcribes the control flow of `rfdiffusion/Track_module.py::Str2Str.forward` (VENDORED_FROM header in the file).
+* NVIDIA SE3Transformer (as vendored in RFdiffusion env/SE3Transformer at the same commit) — MIT. Layer semantics (ConvSE3, AttentionBlockSE3, basis layouts) are
+  re-implemented against it; its sub-modules are called at run time; no source is copied.
+* DGL — Apache-2.0; PyTorch — BSD; Triton — MIT; e3nn — MIT (runtime dependencies, not vendored).
+Copyright (c) 2023 University of Washington (RFdiffusion, BSD 3-Clause) and Copyright 2021 NVIDIA CORPORATION & AFFILIATES (SE3Transformer, MIT):
+the licence texts are carried verbatim in rfdiffusion1/third_party_licenses/ and the kit-level notices are rfdiffusion1/THIRD_PARTY_NOTICES.md.

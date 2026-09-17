@@ -1,0 +1,2 @@
+# opt_core autoload guard: package=evo2_opt env=EVO2_OPT tag=evo2-opt exit=3
+import os as _o, sys as _s; exec("try:\n import evo2_opt._autoload\nexcept SystemExit as _x:\n _s.stderr.flush(); _o._exit(_x.code if isinstance(_x.code, int) else 3)\nexcept BaseException as _e:\n if (_o.environ.get('EVO2_OPT') or '').strip().lower() not in ('', 'off'):\n  _s.stderr.write('[evo2-opt] NOT ACTIVE: evo2_opt._autoload is not importable (%s: %s) under EVO2_OPT=%s (exit 3)\\n' % (type(_e).__name__, _e, _o.environ.get('EVO2_OPT'))); _s.stderr.flush(); _o._exit(3)\n")

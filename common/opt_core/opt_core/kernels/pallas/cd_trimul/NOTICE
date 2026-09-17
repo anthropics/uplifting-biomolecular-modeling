@@ -1,0 +1,7 @@
+cd_trimul -- TriangleMultiplication (AlphaFold-2 multimer fused-projection form) forward + backward as Pallas (Triton lowering)
+kernels: LayerNorm -> projection / gate -> mask (prologue), channel-batched contraction P Q^T, centre LayerNorm -> output
+projection -> gate (epilogue); backward by the mirrored kernels under jax.custom_vjp; run-to-run bitwise.
+
+Origin: first written as a kit's Pallas triangle-multiplication kernel in this repository (v2 'padded planes') and carried here
+byte for byte; kits bind it through their own module adapters.  The parameter-tree layout follows AlphaFold 2 multimer (DeepMind, Apache-2.0); no
+AlphaFold source is copied here.

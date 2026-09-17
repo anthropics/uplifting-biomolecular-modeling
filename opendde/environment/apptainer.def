@@ -1,0 +1,29 @@
+# OpenDDE optimization kit — Apptainer / Singularity image made FROM the container image of opendde/environment/Dockerfile: the same stack and
+# the same /kit, for hosts that run Apptainer instead of Docker. The source is the image tagged opendde-kit:dev in the local Docker daemon (build
+# it first: README.md 'Setup'); for a published tag the two header lines read `Bootstrap: docker` / `From: <registry>/opendde-kit:<tag>`.
+#   apptainer build opendde.sif opendde/environment/apptainer.def
+#   apptainer run --nv --cleanenv --bind /path/to/opendde_root:/weights --env OPENDDE_ROOT_DIR=/weights --bind "$PWD/out":/out opendde.sif \
+#     warm --config h100 -o /out/warm
+# The image is read-only: give every verb an output directory (-o) on a bound, writable path; the JIT caches (Triton, the fused-LayerNorm
+# extension build) go under $HOME/.cache (bound by default) or under MODEL_OPT_JIT_ROOT when set; %environment keeps a host user site-packages
+# (PEP 370) from shadowing the pinned stack, --cleanenv keeps the host's variables out.
+Bootstrap: docker-daemon
+From: opendde-kit:dev
+
+%post
+    mkdir -p /opt/culib && ln -s /.singularity.d/libs/libcuda.so.1 /opt/culib/libcuda.so && ln -s /.singularity.d/libs/libcuda.so.1 /opt/culib/libcuda.so.1
+
+%environment
+    export PYTHONNOUSERSITE=1
+    # Triton <= 3.5 links its launcher stub with -lcuda: offer the unversioned name when --nv bound only libcuda.so.1
+    if [ -z "${TRITON_LIBCUDA_PATH:-}" ] && [ -e /opt/culib/libcuda.so ]; then export TRITON_LIBCUDA_PATH=/opt/culib; fi
+
+%runscript
+    cd /kit/opendde && exec bash /kit/opendde/run.sh "$@"
+
+%help
+    OpenDDE optimization kit: drop-in modes that make stock OpenDDE 1.1.1 (`opendde pred`, model opendde_v1) faster or lighter on GPU memory
+    without changing how it is called — off = stock exactly; exact = stock's outputs bit for bit (under --det 1), faster; fast = small
+    documented numeric differences, faster still (the default); big = lowest GPU memory for large inputs. `apptainer run --nv opendde.sif
+    <verb> ...` = `bash /kit/opendde/run.sh <verb> ...` (verbs: install, pred, check, warm; /kit/opendde/README.md inside the image). Requires an
+    NVIDIA driver that runs CUDA 12.6 (560 or newer) and OPENDDE_ROOT_DIR naming the weights root.

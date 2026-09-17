@@ -1,0 +1,8 @@
+THIRD-PARTY NOTICES
+- boltz (https://github.com/jwohlwend/boltz), MIT License, Copyright (c) 2024 Jeremy Wohlwend, Gabriele Corso, Saro Passaro. `boltz_trunk_levers.py`
+  re-implements the forward passes of several boltz modules (derived work), distributed under the same MIT licence; the `mask3`-style excerpts of
+  PairWeightedAveraging/OuterProductMean likewise.
+- boltz_flash_triattn_patch.py wraps boltz's triangular_attention module, OpenFold-derived code inside boltz whose
+  files carry the headers "Copyright 2021 AlQuraishi Laboratory" and "Copyright 2021 DeepMind Technologies Limited", licensed under the Apache License,
+  Version 2.0 (http://www.apache.org/licenses/LICENSE-2.0); the patch mirrors that module's forward-pass control flow and no Apache-licensed source file is
+  redistributed here; attribution is retained here.

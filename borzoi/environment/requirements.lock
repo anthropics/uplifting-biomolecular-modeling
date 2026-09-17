@@ -1,0 +1,109 @@
+# Borzoi optimization kit — the tested stack, pinned: `pip freeze --all` of the environment this kit is tested in (Python 3.10.17,
+# stock/PINS.json `python` / `pins`): tensorflow 2.15.1 with the CUDA 12.2 / cuDNN 8.9 runtime as nvidia-*-cu12 wheels (the only CUDA
+# user-space the stack loads: TensorFlow resolves them beside itself in site-packages), keras 2.15.0, numpy 1.24.4, h5py 3.10.0, pandas 1.5.3,
+# pysam 0.22.1, scipy 1.9.3 and the rest of upstream's dependency set, plus the interpreter's tooling at the versions the stack carries
+# (pip 25.1.1 — installed first: it replaces the base image's bundled pip and runs every later install —, setuptools 65.5.1, wheel 0.45.1,
+# uv 0.7.19). The two `-e git+https://…` lines are the pinned upstream itself — calico/baskerville @ 544073b and calico/borzoi @ 5c93582,
+# editable: environment/Dockerfile installs them from the archives in stock/ at /opt/baskerville and /opt/borzoi (README.md 'Setup' route C
+# shows the same commands) and filters these two lines out of the `pip install -r` pass; given to pip as they stand they clone the same
+# commits from GitHub instead. Install with --no-deps (the set is complete and consistent: `pip check` passes); Linux x86_64, CPython 3.10.
+absl-py==2.5.0
+astunparse==1.6.3
+-e git+https://github.com/calico/baskerville.git@544073b87245d9f43ba63442c75bdbf32a9f8720#egg=baskerville
+-e git+https://github.com/calico/borzoi.git@5c9358222b5026abb733ed5fb84f3f6c77239b37#egg=borzoi
+certifi==2026.7.22
+cffi==2.1.1
+charset-normalizer==3.5.1
+contourpy==1.3.2
+cryptography==50.0.0
+cycler==0.12.1
+flatbuffers==25.12.19
+fonttools==4.63.0
+gast==0.7.0
+google-api-core==2.30.3
+google-auth==2.57.0
+google-auth-oauthlib==1.4.1
+google-cloud-core==2.7.0
+google-cloud-storage==2.0.0
+google-crc32c==1.8.0
+google-pasta==0.2.0
+google-resumable-media==2.10.1
+googleapis-common-protos==1.75.0
+grpcio==1.83.0
+h5py==3.10.0
+idna==3.19
+importlib_metadata==9.0.0
+intervaltree==3.1.0
+joblib==1.1.1
+keras==2.15.0
+kiwisolver==1.5.0
+libclang==18.1.1
+llvmlite==0.49.0
+Markdown==3.10.3
+MarkupSafe==3.0.3
+matplotlib==3.7.5
+ml-dtypes==0.3.2
+natsort==7.1.1
+ncls==0.0.70
+networkx==2.8.8
+numba==0.67.0
+numpy==1.24.4
+nvidia-cublas-cu12==12.2.5.6
+nvidia-cuda-cupti-cu12==12.2.142
+nvidia-cuda-nvcc-cu12==12.2.140
+nvidia-cuda-nvrtc-cu12==12.2.140
+nvidia-cuda-runtime-cu12==12.2.140
+nvidia-cudnn-cu12==8.9.4.25
+nvidia-cufft-cu12==11.0.8.103
+nvidia-curand-cu12==10.3.3.141
+nvidia-cusolver-cu12==11.5.2.141
+nvidia-cusparse-cu12==12.1.2.141
+nvidia-nccl-cu12==2.16.5
+nvidia-nvjitlink-cu12==12.2.140
+oauthlib==3.3.1
+opt_einsum==3.4.0
+packaging==26.3
+pandas==1.5.3
+patsy==1.0.2
+pillow==12.3.0
+pip==25.1.1
+proto-plus==1.28.2
+protobuf==4.25.9
+pyasn1==0.6.4
+pyasn1_modules==0.4.2
+pybedtools==0.10.0
+pyBigWig==0.3.25
+pycparser==3.0
+pyfaidx==0.7.2.2
+pyparsing==3.3.2
+pyranges==0.0.133
+pysam==0.22.1
+python-dateutil==2.9.0.post0
+pytz==2026.3.post1
+qnorm==0.8.1
+requests==2.34.2
+requests-oauthlib==2.0.0
+scikit-learn==1.2.2
+scipy==1.9.3
+seaborn==0.12.2
+setuptools==65.5.1
+six==1.17.0
+sorted_nearest==0.0.41
+sortedcontainers==2.4.0
+statsmodels==0.13.5
+tabulate==0.8.10
+tensorboard==2.15.2
+tensorboard-data-server==0.7.2
+tensorflow==2.15.1
+tensorflow-estimator==2.15.0
+tensorflow-io-gcs-filesystem==0.37.1
+termcolor==3.3.0
+threadpoolctl==3.6.0
+tqdm==4.65.2
+typing_extensions==4.16.0
+urllib3==2.7.0
+uv==0.7.19
+Werkzeug==3.1.8
+wheel==0.45.1
+wrapt==1.14.2
+zipp==4.1.0

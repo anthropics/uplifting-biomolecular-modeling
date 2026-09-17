@@ -1,0 +1,7 @@
+cd_layers -- three sub-layer rows from the hallucination-design kit's kernels package in this repository, carried byte for byte:
+layers_ln.py (LayerNorm forward / backward row kernels, Pallas), layers_opm.py (outer-product mean re-associated as pure XLA,
+f32 intermediate; imports haiku with jax behind an import guard), layers_transition.py (ReLU transition: one fused forward
+kernel, one backward kernel for d_x, XLA weight gradients).  layers_ln / layers_opm: kit 0.6.0 (v1); layers_transition: the
+kit's queued v1 (not bound by the kit's shipped modes: its per-unit yardstick placed the pair-stack transition outside the
+kit's precision class while the kernel itself is class-correct -- the cell table records where it measured ahead).
+The formulas follow AlphaFold 2 (DeepMind, Apache-2.0) haiku modules; no AlphaFold source is copied here.

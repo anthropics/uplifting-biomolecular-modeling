@@ -1,0 +1,108 @@
+; ModuleID = 'LLVMDialectModule'
+source_filename = "LLVMDialectModule"
+
+define void @_dense_chains_kernel(ptr addrspace(1) %0, ptr addrspace(1) %1, ptr addrspace(1) %2) local_unnamed_addr !dbg !7 {
+  %4 = tail call i32 asm "mov.u32 $0, %ctaid.x;", "=r"() #1, !dbg !10
+  %5 = tail call i32 @llvm.nvvm.read.ptx.sreg.tid.x(), !dbg !11
+  %6 = and i32 %5, 15, !dbg !11
+  %7 = shl i32 %4, 9, !dbg !12
+  %8 = sext i32 %7 to i64, !dbg !13
+  %9 = getelementptr float, ptr addrspace(1) %0, i64 %8, !dbg !13
+  br label %10, !dbg !14
+
+10:                                               ; preds = %3, %10
+  %11 = phi float [ 0.000000e+00, %3 ], [ %22, %10 ]
+  %12 = phi i32 [ 0, %3 ], [ %23, %10 ]
+  %13 = shl nuw nsw i32 %12, 4, !dbg !15
+  %14 = or disjoint i32 %13, %6, !dbg !16
+  %15 = zext nneg i32 %14 to i64, !dbg !17
+  %16 = getelementptr float, ptr addrspace(1) %9, i64 %15, !dbg !17
+  %17 = tail call i32 asm sideeffect "mov.u32 $0, 0x0;\0A\09@$2 ld.global.b32 { $0 }, [ $1 + 0 ];\0A\09@!$4 mov.u32 $0, $3;", "=r,l,b,r,b"(ptr addrspace(1) %16, i1 true, i32 0, i1 true) #1, !dbg !18
+  %18 = bitcast i32 %17 to float, !dbg !18
+  %19 = getelementptr float, ptr addrspace(1) %1, i64 %15, !dbg !19
+  %20 = tail call i32 asm sideeffect "mov.u32 $0, 0x0;\0A\09@$2 ld.global.b32 { $0 }, [ $1 + 0 ];\0A\09@!$4 mov.u32 $0, $3;", "=r,l,b,r,b"(ptr addrspace(1) %19, i1 true, i32 0, i1 true) #1, !dbg !20
+  %21 = bitcast i32 %20 to float, !dbg !20
+  %22 = tail call float @llvm.fma.f32(float %18, float %21, float %11), !dbg !21
+  %23 = add nuw nsw i32 %12, 1, !dbg !14
+  %24 = icmp ult i32 %12, 15, !dbg !14
+  br i1 %24, label %10, label %25, !dbg !14
+
+25:                                               ; preds = %10
+  %26 = and i32 %5, 16, !dbg !11
+  %27 = shl i32 %4, 5, !dbg !22
+  %28 = sext i32 %27 to i64, !dbg !23
+  %29 = getelementptr float, ptr addrspace(1) %2, i64 %28, !dbg !23
+  %30 = zext nneg i32 %6 to i64, !dbg !24
+  %31 = getelementptr float, ptr addrspace(1) %29, i64 %30, !dbg !24
+  %32 = icmp eq i32 %26, 0, !dbg !25
+  %33 = bitcast float %22 to i32, !dbg !25
+  tail call void asm sideeffect "@$2 st.global.b32 [ $1 + 0 ], { $0 };", "r,l,b"(i32 %33, ptr addrspace(1) %31, i1 %32) #1, !dbg !25
+  br label %34, !dbg !14
+
+34:                                               ; preds = %25, %34
+  %35 = phi float [ 0.000000e+00, %25 ], [ %46, %34 ]
+  %36 = phi i32 [ 16, %25 ], [ %47, %34 ]
+  %37 = shl nuw nsw i32 %36, 4, !dbg !15
+  %38 = or disjoint i32 %37, %6, !dbg !16
+  %39 = zext nneg i32 %38 to i64, !dbg !17
+  %40 = getelementptr float, ptr addrspace(1) %9, i64 %39, !dbg !17
+  %41 = tail call i32 asm sideeffect "mov.u32 $0, 0x0;\0A\09@$2 ld.global.b32 { $0 }, [ $1 + 0 ];\0A\09@!$4 mov.u32 $0, $3;", "=r,l,b,r,b"(ptr addrspace(1) %40, i1 true, i32 0, i1 true) #1, !dbg !18
+  %42 = bitcast i32 %41 to float, !dbg !18
+  %43 = getelementptr float, ptr addrspace(1) %1, i64 %39, !dbg !19
+  %44 = tail call i32 asm sideeffect "mov.u32 $0, 0x0;\0A\09@$2 ld.global.b32 { $0 }, [ $1 + 0 ];\0A\09@!$4 mov.u32 $0, $3;", "=r,l,b,r,b"(ptr addrspace(1) %43, i1 true, i32 0, i1 true) #1, !dbg !20
+  %45 = bitcast i32 %44 to float, !dbg !20
+  %46 = tail call float @llvm.fma.f32(float %42, float %45, float %35), !dbg !21
+  %47 = add nuw nsw i32 %36, 1, !dbg !14
+  %48 = icmp ult i32 %36, 31, !dbg !14
+  br i1 %48, label %34, label %49, !dbg !14
+
+49:                                               ; preds = %34
+  %50 = getelementptr i8, ptr addrspace(1) %29, i64 64, !dbg !26
+  %51 = getelementptr float, ptr addrspace(1) %50, i64 %30, !dbg !24
+  %52 = bitcast float %46 to i32, !dbg !25
+  tail call void asm sideeffect "@$2 st.global.b32 [ $1 + 0 ], { $0 };", "r,l,b"(i32 %52, ptr addrspace(1) %51, i1 %32) #1, !dbg !25
+  ret void, !dbg !27
+}
+
+; Function Attrs: mustprogress nocallback nofree nosync nounwind speculatable willreturn memory(none)
+declare noundef i32 @llvm.nvvm.read.ptx.sreg.tid.x() #0
+
+; Function Attrs: mustprogress nocallback nofree nosync nounwind speculatable willreturn memory(none)
+declare float @llvm.fma.f32(float, float, float) #0
+
+attributes #0 = { mustprogress nocallback nofree nosync nounwind speculatable willreturn memory(none) }
+attributes #1 = { nounwind }
+
+!llvm.module.flags = !{!0, !1}
+!llvm.dbg.cu = !{!2}
+!nvvm.annotations = !{!4, !5}
+!llvm.ident = !{!6}
+
+!0 = !{i32 2, !"Debug Info Version", i32 3}
+!1 = !{i32 4, !"nvvm-reflect-ftz", i32 1}
+!2 = distinct !DICompileUnit(language: DW_LANG_C, file: !3, producer: "triton", isOptimized: true, runtimeVersion: 0, emissionKind: LineTablesOnly)
+!3 = !DIFile(filename: "kernels.py", directory: "/opt/cbp_build/chrombpnet_k1")
+!4 = !{ptr @_dense_chains_kernel, !"kernel", i32 1}
+!5 = !{ptr @_dense_chains_kernel, !"maxntidx", i32 32}
+!6 = !{!"clang version 3.8.0 (tags/RELEASE_380/final)"}
+!7 = distinct !DISubprogram(name: "_dense_chains_kernel", linkageName: "_dense_chains_kernel", scope: !3, file: !3, line: 123, type: !8, scopeLine: 123, spFlags: DISPFlagDefinition | DISPFlagOptimized, unit: !2)
+!8 = !DISubroutineType(cc: DW_CC_normal, types: !9)
+!9 = !{}
+!10 = !DILocation(line: 126, column: 22, scope: !7)
+!11 = !DILocation(line: 126, column: 43, scope: !7)
+!12 = !DILocation(line: 135, column: 32, scope: !7)
+!13 = !DILocation(line: 135, column: 28, scope: !7)
+!14 = !DILocation(line: 130, column: 42, scope: !7)
+!15 = !DILocation(line: 134, column: 24, scope: !7)
+!16 = !DILocation(line: 134, column: 28, scope: !7)
+!17 = !DILocation(line: 135, column: 36, scope: !7)
+!18 = !DILocation(line: 135, column: 24, scope: !7)
+!19 = !DILocation(line: 136, column: 28, scope: !7)
+!20 = !DILocation(line: 136, column: 24, scope: !7)
+!21 = !DILocation(line: 137, column: 36, scope: !7)
+!22 = !DILocation(line: 138, column: 37, scope: !7)
+!23 = !DILocation(line: 138, column: 24, scope: !7)
+!24 = !DILocation(line: 138, column: 49, scope: !7)
+!25 = !DILocation(line: 138, column: 52, scope: !7)
+!26 = !DILocation(line: 138, column: 41, scope: !7)
+!27 = !DILocation(line: 128, column: 4, scope: !7)

@@ -1,0 +1,28 @@
+# E1 optimization kit — Apptainer / Singularity image made FROM the container image of e1/environment/Dockerfile: the same stack and the same
+# /kit, for hosts that run Apptainer instead of Docker. The source is the image tagged e1-kit:dev in the local Docker daemon (build it first:
+# README.md 'Setup'); for a published tag the two header lines read `Bootstrap: docker` / `From: <registry>/e1-kit:<tag>`.
+#   apptainer build e1.sif e1/environment/apptainer.def
+#   apptainer run --nv --cleanenv --bind /path/to/hf_home:/weights --env HF_HOME=/weights --bind "$PWD/out":/out e1.sif \
+#     score --config h100 --variant 600m --mode exact --parent-path /kit/e1/opt/e1_opt/tests/fixtures/warm/parent.fasta \
+#       --mutants-path /kit/e1/opt/e1_opt/tests/fixtures/warm/mutants.fasta --output-path /out/exact/scores.csv
+# The image is read-only: give `score` an --output-path on a bound, writable path; the JIT caches go under $HOME/.cache (bound by default) or
+# MODEL_OPT_JIT_ROOT; %environment keeps a host user site-packages (PEP 370) from shadowing the pinned stack, --cleanenv keeps the host's variables out.
+Bootstrap: docker-daemon
+From: e1-kit:dev
+
+%post
+    mkdir -p /opt/culib && ln -s /.singularity.d/libs/libcuda.so.1 /opt/culib/libcuda.so && ln -s /.singularity.d/libs/libcuda.so.1 /opt/culib/libcuda.so.1
+
+%environment
+    export PYTHONNOUSERSITE=1
+    # Triton <= 3.5 links its launcher stub with -lcuda: offer the unversioned name when --nv bound only libcuda.so.1
+    if [ -z "${TRITON_LIBCUDA_PATH:-}" ] && [ -e /opt/culib/libcuda.so ]; then export TRITON_LIBCUDA_PATH=/opt/culib; fi
+
+%runscript
+    cd /kit/e1 && exec bash /kit/e1/run.sh "$@"
+
+%help
+    E1 optimization kit: drop-in modes that make stock E1 1.0.0 (the `python -m E1.tools.score` point-mutant scorer, sizes 150m / 300m / 600m)
+    faster without changing how it is called — off = stock exactly; exact = the same scores.csv, faster (the default).
+    `apptainer run --nv e1.sif <verb> ...` = `bash /kit/e1/run.sh <verb> ...` (verbs: install, score, check, warm;
+    /kit/e1/README.md inside the image). Requires an NVIDIA driver that runs CUDA 12.8 (570 or newer) and HF_HOME naming the staged weights.

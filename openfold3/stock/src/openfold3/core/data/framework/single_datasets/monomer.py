@@ -1,0 +1,168 @@
+# Copyright 2026 AlQuraishi Laboratory
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import logging
+import random
+import traceback
+
+import pandas as pd
+import torch
+
+from openfold3.core.data.framework.single_datasets.abstract_single import (
+    register_dataset,
+)
+from openfold3.core.data.framework.single_datasets.base_of3 import (
+    BaseOF3Dataset,
+)
+from openfold3.core.data.framework.single_datasets.dataset_utils import (
+    check_invalid_feature_dict,
+    getitem_debug_log,
+)
+
+logger = logging.getLogger(__name__)
+
+
+@register_dataset
+class MonomerDataset(BaseOF3Dataset):
+    def __init__(self, dataset_config: dict) -> None:
+        """Initializes a MonomerDataset.
+
+        Should be used as a base class for single-molecule-type monomer datasets.
+
+        Args:
+            dataset_config (dict):
+                Input config. See openfold3/examples/pdb_sample_dataset_config.yml for
+                an example.
+        """
+        super().__init__(dataset_config)
+
+        # Datapoint cache
+        self.create_datapoint_cache()
+
+    def create_datapoint_cache(self):
+        """Creates the datapoint_cache for uniform sampling.
+
+        Creates a Dataframe storing a flat list of structure_data keys and sets
+        corresponding datapoint probabilities all to 1. Used for mapping FROM the
+        dataset_cache in the SamplerDataset and TO the dataset_cache in the
+        getitem.
+        """
+        # TODO: rename PDB ID to MGnify ID or more generic name
+        sample_ids = list(self.dataset_cache.structure_data.keys())
+        sample_indices = list(
+            [
+                entry_data.chains["1"].index
+                for entry_data in self.dataset_cache.structure_data.values()
+            ]
+        )
+        datapoint_cache_unsorted = pd.DataFrame(
+            {
+                "pdb_id": sample_ids,
+                "index": sample_indices,
+                "datapoint_probabilities": [1.0] * len(sample_ids),
+            }
+        )
+        self.datapoint_cache = datapoint_cache_unsorted.sort_values("index")[
+            ["pdb_id", "datapoint_probabilities"]
+        ]
+
+    def __getitem__(
+        self, index: int
+    ) -> dict[str : torch.Tensor | dict[str, torch.Tensor]]:
+        """Returns a single datapoint from the dataset.
+
+        Note: The data pipeline is modularized at the getitem level to enable
+        subclassing for profiling without code duplication. See
+        logging_datasets.py for an example."""
+
+        # Get PDB ID from the datapoint cache and the preferred chain/interface
+        datapoint = self.datapoint_cache.iloc[index]
+        pdb_id = datapoint["pdb_id"]
+
+        # TODO: Remove debug logic
+        if not self.debug_mode:
+            sample_data = self.create_all_features(
+                pdb_id=datapoint["pdb_id"],
+                preferred_chain_or_interface=None,
+                return_atom_arrays=False,
+                return_crop_strategy=False,
+            )
+
+            features = sample_data["features"]
+            features["pdb_id"] = pdb_id
+            features["preferred_chain_or_interface"] = "none"
+            return features
+        else:
+            try:
+                getitem_debug_log(f"MonomerDataset-{self.single_moltype}")
+                sample_data = self.create_all_features(
+                    pdb_id=datapoint["pdb_id"],
+                    preferred_chain_or_interface=None,
+                    return_atom_arrays=False,
+                    return_crop_strategy=False,
+                )
+
+                features = sample_data["features"]
+
+                features["pdb_id"] = pdb_id
+                features["preferred_chain_or_interface"] = "none"
+
+                check_invalid_feature_dict(features)
+
+                return features
+
+            except Exception as e:
+                tb = traceback.format_exc()
+                dataset_name = self.get_class_name()
+                logger.warning(
+                    "-" * 40
+                    + "\n"
+                    + f"Failed to process {dataset_name} entry "
+                    + f"{pdb_id}: {str(e)}\n"
+                    + f"Exception type: {type(e).__name__}\nTraceback: {tb}"
+                    + "-" * 40
+                )
+                index = random.randint(0, len(self) - 1)
+                return self.__getitem__(index)
+
+
+@register_dataset
+class ProteinMonomerDataset(MonomerDataset):
+    def __init__(self, dataset_config: dict) -> None:
+        """Initializes a ProteinMonomerDataset.
+
+        Args:
+            dataset_config (dict):
+                Input config. See openfold3/examples/pdb_sample_dataset_config.yml for
+                an example.
+        """
+        super().__init__(dataset_config)
+        # All samples are protein
+        self.single_moltype = "PROTEIN"
+
+
+@register_dataset
+class RNAMonomerDataset(MonomerDataset):
+    def __init__(self, dataset_config: dict) -> None:
+        """Initializes a RNAMonomerDataset.
+
+        Args:
+            dataset_config (dict):
+                Input config. See openfold3/examples/pdb_sample_dataset_config.yml for
+                an example.
+        """
+        super().__init__(dataset_config)
+
+        # All samples are RNA
+        self.single_moltype = "RNA"

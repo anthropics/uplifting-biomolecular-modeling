@@ -1,0 +1,8 @@
+fpf_triatt_k2b (a FlashPairformer kernel carried in opt_core: opt_core/kernels/fpf_triatt_k2b) — third-party attributions.
+
+Portions of this kernel re-state the arithmetic of Protenix's pair-stack modules (protenix/model/triangular/*,
+protenix/model/modules/pairformer.py, protenix/model/layer_norm): Protenix, Copyright 2024 ByteDance and/or its affiliates, Apache License 2.0,
+https://github.com/bytedance/Protenix. The licence text is carried as opt_core/kernels/fpf_flashpairformer.PROTENIX_LICENSE (one directory up
+from this file). No Protenix source file is included.
+
+Third-party software this kernel calls and does not include or modify: NVIDIA cuEquivariance (cuequivariance-torch / cuequivariance-ops-torch; NVIDIA's licence, installed by the user), PyTorch (BSD-3-Clause), OpenAI Triton (MIT).

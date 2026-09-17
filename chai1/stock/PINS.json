@@ -1,0 +1,197 @@
+{
+ "model": "chai1",
+ "upstream": {
+  "package": "chai_lab",
+  "version": "0.6.1",
+  "repo": "https://github.com/chaidiscovery/chai-lab",
+  "tag": "v0.6.1",
+  "commit": "8d5ac0f93e9b6ea4c3a6545c253a6381c0f3694b",
+  "install": "pip install chai_lab==0.6.1   # == pip install stock/chai_lab-0.6.1-py3-none-any.whl (same bytes)",
+  "wheel": {
+   "file": "stock/chai_lab-0.6.1-py3-none-any.whl",
+   "package_files": 102,
+   "equals_tag": true,
+   "note": "the wheel's chai_lab/ directory is byte-identical to the tag's (102 files, none differ, none missing either way); stock/src is the git archive of the tag (chai_lab/ + LICENSE, README.md, pyproject.toml, requirements.in, Dockerfile.chailab)"
+  },
+  "cli": {
+   "command": "chai-lab fold",
+   "entry_point": "chai_lab.main:cli",
+   "note": "typer over run_inference (chai_lab/main.py:38); every route of this tree calls run_inference directly"
+  },
+  "declared_ranges": [
+   "antipickle==0.2.0",
+   "beartype>=0.18",
+   "biopython>=1.83",
+   "einops~=0.8",
+   "gemmi~=0.6.3",
+   "jaxtyping>=0.2.25",
+   "matplotlib",
+   "modelcif>=1.0",
+   "numba>=0.59",
+   "numpy~=1.21",
+   "pandas[aws,gcp,parquet]~=2.1",
+   "pandera",
+   "rdkit~=2024.9.5",
+   "tmtools>=0.0.3",
+   "torch<2.7,>=2.3.1",
+   "tqdm~=4.66",
+   "typer-slim~=0.12",
+   "typing-extensions"
+  ],
+  "requires_python": ">=3.10",
+  "dockerfile": {
+   "file": "stock/src/Dockerfile.chailab",
+   "base": "ubuntu:22.04",
+   "python": "3.10",
+   "note": "installs requirements.in through uv; declares no torch/CUDA version, no lock file at the tag"
+  }
+ },
+ "stack": {
+  "note": "the torch / CUDA stack this tree was tested on — every mode (off, exact, fast, big), stock and kit alike, on one and the same stack",
+  "tested_on": "the pinned stack below (torch 2.13.0+cu130, CUDA 13.0, cuDNN 9.20.0, triton 3.7.1, Python 3.11.5) on NVIDIA H100 80GB HBM3 (sm90) — documentation only: nothing reads or compares this line",
+  "python": "3.11.5",
+  "torch": "2.13.0+cu130",
+  "cuda": "13.0",
+  "cudnn": "9.20.0",
+  "triton": "3.7.1",
+  "numpy": "1.26.4",
+  "rdkit": "2024.9.6",
+  "gemmi": "0.6.7",
+  "pandas": "2.3.3",
+  "antipickle": "0.2.0",
+  "einops": "0.8.2",
+  "c_compiler": "gcc 11.4.0",
+  "gpu": "NVIDIA H100 80GB HBM3 (sm90)",
+  "torch_vs_declared_range": "outside the stock wheel's declared torch<2.7,>=2.3.1 (upstream); chai_lab 0.6.1 is installed on it with that requirement relaxed and runs unmodified from source — stock's outputs on it are what the kit modes are compared with (stock/check_pins.py records any other torch / CUDA build as STACK not pinned and, under --strict-stack, refuses it)"
+ },
+ "stacks": {
+  "note": "the pinned stacks, by stack key (torch<version sans local tag>-cu<CUDA>-sm<compute capability>, chai1_opt.stack.stack_key): `stack` above is the only one — every mode (off, exact, fast, big; stock and kit alike on one torch / CUDA stack). On any other torch / CUDA build every mode runs with the record `STACK not pinned: torch <v>+<cuda> (pinned: torch 2.13.0+cu130)` (stock/check_pins.py stack_verdict; the package's NOTE line and opt_manifest.json stack_pinned / stack_line); --strict-stack / CHAI1_OPT_STRICT_STACK=1 refuses it instead. exact is bit-for-bit equal to stock under --det 1 on one and the same stack; fast and big match stock inside stock's seed-to-seed band",
+  "torch2.13.0-cu130-sm90": {
+   "modes": [
+    "off",
+    "exact",
+    "fast",
+    "big"
+   ],
+   "torch": "2.13.0+cu130",
+   "cuda": "13.0",
+   "triton": "3.7.1",
+   "python": "3.11",
+   "chai_lab": "0.6.1",
+   "c_compiler": "gcc 11.4.0 (Triton's launcher build needs one)",
+   "gpu": "NVIDIA H100 80GB HBM3 (sm90); B200 (sm100) in the eager stack's record",
+   "role": "the tree's pinned stack (`stack`): every mode; exact's bit-for-bit runs and fast / big's band runs were measured on it against stock on it",
+   "torch_vs_declared_range": "outside the stock wheel's declared torch<2.7 (stock/PINS.json upstream); the pinned stack carries chai_lab 0.6.1 on this torch regardless (installed without letting pip re-resolve torch) and stock runs unmodified from source"
+  }
+ },
+ "library_defaults": {
+  "use_esm_embeddings": true,
+  "use_msa_server": false,
+  "use_templates_server": false,
+  "recycle_msa_subsample": 0,
+  "num_trunk_recycles": 3,
+  "num_diffn_timesteps": 200,
+  "num_diffn_samples": 5,
+  "num_trunk_samples": 1,
+  "low_memory": true,
+  "msa_server_url": "https://api.colabfold.com",
+  "constraint_path": null,
+  "template_hits_path": null,
+  "seed": null,
+  "device": null,
+  "source": "chai_lab/chai1.py run_inference signature, lines 482-503 (stock/src)"
+ },
+ "model_sizes": {
+  "AVAILABLE_MODEL_SIZES": [
+   256,
+   384,
+   512,
+   768,
+   1024,
+   1536,
+   2048
+  ],
+  "source": "chai_lab/data/collate/utils.py:13 — the crop size is the smallest bin >= the token count; largest 2048 (raise_if_too_many_tokens, chai1.py:242)"
+ },
+ "outputs": {
+  "per_sample": [
+   "pred.model_idx_<k>.cif",
+   "scores.model_idx_<k>.npz"
+  ],
+  "per_run": [
+   "msa_depth.pdf (when an MSA is present)"
+  ],
+  "source": "chai_lab/chai1.py:931,978,998",
+  "empty_output_dir_required": "chai1.py:505-508"
+ },
+ "weights": {
+  "env": "CHAI_DOWNLOADS_DIR",
+  "layout": "chai-lab's downloads/ layout (chai_lab/utils/paths.py:19-22,62-80)",
+  "cdn": "https://chaiassets.com/chai1-inference-depencencies/",
+  "files": [
+   {
+    "local": "models_v2/feature_embedding.pt",
+    "url": "https://chaiassets.com/chai1-inference-depencencies/models_v2/feature_embedding.pt",
+    "sha256": "58600fb282827ee105b4bf33845c2eb2dce2a7d2ba7582951f76c9290c66c019",
+    "bytes": 4587962
+   },
+   {
+    "local": "models_v2/bond_loss_input_proj.pt",
+    "url": "https://chaiassets.com/chai1-inference-depencencies/models_v2/bond_loss_input_proj.pt",
+    "sha256": "98f3b2e415d11e460a684cdbfc213ca80447308022b1953cc5326ad468948851",
+    "bytes": 5502
+   },
+   {
+    "local": "models_v2/token_embedder.pt",
+    "url": "https://chaiassets.com/chai1-inference-depencencies/models_v2/token_embedder.pt",
+    "sha256": "60cada19fd9c77d8298131a00368d162b6bc7d3c836dd36c715db04d21f7bbde",
+    "bytes": 6286772
+   },
+   {
+    "local": "models_v2/trunk.pt",
+    "url": "https://chaiassets.com/chai1-inference-depencencies/models_v2/trunk.pt",
+    "sha256": "b7a08e104455f76491088a5eeaea9bb95a08168c48969b0b892971346e51ccbc",
+    "bytes": 633042135
+   },
+   {
+    "local": "models_v2/diffusion_module.pt",
+    "url": "https://chaiassets.com/chai1-inference-depencencies/models_v2/diffusion_module.pt",
+    "sha256": "bd77cf4095ad6b8a4eae7e390d01d24be1ebd819922ca3f28e8744f9945c9cad",
+    "bytes": 476546304
+   },
+   {
+    "local": "models_v2/confidence_head.pt",
+    "url": "https://chaiassets.com/chai1-inference-depencencies/models_v2/confidence_head.pt",
+    "sha256": "82a4ac9f934fdd0e73870150f508cecbe010c1383234bdadcaa70d57323deb6b",
+    "bytes": 55259496
+   },
+   {
+    "local": "conformers_v1.apkl",
+    "url": "https://chaiassets.com/chai1-inference-depencencies/conformers_v1.apkl",
+    "sha256": "f2161256b565bbd84198da8b3e3d3978ae2f179f778d0995cd135c4c0c57c41f",
+    "bytes": 124726115
+   },
+   {
+    "local": "esm/traced_sdpa_esm2_t36_3B_UR50D_fp16.pt",
+    "url": "https://chaiassets.com/chai1-inference-depencencies/esm2/traced_sdpa_esm2_t36_3B_UR50D_fp16.pt",
+    "sha256": "074673b97e1c1ff9c3cf949294749dd446ad1c83cee50a466b4841bb4d89c27a",
+    "bytes": 5678940466
+   }
+  ],
+  "sha256_note": "sha256 of the eight files as they are read by this tree (also the kit driver's own PROVENANCE lines at start-up); upstream publishes no digests for them",
+  "fetch_policy": "nothing is fetched at run time: the package refuses when a file is missing (stack.weights_check); upstream and the kit would download from the CDN"
+ },
+ "stock_environment": {
+  "reads": [
+   "CHAI_DOWNLOADS_DIR",
+   "CUDA_VISIBLE_DEVICES"
+  ],
+  "must_be_absent": [
+   "CHAI1_OPT*",
+   "CHAI_DETERMINISTIC",
+   "CHAI_JIT_PROFILING_OFF",
+   "CUBLAS_WORKSPACE_CONFIG"
+  ],
+  "note": "the package's own switch (CHAI1_OPT), the kit's recipe and mirror variables, and the recipe's cuBLAS variable: a stock process carries none of them and no kit directory on sys.path (opt/chai1_opt/stock_fold.py env_proof); every other CHAI_* name is refused too (only CHAI_DOWNLOADS_DIR is upstream's)"
+ }
+}

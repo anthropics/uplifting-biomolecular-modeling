@@ -1,0 +1,37 @@
+diff --git a/src/transformers/models/esmfold2/modeling_esmfold2_common.py b/src/transformers/models/esmfold2/modeling_esmfold2_common.py
+index 4c27da182..36aba8490 100644
+--- a/src/transformers/models/esmfold2/modeling_esmfold2_common.py
++++ b/src/transformers/models/esmfold2/modeling_esmfold2_common.py
+@@ -1835,7 +1835,11 @@ class DiffusionStructureHead(nn.Module):
+         token_repr: Tensor | None = None
+         diff_atom_intermediates: Tensor | None = None
+ 
+-        step_pairs = list(zip(schedule[:-1], schedule[1:], gammas[1:]))
++        # one host<->device sync for the whole schedule instead of three .item() syncs per step
++        # (float() of an fp32 tensor element == float(t.item()); values bitwise identical)
++        _sched = [float(v) for v in schedule.tolist()]
++        _gam = [float(v) for v in gammas.tolist()]
++        step_pairs = list(zip(_sched[:-1], _sched[1:], _gam[1:]))
+         num_steps = len(step_pairs)
+ 
+         for step_idx, (sigma_tm, sigma_t, gamma) in enumerate(step_pairs):
+@@ -1843,8 +1847,8 @@ class DiffusionStructureHead(nn.Module):
+                 x, atom_mask, second_coords=x_denoised_prev
+             )
+ 
+-            sigma_tm_val = float(sigma_tm.item())
+-            t_hat_val = sigma_tm_val * (1.0 + float(gamma.item()))
++            sigma_tm_val = sigma_tm
++            t_hat_val = sigma_tm_val * (1.0 + gamma)
+             eps_std = lam * max(t_hat_val**2 - sigma_tm_val**2, 0.0) ** 0.5
+             x_noisy = x + eps_std * torch.randn_like(x)
+ 
+@@ -1894,7 +1898,7 @@ class DiffusionStructureHead(nn.Module):
+             x_noisy = x_noisy.to(dtype=x_denoised.dtype)
+ 
+             # ODE/SDE step
+-            sigma_t_val = float(sigma_t.item())
++            sigma_t_val = sigma_t
+             denoised_over_sigma = (x_noisy - x_denoised) / t_hat_val
+             x = x_noisy + eta * (sigma_t_val - t_hat_val) * denoised_over_sigma
+ 

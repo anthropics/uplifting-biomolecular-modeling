@@ -1,0 +1,18 @@
+# Settings for the `align-msa-server` command in `run_openfold.py`.
+# Put every query for the job in one query JSON so the server requests can be
+# deduplicated across the full set.
+
+# This uses the model defined by core.data.tools.colabfold_msa_server.MsaComputationSettings
+
+# To run with this server yaml:
+#   ```
+#   run_openfold align-msa-server \
+#       --query-json examples/example_inference_inputs/query_ubiquitin.json \
+#       --output-dir output/msa_server_test \
+#       --msa-computation-settings-yaml examples/colabfold_msa_alignment/msa_server.yml
+#   ```
+  
+
+msa_file_format: a3m
+server_user_agent: example-agent
+server_url: https://example-private.url

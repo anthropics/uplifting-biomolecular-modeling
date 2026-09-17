@@ -1,0 +1,52 @@
+{
+ "model": "enformer_deepmind",
+ "upstream": {
+  "deepmind-research/enformer": {
+   "repo": "https://github.com/google-deepmind/deepmind-research",
+   "commit": "f5de0ede8430809180254ee957abf36ed62579ef",
+   "subdir": "enformer",
+   "role": "documents the model and its use (README.md, enformer-usage.ipynb: tensorflow_hub.load(handle).model.predict_on_batch); the network that runs is the TF-Hub SavedModel below, exported by the authors from this code",
+   "note": "the repository's Sonnet module route (enformer.py + the sonnet_weights checkpoint) requires dm-sonnet 2.0.0 / TensorFlow 2.5 (requirements.txt), which do not run on this stack; it is not served"
+  }
+ },
+ "python": "3.11",
+ "pins": {
+  "tensorflow": "2.17.1",
+  "tensorflow-hub": "0.16.1",
+  "numpy": "1.26.4"
+ },
+ "weights": {
+  "tfhub:deepmind/enformer/1": {
+   "handle": "https://tfhub.dev/deepmind/enformer/1",
+   "tfhub_cache_key": "c444fdff3e183daf686869692c26e00391f6773c",
+   "cache_layout": "TFHUB_CACHE_DIR/c444fdff3e183daf686869692c26e00391f6773c/{saved_model.pb, variables/} — tensorflow-hub's own cache (hub.load resolves the handle offline when the directory exists)",
+   "input": "float32 one-hot (B, 393216, 4) in ACGT order (N = zeros); the graph uses the central 196,608 bp",
+   "outputs": {
+    "human": "(B, 896, 5313)",
+    "mouse": "(B, 896, 1643)"
+   },
+   "exported_with": "tensorflow 2.4 (the SavedModel's own metadata); prediction function __inference_predict_on_batch with one concrete signature",
+   "files": {
+    "saved_model.pb": {
+     "sha256": "c8f0af88f3626e7823f2b8fb2b8b7b07d6f337ae0aadc5f70c5671d263c695d6",
+     "size_bytes": 2310075
+    },
+    "variables/variables.data-00000-of-00001": {
+     "sha256": "6a64f5fdb08b79efc5f18a1d18a804486390d5649046c8b63ac7bb6794cfc461",
+     "size_bytes": 1005172750
+    },
+    "variables/variables.index": {
+     "sha256": "7a30693fac902bd23140e962368a80577ed4a05e62c7602b25a820be32d53f91",
+     "size_bytes": 5893
+    }
+   }
+  }
+ },
+ "library_defaults": {
+  "note": "the stock call the kit reproduces: predict_on_batch under TensorFlow's own defaults — float32, TF32 tensor-core arithmetic enabled by TensorFlow on compute capability 8.0 and newer, cuDNN autotuning as TensorFlow ships it, the SavedModel's function optimized by TensorFlow's default graph passes; the kit sets no TensorFlow option and no environment variable"
+ },
+ "entry_point": {
+  "hub": "tensorflow_hub.load('https://tfhub.dev/deepmind/enformer/1').model.predict_on_batch(x)",
+  "saved_model": "tf.saved_model.load(<dir>).model.predict_on_batch(x)"
+ }
+}

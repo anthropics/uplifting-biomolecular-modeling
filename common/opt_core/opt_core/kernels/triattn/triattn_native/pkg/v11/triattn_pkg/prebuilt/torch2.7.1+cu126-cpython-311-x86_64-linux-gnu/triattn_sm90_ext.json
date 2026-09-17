@@ -1,0 +1,41 @@
+{
+ "arch": [
+  "arch=compute_90a,code=sm_90a"
+ ],
+ "build_s": 84.7,
+ "built_by": "tools/build_prebuilt.py: the kernel directory's own _build() in the target stack",
+ "built_utc": "2026-09-12T02:26:23Z",
+ "cutlass_tag": "v4.7.1",
+ "cxx11abi": true,
+ "device": "NVIDIA H100 80GB HBM3",
+ "dir": "cuda",
+ "ext": "triattn_sm90_ext",
+ "loadcheck": {
+  "s384_endstrided": "b51395b940080c97"
+ },
+ "loadcheck_bitwise": {
+  "s384_endstrided": true
+ },
+ "module": "triattn_cuda",
+ "module_sha256": {
+  "triattn_cuda.py": "3dae2aea5b40579ac5fdbf5b1a72d145897f745fdae7fdb533dfaeeb2eafb40b"
+ },
+ "nvcc": "Build cuda_12.6.r12.6/compiler.35059454_0",
+ "ptxas": {
+  "path": "/usr/local/cuda/bin/ptxas",
+  "version": "Build cuda_12.6.r12.6/compiler.35059454_0"
+ },
+ "python": "3.11.5",
+ "route": "cuda",
+ "so_bytes": 748800,
+ "so_sha256": "ce003571c418571d6eb37064adc5b33a9493d25be70e4a5b966051ed6e27efe5",
+ "soabi": "cpython-311-x86_64-linux-gnu",
+ "source_sha256": {
+  "fa3_utils.h": "776172706a741081ba0a32058ca6d0ce94bea976a5689d0965b162eaf7f5d9cc",
+  "triattn_binding.cu": "edc9be068eb8f0b51c197c004ea2a7da41bb547ee0a3b996747e6e5fca80d2fe",
+  "triattn_sm90.cuh": "4a4cc4b45ee1337ff3c25776db265d98cc7641ef7a7303110195da73995fb243"
+ },
+ "stack_tag": "torch2.7.1+cu126-cpython-311-x86_64-linux-gnu",
+ "torch": "2.7.1+cu126",
+ "torch_cuda": "12.6"
+}

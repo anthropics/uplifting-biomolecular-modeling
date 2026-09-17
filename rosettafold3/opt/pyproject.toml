@@ -1,0 +1,38 @@
+# rosettafold3_opt — the RoseTTAFold3 (foundry `rf3`) optimization kit's package.
+# Install editable from this directory INTO THE PATCHED INTERPRETER, the pinned core first: `opt/venv/bin/pip install -e common/opt_core
+# -e rosettafold3/opt` (`run.sh install` does both). The kit code it wraps lives beside the package (forward/) and is resolved
+# from the package location, so the install must stay editable. No
+# install-time dependency on the upstream package (rc-foundry: stock/PINS.json): its pin is checked at activation by stock/check_pins.py.
+# The build backend is the core's template (setuptools plus one step that ships rosettafold3_opt_autoload.pth at the wheel root, which
+# is what makes `ROSETTAFOLD3_OPT=<mode>` activate without code changes; see rosettafold3_opt/_autoload.py). Never install this package
+# into the pristine interpreter (stock/venv): stock carries nothing from this tree.
+[build-system]
+requires = ["setuptools>=64", "wheel"]
+build-backend = "_build_backend"
+backend-path = ["."]
+
+# the shared core this package stands on (rosettafold3_opt/_core.py; gated at activation)
+[tool.opt_core]
+path = "../../common/opt_core"
+version = "0.5.217.0"                               # the minimum opt_core version this kit requires (a floor: _core_gate accepts any newer core)
+
+[project]
+name = "rosettafold3-opt"                           # the distribution name = the tag of every line this tree prints ([rosettafold3-opt] …; _core_gate reads it here)
+dynamic = ["version"]
+description = "RoseTTAFold3 inference optimizations: modes off | exact | fast | big (--n_gpu P), tree-state activation, lazy autoload, activation report"
+requires-python = ">=3.11"                          # rosettafold3_opt/_core.py reads the pin with tomllib
+classifiers = ["Private :: Do Not Upload"]        # not for PyPI: uploads carrying this classifier are rejected
+dependencies = []
+
+[project.optional-dependencies]
+test = ["pytest"]                                    # the package's CPU tests
+
+[project.scripts]
+rosettafold3-opt = "rosettafold3_opt.__main__:main"   # `rosettafold3-opt pred|check|warm|install ...` == `python -m rosettafold3_opt ...`
+
+[tool.setuptools]
+packages = ["rosettafold3_opt", "rosettafold3_opt.tests"]
+include-package-data = false
+
+[tool.setuptools.dynamic]
+version = {attr = "rosettafold3_opt.__version__"}

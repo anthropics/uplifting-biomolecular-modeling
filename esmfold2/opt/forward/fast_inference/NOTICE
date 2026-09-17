@@ -1,0 +1,30 @@
+ESMFold2 fast-inference add-on — third-party attributions.
+
+It contains modified copies of Triton kernels from the ESMFold2 implementation in the
+Biohub fork of the Hugging Face `transformers` library at commit ef32577f (src/transformers/models/esmfold2/kernels/:
+fused_lnlin_swiglu.py, fused_dual_gemm.py, fused_ln_residual.py, trimul_with_residual.py),
+licensed under the Apache License, Version 2.0: the fork's LICENSE prints `Copyright 2018- The Hugging Face team.
+All rights reserved.`, its ESMFold2 source files that carry a header print `Copyright 2026 Biohub. All rights
+reserved.`, and the four kernel files themselves print no copyright line. The modifications (inference-only kernel
+variants, padded-layout addressing, row-block restructuring, tile tables) are marked in driver/ef2_w4.py.
+The other driver modules (ef2_opt.py, ef2_pair_v2.py, ef2_transition_cute.py, ef2_xte.py, ef2_hoist.py,
+ef2_atom.py, ef2_dit.py, ef2_mk_sampler.py, ef2_msa.py, ef2_msa_v2.py, ef2_conf.py) re-issue functions of that
+fork's modeling_esmfold2.py / modeling_esmfold2_common.py statement by statement with a kernel call, a cache or
+a hoisted constant substituted, and driver/ef2_feats.py re-implements two functions of `esm`
+(esm/models/esmfold2/paired_msa.py; MIT, Copyright 2026 Chan Zuckerberg Biohub, Inc.): the function list is
+LEVER_SOURCES in driver/ef2_srcguard.py. The kit-wide list of files concerned and the verbatim licence texts are in
+esmfold2/THIRD_PARTY_NOTICES.md and esmfold2/third_party_licenses/.
+
+The public example inputs (tests/w4_public_slice.json) are amino-acid sequences of PDB entry 1BRS (barnase / barstar),
+obtained from the RCSB PDB; PDB archive data are available under CC0 1.0 (wwPDB). tests/SOURCES.md gives the entry-level detail.
+
+Model weights (ESMFold2, ESMFold2-Fast, ESMC) are NOT included and are governed by their
+publishers' own licences.
+
+It drives the fpf_trimul_v4 Triton kernels carried by the shared core (`../common/opt_core`; portions derived from Protenix,
+https://github.com/bytedance/Protenix, Apache License 2.0, whose LICENSE prints `Copyright 2024 ByteDance and/or its affiliates.` —
+see opt_core/kernels/fpf_trimul_v4/NOTICE, fpf_transition/NOTICE, fpf_glue_v2/NOTICE and opt_core/kernels/fpf_flashpairformer.PROTENIX_LICENSE
+in the shared core), and contains a transition kernel (driver/ef2_w4.py `_transition_fused_kernel`) whose structure is adapted from the
+shared core's fpf_transition and fpf_glue_v2 kernels. No Protenix source file is included here. upstream/*.diff are patches against the
+Biohub `transformers` fork @ ef32577f (Apache-2.0, upstream's licence); the fork's repository is no longer publicly available and the
+commit is the one carried as esmfold2/stock/transformers-ef32577f.tar.gz.

@@ -1,0 +1,8 @@
+AF2 Pallas flash-attention kernel (af2_flash_pallas.py) — third-party attributions.
+- The reference math in af2_flash_pallas.reference_attention mirrors alphafold/model/modules.py::Attention
+  (AlphaFold 2, Copyright 2021 DeepMind Technologies Limited, Apache-2.0).
+- colabdesign_pallas_attn.py patches, at runtime, the `Attention` class of either
+  `colabdesign.af.alphafold.model.modules` (ColabDesign, github.com/sokrypton/ColabDesign; its bundled alphafold
+  code is Apache-2.0) or `alphafold.model.modules` (alphafold-colabfold, Apache-2.0). No upstream file is modified on disk.
+- AlphaFold 2 parameters are NOT included; they are subject to their own terms (CC BY 4.0) and must be obtained by the user.
+- Test input 1BRS (barnase-barstar) is fetched from the RCSB PDB at test time (public domain data, wwPDB policy).

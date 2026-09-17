@@ -1,0 +1,34 @@
+{
+ "exports": {
+  "MODEL_OPT_LEVERS_OFF": {
+   "param": "levers_off",
+   "path": false,
+   "required": false,
+   "what": "the uniform ablation switch: words `trimul_xla`, `trimul_xla:native_xla`, `native_xla` switch the row off (refused by name)"
+  },
+  "TRIMUL_XLA_CC": {
+   "param": "cc",
+   "path": false,
+   "required": false,
+   "what": "compute capability `<major>.<minor>` used for selection instead of the default backend's first device (tests; tracing off the target)"
+  },
+  "TRIMUL_XLA_CONTRACTION": {
+   "param": "contraction",
+   "path": false,
+   "required": false,
+   "what": "`cublas` (default: the launcher's strided-batched GEMM target on the plane buffer) | `xla` (XLA's own dot on the sliced planes) -- measurement / bring-up switch"
+  }
+ },
+ "kind": "package",
+ "license": "Apache-2.0, original work of this repository (pkg/v1 = a byte-identical subset of the sealed trimul_native release; provenance in NOTICE)",
+ "mechanism": "triangle multiplication (bias-free pair update, forward) for JAX / XLA programs: the sealed trimul_native sm_90a cubins (K1 prologue, K3 epilogue) launched through kernels/triattn_xla's XLA-FFI launcher (generic self-describing target: by-value parameter structs with tensor maps encoded at call time), the contraction as one XLA dot between them; row native_xla; refused by name (arch / width / dtype / size / biases / levers_off / launcher / forward_only) with the fallback `kernels.pallas cd_trimul`",
+ "name": "trimul_xla",
+ "not_carried": [
+  "the release's sm_80 units, c_z 64x128 / 256 / 384 units, wide K3, backward sources, torch binding and test vectors"
+ ],
+ "runtime_imports": [
+  "triattn_xla"
+ ],
+ "version": "1.0.0",
+ "version_attr": "__version__"
+}

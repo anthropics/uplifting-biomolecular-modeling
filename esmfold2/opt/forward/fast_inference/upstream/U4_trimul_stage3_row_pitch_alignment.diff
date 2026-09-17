@@ -1,0 +1,39 @@
+--- a/src/transformers/models/esmfold2/kernels/trimul_with_residual.py	2026-08-23 02:16:59.095770847 +0000
++++ b/src/transformers/models/esmfold2/kernels/trimul_with_residual.py	2026-08-23 02:16:59.115770832 +0000
+@@ -53,6 +53,27 @@
+ from .fused_ln_residual import fused_ln_transpose, fused_ln_with_residual_link
+ from .trimul_einsum_triton import trimul_batched_einsum
+ 
++# Inference stage-3 operand alignment (H100 / cuBLAS >= 12): cuBLAS selects its bf16 batched-GEMM kernel from the 16-byte alignment
++# of the operand row pitch (L * 2 bytes). For L % 8 != 0 it falls back from the sm90 kernel to `cutlass_80_..._align2` (even L) or
++# `cutlass_75_..._align1` (odd L), 2.3-3.2x slower on the O(L^3) contraction (21% of an ESMFold2-Fast fold at 705 tokens).
++# Copying the operands into buffers whose row pitch is a multiple of ESMFOLD2_TRIMUL_S3_ALIGN elements (default 8; 0/1 disables)
++# restores the fast kernel. Products with the zero padding are exact, so the result differs from the un-padded call only by the
++# fp32 accumulation order of the (different) cuBLAS kernel; L % 8 == 0 inputs are untouched.
++_S3_ALIGN = int(os.environ.get("ESMFOLD2_TRIMUL_S3_ALIGN", "8"))
++
++
++def _einsum_row_pitch_aligned(a: torch.Tensor, b_t: torch.Tensor, direction: str, align: int) -> torch.Tensor:
++    """Stage-3 contraction on zero-padded, 16B-aligned copies of ``a``/``b_t`` (D, B, L, L); returns the (D, B, L, L) result."""
++    D, B, L, _ = a.shape
++    LP = -(-L // align) * align
++    ap = a.new_zeros((D * B, LP, LP)); bp = b_t.new_zeros((D * B, LP, LP))
++    ap[:, :L, :L] = a.reshape(D * B, L, L); bp[:, :L, :L] = b_t.reshape(D * B, L, L)
++    if direction == "outgoing":
++        xp = torch.matmul(ap, bp.transpose(1, 2))      # x[i,j] = sum_k a[i,k] b[j,k]
++    else:
++        xp = torch.matmul(ap.transpose(1, 2), bp)      # x[i,j] = sum_k a[k,i] b[k,j]
++    return xp[:, :L, :L].reshape(D, B, L, L).contiguous()
++
+ # Static config — runtime autotune cold-start is unshippable for inference.
+ _AUTOTUNE_CONFIGS = [
+     triton.Config(
+@@ -592,6 +613,8 @@
+     # Inference: torch.einsum (cuBLAS bgemm) is faster fwd-only.
+     if torch.is_grad_enabled():
+         x = trimul_batched_einsum(a, b_t, direction)
++    elif _S3_ALIGN > 1 and a.shape[-1] % _S3_ALIGN != 0 and a.is_cuda:
++        x = _einsum_row_pitch_aligned(a, b_t, direction, _S3_ALIGN)
+     elif direction == "outgoing":
+         x = torch.einsum("dbik,dbjk->dbij", a, b_t)
+     else:

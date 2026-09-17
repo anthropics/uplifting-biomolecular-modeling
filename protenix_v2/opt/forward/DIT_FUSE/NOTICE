@@ -1,0 +1,6 @@
+NOTICE — DIT_FUSE (fused elementwise kernels for the Protenix v2 diffusion transformer)
+- Protenix v2.0.0 (Copyright 2024 ByteDance and/or its affiliates; Apache-2.0): tools/dit_fuse_patch.py wraps, at run time, methods of
+  protenix.model.modules.primitives.AdaptiveLayerNorm / Attention and protenix.model.modules.transformer.DiffusionTransformerBlock /
+  DiffusionTransformer / ConditionedTransitionBlock, reproducing their forward logic with fused epilogues. No Protenix source file is
+  shipped or modified.
+- Triton (OpenAI; MIT): the compiler of tools/dit_fuse.py (including triton.language.extra.libdevice), used unmodified.

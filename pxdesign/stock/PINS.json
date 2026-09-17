@@ -1,0 +1,153 @@
+{
+ "model": "pxdesign",
+ "upstream": {
+  "pxdesign": {
+   "repo": "https://github.com/bytedance/PXDesign",
+   "commit": "f788441313c84c3074fe9596ac2433f96b15c763",
+   "version": "0.1.0",
+   "tag": null,
+   "package": "pxdesign",
+   "console_script": "pxdesign = pxdesign.runner.cli:cli",
+   "install": "pip install --no-deps -e \"git+https://github.com/bytedance/PXDesign.git@f788441313c84c3074fe9596ac2433f96b15c763#egg=pxdesign\"",
+   "archive": "stock/pxdesign-f7884413.tar.gz",
+   "src": "stock/src/PXDesign",
+   "omitted": [
+    "pxdesign/pxd_server/Helvetica-Regular.ttf",
+    "pxdesign/pxd_server/TimesNewRoman.ttf"
+   ],
+   "omitted_note": "left out of the archive and of stock/src: two font files of upstream's pxd_server module, read only for the `pxdesign pipeline` verb's summary figure and the web UI, neither of which this kit installs for or runs (STOCK.md Pin); the pin check compares source files only, so an installed checkout that carries them passes unchanged"
+  },
+  "protenix": {
+   "repo": "https://github.com/bytedance/Protenix",
+   "commit": "d18aa1daadd02a001b32bc7fa2278fc8a2f8f025",
+   "version": "0.5.0+pxd",
+   "tag": "v0.5.0+pxd",
+   "package": "protenix",
+   "install": "pip install --no-deps \"protenix @ git+https://github.com/bytedance/Protenix.git@d18aa1daadd02a001b32bc7fa2278fc8a2f8f025\"",
+   "archive": "stock/protenix-d18aa1da.tar.gz",
+   "src": "stock/src/Protenix"
+  },
+  "pxdbench": {
+   "repo": "https://github.com/bytedance/PXDesignBench",
+   "commit": "f6d0d72496c23ca1374df5943754f3454ae8c549",
+   "version": "0.1.2",
+   "tag": "v0.1.2",
+   "package": "pxdbench",
+   "install": "pip install --no-deps \"pxdbench @ git+https://github.com/bytedance/PXDesignBench.git@v0.1.2\"",
+   "fetched": "from the repository at install, at this commit (environment/requirements.lock); no copy of PXDesignBench is carried in this tree; the pin check verifies the installed version and the checked-out commit"
+  }
+ },
+ "archive_recipe": "git archive --format=tar --prefix=<name>-<commit8>/ <commit> <paths> | gzip -n -9  (PXDesign: pxdesign setup.py README.md LICENSE requirements.txt install.sh examples ':(exclude)pxdesign/pxd_server/Helvetica-Regular.ttf' ':(exclude)pxdesign/pxd_server/TimesNewRoman.ttf' — the pinned commit minus the two font files named under upstream.pxdesign.omitted; Protenix: protenix setup.py README.md LICENSE requirements.txt); stock/src/<Repo>/ is the extraction of each archive without its prefix directory. PXDesignBench has no archive and no extraction here: it is fetched from its repository at install and pinned by version and commit",
+ "python": "3.11.5",
+ "pinned_stack": {
+  "status": "pinned",
+  "pinned": {
+   "id": "pxd-cu121",
+   "cuda_base": "nvidia/cuda:12.1.1-devel-ubuntu22.04",
+   "python": "3.11.5",
+   "torch": "2.3.1+cu121",
+   "cuda": "12.1",
+   "cudnn": "8902",
+   "triton": "2.3.1",
+   "deepspeed": "0.15.4",
+   "numpy": "1.26.3",
+   "nvcc": "12.1"
+  },
+  "declared_by_upstream": {
+   "torch": "2.3.1 (requirements.txt)",
+   "numpy": "1.26.3 (requirements.txt)",
+   "cuda_wheel_tags": "cu121 | cu124 (install.sh:109,111)",
+   "python": "3.11 (install.sh:171,193)",
+   "deepspeed": ">=0.15.1 (requirements.txt)"
+  },
+  "freeze": "environment/requirements.lock: the tested stack's `pip freeze --all` (environment/Dockerfile installs it with --no-deps; README.md 'Setup')",
+  "tested_on": "one NVIDIA H100 80GB in a container built from the pinned block above; a record, compared by nothing"
+ },
+ "pins": {
+  "torch": "2.3.1",
+  "numpy": "1.26.3",
+  "deepspeed": "0.15.4",
+  "biotite": "1.0.1",
+  "biopython": "1.83",
+  "modelcif": "0.7",
+  "protobuf": "3.20.2",
+  "transformers": "4.51.3",
+  "matplotlib": "3.9.2",
+  "optax": "0.2.5",
+  "dm-haiku": "0.0.13",
+  "rdkit": "unpinned (requirements.txt)",
+  "scipy": "unpinned (requirements.txt)"
+ },
+ "weights": {
+  "root_env": "PXDESIGN_CKPT_DIR",
+  "flag": "--load_checkpoint_dir $PXDESIGN_CKPT_DIR",
+  "model_name": "pxdesign_v0.1.0",
+  "checkpoint": {
+   "file": "pxdesign_v0.1.0.pt",
+   "sha256": "b075867bae942dc0c6487173736922b0e2913308c1ba542d227418b6e176478d",
+   "source": "https://pxdesign.tos-cn-beijing.volces.com/release_model/pxdesign_v0.1.0.pt (pxdesign/utils/infer.py:38)",
+   "upstream_default_dir": "<repo>/release_data/checkpoint (configs/configs_infer.py:27); upstream downloads into --load_checkpoint_dir when the file is absent (utils/infer.py:61-105) — the tree refuses before any download"
+  },
+  "required_in_dir": {
+   "files": {
+    "protenix_base_default_v0.5.0.pt": "9ea20b0aba42f2256711da1d0cd081510a4b291e64375bff6b70ced70b87a5f1",
+    "protenix_mini_default_v0.5.0.pt": "3803340c5d9958c038e799ddd2b53b532db21855f261592ad455a5f003791f81",
+    "protenix_mini_tmpl_v0.5.0.pt": "221ca4da769e36ea0e2fa1fa82c46f6ca3a00bc7a1eff8ec0e3ddc02ed830474"
+   },
+   "source": "https://pxdesign.tos-cn-beijing.volces.com/release_model/ (pxdesign/utils/infer.py:39-41); every pxdesign infer run requires them in --load_checkpoint_dir and downloads any absent one (runner/inference.py:213 -> utils/infer.py:119-131); the sampler loads pxdesign_v0.1.0.pt alone (runner/inference.py:90-101)",
+   "bytes": {
+    "protenix_base_default_v0.5.0.pt": 1474265486,
+    "protenix_mini_default_v0.5.0.pt": 537049294,
+    "protenix_mini_tmpl_v0.5.0.pt": 537487513
+   }
+  }
+ },
+ "ccd_cache": {
+  "root_env": "PROTENIX_DATA_ROOT_DIR",
+  "files": {
+   "components.v20240608.cif": "7240b17369ccfbbcc86e2d02dc8c9db59f46c32e0420f58889c6c121c60bfef0",
+   "components.v20240608.cif.rdkit_mol.pkl": "2d6caced2d26c62015115a1d0a50f4106755a300e0c2a2d2b5c101c9038dcbcd",
+   "clusters-by-entity-40.txt": "1ab4af905e75b382eda8dec59917dc3608bee0729e36b9e71baf860bbe86850c"
+  },
+  "source": "https://pxdesign.tos-cn-beijing.volces.com/release_data/ (pxdesign/utils/infer.py:42-44; the endpoint publishes no hashes); read by protenix/data/ccd.py and protenix/data/utils.py"
+ },
+ "cli_defaults": {
+  "command": "pxdesign infer -i <tasks> -o <out> [options]",
+  "N_step": 400,
+  "N_sample": 5,
+  "dtype": "bf16",
+  "eta_type": "const",
+  "eta_min": 2.5,
+  "eta_max": 2.5,
+  "num_workers": 16,
+  "use_msa": true,
+  "use_fast_ln": true,
+  "use_deepspeed_evo_attention": false,
+  "load_strict": true,
+  "sample_diffusion_chunk_size": 10,
+  "seeds": "empty list: one seed derived from time.time_ns() (runner/inference.py:233)",
+  "seeding": "seed_everything(seed, deterministic=False) (runner/inference.py:236)",
+  "where": "runner/cli.py:88-131 (shared options), configs/configs_infer.py:21-31, configs/configs_base.py:60-62"
+ },
+ "variants": {
+  "checkpoint": "pxdesign_v0.1.0"
+ },
+ "stock_environment": {
+  "reads": [
+   "LAYERNORM_TYPE",
+   "PROTENIX_DATA_ROOT_DIR",
+   "TORCH_EXTENSIONS_DIR",
+   "CUDA_VISIBLE_DEVICES",
+   "DEEPSPEED_EVO"
+  ],
+  "must_be_absent_prefixes": [
+   "PXD_",
+   "PXDESIGN_HOIST",
+   "PXDESIGN_OPT",
+   "CUDA_MPS_"
+  ],
+  "allowed_exceptions": [
+   "CUBLAS_WORKSPACE_CONFIG"
+  ]
+ }
+}

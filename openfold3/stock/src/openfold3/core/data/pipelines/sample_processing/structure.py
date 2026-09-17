@@ -1,0 +1,154 @@
+# Copyright 2026 AlQuraishi Laboratory
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+"""This module contains pipelines for processing structural features on-the-fly."""
+
+import logging
+from pathlib import Path
+from typing import Literal, NamedTuple
+
+import numpy as np
+from biotite.structure import AtomArray
+
+from openfold3.core.data.io.structure.cif import parse_target_structure
+from openfold3.core.data.primitives.caches.format import PreprocessingChainData
+from openfold3.core.data.primitives.permutation.mol_labels import (
+    assign_mol_permutation_ids,
+)
+from openfold3.core.data.primitives.quality_control.logging_utils import (
+    log_runtime_memory,
+)
+from openfold3.core.data.primitives.structure.component import (
+    assign_component_ids_from_metadata,
+)
+from openfold3.core.data.primitives.structure.cropping import (
+    crop_chainwise_and_set_crop_mask,
+)
+from openfold3.core.data.primitives.structure.labels import (
+    assign_uniquified_atom_names,
+)
+from openfold3.core.data.primitives.structure.tokenization import tokenize_atom_array
+
+logger = logging.getLogger(__name__)
+
+
+class ProcessedTargetStructure(NamedTuple):
+    atom_array_gt: AtomArray
+    crop_strategy: str
+    n_tokens: int
+
+
+# TODO: Update docstring
+@log_runtime_memory(runtime_dict_key="runtime-target-structure-proc")
+def process_target_structure_of3(
+    target_structures_directory: Path,
+    pdb_id: str,
+    crop_config: dict,
+    preferred_chain_or_interface: str | list[str, str] | None,
+    structure_format: Literal["pkl", "npz"],
+    per_chain_metadata: dict[str, PreprocessingChainData],
+    use_roda_monomer_format: bool = False,
+) -> ProcessedTargetStructure:
+    """AF3 pipeline for processing target structure into AtomArrays.
+
+    Args:
+        target_structures_directory (Path):
+            Path to the directory containing the directories of target structure files.
+        pdb_id (str):
+            PDB ID of the target structure.
+        crop_config (dict):
+            Crop configuration dictionary (see CropSettings in
+            dataset_config_components.py).
+        preferred_chain_or_interface (str | list[str, str] | None):
+            Sampled preferred chain or interface to sample the crop around.
+        structure_format (Literal["pkl", "npz"]):
+            File extension of the target structure. Only "pkl" and "npz" are currently
+            supported.
+        per_chain_metadata (dict[str, PreprocessingChainData]):
+            Metadata for each chain in the target structure, obtained from the dataset
+            cache.
+        use_roda_monomer_format (bool):
+            Whether input filepath is expected to be in the s3 RODA monomer format:
+            <struc_dir>/<mgy_id>/structure.npz
+
+    Returns:
+        ProcessedTargetStructure:
+            A NamedTuple containing the full AtomArray, the crop strategy, and the
+            number of tokens in the full AtomArray if token cropping is disabled or the
+            slice of the AtomArray with crop_mask=True if it is enabled.
+    """
+    # Parse target structure
+    atom_array = parse_target_structure(
+        target_structures_directory,
+        pdb_id,
+        structure_format,
+        use_roda_monomer_format=use_roda_monomer_format,
+    )
+
+    # TODO: Remove this legacy patch once all NPZs have been reprocessed with the
+    # fix from 06e118c5, which correctly sets sym_id=0 for unresolved atoms.
+    #
+    # NPZs preprocessed before that commit have sym_id=-1 on unresolved atoms
+    # (dummy integer value) while resolved atoms have sym_id=0. Biotite >=1.3's
+    # get_residue_starts() uses sym_id as a residue boundary criterion, so
+    # partially-resolved residues get split into two tokens. In homodimers with
+    # different disorder patterns per chain, this produces mismatched token counts
+    # for symmetric chains, crashing torch.stack() in permutation alignment. Safe
+    # to remove because the model's sym_id feature is independently computed from
+    # entity IDs in create_sym_id().
+    if "sym_id" in atom_array.get_annotation_categories() and np.any(
+        atom_array.sym_id == -1
+    ):
+        logger.warning(
+            f"Dummy sym_id=-1 found in {pdb_id}, applying legacy patch "
+            f"(removing sym_id annotation to prevent residue splitting)."
+        )
+        atom_array.del_annotation("sym_id")
+
+    # Mark individual components (which get unique conformers)
+    assign_component_ids_from_metadata(atom_array, per_chain_metadata)
+
+    # Tokenize
+    tokenize_atom_array(atom_array=atom_array)
+
+    # Apply optional pre-cropping and main cropping (setting crop_mask attribute)
+    atom_array, crop_strategy = crop_chainwise_and_set_crop_mask(
+        atom_array=atom_array,
+        crop_config=crop_config,
+        preferred_chain_or_interface=preferred_chain_or_interface,
+    )
+
+    # The number of tokens is used in downstream parts of the data pipeline
+    # if cropping was done, we want to set the number of tokens to the token budget
+    token_crop_settings = crop_config["token_crop"]
+    if token_crop_settings["enabled"]:
+        n_tokens = token_crop_settings["token_budget"]
+    else:
+        n_tokens = np.unique(atom_array.token_id).shape[0]
+
+    # Add labels to identify symmetric mols in permutation alignment
+    atom_array = assign_mol_permutation_ids(atom_array, retokenize=True)
+
+    # NOTE: could move this to conformer processing
+    # TODO: make this logic more robust (potentially by reverting treating multi-residue
+    # ligands as single components)
+    # Necessary for multi-residue ligands (which can have duplicated atom names) to
+    # identify which atom names ended up in the crop.
+    atom_array = assign_uniquified_atom_names(atom_array)
+
+    return ProcessedTargetStructure(
+        atom_array_gt=atom_array,
+        crop_strategy=crop_strategy,
+        n_tokens=n_tokens,
+    )

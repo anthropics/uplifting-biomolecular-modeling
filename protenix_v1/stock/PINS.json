@@ -1,0 +1,174 @@
+{
+ "schema": "protenix_v1_opt.pins/1",
+ "stock": {
+  "package": "protenix",
+  "version": "1.1.0",
+  "cli": "protenix pred",
+  "console_script": "protenix = runner.batch_inference:protenix_cli",
+  "upstream": "https://github.com/bytedance/Protenix",
+  "release": "PyPI protenix 1.1.0 (uploaded 2026-03-23); the kit records the pip version, no upstream git commit",
+  "wheel": {
+   "file": "protenix-1.1.0-py3-none-any.whl",
+   "bytes": 483638,
+   "url": "https://files.pythonhosted.org/packages/a2/65/fe951e08d570c66c7a018818377cab0cabacf468b8bb4d337a2feda19fdf/protenix-1.1.0-py3-none-any.whl"
+  },
+  "sdist": {
+   "file": "protenix-1.1.0.tar.gz",
+   "bytes": 404832,
+   "url": "https://files.pythonhosted.org/packages/5b/0d/fd94efa8310c09f615eec1050c171bdae64d8cc2dc9e370eee0e6c79ae82/protenix-1.1.0.tar.gz"
+  },
+  "requires_python": ">=3.11",
+  "requires_dist": [
+   "torch==2.7.1",
+   "torchvision==0.22.1",
+   "torchaudio==2.7.1",
+   "cuequivariance-ops-torch-cu12==0.8.0",
+   "cuequivariance-torch==0.8.0",
+   "scipy>=1.9.0",
+   "ml_collections==1.1.0",
+   "tqdm==4.67.1",
+   "pandas==2.3.1",
+   "PyYAML==6.0.2",
+   "matplotlib==3.10.5",
+   "ipywidgets==8.1.7",
+   "py3Dmol==2.5.2",
+   "rdkit==2025.9.3",
+   "biopython==1.85",
+   "biotite==1.4.0",
+   "modelcif==1.4",
+   "gemmi==0.6.7",
+   "pdbeccdutils==1.0.0",
+   "fair-esm==2.0.0",
+   "scikit-learn==1.7.1",
+   "scikit-learn-extra==0.3.0",
+   "deepspeed==0.17.5",
+   "pydantic>=2.0.0",
+   "triton==3.3.1",
+   "optree==0.17.0",
+   "protobuf==6.31.1",
+   "icecream==2.1.7",
+   "ipdb==0.13.13",
+   "wandb==0.21.1",
+   "numpy==2.4.1",
+   "networkx>=3.4.2"
+  ],
+  "model_name": "protenix_base_default_v1.0.0",
+  "root_env": "PROTENIX_ROOT_DIR",
+  "checkpoint": "checkpoint/protenix_base_default_v1.0.0.pt",
+  "checkpoint_sha256": "2b7d5a8b30494514fc47fd2271a16260528cdba170ba09cc112fdecd8f85ec04",
+  "checkpoint_url": "https://protenix.tos-cn-beijing.volces.com/checkpoint/protenix_base_default_v1.0.0.pt",
+  "data_files": {
+   "ccd_components_file": "common/components.cif",
+   "ccd_components_rdkit_mol_file": "common/components.cif.rdkit_mol.pkl",
+   "pdb_cluster_file": "common/clusters-by-entity-40.txt",
+   "obsolete_release_data_csv": "common/obsolete_release_date.csv",
+   "template (use_template=true only)": [
+    "common/obsolete_to_successor.json",
+    "common/release_date_cache.json"
+   ]
+  },
+  "data_files_sha256": {
+   "common/components.cif": "bb31ae5cf6c8bc669924313077cb4231ee5ffefd3a20118cd14f3ec89f8bb6a5",
+   "common/components.cif.rdkit_mol.pkl": "d1cfb71f5993a3ebea7c47877022d7f597bbfbaf86e28a4770e957da6c50cd35",
+   "common/clusters-by-entity-40.txt": "1ab4af905e75b382eda8dec59917dc3608bee0729e36b9e71baf860bbe86850c",
+   "common/obsolete_release_date.csv": "a4f3f63ac5d7eebd78b07995cc669b9eccd6f5d8813c9492c9df02868893cf33",
+   "common/obsolete_to_successor.json": "2bc08348d0efba438c109bb27be6fa25b611d371c60b8a8da3de387a4a0698ad",
+   "common/release_date_cache.json": "8b1ef12ddc01a0d5eb2d388c77ded91aa906eebce7440726c57b6f8d1a3ec142"
+  },
+  "data_urls_module": "protenix/web_service/dependency_url.py (URL)",
+  "cli_defaults": {
+   "seeds": "101",
+   "cycle": 10,
+   "step": 200,
+   "sample": 5,
+   "dtype": "bf16",
+   "model_name": "protenix_base_default_v1.0.0",
+   "use_msa": true,
+   "trimul_kernel": "cuequivariance",
+   "triatt_kernel": "cuequivariance",
+   "enable_cache": true,
+   "enable_fusion": true,
+   "enable_tf32": true,
+   "use_template": false,
+   "use_rna_msa": false,
+   "use_seeds_in_json": false,
+   "need_atom_confidence": false
+  },
+  "output_layout": "<out_dir>/<sample_name>/seed_<seed>/predictions/<sample_name>_sample_<rank>.cif + <sample_name>_summary_confidence_sample_<rank>.json (ranked by ranking_score)",
+  "checkpoint_bytes": 1475950125,
+  "model_files": {
+   "rule": "sha256 of the installed module file (the members of stock/protenix-1.1.0-py3-none-any.whl): the stock files the big memory levers carry patched statements of (opt/protenix_v1_opt/big.py _module_pinned refuses a lever by name when the installed file differs)",
+   "protenix.model.modules.embedders": "05e9e8d7bc8e9f917a6cadb3534b4b95764ea9968c19bc38d4743a29daf982f8",
+   "protenix.model.modules.diffusion": "c92001aeb046ea9a5dbbc8120a5487c76d0497c52ff7fe178143f443dd4cc988",
+   "protenix.model.modules.confidence": "064375730d100f1536cf1a2061fa08ad0a039f21c4bf2965275a74646d33cebd",
+   "protenix.model.protenix": "c4250bd93d592a11d9019285cfd84b71b26fa6a8aca6944a239fb31e0337e179"
+  }
+ },
+ "pinned_stack": {
+  "python": "3.11.5",
+  "cuda": "12.6",
+  "torch": "2.7.1+cu126",
+  "triton": "3.3.1",
+  "cuequivariance-torch": "0.8.0",
+  "cuequivariance-ops-torch-cu12": "0.8.0",
+  "deepspeed": "0.17.5",
+  "layernorm": "LAYERNORM_TYPE=fast_layernorm (the stock fast LayerNorm extension; the kit installs its prebuilt stream-correct build of it)",
+  "base": "a CUDA 12.6 development userland with Python 3.11 (e.g. the nvidia/cuda:12.6.3-devel-ubuntu22.04 container image + python 3.11); nvcc runs once per box, only when the kit's prebuilt fast-LN .so does not match the stack (it rebuilds under TORCH_EXTENSIONS_DIR)",
+  "install": "pip install torch==2.7.1 torchvision==0.22.1 torchaudio==2.7.1 --index-url https://download.pytorch.org/whl/cu126; pip install protenix==1.1.0 (== stock/protenix-1.1.0-py3-none-any.whl); then run.sh install (the shared core + this package, editable); environment LAYERNORM_TYPE=fast_layernorm PYTHONDONTWRITEBYTECODE=1 (configs/h100.env exports both)",
+  "tested_on": "the pinned stack: this base + install exactly (Python 3.11.5, torch 2.7.1+cu126, CUDA 12.6, triton 3.3.1, cuequivariance-torch 0.8.0) on H100 80GB — a documentation line: nothing reads or compares it",
+  "nvcc": "12.6.85",
+  "numpy": "2.4.1"
+ },
+ "supported_gpus": {
+  "H100": {
+   "compute_capability": "9.0",
+   "pinned": true,
+   "note": "the kit's reference class; the prebuilt stream-correct fast-LN .so (torch 2.13.0+cu130; sm_90 among its device code) loads as shipped on the tested stack, and is rebuilt from source with nvcc on another torch / CUDA"
+  },
+  "H200": {
+   "compute_capability": "9.0",
+   "pinned": false
+  },
+  "B200": {
+   "compute_capability": "10.0",
+   "pinned": false,
+   "note": "the kit's Tier-1 rows exist on B200/B300; the stream-correct fast-LN is rebuilt from source there (nvcc)"
+  },
+  "B300": {
+   "compute_capability": "10.3",
+   "pinned": false
+  },
+  "A100": {
+   "compute_capability": "8.0",
+   "pinned": false,
+   "note": "admitted by compute capability (any sm_80 card runs as this class, the 80 GB and the 40 GB card alike; a differing name is a NOTE; memory-dependent limits are read from the running device); 8.0 kernel rows are the shared core's cc-keyed tables and this kit's lib/fpf_trimul_v4/cells.json `8.0|3.3` / `8.0|*`; the prebuilt stream-correct fast-LN .so carries sm_80 device code and loads as shipped on the tested stack (rebuilt from source with nvcc on another torch / CUDA, as on every card)"
+  }
+ },
+ "stock_environment": {
+  "must_be_absent_prefixes": [
+   "PROTENIX_V1_OPT",
+   "PTX_",
+   "FPF_",
+   "INFOPT_",
+   "PROTENIX_DET_SCATTER"
+  ],
+  "reads": [
+   "PROTENIX_ROOT_DIR",
+   "LAYERNORM_TYPE",
+   "CUTLASS_PATH",
+   "CUBLAS_WORKSPACE_CONFIG",
+   "TORCH_EXTENSIONS_DIR",
+   "TRITON_CACHE_DIR"
+  ]
+ },
+ "kit": {
+  "name": "PROTENIX_V1_V05_ADDON v1",
+  "dir": "opt/forward/v05_addon",
+  "entry": "ptxfpf/levers_ptx1.py (bind_model, apply(arm), describe)",
+  "pythonpath": [
+   "lib",
+   "lib/kit112_src",
+   "ptxfpf"
+  ]
+ }
+}

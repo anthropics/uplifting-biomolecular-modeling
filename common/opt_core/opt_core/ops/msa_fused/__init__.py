@@ -1,0 +1,1 @@
+"""opt_core.ops.msa_fused — the fused MSA-module Triton kernels: ``from opt_core.ops.msa_fused import msa_triton`` (ln_linear, opm_out, pwa_ln_vg, pwa_out2). Moved verbatim from the producing kit tree (one shared copy); nothing is imported at package level."""

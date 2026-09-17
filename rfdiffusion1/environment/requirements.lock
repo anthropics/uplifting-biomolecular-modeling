@@ -1,0 +1,70 @@
+# RFdiffusion-1 optimization kit — the pinned Python stack (the versions this release was tested with), `pip freeze` form.
+# Interpreter: CPython 3.11.5 (python-build-standalone 20230826, x86_64-unknown-linux-gnu) with its bundled pip 23.2.1 and setuptools 68.1.2,
+# which are therefore not lines of this file. Platform: Linux x86_64, glibc 2.35 (Ubuntu 22.04).
+# torch 2.4.0 is PyPI's CUDA 12.1 build (torch.__version__ reads 2.4.0+cu121): its CUDA 12.1 / cuDNN 9.1 / NCCL 2.20 runtime libraries are the
+# nvidia-*-cu12 wheels below, loaded from site-packages — no CUDA toolkit is needed on the machine, only an NVIDIA driver that runs CUDA 12.
+# dgl 2.4.0+cu124 is not on PyPI: its line names the wheel itself on DGL's own wheel list for torch 2.4 / CUDA 12.4 (data.dgl.ai), with the
+# file's sha256, so pip fetches exactly that build; every other line resolves on PyPI.
+# Stock RFdiffusion 1.1.0 (RosettaCommons/RFdiffusion @ 86507b65) and its vendored SE3Transformer are not lines of this file: they install from
+# the source archive in rfdiffusion1/stock/ (environment/Dockerfile, README.md 'Setup'); this kit and its shared core install last (`run.sh install`).
+# Install exactly these builds, without letting pip re-resolve dependencies:
+#   python -m pip install --no-deps -r requirements.lock
+annotated-types==0.8.0
+antlr4-python3-runtime==4.9.3
+asttokens==3.0.2
+biopython==1.79
+certifi==2026.7.22
+charset-normalizer==3.5.1
+colorama==0.4.6
+decorator==5.3.1
+dgl @ https://data.dgl.ai/wheels/torch-2.4/cu124/dgl-2.4.0%2Bcu124-cp311-cp311-manylinux1_x86_64.whl#sha256=cb7f30bd08b20ffc336c1e5e3f828854f1b498422bbde37e6119a1652d2f799c
+e3nn==0.5.1
+executing==2.2.1
+filelock==3.32.3
+fsspec==2026.7.0
+hydra-core==1.3.2
+icecream==2.2.0
+idna==3.19
+Jinja2==3.1.6
+MarkupSafe==3.0.3
+mpmath==1.3.0
+networkx==3.2.1
+numpy==1.26.4
+nvidia-cublas-cu12==12.1.3.1
+nvidia-cuda-cupti-cu12==12.1.105
+nvidia-cuda-nvrtc-cu12==12.1.105
+nvidia-cuda-runtime-cu12==12.1.105
+nvidia-cudnn-cu12==9.1.0.70
+nvidia-cufft-cu12==11.0.2.54
+nvidia-curand-cu12==10.3.2.106
+nvidia-cusolver-cu12==11.4.5.107
+nvidia-cusparse-cu12==12.1.0.106
+nvidia-nccl-cu12==2.20.5
+nvidia-nvjitlink-cu12==12.9.86
+nvidia-nvtx-cu12==12.1.105
+omegaconf==2.3.1
+opt-einsum==3.3.0
+opt-einsum-fx==0.1.4
+packaging==26.3
+pandas==2.1.4
+psutil==7.2.2
+pydantic==2.13.4
+pydantic_core==2.46.4
+Pygments==2.21.0
+pynvml==11.5.0
+pyrsistent==0.20.0
+python-dateutil==2.9.0.post0
+pytz==2026.3.post1
+PyYAML==6.0.1
+requests==2.34.2
+scipy==1.13.1
+six==1.17.0
+sympy==1.14.0
+torch==2.4.0
+torchdata==0.8.0
+tqdm==4.70.0
+triton==3.0.0
+typing-inspection==0.4.4
+typing_extensions==4.16.0
+tzdata==2026.3
+urllib3==2.7.0

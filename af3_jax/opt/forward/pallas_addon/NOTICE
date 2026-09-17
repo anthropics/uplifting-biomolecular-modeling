@@ -1,0 +1,10 @@
+AF3 Pallas add-on (patches/af3_pallas_levers.py) — third-party attributions.
+
+Upstream projects patched or adapted, with their licences:
+* AlphaFold 3 inference code — github.com/google-deepmind/alphafold3 and the fork github.com/sokrypton/alphafold3 @ bc32b22f: Apache License 2.0
+  (code). The AlphaFold 3 model PARAMETERS from DeepMind are under separate terms (WEIGHTS_TERMS_OF_USE.md) and are NOT included or required here.
+* tokamax — github.com/openxla/tokamax 0.0.12: Apache License 2.0. af3_pallas_levers.glu_transposed_masked re-implements the Pallas-Triton
+  gated-linear-unit kernel of tokamax/_src/ops/gated_linear_unit/pallas_triton.py with a transposed+masked epilogue.
+* JAX / Pallas — github.com/jax-ml/jax: Apache License 2.0.
+* OpenFold3-preview2 weights (public; converted at install, not shipped in this tree): see the OpenFold consortium's licence for the OF3 checkpoint.
+No Rosetta / PyRosetta code or binaries are used anywhere in this add-on.

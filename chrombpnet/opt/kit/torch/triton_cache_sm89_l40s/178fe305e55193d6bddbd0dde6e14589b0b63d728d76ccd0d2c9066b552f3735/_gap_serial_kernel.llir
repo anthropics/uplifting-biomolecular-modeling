@@ -1,0 +1,113 @@
+; ModuleID = 'LLVMDialectModule'
+source_filename = "LLVMDialectModule"
+
+@.str = private unnamed_addr constant [11 x i8] c"__CUDA_FTZ\00", align 1
+
+define void @_gap_serial_kernel(ptr addrspace(1) %0, ptr addrspace(1) %1, i32 %2) local_unnamed_addr !dbg !7 {
+  %4 = tail call i32 asm "mov.u32 $0, %ctaid.y;", "=r"() #3, !dbg !10
+  %5 = tail call i32 asm "mov.u32 $0, %ctaid.x;", "=r"() #3, !dbg !11
+  %6 = shl i32 %5, 6, !dbg !12
+  %7 = tail call i32 @llvm.nvvm.read.ptx.sreg.tid.x(), !dbg !13
+  %8 = and i32 %7, 63, !dbg !13
+  %9 = or disjoint i32 %6, %8, !dbg !14
+  %10 = icmp slt i32 %9, 128, !dbg !15
+  %11 = shl i32 %4, 7, !dbg !16
+  %12 = mul i32 %11, %2, !dbg !17
+  %13 = sext i32 %12 to i64, !dbg !18
+  %14 = getelementptr float, ptr addrspace(1) %0, i64 %13, !dbg !18
+  %15 = mul i32 %9, %2, !dbg !19
+  %16 = sext i32 %15 to i64, !dbg !20
+  %17 = getelementptr float, ptr addrspace(1) %14, i64 %16, !dbg !20
+  %18 = icmp sgt i32 %2, 0, !dbg !21
+  br i1 %18, label %.lr.ph, label %._crit_edge, !dbg !21
+
+.lr.ph:                                           ; preds = %3, %.lr.ph
+  %19 = phi float [ %25, %.lr.ph ], [ 0.000000e+00, %3 ]
+  %20 = phi i32 [ %26, %.lr.ph ], [ 0, %3 ]
+  %21 = zext nneg i32 %20 to i64, !dbg !22
+  %22 = getelementptr float, ptr addrspace(1) %17, i64 %21, !dbg !22
+  %23 = tail call i32 asm sideeffect "mov.u32 $0, 0x0;\0A\09@$2 ld.global.b32 { $0 }, [ $1 + 0 ];\0A\09@!$4 mov.u32 $0, $3;", "=r,l,b,r,b"(ptr addrspace(1) %22, i1 %10, i32 0, i1 %10) #3, !dbg !23
+  %24 = bitcast i32 %23 to float, !dbg !23
+  %25 = fadd float %19, %24, !dbg !24
+  %26 = add nuw nsw i32 %20, 1, !dbg !21
+  %27 = icmp slt i32 %26, %2, !dbg !21
+  br i1 %27, label %.lr.ph, label %._crit_edge, !dbg !21
+
+._crit_edge:                                      ; preds = %.lr.ph, %3
+  %.lcssa = phi float [ 0.000000e+00, %3 ], [ %25, %.lr.ph ]
+  %28 = sitofp i32 %2 to float, !dbg !25
+  %29 = tail call i32 @__nvvm_reflect(ptr nonnull @.str) #3, !dbg !26
+  %.not.i = icmp eq i32 %29, 0, !dbg !26
+  br i1 %.not.i, label %32, label %30, !dbg !26
+
+30:                                               ; preds = %._crit_edge
+  %31 = tail call float @llvm.nvvm.div.rn.ftz.f(float %.lcssa, float %28), !dbg !26
+  br label %__nv_fdiv_rn.exit, !dbg !26
+
+32:                                               ; preds = %._crit_edge
+  %33 = tail call float @llvm.nvvm.div.rn.f(float %.lcssa, float %28), !dbg !26
+  br label %__nv_fdiv_rn.exit, !dbg !26
+
+__nv_fdiv_rn.exit:                                ; preds = %30, %32
+  %.0.i = phi float [ %31, %30 ], [ %33, %32 ], !dbg !26
+  %34 = sext i32 %11 to i64, !dbg !27
+  %35 = getelementptr float, ptr addrspace(1) %1, i64 %34, !dbg !27
+  %36 = sext i32 %9 to i64, !dbg !28
+  %37 = getelementptr float, ptr addrspace(1) %35, i64 %36, !dbg !28
+  %38 = bitcast float %.0.i to i32, !dbg !29
+  tail call void asm sideeffect "@$2 st.global.b32 [ $1 + 0 ], { $0 };", "r,l,b"(i32 %38, ptr addrspace(1) %37, i1 %10) #3, !dbg !29
+  ret void, !dbg !30
+}
+
+; Function Attrs: mustprogress nocallback nofree nosync nounwind speculatable willreturn memory(none)
+declare noundef i32 @llvm.nvvm.read.ptx.sreg.tid.x() #0
+
+declare i32 @__nvvm_reflect(ptr) local_unnamed_addr #1
+
+; Function Attrs: mustprogress nocallback nofree nosync nounwind willreturn memory(none)
+declare float @llvm.nvvm.div.rn.ftz.f(float, float) #2
+
+; Function Attrs: mustprogress nocallback nofree nosync nounwind willreturn memory(none)
+declare float @llvm.nvvm.div.rn.f(float, float) #2
+
+attributes #0 = { mustprogress nocallback nofree nosync nounwind speculatable willreturn memory(none) }
+attributes #1 = { "disable-tail-calls"="false" "frame-pointer"="all" "less-precise-fpmad"="false" "no-infs-fp-math"="false" "no-nans-fp-math"="false" "stack-protector-buffer-size"="8" "unsafe-fp-math"="false" "use-soft-float"="false" }
+attributes #2 = { mustprogress nocallback nofree nosync nounwind willreturn memory(none) }
+attributes #3 = { nounwind }
+
+!llvm.module.flags = !{!0, !1}
+!llvm.dbg.cu = !{!2}
+!nvvm.annotations = !{!4, !5}
+!llvm.ident = !{!6}
+
+!0 = !{i32 2, !"Debug Info Version", i32 3}
+!1 = !{i32 4, !"nvvm-reflect-ftz", i32 1}
+!2 = distinct !DICompileUnit(language: DW_LANG_C, file: !3, producer: "triton", isOptimized: true, runtimeVersion: 0, emissionKind: LineTablesOnly)
+!3 = !DIFile(filename: "kernels.py", directory: "/opt/cbp_build/chrombpnet_k1")
+!4 = !{ptr @_gap_serial_kernel, !"kernel", i32 1}
+!5 = !{ptr @_gap_serial_kernel, !"maxntidx", i32 64}
+!6 = !{!"clang version 3.8.0 (tags/RELEASE_380/final)"}
+!7 = distinct !DISubprogram(name: "_gap_serial_kernel", linkageName: "_gap_serial_kernel", scope: !3, file: !3, line: 111, type: !8, scopeLine: 111, spFlags: DISPFlagDefinition | DISPFlagOptimized, unit: !2)
+!8 = !DISubroutineType(cc: DW_CC_normal, types: !9)
+!9 = !{}
+!10 = !DILocation(line: 113, column: 22, scope: !7)
+!11 = !DILocation(line: 113, column: 44, scope: !7)
+!12 = !DILocation(line: 113, column: 49, scope: !7)
+!13 = !DILocation(line: 113, column: 72, scope: !7)
+!14 = !DILocation(line: 113, column: 59, scope: !7)
+!15 = !DILocation(line: 113, column: 91, scope: !7)
+!16 = !DILocation(line: 114, column: 19, scope: !7)
+!17 = !DILocation(line: 114, column: 23, scope: !7)
+!18 = !DILocation(line: 114, column: 15, scope: !7)
+!19 = !DILocation(line: 114, column: 31, scope: !7)
+!20 = !DILocation(line: 114, column: 27, scope: !7)
+!21 = !DILocation(line: 116, column: 22, scope: !7)
+!22 = !DILocation(line: 117, column: 35, scope: !7)
+!23 = !DILocation(line: 117, column: 28, scope: !7)
+!24 = !DILocation(line: 117, column: 20, scope: !7)
+!25 = !DILocation(line: 118, column: 33, scope: !7)
+!26 = !DILocation(line: 118, column: 28, scope: !7)
+!27 = !DILocation(line: 119, column: 17, scope: !7)
+!28 = !DILocation(line: 119, column: 25, scope: !7)
+!29 = !DILocation(line: 119, column: 28, scope: !7)
+!30 = !DILocation(line: 119, column: 4, scope: !7)

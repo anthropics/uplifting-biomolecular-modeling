@@ -1,0 +1,157 @@
+# Enformer (official TensorFlow implementation, TF-Hub SavedModel deepmind/enformer/1) optimization kit — the tested stack for Python 3.11 on
+# Linux x86_64: TensorFlow 2.17.1 with its CUDA 12.3 / cuDNN 8.9 libraries, ptxas and libdevice from the nvidia-* wheels below (no CUDA toolkit
+# installed; the GPU driver is the host's, CUDA 12.3 capable: 545 or newer), tensorflow-hub 0.16.1, numpy 1.26.4; setuptools below 81 because
+# tensorflow-hub imports pkg_resources. environment/Dockerfile installs every line with --no-deps, then this kit editable (run.sh install).
+absl-py==2.5.0
+    # via
+    #   keras
+    #   tensorboard
+    #   tensorflow
+astunparse==1.6.3
+    # via tensorflow
+certifi==2026.7.22
+    # via requests
+charset-normalizer==3.5.1
+    # via requests
+flatbuffers==25.12.19
+    # via tensorflow
+gast==0.7.0
+    # via tensorflow
+google-pasta==0.2.0
+    # via tensorflow
+grpcio==1.83.1
+    # via
+    #   tensorboard
+    #   tensorflow
+h5py==3.16.0
+    # via
+    #   keras
+    #   tensorflow
+idna==3.19
+    # via requests
+keras==3.15.1
+    # via tensorflow
+libclang==18.1.1
+    # via tensorflow
+markdown==3.10.3
+    # via tensorboard
+markdown-it-py==4.2.0
+    # via rich
+markupsafe==3.0.3
+    # via werkzeug
+mdurl==0.1.2
+    # via markdown-it-py
+ml-dtypes==0.4.1
+    # via
+    #   keras
+    #   tensorflow
+namex==0.1.0
+    # via keras
+numpy==1.26.4
+    # via
+    #   -r req.in
+    #   h5py
+    #   keras
+    #   ml-dtypes
+    #   tensorboard
+    #   tensorflow
+    #   tensorflow-hub
+nvidia-cublas-cu12==12.3.4.1
+    # via
+    #   nvidia-cudnn-cu12
+    #   nvidia-cusolver-cu12
+    #   tensorflow
+nvidia-cuda-cupti-cu12==12.3.101
+    # via tensorflow
+nvidia-cuda-nvcc-cu12==12.3.107
+    # via tensorflow
+nvidia-cuda-nvrtc-cu12==12.3.107
+    # via
+    #   nvidia-cudnn-cu12
+    #   tensorflow
+nvidia-cuda-runtime-cu12==12.3.101
+    # via tensorflow
+nvidia-cudnn-cu12==8.9.7.29
+    # via tensorflow
+nvidia-cufft-cu12==11.0.12.1
+    # via tensorflow
+nvidia-curand-cu12==10.3.4.107
+    # via tensorflow
+nvidia-cusolver-cu12==11.5.4.101
+    # via tensorflow
+nvidia-cusparse-cu12==12.2.0.103
+    # via
+    #   nvidia-cusolver-cu12
+    #   tensorflow
+nvidia-nccl-cu12==2.19.3
+    # via tensorflow
+nvidia-nvjitlink-cu12==12.3.101
+    # via
+    #   nvidia-cusolver-cu12
+    #   nvidia-cusparse-cu12
+    #   tensorflow
+opt-einsum==3.4.0
+    # via tensorflow
+optree==0.20.0
+    # via keras
+packaging==26.3
+    # via
+    #   keras
+    #   tensorboard
+    #   tensorflow
+    #   wheel
+pip==26.2.1
+    # via -r req.in
+protobuf==4.25.9
+    # via
+    #   tensorboard
+    #   tensorflow
+    #   tensorflow-hub
+pygments==2.21.0
+    # via rich
+requests==2.34.2
+    # via tensorflow
+rich==15.0.0
+    # via keras
+setuptools==80.10.2
+    # via
+    #   -r req.in
+    #   tensorboard
+    #   tensorflow
+six==1.17.0
+    # via
+    #   astunparse
+    #   google-pasta
+    #   tensorboard
+    #   tensorflow
+tensorboard==2.17.1
+    # via tensorflow
+tensorboard-data-server==0.7.2
+    # via tensorboard
+tensorflow==2.17.1
+    # via
+    #   -r req.in
+    #   tf-keras
+tensorflow-hub==0.16.1
+    # via -r req.in
+tensorflow-io-gcs-filesystem==0.37.1
+    # via tensorflow
+termcolor==3.3.0
+    # via tensorflow
+tf-keras==2.17.0
+    # via tensorflow-hub
+typing-extensions==4.16.0
+    # via
+    #   grpcio
+    #   optree
+    #   tensorflow
+urllib3==2.7.0
+    # via requests
+werkzeug==3.1.8
+    # via tensorboard
+wheel==0.48.0
+    # via
+    #   -r req.in
+    #   astunparse
+wrapt==2.4.0
+    # via tensorflow

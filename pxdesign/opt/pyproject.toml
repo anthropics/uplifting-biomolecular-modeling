@@ -1,0 +1,44 @@
+# pxdesign_opt — explicit interface to the PXDesign inference optimizations.
+# Install editable from this directory: `pip install -e pxdesign/opt`. The kit code it wraps lives beside the package
+# (forward/hoist/ — the lever) and is resolved from the
+# package location (PXDESIGN_OPT_HOME / MODEL_OPT name the pxdesign/ tree explicitly). The install must stay editable: the core pin gate reads
+# [tool.opt_core] from this file, above the package, so a regular (non-editable) wheel install refuses on every entry with
+# `core_pin_unreadable` (rc 3). No install-time dependency on
+# the upstream packages (pxdesign / protenix / pxdbench: stock/PINS.json): their pins are checked at activation. The build backend is the
+# shared core's template (common/opt_core/kit_template/_build_backend.py, carried byte-for-byte): setuptools plus one step that ships
+# pxdesign_opt_autoload.pth at the wheel root, which is what makes `PXDESIGN_OPT=<mode> pxdesign infer ...` activate without code changes
+# (pxdesign_opt/_autoload.py: this kit's AutoloadSpec on the core's finder, opt_core.autoload). The .pth text is generated, never hand-written:
+# `python _build_backend.py pxdesign_opt PXDESIGN_OPT pxdesign-opt > pxdesign_opt_autoload.pth` (the backend refuses to build any other text). Install = the core and this kit:
+# `pip install -e common/opt_core -e pxdesign/opt`.
+[build-system]
+requires = ["setuptools>=64", "wheel"]
+build-backend = "_build_backend"
+backend-path = ["."]
+
+# the shared core this kit runs on (common/opt_core): pinned by path, version and tree sha. The core pin gate (pxdesign_opt/_core_gate.py, the
+# core's kit_template carried byte-for-byte; statement one of every entry) refuses by name with exit 3 on an absent, older, newer or edited core
+# before anything of the core is imported; the table's header line below carries no trailing text (the gate reads it on interpreters without tomllib)
+[tool.opt_core]
+path = "../../common/opt_core"
+version = "0.5.18.20"
+
+[project]
+name = "pxdesign_opt"
+dynamic = ["version"]
+description = "PXDesign inference optimizations: modes off/exact/fast/big, upstream's own options passed through, lazy autoload, activation report"
+requires-python = ">=3.10"
+classifiers = ["Private :: Do Not Upload"]
+dependencies = []
+
+[project.optional-dependencies]
+test = ["pytest", "numpy", "setuptools>=64"]        # the package's CPU tests: numpy for test_rowpipe.py (importorskip); setuptools: the tests exec opt/_build_backend.py (the build requirement, same floor as [build-system])
+
+[project.scripts]
+pxdesign-opt = "pxdesign_opt.__main__:main"        # `pxdesign-opt design|check|warm ...` == `python -m pxdesign_opt ...`
+
+[tool.setuptools]
+packages = ["pxdesign_opt", "pxdesign_opt.tests"]
+include-package-data = false
+
+[tool.setuptools.dynamic]
+version = {attr = "pxdesign_opt.__version__"}

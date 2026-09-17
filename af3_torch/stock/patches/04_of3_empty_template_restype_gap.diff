@@ -1,0 +1,34 @@
+# lever: OF3 empty-template restype convention (patch 04) for the --of3_weights port — REQUIRED correctness fix
+# what: OpenFold3 featurises tokens of absent (padding) templates as GAP; AF3 pads template_aatype with 0 (= ALA). Both codes run the template
+#       embedder over the 4 padded template slots even in template-free mode, so with OF3 weights an all-empty template must present GAP one-hots
+#       to aatype_linear_1/2 — on every one of the N^2 token pairs. Gated on global_config.of3_weights; AF3-weights behaviour unchanged.
+# measured effect (report §5.3/§5.10): measured range = 185-705 tokens. At 185-290 tokens: negligible (same-seed CA-RMSD 0.04-0.06 A, max-ipSAE within 0.006).
+#       At 705 tokens (EGFR + binder, OpenBind-0 weights, 15 seeds): per-seed ipSAE 0.674+/-0.060 without -> 0.738+/-0.040 with (native OpenFold3 0.749+/-0.010;
+#       same-seed A/B Mann-Whitney p = 0.004), ipTM 0.923 -> 0.945 (native 0.949). The effect grows with token count; an earlier 'negligible' label was based on
+#       the small blocks only and has been withdrawn. No extrapolation beyond 705 tokens is claimed.
+# applies to: sokrypton/alphafold3 @ bc32b22f (= upstream HEAD at the time of writing), alone or after 01-03. licence: Apache-2.0 (same as upstream).
+# PR text: "With --of3_weights, featurise padding templates as GAP (OpenFold3 convention) instead of restype 0. OpenFold3's create_feature_placeholders()
+#   fills res_names with 'GAP' for empty template slots and the template embedder always runs over n_templates=4 slots; AF3 pads template_aatype with zeros,
+#   so the ported aatype_linear_1/2 weights see ALA one-hots for empty templates on all N^2 pairs. On a 705-token complex this biases OpenBind-0 interface
+#   scores low (per-seed ipSAE -0.06, ipTM -0.02 vs native OpenFold3, 15 seeds, p = 0.004 in a same-seed A/B) and doubles their seed-to-seed spread; with the
+#   fix the port matches native within seed noise. At <= 290 tokens the effect is below 0.01. Required for OF3-equivalent template-free inference."
+diff --git a/src/alphafold3/model/network/template_modules.py b/src/alphafold3/model/network/template_modules.py
+index 38b4d67..832f2c3 100644
+--- a/src/alphafold3/model/network/template_modules.py
++++ b/src/alphafold3/model/network/template_modules.py
+@@ -283,6 +283,15 @@ class SingleTemplateEmbedding(hk.Module):
+       pseudo_beta_mask_2d = pseudo_beta_mask_2d.astype(dtype)
+       to_concat = [(dgram, 1), (pseudo_beta_mask_2d, 0)]
+ 
++      if gc.of3_weights:
++        # OpenFold3 featurises the tokens of absent (padding) templates as GAP,
++        # whereas AF3 pads template_aatype with 0 (= ALA). Both codes always run
++        # the template embedder over the padded template stack (also in
++        # template-free mode), so with OF3 weights an all-empty template must
++        # present GAP one-hots to aatype_linear_1/2 to match native inputs.
++        template_is_empty = jnp.all(dense_atom_mask == 0)
++        gap_idx = residue_names.PROTEIN_TYPES_ONE_LETTER_WITH_UNKNOWN_AND_GAP.index('-')
++        aatype = jnp.where(template_is_empty, gap_idx, aatype)
+       aatype = jax.nn.one_hot(
+           aatype,
+           residue_names.POLYMER_TYPES_NUM_WITH_UNKNOWN_AND_GAP,

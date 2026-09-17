@@ -1,0 +1,14 @@
+entities:
+  - protein:
+      id: B
+      sequence: 60..80
+  - file:
+      path: PDL1_IgV_Q9NZQ7_18-132.pdb
+      include:
+        - chain:
+            id: A
+      binding_types:
+        - chain:
+            id: A
+            binding: "39,96,98,105,106"
+      structure_groups: "all"

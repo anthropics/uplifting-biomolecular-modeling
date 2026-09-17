@@ -1,0 +1,99 @@
+{
+ "binaries": {
+  "torch2.13.0+cu130-cpython-311-x86_64-linux-gnu-sm90": {
+   "built_utc": "2026-09-11T07:46:12Z",
+   "bytes": 1304824,
+   "file": "torch2.13.0+cu130-cpython-311-x86_64-linux-gnu-sm90/protenix_trimul_tx_sm90.so",
+   "migrated_from_key": "torch213_cu130_sm90",
+   "module": "protenix_trimul_tx_sm90",
+   "nvcc_flags": [
+    "-O3",
+    "-std=c++17",
+    "-gencode=arch=compute_90a,code=sm_90a",
+    "--expt-relaxed-constexpr",
+    "-DNDEBUG",
+    "-Xptxas=--register-usage-level=10",
+    "-Xcompiler -ffile-prefix-map=<scratch>=csrc"
+   ],
+   "python_soabi": "cpython-311-x86_64-linux-gnu",
+   "sha256": "e913917e2d714daa98feb97f40973adc29994c392b75a26b15db1284928af64a",
+   "toolchain": {
+    "cuda": "13.0",
+    "device_built_on": "NVIDIA H100 80GB HBM3",
+    "gcc": "gcc (Ubuntu 13.3.0-6ubuntu2~24.04) 13.3.0",
+    "nvcc": "Build cuda_13.0.r13.0/compiler.36424714_0",
+    "torch": "2.13.0+cu130"
+   }
+  },
+  "torch2.13.0+cu130-cpython-312-x86_64-linux-gnu-sm90": {
+   "build_s": 65.7,
+   "built_utc": "2026-09-11T15:22:21Z",
+   "bytes": 1293752,
+   "file": "torch2.13.0+cu130-cpython-312-x86_64-linux-gnu-sm90/protenix_trimul_tx_sm90.so",
+   "module": "protenix_trimul_tx_sm90",
+   "note": "built in the cp312 dev image of the torch 2.13.0+cu130 line",
+   "nvcc_flags": [
+    "-O3",
+    "-std=c++17",
+    "-gencode=arch=compute_90a,code=sm_90a",
+    "--expt-relaxed-constexpr",
+    "-DNDEBUG",
+    "-Xptxas=--register-usage-level=10",
+    "-Xcompiler -ffile-prefix-map=<scratch>=csrc"
+   ],
+   "python_soabi": "cpython-312-x86_64-linux-gnu",
+   "sha256": "0a47260e04409ab50b80e58029b0093b19927a9551a5a816e00833b90a042f91",
+   "toolchain": {
+    "cuda": "13.0",
+    "device_built_on": "NVIDIA H100 80GB HBM3",
+    "gcc": "gcc (Ubuntu 11.4.0-1ubuntu1~22.04.3) 11.4.0",
+    "nvcc": "Build cuda_13.0.r13.0/compiler.36424714_0",
+    "python": "3.12.1",
+    "torch": "2.13.0+cu130"
+   }
+  },
+  "torch2.11.0+cu128-cpython-312-x86_64-linux-gnu-sm90": {
+   "build_s": 59.7,
+   "built_utc": "2026-09-12T01:22:49Z",
+   "bytes": 1234248,
+   "file": "torch2.11.0+cu128-cpython-312-x86_64-linux-gnu-sm90/protenix_trimul_tx_sm90.so",
+   "module": "protenix_trimul_tx_sm90",
+   "note": "built inside the torch 2.11.0+cu128 / cpython-312 image of the inverse-folding stack that runs it, with the CUDA 12.8.93 compiler of that runtime release, ninja and the CUTLASS v4.7.1 headers added on top; H100",
+   "nvcc_flags": [
+    "-O3",
+    "-std=c++17",
+    "-gencode=arch=compute_90a,code=sm_90a",
+    "--expt-relaxed-constexpr",
+    "-DNDEBUG",
+    "-Xptxas=--register-usage-level=10",
+    "-Xcompiler -ffile-prefix-map=<scratch>=csrc"
+   ],
+   "python_soabi": "cpython-312-x86_64-linux-gnu",
+   "sha256": "edddd50f7d94350c81f49d83153d10080b7e4cc1ac76bfb314ec0a068c5771aa",
+   "toolchain": {
+    "cuda": "12.8",
+    "device_built_on": "NVIDIA H100 80GB HBM3",
+    "gcc": "gcc (Ubuntu 11.4.0-1ubuntu1~22.04.3) 11.4.0",
+    "nvcc": "Build cuda_12.8.r12.8/compiler.35583870_0",
+    "python": "3.12.14",
+    "torch": "2.11.0+cu128"
+   }
+  }
+ },
+ "key_grammar": "torch<torch.__version__>-<sysconfig SOABI>-sm90 (ops.abi_tag): one directory per (torch, CUDA, CPython, platform, arch)",
+ "loadcheck": {
+  "N": 160,
+  "bmm": "2fcadc8027523d8eec75d584a666c67c",
+  "k1": "d67ded824c44495c0eca1786ea3c8ed3",
+  "k1s": "cc39992a2a52acf6ccba1af032429278",
+  "k3": "9414bfc304fa84bb81a47007d6c9401c",
+  "k3s2": "7e9bf7908ead74ed5717446061edcc53",
+  "k3s3": "18f04baf532336098be2ffaa5c98c160",
+  "note": "closed-form inputs (ops._closed_form_inputs); k1/k3/k1x/k3x must match (this package's kernels), bmm informational (cuBLAS)"
+ },
+ "package": "protenix_fpf_trimul_tx",
+ "sources": {
+  "csrc/trimul_tx.cu": "19fb2bdf4a6845339592fd0c0c8772470492df105ba4a1a6ea21809da2a2d1aa",
+  "csrc/tx_ptx.h": "848836474c9b3a219c15cfb2dd8494e7438175dd31769c5c15408c782f5b60ec"
+ }
+}

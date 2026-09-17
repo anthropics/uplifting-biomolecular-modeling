@@ -1,0 +1,21 @@
+OF3_TRUNK_KERNELS_ADDON — inference-speed add-on for OpenFold3.
+Third-party attributions. Portions derive from OpenFold3 0.4.1 (https://github.com/aqlaboratory/openfold-3, tag 0.4.1; Apache License, Version 2.0;
+"Copyright 2026 AlQuraishi Laboratory" as printed in the upstream LICENSE): OpenFold3's licence text is carried beside this file as OPENFOLD3_LICENSE;
+the kit-level notices file is openfold3/THIRD_PARTY_NOTICES.md.
+
+This add-on contains:
+    of3t_hook/of3t_paircache.py re-states a few lines of OpenFold3's DiffusionConditioning.forward (core/model/layers/diffusion_conditioning.py, header
+    "Copyright 2026 AlQuraishi Laboratory") and AttentionPairBias._prep_bias (core/model/layers/attention_pair_bias.py, header "Copyright 2026 AlQuraishi
+    Laboratory", "Copyright 2026 Advanced Micro Devices, Inc.", "Copyright 2021 DeepMind Technologies Limited"; Apache-2.0) for the non-cached half of those
+    functions; a modified work of those statements, marked in the source.
+    of3t_hook/of3t_levers.py re-implements the body of OpenFold3's TemplateEmbedderAllAtom.forward (core/model/latent/template_module.py, header "Copyright 2026
+    AlQuraishi Laboratory", "Copyright 2026 Advanced Micro Devices, Inc.", "Copyright 2025 NVIDIA Corporation", "Copyright 2021 DeepMind Technologies Limited";
+    Apache-2.0) for the template distinct-evaluation lever; that function is a modified copy and is marked as such in the source.
+  * config/stock_predict.yml — the `model_update` block is the same text as the fast-inference add-on's config/stock_predict.yml (opt/forward/fast_inference/, same
+    lineage); comments rewritten for this add-on. A configuration overlay over OpenFold3's configuration keys; no OpenFold3 text.
+  * tests/inputs/query_7cnx_multimer_590tok.json, tests/inputs/query_leucine_zipper_68tok.json — byte-identical copies of OpenFold3 0.4.1's
+    examples/example_inference_inputs/query_multimer.json and query_homomer.json (Apache-2.0, "Copyright 2026 AlQuraishi Laboratory" as printed in the upstream
+    LICENSE; the JSON files carry no header), renamed by content; tests/inputs/SOURCES.md states the entries they describe.
+No OpenFold3 source file is copied into this directory; the two modules above replace OpenFold3 functions at import time (installed by of3t_hook/sitecustomize.py).
+Third-party software USED (not redistributed): OpenFold3 (Apache-2.0), NVIDIA cuEquivariance (cuequivariance-torch / -ops, their own licence; installed by the user),
+PyTorch (BSD-3), Triton (MIT), DeepSpeed (Apache-2.0; only referenced by the optional measuring tools).

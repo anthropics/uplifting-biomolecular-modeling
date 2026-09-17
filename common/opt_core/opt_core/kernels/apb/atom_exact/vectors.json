@@ -1,0 +1,74 @@
+{
+ "about": "loadcheck vectors for lever atom_attn_exact: inputs = install.make_vectors(seed,S,H,NA); sha256 = digest of the STOCK _local_attention output bytes (fp32, [S,H,NA,32] contiguous) on the pinned image; the fused kernel must reproduce them",
+ "recorded_with": {
+  "torch": "2.13.0+cu130",
+  "cuda": "13.0",
+  "device": "NVIDIA H100 80GB HBM3",
+  "cc": [
+   9,
+   0
+  ]
+ },
+ "cases": [
+  {
+   "name": "s5_h4_n200",
+   "seed": 11,
+   "S": 5,
+   "H": 4,
+   "NA": 200,
+   "sha256": "1365daa925d1204b65e1cca5ee4946a374a4e1ba86cf8a56a087506331086765",
+   "shape": [
+    5,
+    4,
+    200,
+    32
+   ],
+   "remainder_batch": 140
+  },
+  {
+   "name": "s5_h4_n333",
+   "seed": 12,
+   "S": 5,
+   "H": 4,
+   "NA": 333,
+   "sha256": "9419b0c1fafca1ca52d58f6b3a54c3200389433adae028b57110bddd12eb1acc",
+   "shape": [
+    5,
+    4,
+    333,
+    32
+   ],
+   "remainder_batch": 220
+  },
+  {
+   "name": "s1_h4_n96",
+   "seed": 13,
+   "S": 1,
+   "H": 4,
+   "NA": 96,
+   "sha256": "9a1cfd719d9d590845f795cb34c0afff38b0122ae02d4ea0d4143b521f4d43e4",
+   "shape": [
+    1,
+    4,
+    96,
+    32
+   ],
+   "remainder_batch": 12
+  },
+  {
+   "name": "s5_h4_n1291",
+   "seed": 14,
+   "S": 5,
+   "H": 4,
+   "NA": 1291,
+   "sha256": "6e413541ff921860f0f379b34a01331d57bbc959581b6668ed6ef2778f4beb4a",
+   "shape": [
+    5,
+    4,
+    1291,
+    32
+   ],
+   "remainder_batch": 52
+  }
+ ]
+}

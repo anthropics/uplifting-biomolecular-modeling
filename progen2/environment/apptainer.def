@@ -1,0 +1,28 @@
+# ProGen2 optimization kit — Apptainer / Singularity image made FROM the container image of progen2/environment/Dockerfile: the same stack and the
+# same /kit, for hosts that run Apptainer instead of Docker. The source is the image tagged progen2-kit:dev in the local Docker daemon (build it
+# first: STOCK.md 'Pinned stack'); for a published tag the two header lines read `Bootstrap: docker` / `From: <registry>/progen2-kit:<tag>`.
+#   apptainer build progen2.sif progen2/environment/apptainer.def
+#   apptainer run --nv --cleanenv --bind /path/to/progen2_weights:/weights --env PROGEN2_WEIGHTS=/weights --bind "$PWD/out":/out progen2.sif \
+#     score --model progen2-xlarge --mode exact --input /out/items.jsonl --out_dir /out/score
+# The image is read-only: give every verb an --out_dir on a bound, writable path and leave PROGEN2_RUN_DIR unset (the stock run directory then goes
+# under the bound, writable /tmp); %environment keeps a host user site-packages (PEP 370) from shadowing the pinned stack, --cleanenv keeps the host's variables out.
+Bootstrap: docker-daemon
+From: progen2-kit:dev
+
+%environment
+    export PYTHONNOUSERSITE=1
+    # Triton <= 3.5 links its launcher stub with -lcuda: offer the unversioned name when --nv bound only libcuda.so.1
+    if [ -z "${TRITON_LIBCUDA_PATH:-}" ] && [ -e /opt/culib/libcuda.so ]; then export TRITON_LIBCUDA_PATH=/opt/culib; fi
+
+%post
+    mkdir -p /opt/culib && ln -s /.singularity.d/libs/libcuda.so.1 /opt/culib/libcuda.so && ln -s /.singularity.d/libs/libcuda.so.1 /opt/culib/libcuda.so.1
+
+%runscript
+    cd /kit/progen2 && exec bash /kit/progen2/run.sh "$@"
+
+%help
+    ProGen2 optimization kit: the two documented ProGen2 commands, generation (sample.py) and likelihood scoring (likelihood.py), on the seven released
+    model sizes — mode off = stock exactly, one clean process per item; mode exact = identical outputs, faster (both routes in the calling process,
+    the model loaded once; the default). `apptainer run --nv progen2.sif <verb> ...` = `bash /kit/progen2/run.sh <verb> ...` (verbs: install,
+    sample, score, check; /kit/progen2/README.md inside the image). Requires an NVIDIA driver that runs CUDA 12.8 (570 or newer), a GPU of
+    compute capability 8.0 / 9.0 / 10.0 (A100, H100 / H200, B200) and PROGEN2_WEIGHTS naming the weights root (<dir>/<progen2-size>/{pytorch_model.bin, config.json}).

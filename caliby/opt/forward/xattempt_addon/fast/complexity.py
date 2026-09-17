@@ -1,0 +1,352 @@
+# Copyright Generate Biomedicines, Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+"""Layers for computing sequence complexities.
+"""
+
+import numpy as np
+import torch
+import torch.nn.functional as F
+
+from chroma.constants import AA20
+from chroma.layers.graph import collect_neighbors
+
+
+def compositions(S: torch.Tensor, C: torch.LongTensor, w: int = 30):
+    """Compute local compositions per residue.
+
+    Args:
+        S (torch.Tensor): Sequence tensor with shape `(num_batch, num_residues)`
+            (long) or `(num_batch, num_residues, num_alphabet)` (float).
+        C (torch.LongTensor): Chain map with shape `(num_batch, num_residues)`.
+        w (int, optional): Window size.
+
+    Returns:
+        P (torch.Tensor): Local compositions with shape
+            `(num_batch, num_residues - w + 1, num_alphabet)`.
+        N (torch.Tensor): Local counts with shape
+            `(num_batch, num_residues - w + 1, num_alphabet)`.
+        mask_P (torch.Tensor): Mask with shape
+            `(num_batch, num_residues - w + 1)`.
+    """
+    device = S.device
+    Q = len(AA20)
+    mask_i = (C > 0).float()
+    if len(S.shape) == 2:
+        S = F.one_hot(S, Q)
+
+    # Build neighborhoods and masks
+    S_onehot = mask_i[..., None] * S
+    kx = torch.arange(w, device=S.device) - w // 2
+    edge_idx = (
+        torch.arange(S.shape[1], device=S.device)[None, :, None] + kx[None, None, :]
+    )
+    edge_idx = edge_idx.expand(S.shape[0], -1, -1)
+    mask_ij = (edge_idx > 0) & (edge_idx < S.shape[1])
+    edge_idx = edge_idx.clamp(min=0, max=S.shape[1] - 1)
+    C_i = C[..., None]
+    C_j = collect_neighbors(C_i, edge_idx)[..., 0]
+    mask_ij = (mask_ij & C_j.eq(C_i) & (C_i > 0) & (C_j > 0)).float()
+
+    # Sum neighborhood composition
+    S_j = mask_ij[..., None] * collect_neighbors(S_onehot, edge_idx)
+    N = S_j.sum(2)
+
+    num_N = N.sum(-1, keepdims=True)
+    P = N / (num_N + 1e-5)
+    mask_i = ((num_N[..., 0] > 0) & (C > 0)).float()
+    mask_ij = mask_i[..., None] * mask_ij
+    return P, N, edge_idx, mask_i, mask_ij
+
+
+
+
+# ======================================================================================================================
+# XATTEMPT add-on (2026-08-23), lever L-D "fused exact LCP entropy rows".  env CALIBY_X_LCP: unset/"0" = stock;
+# "1" = in complexity_lcp(differentiable, method="naive", CUDA) the (B,N,w,Q,Q) tensor N_ij and estimate_entropy(N_ij)
+# are replaced by ONE Triton kernel that recomputes, per (b,i,k,a) row, the identical fp32 op sequence of the stock code
+#   N_ij = (D[...,None,:] + eye).clamp(min=0);  N_total = N_ij.sum(-1);  P = N_ij / (N_total + eps);
+#   H_ij = -(P * log(P + eps)).sum(-1)                                   with D = N_neighbors - S[:, :, None, :]
+# using IEEE fadd/fmul/fdiv (fp fusion disabled), libdevice logf (bit-identical to torch.log over all positive fp32,
+# tests/ld_unit) and the exact reduction tree of ATen's last-dim fp32 sum for a length-Q row (Reduce.cuh, torch 2.6:
+# block_width = min(last_pow2(Q), 32) lanes; lane t holds ((0+x_t)+(0+x_{t+L}))+0+0; then shfl_down offsets 1,2,4,...).
+# Nothing that carries gradient is touched: the stock code detaches U_ij before it meets S, so autograd's backward graph
+# is unchanged and runs on a bitwise-identical U_ij.  Routing: Q <= 32, fp32, CUDA, method "naive"; other calls take the stock lines.
+# A kernel that cannot build or launch on the device (no triton, no C compiler, a JIT/launch error) is never replaced by the
+# stock lines under CALIBY_X_LCP=1: the served call raises XLcpKernelError (a mode is all of its levers: it refuses by name
+# rather than run a subset) and the failure is kept in _X_LCP_DISABLED_REASON (every later served call raises again without
+# another build; caliby_opt's EXIT line prints it and the design process exits NOT ACTIVE).  An out-of-memory propagates as itself.
+# ======================================================================================================================
+import os as _x_os
+from opt_core.oom import is_oom                                    # an out-of-memory is never rerouted to the stock lines (they need more memory)
+
+_X_LCP_DISABLED_REASON = None                                       # repr of the failure when triton / the kernel did not import, or a served call could not build or launch it (read by caliby_opt.report at exit); None = the kernel is defined and has not failed
+
+
+class XLcpKernelError(RuntimeError):
+    """CALIBY_X_LCP=1 and the fused LCP kernel cannot build or launch on this device: raised at the first served call, never rerouted."""
+
+    def __init__(self, cause):
+        super().__init__(f"[CALIBY_X_LCP] fused LCP kernel could not build/launch on this device: {cause} \u2014 the mode refuses by name (its lever set cannot run whole here); nothing is substituted")
+
+
+try:  # module level so that triton.jit resolves `tl` / `_ld` as globals of this module
+    import triton
+    import triton.language as tl
+    try:
+        from triton.language.extra import libdevice as _ld
+    except Exception:  # older layout
+        from triton.language.extra.cuda import libdevice as _ld
+
+    @triton.jit
+    def _x_tree(x_lo, x_hi):
+        z = tl.zeros_like(x_lo)
+        p = ((z + x_lo) + (z + x_hi)) + z
+        p = p + z
+        a, b = tl.split(tl.reshape(p, [p.shape[0], p.shape[1] // 2, 2]))
+        s = a + b
+        if s.shape[1] >= 2:
+            a, b = tl.split(tl.reshape(s, [s.shape[0], s.shape[1] // 2, 2]))
+            s = a + b
+        if s.shape[1] >= 2:
+            a, b = tl.split(tl.reshape(s, [s.shape[0], s.shape[1] // 2, 2]))
+            s = a + b
+        if s.shape[1] >= 2:
+            a, b = tl.split(tl.reshape(s, [s.shape[0], s.shape[1] // 2, 2]))
+            s = a + b
+        if s.shape[1] >= 2:
+            a, b = tl.split(tl.reshape(s, [s.shape[0], s.shape[1] // 2, 2]))
+            s = a + b
+        return tl.reshape(s, [p.shape[0]])
+
+    @triton.jit
+    def _x_lcp_rows_kernel(D_ptr, H_ptr, R, eps, Q: tl.constexpr, L: tl.constexpr, BLOCK: tl.constexpr):
+        pid = tl.program_id(0)
+        rows = pid * BLOCK + tl.arange(0, BLOCK)
+        rm = rows < R
+        cols_lo = tl.arange(0, L)
+        cols_hi = L + tl.arange(0, L)
+        m_lo = rm[:, None] & (cols_lo[None, :] < Q)
+        m_hi = rm[:, None] & (cols_hi[None, :] < Q)
+        d_lo = tl.load(D_ptr + rows[:, None] * Q + cols_lo[None, :], mask=m_lo, other=0.0)
+        d_hi = tl.load(D_ptr + rows[:, None] * Q + cols_hi[None, :], mask=m_hi, other=0.0)
+        zpad = tl.zeros_like(d_hi)                               # +0.0 (all bits zero)
+        for a in tl.static_range(Q):
+            e_lo = (cols_lo[None, :] == a).to(tl.float32)
+            e_hi = (cols_hi[None, :] == a).to(tl.float32)
+            v_lo = d_lo + e_lo                                   # N_ij = D + eye
+            v_hi = d_hi + e_hi
+            v_lo = tl.where(v_lo < 0.0, 0.0, v_lo)               # .clamp(min=0)  (integral-valued: no -0.0/NaN cases)
+            v_hi = tl.where(v_hi < 0.0, 0.0, v_hi)
+            v_hi = tl.where(cols_hi[None, :] < Q, v_hi, zpad)    # padding columns = +0.0 identity of the sum
+            n_tot = _x_tree(v_lo, v_hi)                          # N.sum(-1)
+            den = n_tot + eps                                    # N_total + eps
+            p_lo = tl.div_rn(v_lo, den[:, None])                 # P = N / (N_total + eps)   (IEEE division like ATen a / b)
+            p_hi = tl.div_rn(v_hi, den[:, None])
+            q_lo = p_lo * _ld.log(p_lo + eps)                    # P * log(P + eps)   (P=0 columns give 0*log(eps) = -0.0, as in ATen)
+            q_hi = p_hi * _ld.log(p_hi + eps)
+            q_hi = tl.where(cols_hi[None, :] < Q, q_hi, zpad)    # padding columns: +0.0 = the `ident` of ATen's sum (NOT -0.0)
+            hs = _x_tree(q_lo, q_hi)
+            h = (hs.to(tl.int32, bitcast=True) ^ (-2147483648)).to(tl.float32, bitcast=True)  # H = -(sum): exact sign-bit flip as ATen neg (-(+0.0) = -0.0; triton's unary minus may lower to 0-x)
+            tl.store(H_ptr + rows * Q + a, h, mask=rm)
+except Exception as _exc:  # pragma: no cover
+    _X_LCP_DISABLED_REASON = repr(_exc)
+
+
+def _x_lcp_level() -> int:
+    try:
+        return int(_x_os.environ.get("CALIBY_X_LCP", "0"))
+    except ValueError:
+        return 0
+
+
+# Launch geometry of the fused kernel: (rows per program = BLOCK, num_warps), the same on every card — chosen by a launch-geometry sweep
+# on H100 and A100. A row's Q lanes are reduced by the fixed L-leaf tree inside one program whatever the geometry, so every geometry
+# yields the same H bits: the pair is launch speed, never arithmetic.
+_X_LCP_GEOMETRY = (8, 2)
+
+
+def _x_fused_entropy_rows(D: torch.Tensor, eps: float = 1e-11) -> torch.Tensor:
+    """H[..., a] == estimate_entropy(((D[..., None, :] + eye).clamp(min=0)), method="naive")[..., a], bitwise (fp32, Q<=32)."""
+    Q = D.shape[-1]
+    L = 1
+    while L * 2 <= Q:
+        L *= 2
+    L = min(L, 32)
+    Dc = D.contiguous()
+    R = Dc.numel() // Q
+    H = torch.empty_like(Dc)
+    BLOCK, warps = _X_LCP_GEOMETRY
+    grid = ((R + BLOCK - 1) // BLOCK,)
+    _x_lcp_rows_kernel[grid](Dc, H, R, float(np.float32(eps)), Q=Q, L=L, BLOCK=BLOCK, num_warps=warps, enable_fp_fusion=False)
+    return H
+
+
+def _x_lcp_usable(S: torch.Tensor, method: str) -> bool:
+    """True = this call is the kernel's (CALIBY_X_LCP=1, method "naive", CUDA fp32, an alphabet its row reduction serves: Q <= 2 * L with
+    L = min(2 ** floor(log2 Q), 32)); False = the stock lines serve it (routing). Raises XLcpKernelError when the call is the kernel's but
+    the kernel is unavailable in this process (triton / the kernel did not import, or an earlier served call could not build or launch it)."""
+    if _x_lcp_level() < 1 or method != "naive" or not S.is_cuda or S.dtype != torch.float32:
+        return False
+    Q = S.shape[-1]
+    L = 1
+    while L * 2 <= Q:
+        L *= 2
+    if not (2 <= L <= 32 and Q <= 2 * L):
+        return False
+    if _X_LCP_DISABLED_REASON is not None:
+        raise XLcpKernelError(_X_LCP_DISABLED_REASON)
+    return True
+
+
+def complexity_lcp(
+    S: torch.LongTensor,
+    C: torch.LongTensor,
+    w: int = 30,
+    entropy_min: float = 2.32,
+    method: str = "naive",
+    differentiable=True,
+    eps: float = 1e-5,
+    min_coverage=0.9,
+    # entropy_min: float = 2.52,
+    # method = "chao-shen"
+) -> torch.Tensor:
+    """Compute the Local Composition Perplexity metric.
+
+    Args:
+        S (torch.Tensor): Sequence tensor with shape `(num_batch, num_residues)`
+            (index tensor) or `(num_batch, num_residues, num_alphabet)`.
+        C (torch.LongTensor): Chain map with shape `(num_batch, num_residues)`.
+        w (int): Window size.
+        grad_pseudocount (float): Pseudocount for stabilizing entropy gradients
+            on backwards pass.
+        eps (float): Small number for numerical stability in division and logarithms.
+
+    Returns:
+        U (torch.Tensor): Complexities with shape `(num_batch)`.
+    """
+
+    # adjust window size based on sequence length
+    if S.shape[1] < w:
+        w = S.shape[1]
+
+    P, N, edge_idx, mask_i, mask_ij = compositions(S, C, w)
+
+    # Only count windows with `min_coverage`
+    min_N = int(min_coverage * w)
+    mask_coverage = N.sum(-1) > int(min_coverage * w)
+
+    H = estimate_entropy(N, method=method)
+    U = mask_coverage * (torch.exp(H) - np.exp(entropy_min)).clamp(max=0).square()
+
+    # Compute entropy as a function of perturbed counts
+    if differentiable and len(S.shape) == 3:
+        # Compute how a mutation changes entropy for each neighbor
+        N_neighbors = collect_neighbors(N, edge_idx)
+        mask_coverage_j = collect_neighbors(mask_coverage[..., None], edge_idx)
+        if _x_lcp_usable(S, method):
+            # XATTEMPT L-D: same D as the stock expression below; the (B,N,w,Q,Q) N_ij is never materialised.
+            try:
+                H_ij = _x_fused_entropy_rows((N_neighbors - S[:, :, None, :]).detach())
+            except Exception as exc:  # Triton JIT/build/launch failure (e.g. no C compiler): the lever cannot serve on this device — the run stops here, by name
+                if is_oom(exc): raise
+                global _X_LCP_DISABLED_REASON
+                _X_LCP_DISABLED_REASON = repr(exc)
+                raise XLcpKernelError(repr(exc)) from exc
+        else:
+            N_ij = (N_neighbors - S[:, :, None, :])[..., None, :] + torch.eye(
+                N.shape[-1], device=N.device
+            )[None, None, None, ...]
+            N_ij = N_ij.clamp(min=0)
+            H_ij = estimate_entropy(N_ij, method=method)
+        U_ij = (torch.exp(H_ij) - np.exp(entropy_min)).clamp(max=0).square()
+        U_ij = mask_ij[..., None] * mask_coverage_j * U_ij
+        U_differentiable = (U_ij.detach() * S[:, :, None, :]).sum([-1, -2])
+        U = U.detach() + U_differentiable - U_differentiable.detach()
+
+    U = (mask_i * U).sum(1)
+    return U
+
+
+def complexity_scores_lcp_t(
+    t,
+    S: torch.LongTensor,
+    C: torch.LongTensor,
+    idx: torch.LongTensor,
+    edge_idx_t: torch.LongTensor,
+    mask_ij_t: torch.Tensor,
+    w: int = 30,
+    entropy_min: float = 2.515,
+    eps: float = 1e-5,
+    method: str = "chao-shen",
+) -> torch.Tensor:
+    """Compute local LCP scores for autoregressive decoding."""
+    Q = len(AA20)
+    O = F.one_hot(S, Q)
+    O_j = collect_neighbors(O, edge_idx_t)
+    idx_i = idx[:, t, None]
+    C_i = C[:, t, None]
+    idx_j = collect_neighbors(idx[..., None], edge_idx_t)[..., 0]
+    C_j = collect_neighbors(C[..., None], edge_idx_t)[..., 0]
+
+    # Sum valid neighbor counts
+    is_near = (idx_i - idx_j).abs() <= w / 2
+    same_chain = C_i == C_j
+    valid_ij_t = (is_near * same_chain * (mask_ij_t > 0)).float()[..., None]
+    N_k = (valid_ij_t * O_j).sum(-2)
+
+    # Compute counts under all possible extensions
+    N_k = N_k[:, :, None, :] + torch.eye(Q, device=N_k.device)[None, None, ...]
+
+    H = estimate_entropy(N_k, method=method)
+    U = -(torch.exp(H) - np.exp(entropy_min)).clamp(max=0).square()
+    return U
+
+
+def estimate_entropy(
+    N: torch.Tensor, method: str = "chao-shen", eps: float = 1e-11
+) -> torch.Tensor:
+    """Estimate entropy from counts.
+
+        See Chao, A., & Shen, T. J. (2003) for more details.
+
+    Args:
+        N (torch.Tensor): Tensor of counts with shape `(..., num_bins)`.
+
+    Returns:
+        H (torch.Tensor): Estimated entropy with shape `(...)`.
+    """
+    N = N.float()
+    N_total = N.sum(-1, keepdims=True)
+    P = N / (N_total + eps)
+
+    if method == "chao-shen":
+        # Estimate coverage and adjusted frequencies
+        singletons = N.long().eq(1).sum(-1, keepdims=True).float()
+        C = 1.0 - singletons / (N_total + eps)
+        P_adjust = C * P
+        P_inclusion = (1.0 - (1.0 - P_adjust) ** N_total).clamp(min=eps)
+        H = -(P_adjust * torch.log(P_adjust.clamp(min=eps)) / P_inclusion).sum(-1)
+    elif method == "miller-maddow":
+        bins = (N > 0).float().sum(-1)
+        bias = (bins - 1) / (2 * N_total[..., 0] + eps)
+        H = -(P * torch.log(P + eps)).sum(-1) + bias
+    elif method == "laplace":
+        N = N.float() + 1 / N.shape[-1]
+        N_total = N.sum(-1, keepdims=True)
+        P = N / (N_total + eps)
+        H = -(P * torch.log(P)).sum(-1)
+    else:
+        H = -(P * torch.log(P + eps)).sum(-1)
+    return H

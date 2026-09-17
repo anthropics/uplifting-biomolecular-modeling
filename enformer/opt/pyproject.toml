@@ -1,0 +1,30 @@
+# enformer_opt — the Enformer exact kit as a package. Install editable from this directory (`pip install -e enformer/opt`, or `bash run.sh install`):
+# the vendored kernels (forward/enformer_kit/: the kit modules; forward/bin/, forward/classes/: the prebuilt extension objects) are resolved from the
+# package's own location, so the install must stay editable. No install-time dependency on the upstream package (enformer-pytorch, stock/PINS.json):
+# its version is checked at activation. The build backend is setuptools plus one step that ships enformer_opt_autoload.pth at the wheel root, which
+# is what makes `ENFORMER_OPT=exact` engage the kit without code changes (enformer_opt/_autoload.py).
+[build-system]
+requires = ["setuptools>=64"]
+build-backend = "_build_backend"
+backend-path = ["."]
+
+[project]
+name = "enformer_opt"
+dynamic = ["version"]
+description = "Enformer inference optimizations: one exact mode, engaged by ENFORMER_OPT=exact or enformer_opt.enable()"
+requires-python = ">=3.10"
+classifiers = ["Private :: Do Not Upload"]        # not for PyPI: the index rejects uploads carrying this classifier
+dependencies = []
+
+[project.optional-dependencies]
+test = ["pytest"]                                    # the package's CPU tests (opt/enformer_opt/tests; no GPU, no upstream needed)
+
+[project.scripts]
+enformer-opt = "enformer_opt.__main__:main"        # `enformer-opt check` == `python -m enformer_opt check`
+
+[tool.setuptools]
+packages = ["enformer_opt", "enformer_opt.tests"]
+include-package-data = false
+
+[tool.setuptools.dynamic]
+version = {attr = "enformer_opt.__version__"}

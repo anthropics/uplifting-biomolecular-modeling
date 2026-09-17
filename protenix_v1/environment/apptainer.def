@@ -1,0 +1,32 @@
+# Protenix v1 optimization kit — Apptainer / Singularity image made FROM the container image of protenix_v1/environment/Dockerfile: the same
+# stack and the same /kit, for hosts that run Apptainer instead of Docker. The source is the image tagged protenix_v1-kit:dev in the local
+# Docker daemon (build it first: README.md 'Setup'); for a published tag the two header lines read `Bootstrap: docker` /
+# `From: <registry>/protenix_v1-kit:<tag>`.
+#   apptainer build protenix_v1.sif protenix_v1/environment/apptainer.def
+#   apptainer run --nv --cleanenv --bind /path/to/protenix_root:/weights --env PROTENIX_ROOT_DIR=/weights --bind "$PWD/out":/out protenix_v1.sif \
+#     warm --config h100 --mode fast --out_dir /out/warm
+# The image is read-only: give every verb an --out_dir on a bound, writable path and keep outputs outside the image (README.md
+# 'Run'); the JIT caches go under /tmp (configs/h100.env: TORCH_EXTENSIONS_DIR, TRITON_CACHE_DIR — bind a persistent
+# directory there to keep them across runs); %environment keeps a host user site-packages (PEP 370) from shadowing the pinned stack,
+# --cleanenv keeps the host's variables out.
+Bootstrap: docker-daemon
+From: protenix_v1-kit:dev
+
+%post
+    mkdir -p /opt/culib && ln -s /.singularity.d/libs/libcuda.so.1 /opt/culib/libcuda.so && ln -s /.singularity.d/libs/libcuda.so.1 /opt/culib/libcuda.so.1
+
+%environment
+    export PYTHONNOUSERSITE=1
+    # Triton <= 3.5 links its launcher stub with -lcuda: offer the unversioned name when --nv bound only libcuda.so.1
+    if [ -z "${TRITON_LIBCUDA_PATH:-}" ] && [ -e /opt/culib/libcuda.so ]; then export TRITON_LIBCUDA_PATH=/opt/culib; fi
+
+%runscript
+    cd /kit/protenix_v1 && exec bash /kit/protenix_v1/run.sh "$@"
+
+%help
+    Protenix v1 optimization kit: drop-in modes that make stock Protenix (protenix 1.1.0, `protenix pred`) faster or lighter on GPU memory
+    without changing how it is called — off = stock exactly; exact = stock's outputs (byte-identical under --det 1), faster; fast = small
+    numeric differences inside stock's seed-to-seed spread, faster still (the default); big = lowest memory for large inputs, --n_gpu 2|4|8
+    shards one prediction over the GPUs of one machine. `apptainer run --nv protenix_v1.sif <verb> ...` = `bash /kit/protenix_v1/run.sh <verb> ...`
+    (verbs: install, probe, pred, check, warm; /kit/protenix_v1/README.md inside the image). Requires an NVIDIA driver that runs CUDA 13.0
+    (580 or newer) and PROTENIX_ROOT_DIR naming the weights root.

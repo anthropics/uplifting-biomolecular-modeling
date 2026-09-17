@@ -1,0 +1,19 @@
+{
+ "exports": {
+  "PF_TRIATTN_TABLE": {
+   "param": "cells",
+   "path": true,
+   "required": false,
+   "what": "per-arch launch cells json (K2B_CELLS.json, carried in the package; read once at import, compute capability keyed); unset -> the package's frozen CONFIG; opt_core.attn.pair_fused exports the carried K2B_CELLS.json before the first import"
+  }
+ },
+ "kind": "package",
+ "license": "Apache-2.0 (this repository's own code: common/opt_core/LICENSE); portions derive from Protenix (Apache-2.0, Copyright 2024 ByteDance and/or its affiliates): NOTICE in the package directory, licence text kernels/fpf_flashpairformer.PROTENIX_LICENSE",
+ "mechanism": "attn.triangle_attention (core kernel; cuequivariance triangle_attention call convention)",
+ "name": "fpf_triatt_k2b",
+ "not_carried": {},
+ "runtime_imports": [],
+ "runtime_imports_note": "__init__.py inserts its own directory on sys.path and imports triatt_k2b / flash_triattn_k2 as top-level modules (the kit's loader, carried as-is); fn / fn_k2 (registry ops) are same-signature wrappers in __init__.py over _engine_adapter.py, imported on first call, whose bodies import the engine's upstream package lazily inside the call; the core's serve layer calls attn_k2b (= triatt_k2b.flash_triangle_attention) only flash_triattn_k2.py: the cached-launch and launch-check handlers of _launch_generic import opt_core.oom.is_oom (standard library) and re-raise an out-of-memory instead of disabling the fast launch path; kernel statements unchanged.",
+ "served_note": "attn_k2b(q, k, v, bias [B,1,H,SQ,SK] fp32, mask [B,N,1,1,SK] bool | None, scale) -> [B,N,H,SQ,D]; D in {16,32,64,128}, any H; bf16/fp16 (base-2 domain) and fp32 (natural domain, IP via PF_TRIATTN_FP32_DOT / PF_FLASH_IP); deterministic; served as core='k2b' by opt_core.attn.pair_fused",
+ "version": "K2B v1.1.1 (FPF TriAtt library kernel; K2 = flash_triattn v9 / OF3T port + base-2 softmax domain + MAXNREG cap; FLASHPAIRFORMER v0.6.1 tree)"
+}

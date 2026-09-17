@@ -1,0 +1,14 @@
+{
+ "class": "a100",
+ "sm": [
+  8,
+  0
+ ],
+ "memory_mib": 81920,
+ "device_names": [
+  "NVIDIA A100-SXM4-80GB",
+  "NVIDIA A100 80GB PCIe",
+  "NVIDIA A100-SXM4-40GB"
+ ],
+ "kit": "de63c28b1605fa9e201e1ea1e3128e06890167b6b8834dde3991d2821e49e95f"
+}

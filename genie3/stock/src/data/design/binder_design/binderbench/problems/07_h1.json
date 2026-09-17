@@ -1,0 +1,76 @@
+{
+    "key": "07_h1",
+    "name": "H1",
+    "target_pdb_filepath": "data/design/binder_design/binderbench/targets/pdb/07_h1.pdb",
+    "target_fasta_filepath": "data/design/binder_design/binderbench/targets/fasta/07_h1.fasta",
+    "target_msa_filepath": "data/design/binder_design/binderbench/targets/msa/07_h1.a3m",
+    "target_pdb_filepath_by_chain": [
+        "data/design/binder_design/binderbench/targets/pdb/07_h1-chain_B.pdb",
+        "data/design/binder_design/binderbench/targets/pdb/07_h1-chain_C.pdb"
+    ],
+    "target_fasta_filepath_by_chain": [
+        "data/design/binder_design/binderbench/targets/fasta/07_h1-chain_B.fasta",
+        "data/design/binder_design/binderbench/targets/fasta/07_h1-chain_C.fasta"
+    ],
+    "target_msa_filepath_by_chain": [
+        "data/design/binder_design/binderbench/targets/msa/07_h1-chain_B.a3m",
+        "data/design/binder_design/binderbench/targets/msa/07_h1-chain_C.a3m"
+    ],
+    "target_chain_and_residues": [
+        "B1-322",
+        "C1-170"
+    ],
+    "target_interface_residues": {
+        "hotspot": [
+            "C21",
+            "C45",
+            "C52"
+        ],
+        "extended": [
+            "C19",
+            "C21",
+            "C42",
+            "C43",
+            "C45",
+            "C46",
+            "C47",
+            "C49",
+            "C50",
+            "C52",
+            "C53",
+            "C54",
+            "C57",
+            "C110"
+        ],
+        "common": [
+            "B29",
+            "B31",
+            "B289",
+            "B316",
+            "C18",
+            "C19",
+            "C20",
+            "C21",
+            "C36",
+            "C38",
+            "C41",
+            "C42",
+            "C45",
+            "C46",
+            "C48",
+            "C49",
+            "C50",
+            "C52",
+            "C53",
+            "C56",
+            "C57"
+        ]
+    },
+    "binder_min_length": 80,
+    "binder_max_length": 120,
+    "tag": [
+        "RFDiffusion",
+        "AlphaProteo"
+    ],
+    "pdb_id": "5VLI"
+}

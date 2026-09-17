@@ -1,0 +1,69 @@
+{
+ "expected": {
+  "cc90|triton3.7.1|torch2.13.0": {
+   "ln_linear_a": {
+    "dtype": "bfloat16",
+    "finite": true,
+    "sha256": "39436f3e1f0d3d20bb7f22891b94bcaac9f370c43c229d170e7f17c980a17394",
+    "shape": [
+     77,
+     52,
+     32
+    ]
+   },
+   "ln_linear_b": {
+    "dtype": "bfloat16",
+    "finite": true,
+    "sha256": "ce2c5d8c6e001f572203c41c154b4f0833444111028c747aec03607efdc56e88",
+    "shape": [
+     77,
+     52,
+     32
+    ]
+   },
+   "opm_out": {
+    "dtype": "bfloat16",
+    "finite": true,
+    "sha256": "ce4d125ef69c098d6db7156156b7acc955f4d5165f05739871a296c24bf5a23e",
+    "shape": [
+     52,
+     52,
+     256
+    ]
+   },
+   "pwa_ln_g": {
+    "dtype": "bfloat16",
+    "finite": true,
+    "sha256": "edbb3d4a03a3868f233f8e2fbf8607c068e094080b1b268028c2ff290b0821c0",
+    "shape": [
+     61,
+     52,
+     64
+    ]
+   },
+   "pwa_ln_v": {
+    "dtype": "bfloat16",
+    "finite": true,
+    "sha256": "1d5bd41b6ce8548c4eb839f4e5c486bce26df38c07d8ebc3e8371f02a7ad048b",
+    "shape": [
+     8,
+     52,
+     61,
+     8
+    ]
+   },
+   "pwa_out2": {
+    "dtype": "bfloat16",
+    "finite": true,
+    "sha256": "6179d9f527717bfdb3483a62e5feb27b334756bdd00e67879765a35f3b50c925",
+    "shape": [
+     61,
+     52,
+     128
+    ]
+   }
+  }
+ },
+ "generator": "protenix_fpf_apb.loadcheck.det",
+ "schema": "fpf_vectors/v1"
+}

@@ -1,0 +1,105 @@
+--- a/caliby/api.py
++++ b/caliby/api.py
+@@ -17,6 +17,7 @@
+ from typing import Any
+ 
+ import pandas as pd
++from opt_core.oom import is_oom  # an out-of-memory is never rerouted to the serial fallback
+ 
+ # Set AtomWorks env vars to safe defaults before any atomworks imports.
+ os.environ.setdefault("PDB_MIRROR_PATH", "")
+@@ -398,6 +399,23 @@
+     return CalibyModel(model=sd_model, data_cfg=data_cfg, sampling_cfg=sampling_cfg, device=device)
+ 
+ 
++class _XCleanDataset:  # XATTEMPT L-B "loader": map-style dataset whose items are the cleaned-file paths written by the stock clean_pdb()
++    def __init__(self, pdb_paths: list[str], out_dir: str):
++        self._pdb_paths, self._out_dir = pdb_paths, out_dir
++
++    def __len__(self) -> int:
++        return len(self._pdb_paths)
++
++    def __getitem__(self, idx: int) -> str:
++        from caliby.data.preprocessing.atomworks.clean_pdbs import clean_pdb
++
++        return clean_pdb(self._pdb_paths[idx], self._out_dir)
++
++
++def _x_identity(batch):
++    return batch
++
++
+ def clean_pdbs(
+     pdb_paths: list[str],
+     *,
+@@ -432,6 +450,27 @@
+     if num_workers == 1:
+         return [clean_pdb(pdb_path, out_dir) for pdb_path in pdb_paths]
+ 
++    # XATTEMPT add-on lever L-B (env CALIBY_X_CLEAN=loader): run the stock clean_pdb() per file inside `num_workers` torch DataLoader
++    # worker processes -- the same mechanism (fork of this already-imported process, index-ordered results, no shuffling) that
++    # caliby's own InferenceDataLoader uses for featurisation in this very process; each worker pays the lazy CCD load once, in
++    # parallel.  Outputs are the files clean_pdb writes, byte-identical to the serial path except biotite's `_entry.date/time`;
++    # any failure -> falls back to the stock serial loop (identical outputs) with a note on stderr.
++    if os.environ.get("CALIBY_X_CLEAN", "") == "loader":
++        import sys as _sys
++
++        try:
++            from torch.utils.data import DataLoader as _DL
++
++            _ds = _XCleanDataset(list(map(str, pdb_paths)), str(out_dir))
++            _paths = [b[0] for b in _DL(_ds, batch_size=1, shuffle=False, num_workers=min(num_workers, len(pdb_paths)), collate_fn=_x_identity)]
++            if len(_paths) == len(pdb_paths) and all(isinstance(p, str) and os.path.exists(p) for p in _paths):
++                return _paths
++            print("[CALIBY_X_CLEAN=loader] incomplete result -> serial fallback", file=_sys.stderr)
++        except Exception as _exc:  # noqa: BLE001
++            if is_oom(_exc): raise
++            print(f"[CALIBY_X_CLEAN=loader] failed ({_exc!r}) -> serial fallback", file=_sys.stderr)
++        return [clean_pdb(pdb_path, out_dir) for pdb_path in pdb_paths]
++
+     parallel = Parallel(n_jobs=num_workers)
+     return list(parallel(delayed(clean_pdb)(pdb_path, out_dir) for pdb_path in pdb_paths))
+ 
+@@ -549,6 +588,7 @@
+     os.environ["PROTPARDELLE_MODEL_PARAMS"] = f"{model_params_path}/protpardelle-1c"
+     protpardelle_sample = importlib.import_module("protpardelle.sample")
+     GlobalHydra.instance().clear()
++    _x_pp_model_cache_install(protpardelle_sample)  # XATTEMPT L-G (no-op unless CALIBY_X_PP_CACHE=1)
+ 
+     L.seed_everything(seed)
+     torch.backends.cudnn.deterministic = True
+@@ -587,6 +627,34 @@
+     return pdb_to_conformers
+ 
+ 
++# XATTEMPT add-on lever L-G (env CALIBY_X_PP_CACHE=1): protpardelle.sample.sample() re-loads the Protpardelle-1c checkpoint from disk
++# (torch.load + Protpardelle(config) + load_state_dict) on EVERY call, and caliby.generate_ensembles calls it once per input PDB.
++# With the switch on, load_model(config_path, checkpoint_path[, device]) as seen by protpardelle.sample is memoised per
++# (config_path, checkpoint_path, device): the same weights on the same device give the identical module object in eval mode
++# (Protpardelle.sample never mutates parameters or buffers), so outputs are unchanged; ~1.4 s per backbone saved.
++_X_PP_MODELS: dict = {}
++
++
++def _x_pp_model_cache_install(protpardelle_sample) -> None:
++    if os.environ.get("CALIBY_X_PP_CACHE", "0") in ("", "0"):
++        return
++    if getattr(protpardelle_sample.load_model, "_x_cached", False):
++        return
++    _orig = protpardelle_sample.load_model
++
++    def load_model_cached(config_path, checkpoint_path, device=None):
++        key = (str(config_path), str(checkpoint_path), str(device))
++        m = _X_PP_MODELS.get(key)
++        if m is None:
++            m = _orig(config_path, checkpoint_path, device) if device is not None else _orig(config_path, checkpoint_path)
++            _X_PP_MODELS[key] = m
++        m.eval()
++        return m
++
++    load_model_cached._x_cached = True
++    protpardelle_sample.load_model = load_model_cached
++
++
+ # ---------------------------------------------------------------------------
+ # Module-level convenience functions (load model + call + return)
+ # ---------------------------------------------------------------------------

@@ -1,0 +1,38 @@
+# chai1_opt — explicit interface to the Chai-1 inference optimizations.
+# Install editable from this directory: `pip install -e chai1/opt`. The kit code it wraps lives beside the package — the three kit
+# directories forward/fast_inference/ (the driver kit's modules; the worker the tree runs is forward/errata_02/chai_worker.py), forward/eager_trunk/ (the eager stack,
+# chai1_eager) and forward/dstep_megakernel/ (the DSTEP add-on, chai1_fastln) — and is resolved from the package location, so the
+# install must stay editable (or point CHAI1_OPT_HOME at the tree, or CHAI1_OPT_KIT / CHAI1_OPT_EAGER / CHAI1_OPT_DSTEP at each
+# directory). No install-time dependency on the upstream
+# package (chai_lab: stock/PINS.json): its version is checked at activation. The build backend is setuptools plus one step that
+# ships chai1_opt_autoload.pth at the wheel root, which is what makes `CHAI1_OPT=<mode>` activate without code changes
+# (see chai1_opt/_autoload.py).
+[build-system]
+requires = ["setuptools>=64", "wheel"]
+build-backend = "_build_backend"
+backend-path = ["."]
+
+[project]
+name = "chai1_opt"
+dynamic = ["version"]
+description = "Chai-1 inference optimizations: modes off/exact/fast/big, stock's fold flags passed through, the deterministic recipe, lazy autoload, activation report"
+requires-python = ">=3.10"
+classifiers = ["Private :: Do Not Upload"]
+dependencies = []
+
+[project.optional-dependencies]
+test = ["pytest", "numpy", "setuptools>=64", "wheel"]   # the package's CPU tests (numpy: the output writer's array round trip; setuptools + wheel = [build-system] requires: the tests execute opt/_build_backend.py and build this package editable with build isolation off, on the interpreter's own setuptools.build_meta — bare venvs bundle neither on Python >= 3.12, and a bundled setuptools < 70.1 has no bdist_wheel without wheel)
+
+[project.scripts]
+chai1-opt = "chai1_opt.__main__:main"              # `chai1-opt pred|check|warm ...` == `python -m chai1_opt ...`
+
+[tool.setuptools]
+packages = ["chai1_opt", "chai1_opt.tests"]
+include-package-data = false
+
+[tool.setuptools.dynamic]
+version = {attr = "chai1_opt.__version__"}
+
+[tool.opt_core]
+path = "../../common/opt_core"
+version = "0.5.125.0"

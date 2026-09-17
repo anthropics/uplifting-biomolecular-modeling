@@ -1,0 +1,30 @@
+# evo2_opt — the Evo 2 exact inference kit (a drop-in for the `evo2` package). Install editable from this directory: `pip install -e evo2/opt`
+# (`run.sh install` does it); the tree's stock/PINS.json and route/evo2_route.py are resolved from the package location, so the install stays
+# editable (or EVO2_OPT_HOME names the tree). No install-time dependency on the upstream packages (evo2 / vtx) nor on torch: their presence and
+# versions are read at activation. The build backend is setuptools plus one step that ships evo2_opt_autoload.pth at the wheel root, which is
+# what makes `EVO2_OPT=exact` engage the kit without code changes (evo2_opt/_autoload.py).
+[build-system]
+requires = ["setuptools>=64"]
+build-backend = "_build_backend"
+backend-path = ["."]
+
+[project]
+name = "evo2_opt"
+dynamic = ["version"]
+description = "Evo 2 exact inference kit: bit-identical scoring and generation, faster; one switch (EVO2_OPT=exact)"
+requires-python = ">=3.10"
+classifiers = ["Private :: Do Not Upload"]
+dependencies = []
+
+[project.optional-dependencies]
+test = ["pytest"]                                    # the package's CPU tests (no torch needed)
+
+[project.scripts]
+evo2-opt = "evo2_opt.cli:main"                     # `evo2-opt check` == `python -m evo2_opt check`
+
+[tool.setuptools]
+packages = ["evo2_opt", "evo2_opt.kit", "evo2_opt.gen", "evo2_opt.gen.hyenafuse", "evo2_opt.gen.cudagraph", "evo2_opt.tests"]
+include-package-data = false
+
+[tool.setuptools.dynamic]
+version = {attr = "evo2_opt.__version__"}

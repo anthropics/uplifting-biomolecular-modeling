@@ -1,0 +1,174 @@
+{
+ "model": "colabdesign",
+ "upstream": {
+  "colabdesign": {
+   "repo": "https://github.com/sokrypton/ColabDesign",
+   "commit": "e31a56fe1d9b4de25c8697f3a28b75892941cc72",
+   "version": "1.1.3",
+   "tag": null,
+   "install": "colabdesign @ git+https://github.com/sokrypton/ColabDesign.git@e31a56fe1d9b4de25c8697f3a28b75892941cc72",
+   "archive": "stock/colabdesign-e31a56fe.tar.gz",
+   "archive_recipe": "git archive --format=tar --prefix=colabdesign-e31a56fe/ e31a56fe1d9b4de25c8697f3a28b75892941cc72 -- colabdesign setup.py LICENSE.txt README.md | gzip -n -9",
+   "extracted": [
+    "src/LICENSE.txt",
+    "src/README.md",
+    "src/setup.py",
+    "src/colabdesign/__init__.py",
+    "src/colabdesign/af/README.md",
+    "src/colabdesign/af/alphafold/model/modules.py",
+    "src/colabdesign/af/design.py",
+    "src/colabdesign/af/model.py",
+    "src/colabdesign/af/prep.py",
+    "src/colabdesign/af/utils.py",
+    "src/colabdesign/shared/model.py",
+    "src/colabdesign/shared/utils.py"
+   ]
+  },
+  "bindcraft": {
+   "repo": "https://github.com/martinpacesa/BindCraft",
+   "commit": "efb5bfeb8b4b1a5944256f979c34e0c8e6a82d9d",
+   "version": null,
+   "tag": null,
+   "install": "vendored: stock/src/bindcraft/ (BindCraft is not a Python distribution; its design step is imported from the vendored files by opt/colabdesign_opt/bindcraft.py); the prebuilt DSSP executable functions/dssp is not carried: `run.sh install` fetches it from the repository at this commit into stock/src/bindcraft/functions/dssp, checks its sha256 and sets mode 755 (install_bindcraft.sh's `chmod +x`) \u2014 `fetched` below; functions/DAlphaBall.gcc is neither carried nor fetched (the PyRosetta stage that uses it is not run by this kit)",
+   "archive": "stock/bindcraft-efb5bfeb.tar.gz",
+   "archive_recipe": "git archive --format=tar --prefix=bindcraft-efb5bfeb/ efb5bfeb8b4b1a5944256f979c34e0c8e6a82d9d -- . ':(exclude)functions/dssp' ':(exclude)functions/DAlphaBall.gcc' | gzip -n -9",
+   "extracted": [
+    "src/bindcraft/LICENSE",
+    "src/bindcraft/README.md",
+    "src/bindcraft/bindcraft.py",
+    "src/bindcraft/functions/__init__.py",
+    "src/bindcraft/functions/biopython_utils.py",
+    "src/bindcraft/functions/colabdesign_utils.py",
+    "src/bindcraft/functions/generic_utils.py",
+    "src/bindcraft/settings_advanced/default_4stage_multimer.json",
+    "src/bindcraft/settings_filters/default_filters.json",
+    "src/bindcraft/settings_target/PDL1.json",
+    "src/bindcraft/example/PDL1.pdb"
+   ],
+   "fetched": {
+    "files": {
+     "src/bindcraft/functions/dssp": {
+      "url": "https://raw.githubusercontent.com/martinpacesa/BindCraft/efb5bfeb8b4b1a5944256f979c34e0c8e6a82d9d/functions/dssp",
+      "sha256": "ef5e4ba600ccdf7053a4f296846065181b04d44721927ce97f97c1fc7cd2dab3",
+      "bytes": 877904,
+      "mode": "755"
+     }
+    },
+    "why": "BindCraft's repository carries two prebuilt third-party executables whose licences it does not state, functions/dssp and functions/DAlphaBall.gcc; this tree distributes neither (both are left out of the archive above and of stock/src/). The design step runs DSSP (biopython_utils.calc_ss_percentage, settings optimise_beta), so `run.sh install` fetches that one file from upstream as published at the pinned commit; DAlphaBall.gcc serves only the PyRosetta stage, which this kit does not run, and is not fetched"
+   },
+   "colabdesign_requirement": {
+    "stated": "none: install_bindcraft.sh `pip3 install git+https://github.com/sokrypton/ColabDesign.git --no-deps` (the default branch's tip, unpinned); jax 'jax>=0.4,<=0.6.0'",
+    "resolved": "sokrypton/ColabDesign main = e31a56fe1d9b4de25c8697f3a28b75892941cc72 since 2025-10-23, with no later commit on main by this BindCraft commit's date (2026-08-12): the tip BindCraft installs IS upstream.colabdesign.commit \u2014 the ColabDesign pin stands; jax 0.6.0 is inside BindCraft's range",
+    "api_used_by_the_design_step": "colabdesign.mk_afdesign_model(protocol, debug, data_dir, use_multimer, num_recycles, best_metric) \u00b7 prep_inputs(pdb_filename, chain, binder_len, hotspot, seed, rm_aa, rm_target_seq, rm_target_sc) \u00b7 opt['weights'|'con'|'i_con'] \u00b7 _callbacks['model']['loss'] \u00b7 design_logits / design_soft / design_hard / design_pssm_semigreedy (sample_models, save_best, ramp_recycles, ramp_models, e_soft, e_temp, temp, dropout) \u00b7 clear_best \u00b7 _tmp['best']['aux'] \u00b7 aux['seq']['logits'] \u00b7 set_opt \u00b7 save_pdb \u00b7 get_seqs \u00b7 animate \u00b7 colabdesign.af.loss get_ptm / mask_loss / get_dgram_bins / _get_con_loss \u2014 all present with these signatures at the pinned ColabDesign commit"
+   }
+  }
+ },
+ "source_sha256": {
+  "src/colabdesign/af/prep.py": "b2ebf1ccb2c8f8fd0cb65871fbc307f65fc32d582ffe2547f118c1102de6df38",
+  "src/colabdesign/af/model.py": "d0e7aa65e491f6744e4e8ef26f01a88bc731855f773e68bc3a0ca46cc29e1758",
+  "src/colabdesign/af/alphafold/model/modules.py": "6032b2f08bb3ffcf75d2e10b5c23c9c92f35a014a4f9a84ca6129d4c15567196"
+ },
+ "python": "3.10.18",
+ "pins": {
+  "jax": "0.6.0",
+  "jaxlib": "0.6.0",
+  "jax-cuda12-plugin": "0.6.0",
+  "jax-cuda12-pjrt": "0.6.0",
+  "dm-haiku": "0.0.17",
+  "numpy": "1.26.4",
+  "scipy": "1.15.2",
+  "biopython": "1.88",
+  "ml-collections": "1.0.0",
+  "dm-tree": "0.1.9",
+  "chex": "0.1.90",
+  "optax": "0.2.8",
+  "colabdesign": "1.1.3"
+ },
+ "pins_asserted": [
+  "colabdesign",
+  "jax",
+  "jaxlib",
+  "dm-haiku",
+  "numpy"
+ ],
+ "pinned_stack": {
+  "compiler": "gcc 12.2.0 at /usr/bin/gcc (the Pallas kernel's Triton JIT needs a C compiler: opt_core/kernels/pallas_attn)",
+  "triton": "no `triton` distribution: Pallas uses jaxlib's bundled Triton backend"
+ },
+ "weights": {
+  "source": "https://storage.googleapis.com/alphafold/alphafold_params_2022-12-06.tar",
+  "license": "CC BY 4.0 (STOCK.md Licences; not redistributed)",
+  "layout": "<params root>/params/params_model_{1..5}_multimer_v3.npz \u2014 mk_afdesign_model(data_dir=<params root>) reads them through data.get_model_haiku_params (colabdesign/af/model.py:110-111,120)",
+  "files": {
+   "params_model_1_multimer_v3.npz": {
+    "sha256": "611da8fc7478928f68de12e8b226260ef1f4ce62bcc29b008572e52f4f212959",
+    "bytes": 373043148
+   },
+   "params_model_2_multimer_v3.npz": {
+    "sha256": "51362b0844382ae0f5720c59b81dd13a43eea40fbf9995dd2573bdab88865378",
+    "bytes": 373043148
+   },
+   "params_model_3_multimer_v3.npz": {
+    "sha256": "46d9bcad288edc7ad5a6362ee8e5f84307a69712e00e6c36b1ef9daf96ebc9ce",
+    "bytes": 373043148
+   },
+   "params_model_4_multimer_v3.npz": {
+    "sha256": "59bdabd2d69c07fe26b37882d544acbd1b9f89f196828f4220da49e0610b572c",
+    "bytes": 373043148
+   },
+   "params_model_5_multimer_v3.npz": {
+    "sha256": "917742be5a105d6b80f13f1f13f20459f27ec3fdcd34ea088b359f4502d6177f",
+    "bytes": 373043148
+   }
+  }
+ },
+ "gpu": {
+  "name": "NVIDIA H100 80GB HBM3",
+  "memory_mib": 81559,
+  "cc_min": "8.0"
+ },
+ "recipe": {
+  "driver": "stock/src/bindcraft/functions/colabdesign_utils.py binder_hallucination(design_name, starting_pdb, chain, target_hotspot_residues, length, seed, helicity_value, design_models, advanced_settings, design_paths, failure_csv) \u2014 BindCraft's design step (model build, losses, the 4-stage schedule with its pLDDT gates, the optimise_beta DSSP check, the CA-clash / pLDDT / contact triage, plots and animation as the settings say), imported unmodified and called by opt/colabdesign_opt/bindcraft.py in both arms",
+  "derivation": "stock/src/bindcraft/bindcraft.py \u2014 advanced_settings = perform_advanced_settings_check(<settings>, <stock/src/bindcraft>); design_models = load_af2_models(use_multimer_design)[0]; helicity_value = load_helicity(advanced_settings); design_paths = generate_directories(<out>); failure_csv = <out>/failure_csv.csv via generate_filter_pass_csv(default_filters.json); design_name = <tag>_l<binder_len>_s<seed>",
+  "inputs_from_the_case": "starting_pdb (--starting-pdb), chain (--chains), length (--binder-len), seed (--seed), target_hotspot_residues (--target-hotspot-residues, BindCraft's grammar verbatim; absent = none), design_name (--binder-name: <name>_l<length>_s<seed>), af_params_dir (--params-dir: <root>/params/params_model_*_multimer_v3.npz)",
+  "settings": "settings (the top-level `settings` key: every value read from the file at run time)",
+  "outputs": "BindCraft's own tree under <out>/ (generate_directories) with <design_name>.pdb where the triage leaves it and failure_csv.csv, plus the outputs: design.pdb (save_pdb, get_best), design.fasta (get_seqs), trajectory.jsonl (af_model._tmp['log']); the arm's log run.log beside them"
+ },
+ "stock_environment": {
+  "reads": {
+   "AF_PALLAS_ATTN_PRECISE_BWD": "common/opt_core/opt_core/kernels/pallas_attn/af2_flash_pallas.py:350 (the carried kernel's backward knob; default off)",
+   "AF_PALLAS_ATTN_DBIAS_F32": "common/opt_core/opt_core/kernels/pallas_attn/af2_flash_pallas.py:367 (backward knob; default off)",
+   "AF_PALLAS_ATTN_BWD_BATCH_CHUNK": "common/opt_core/opt_core/kernels/pallas_attn/af2_flash_pallas.py:380 (backward knob; default: no batch chunking)",
+   "AF_PALLAS_ATTN_F32_PRECISION": "common/opt_core/opt_core/kernels/pallas_attn/af2_flash_pallas.py make_flash_attention (read by the shared kernel where the core carries the float32-precision word: the matmul precision for float32 inputs, ieee | tf32 | bf16; unset = the core's default ieee = the existing path; colabdesign does not set it)",
+   "AF_PALLAS_ATTN_BWD_F32_PRECISION": "common/opt_core/opt_core/kernels/pallas_attn/af2_flash_pallas.py:355 (backward matmul precision knob; default: the forward's)",
+   "AF_PALLAS_ATTN_DQ": "common/opt_core/opt_core/kernels/pallas_attn/af2_flash_pallas.py:359 (backward dQ home: fused | separate kernel; default per DQ_MODE_DEFAULT)",
+   "AF_PALLAS_ATTN_DBIAS": "common/opt_core/opt_core/kernels/pallas_attn/af2_flash_pallas.py:362 (pair-bias gradient home: xla | kernel; default per DBIAS_MODE_DEFAULT)",
+   "AF2M_LEVERS, AF2M_SUBBATCH_FN, AF2M_SUBBATCH_GRAD, AF_PALLAS_ATTN, AF_PALLAS_ATTN_ALL": "read by no module of this tree: the AF2M design add-on's own switches; a mode is its lever set (opt/colabdesign_opt/modes.py) \u2014 kept absent so no arm carries one",
+   "COLABDESIGN_OPT, COLABDESIGN_OPT_HOME": "the package's own variables (opt/colabdesign_opt/modes.py, stack.py): read by the parent `colabdesign-opt` process only; the arm's mode and paths travel as arguments",
+   "COLABDESIGN_OPT_LOWERCACHE": "opt/colabdesign_opt/lowercache.py install() (lever lowercache's self-check word `relower`: lower afresh on load and compare first-call outputs bit for bit; in-process routes only; run.sh arms never carry COLABDESIGN_OPT_* -- must_be_absent_prefixes -- so the launcher drops it by name)",
+   "KEEP_XLA_DEFAULTS": "read by no file of this tree (a self-test switch of the original kit)",
+   "XLA_FLAGS": "assigned wholesale (`--xla_gpu_enable_triton_gemm=false`) by colabdesign/__init__.py at import in every arm; in the kit arm lever parcompile (opt/colabdesign_opt/launchpad_parcompile.py install) then APPENDS `--xla_gpu_enable_llvm_module_compilation_parallelism=true --xla_gpu_force_compilation_parallelism=<threads>` once, after that assignment and before jax creates a backend; the stock arm carries colabdesign's value alone. Never read by the kit as a switch; the value in force at exit is recorded in each arm's probe (`xla_flags`).",
+   "JAX_COMPILATION_CACHE_DIR": "jax's own persistent-compilation-cache directory variable (read by jax at import): set INTO the kit arm by lever compilecache (opt/colabdesign_opt/compilecache_jax.py install: the caller's value adopted as the cache directory when set, else the keyed default under XDG_CACHE_HOME|~/.cache); stripped from the stock arm (driver.compose) so a caller's cache never warms stock's compiles",
+   "JAX_PERSISTENT_CACHE_MIN_COMPILE_TIME_SECS, JAX_PERSISTENT_CACHE_MIN_ENTRY_SIZE_BYTES": "jax's cache thresholds: set to 0 INTO the kit arm by lever compilecache (every executable written); stripped from the stock arm"
+  },
+  "must_be_absent_prefixes": [
+   "AF2M_",
+   "AF_PALLAS_",
+   "COLABDESIGN_OPT",
+   "KEEP_XLA_DEFAULTS"
+  ],
+  "stock_arm_absent_prefixes": [
+   "JAX_COMPILATION_CACHE_DIR",
+   "JAX_PERSISTENT_CACHE_"
+  ],
+  "tolerated": [
+   "XLA_FLAGS (stock's own: colabdesign/__init__.py:3-4 overwrites it at import)",
+   "MODEL_OPT, COLABDESIGN_PARAMS_DIR, MODEL_OPT_TARGET_GPU (deployment paths of configs/<gpu>.env; no lever reads them)"
+  ]
+ },
+ "settings": {
+  "file": "stock/src/bindcraft/settings_advanced/default_4stage_multimer.json",
+  "read_at_run_time_by": "opt/colabdesign_opt/settings.py (bindcraft.py's default --advanced; `design --advanced FILE` names another; no value of it is typed anywhere in the kit)",
+  "filters_for_the_failure_census": "stock/src/bindcraft/settings_filters/default_filters.json (bindcraft.py's default --filters; `design --filters FILE` names another; the design step only names its columns in failure_csv.csv)"
+ }
+}

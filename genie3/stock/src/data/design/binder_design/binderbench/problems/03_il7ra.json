@@ -1,0 +1,57 @@
+{
+    "key": "03_il7ra",
+    "name": "IL-7RA",
+    "target_pdb_filepath": "data/design/binder_design/binderbench/targets/pdb/03_il7ra.pdb",
+    "target_fasta_filepath": "data/design/binder_design/binderbench/targets/fasta/03_il7ra.fasta",
+    "target_msa_filepath": "data/design/binder_design/binderbench/targets/msa/03_il7ra.a3m",
+    "target_pdb_filepath_by_chain": [
+        "data/design/binder_design/binderbench/targets/pdb/03_il7ra-chain_B.pdb"
+    ],
+    "target_fasta_filepath_by_chain": [
+        "data/design/binder_design/binderbench/targets/fasta/03_il7ra-chain_B.fasta"
+    ],
+    "target_msa_filepath_by_chain": [
+        "data/design/binder_design/binderbench/targets/msa/03_il7ra-chain_B.a3m"
+    ],
+    "target_chain_and_residues": [
+        "B1-193"
+    ],
+    "target_interface_residues": {
+        "hotspot": [
+            "B42",
+            "B64",
+            "B123"
+        ],
+        "extended": [
+            "B15",
+            "B42",
+            "B43",
+            "B44",
+            "B45",
+            "B61",
+            "B62",
+            "B64",
+            "B66",
+            "B122",
+            "B123",
+            "B125",
+            "B126"
+        ],
+        "common": [
+            "B42",
+            "B64",
+            "B65",
+            "B66",
+            "B122",
+            "B123",
+            "B176"
+        ]
+    },
+    "binder_min_length": 50,
+    "binder_max_length": 120,
+    "tag": [
+        "RFDiffusion",
+        "AlphaProteo"
+    ],
+    "pdb_id": "3DI3"
+}

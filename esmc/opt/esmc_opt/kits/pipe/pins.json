@@ -1,0 +1,10 @@
+{
+ "esm": {
+  "models/esmc/compatibility.py": "82107ae077e5c58fd00d919341848376c7d92bfd1b46470fec25b37380849dd6",
+  "models/esmc/tokenizer.py": "b147eab8dea8da232ef5fa1cb7caa83ba548356a135d47207943402d4dffc14a",
+  "version": "3.4.0"
+ },
+ "torch": {
+  "version": "2.11.0"
+ }
+}

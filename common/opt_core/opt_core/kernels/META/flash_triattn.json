@@ -1,0 +1,14 @@
+{
+ "exports": {},
+ "kind": "module",
+ "license": "Apache-2.0 (this repository's own code: common/opt_core/LICENSE); the release tree's own Triton kernel (no third-party code carried)",
+ "mechanism": "attn.triangle_attention",
+ "name": "flash_triattn",
+ "not_carried": {
+  "MANIFEST.json, sitecustomize.py, the add-on's lever / census / pair-cache / bit-equality modules, README/CHANGELOG/KNOWN_ISSUES/UPSTREAM, config/, tests/, tools/": "the kit's add-on around the kernel (levers, hooks, as-built records): kit files"
+ },
+ "runtime_imports": [],
+ "runtime_imports_note": "flash_triattn.py: the cached-launch and launch-check handlers of _launch_generic import opt_core.oom.is_oom (standard library) and re-raise an out-of-memory instead of disabling the fast launch path; kernel statements unchanged.",
+ "served_note": "16-bit paths (bf16/fp16, every D/shape/mask/exact_exp variant) are output-bitwise-identical to kernel v9 (sha256 8991a671…) on torch 2.13.0+cu130/triton 3.7.1 and torch 2.7.1+cu126/triton 3.3.1, H100; the fp32 input path is served by one engine's fast line only — adapters declare served dtypes (flash_triattn_serve serve_dtypes)",
+ "version": "v9-ip@06126752"
+}

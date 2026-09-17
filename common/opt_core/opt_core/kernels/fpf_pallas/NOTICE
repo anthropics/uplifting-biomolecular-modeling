@@ -1,0 +1,13 @@
+fpf_pallas (carried in opt_core: opt_core/kernels/fpf_pallas) — third-party attributions.
+
+transition_pallas.py, triattn_pallas.py and trimul_pallas.py extend the pair-stack modules of the AlphaFold 3 source
+(the transition, triangle-attention and triangle-multiplication blocks of the Pairformer) with Pallas kernels that keep
+the modules' arithmetic; they were written for this package against that source and carry no upstream file.
+AlphaFold 3 source code: Copyright 2024 DeepMind Technologies Limited, Apache License 2.0,
+https://github.com/google-deepmind/alphafold3 (the model parameters are distributed separately under their own terms
+and are not part of this package). The Apache-2.0 text is carried as
+common/opt_core/third_party_licenses/jax-xla-ffi.Apache-2.0.txt; the package-wide list of third-party components is
+common/opt_core/THIRD_PARTY_NOTICES.md. The sibling package opt_core/kernels/fpf_pallas_f32 follows the same terms.
+
+Third-party software these kernels call and do not include or modify: JAX / jaxlib and its Pallas / Triton lowering
+(Apache-2.0), OpenAI Triton (MIT).

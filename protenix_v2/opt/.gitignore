@@ -1,0 +1,4 @@
+# local build artifacts of `pip install -e .` / setuptools: never part of the tree
+build/
+*.egg-info/
+__pycache__/

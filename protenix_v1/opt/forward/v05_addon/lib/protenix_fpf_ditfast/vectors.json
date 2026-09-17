@@ -1,0 +1,108 @@
+{
+ "about": "byte test vectors of protenix_fpf_ditfast's fused stacks on seeded modules/inputs (see vectors.py); sha256 of the fp32 output bytes",
+ "recorded_with": {
+  "torch": "2.13.0+cu130",
+  "cuda": "13.0",
+  "device": "NVIDIA H100 80GB HBM3",
+  "cc": [
+   9,
+   0
+  ]
+ },
+ "cases": [
+  {
+   "name": "tok_s2_n64_off",
+   "kind": "token",
+   "seed": 21,
+   "S": 2,
+   "N": 64,
+   "word": "off",
+   "sha256": "612002ae9bc79f4e9824f5ef8d320b6aad99c67ccab95a041a668c5da6646044",
+   "shape": [
+    2,
+    64,
+    768
+   ],
+   "finite": true,
+   "repeatable": true
+  },
+  {
+   "name": "tok_s2_n64_fp16",
+   "kind": "token",
+   "seed": 21,
+   "S": 2,
+   "N": 64,
+   "word": "fp16",
+   "sha256": "345fe897d0e166a82156b4f3c6d947de18b74f24dfd7851dea70f878837cfe1d",
+   "shape": [
+    2,
+    64,
+    768
+   ],
+   "finite": true,
+   "repeatable": true
+  },
+  {
+   "name": "tok_s2_n64_bf16",
+   "kind": "token",
+   "seed": 21,
+   "S": 2,
+   "N": 64,
+   "word": "bf16",
+   "sha256": "8cba77711e7821eecef08b41573d8a6ba696c06fbcfdf58a77e85d46c044a314",
+   "shape": [
+    2,
+    64,
+    768
+   ],
+   "finite": true,
+   "repeatable": true
+  },
+  {
+   "name": "tok_s5_n200_fp16",
+   "kind": "token",
+   "seed": 22,
+   "S": 5,
+   "N": 200,
+   "word": "fp16",
+   "sha256": "374f01839388555c646ce8c6e587dbbfbedd919fc9579331ad69570b1a1cb111",
+   "shape": [
+    5,
+    200,
+    768
+   ],
+   "finite": true,
+   "repeatable": true
+  },
+  {
+   "name": "atom_s2_n200",
+   "kind": "atom",
+   "seed": 23,
+   "S": 2,
+   "NA": 200,
+   "sha256": "6e257d3b3c84de36a6cdfee948c6f3ce9ea0b78511c62f98b635ab2f377958f7",
+   "shape": [
+    2,
+    200,
+    128
+   ],
+   "finite": true,
+   "repeatable": true
+  },
+  {
+   "name": "atom_s5_n333",
+   "kind": "atom",
+   "seed": 24,
+   "S": 5,
+   "NA": 333,
+   "sha256": "3e2721fba0cdd23e76882f47c0a2c7237787a75c19a4862fcdfd197da30f6a3e",
+   "shape": [
+    5,
+    333,
+    128
+   ],
+   "finite": true,
+   "repeatable": true
+  }
+ ]
+}

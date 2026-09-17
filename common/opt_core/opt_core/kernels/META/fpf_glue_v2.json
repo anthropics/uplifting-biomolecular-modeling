@@ -1,0 +1,26 @@
+{
+ "exports": {},
+ "kind": "package",
+ "license": "Apache-2.0 (this repository's own code: common/opt_core/LICENSE); portions derive from Protenix (Apache-2.0, Copyright 2024 ByteDance and/or its affiliates): NOTICE in the package directory, licence text kernels/fpf_flashpairformer.PROTENIX_LICENSE",
+ "mechanism": "attn.triangle_attention_prologue+epilogue, pair.transition_swiglu (kernel variants prologue_v4 / prologue_v4_padded / epilogue_v3 / transition_v3 warp-specialized; torch.equal to the fpf_triatt_pro / fpf_triatt_epi / fpf_transition kernels on their pinned cells)",
+ "name": "fpf_glue_v2",
+ "not_carried": {
+  "design_notes/CELLS_FRAGMENT_glue_sm100_v1.json": "not in the package tree (design notes and prototypes, not included in this package: nothing imports or reads them at run time)",
+  "design_notes/CHANGELOG.md": "not in the package tree (design notes and prototypes, not included in this package: nothing imports or reads them at run time)",
+  "design_notes/MANIFEST.json": "not in the package tree (design notes and prototypes, not included in this package: nothing imports or reads them at run time)",
+  "design_notes/README.md": "not in the package tree (design notes and prototypes, not included in this package: nothing imports or reads them at run time)",
+  "design_notes/env_glue_v2.sh": "not in the package tree (design notes and prototypes, not included in this package: nothing imports or reads them at run time)",
+  "design_notes/overlay_sitecustomize.py": "not in the package tree (design notes and prototypes, not included in this package: nothing imports or reads them at run time)",
+  "prototype_lnstats/glue_lnstats.py": "not in the package tree (design notes and prototypes, not included in this package: nothing imports or reads them at run time)",
+  "prototype_lnstats/lnstats_b200.json": "not in the package tree (design notes and prototypes, not included in this package: nothing imports or reads them at run time)",
+  "prototype_lnstats/lnstats_h100.json": "not in the package tree (design notes and prototypes, not included in this package: nothing imports or reads them at run time)"
+ },
+ "runtime_imports": [
+  "fpf_triatt_pro",
+  "fpf_triatt_epi",
+  "fpf_transition"
+ ],
+ "runtime_imports_note": "install() monkeypatches fpf_triatt_pro.prologue.triatt_prologue / fpf_triatt_epi.epilogue.triatt_epilogue / fpf_transition.transition._launch (imports them by name: a kit routes all four names together); kernels.py imports fpf_triatt_epi.epilogue helpers (_as5, _woT) inside epilogue_v3; GLUE_CELLS.json (the kit's cc x triton cell table) is carried as data",
+ "served_note": "the core's serve layer names the variant per cell row (variant = prologue_v4 | epilogue_v3 | transition_v3) and calls kernels.prologue_v4(module_like, x_ln, cch, cfg) / epilogue_v3(...) / transition_v3(y2d, cache, out2d, res2d, cfg) directly; install() is the kit's hook and is not used by the core",
+ "version": "2.2-glue-sm100-20260823-rc2"
+}

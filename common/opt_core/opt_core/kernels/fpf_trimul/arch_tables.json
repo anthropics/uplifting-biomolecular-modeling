@@ -1,0 +1,15 @@
+{
+ "schema": "fpf_trimul per-architecture tile tables, keyed by CUDA compute capability (torch.cuda.get_device_capability -> 'sm_<major><minor>'). Only the A' (dual gated projection GEMM) and C' (output GEMM + epilogue) Triton stages are arch-tuned; B (cuBLAS contraction) and the LN stages are unchanged. EXACT bitwise-vs-cuEq is tile-invariant by construction (verified: all 30 swept configs bitwise on sm_90 and sm_100).",
+ "default_note": "no entry for an arch -> the shipped table (tuned on H100 sm_90) is used unchanged",
+ "tables": {
+  "sm_90":  {"fp32_384": null, "source": "shipped TILES[('fp32',384)] = A 128x128x32 w8 s3 / C 128x128x32 w8 s3 (FPF v3 kit, H100); sweep_c384 2026-08-28 H100 best of 30 = A64x64x32_w4_s3/C64x64x32_w4_s3 (12.11 ms @705 vs stock 17.55)"},
+  "sm_100": {"fp32_384": {"A": {"v": 9, "BM": 128, "BN": 64, "BK": 32, "num_warps": 4, "num_stages": 2}, "C": {"v": 9, "BM": 64, "BN": 128, "BK": 32, "num_warps": 4, "num_stages": 2}},
+             "source": "sweep_c384.py on NVIDIA B200 (torch 2.7.1+cu128, triton 3.3.1 -> sm_100a tcgen05), 2026-08-28: best of 30 at N=418/705/903 = 3.22/8.94/16.20 ms vs stock cuEq 4.68/13.62/24.13 (x1.46-1.52); H100-best tiles on B200 = 3.73/10.88/19.02 ms -> re-tune gain x1.16-1.22; EXACT bitwise 30/30"},
+  "sm_103": {"fp32_384": {"A": {"v": 9, "BM": 128, "BN": 64, "BK": 32, "num_warps": 4, "num_stages": 2}, "C": {"v": 9, "BM": 64, "BN": 128, "BK": 32, "num_warps": 4, "num_stages": 2}},
+             "source": "B300: inherits the sm_100 table until a B300 sweep exists (same SM architecture family); re-run jobs/run_sweep.sh on B300 to replace"},
+  "sm_80":  {"fp32_384": {"A": {"v": 9, "BM": 64, "BN": 128, "BK": 32, "num_warps": 4, "num_stages": 2}, "C": {"v": 9, "BM": 64, "BN": 128, "BK": 32, "num_warps": 4, "num_stages": 2}},
+             "bf16_256": {"A": {"v": 9, "BM": 128, "BN": 64, "BK": 64, "num_warps": 4, "num_stages": 3}, "C": {"v": 9, "BM": 64, "BN": 128, "BK": 64, "num_warps": 4, "num_stages": 2}},
+             "bf16_128": {"A": {"v": 9, "BM": 64, "BN": 128, "BK": 64, "num_warps": 4, "num_stages": 2}, "C": {"v": 9, "BM": 64, "BN": 128, "BK": 64, "num_warps": 4, "num_stages": 2}},
+             "source": "A100-SXM4-80GB (cc 8.0) sweep 2026-09-06 (torch 2.7.1+cu126, triton 3.3.1 -> sm_80, cuequivariance_torch 0.10.0 stock functional op, default cache; synthetic z/weights as sweep_c384.py): fp32_384: A'64x128x32_w4_s2 C'64x128x32_w4_s2 exact bitwise 8/8 points (N=[436, 705, 1024, 1536] x out/in), x1.50-1.78 vs stock cuEq; bf16_128: A'64x128x64_w4_s2 C'64x128x64_w4_s2 exact bitwise 6/6 points (N=[384, 705, 1408] x out/in), x0.96-1.44 vs stock cuEq; bf16_256: A'128x64x64_w4_s3 C'64x128x64_w4_s2 exact bitwise 6/6 points (N=[384, 705, 1536] x out/in), x1.39-1.68 vs stock cuEq; every fitting tile pair was bitwise vs stock in EXACT mode (fp32_384 66/66, bf16_128 54/54, bf16_256 54/54 confirm points); the shipped sm_90 cells also run on sm_80 (bitwise) but slower (fp32_384 x1.12, bf16_128 x0.79, bf16_256 x1.10 vs stock @705); all sm_80 tiles <= 98,304 B by smem_bytes (cap 166,912 B)"}
+ }
+}

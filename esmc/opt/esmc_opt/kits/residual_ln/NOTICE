@@ -1,0 +1,14 @@
+residual_ln (esmc_opt/kits/residual_ln: kernels.cu, build.py, EXTENSION.json) — third-party attributions. Kit-level table:
+../../../../THIRD_PARTY_NOTICES.md (esmc/THIRD_PARTY_NOTICES.md); verbatim licence texts: esmc/third_party_licenses/.
+
+kernels.cu restates, and does not copy, the arithmetic of two third-party kernels so that its results are bit-identical to theirs:
+- the LayerNorm forward kernel of NVIDIA Transformer Engine (`ln_fwd_general_kernel` and its reducer) — Transformer Engine,
+  https://github.com/NVIDIA/TransformerEngine, Apache License, Version 2.0 (upstream's LICENSE is the Apache License 2.0 text without a
+  project copyright line; its source files carry NVIDIA CORPORATION & AFFILIATES copyright headers); text:
+  esmc/third_party_licenses/NVIDIA-TransformerEngine.Apache-2.0.txt;
+- the element-wise add and divide kernels of PyTorch (ATen) — PyTorch, https://github.com/pytorch/pytorch, BSD-style licence,
+  "Copyright (c) 2016-     Facebook, Inc            (Adam Paszke)" and the further holders listed in the text; text:
+  esmc/third_party_licenses/PyTorch.LICENSE.txt.
+No Transformer Engine or PyTorch source file is included in this directory. The extension is compiled on the user's machine with the NVIDIA
+CUDA toolkit (nvcc; NVIDIA's licence) against PyTorch's C++ extension headers; both are installed by the user at the versions pinned in
+esmc/environment/requirements.lock and keep their own licences.

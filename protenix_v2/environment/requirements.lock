@@ -1,0 +1,132 @@
+# Protenix v2 optimization kit — the tested stack: `python -m pip freeze --all` of its interpreter, Python 3.11.5 (/usr/local/bin/python,
+# python-build-standalone 20230826) on Ubuntu 24.04 with the CUDA 13.0.1 development base (nvcc, cuDNN 9.13 headers) and gcc 13.3. This kit
+# (protenix_v2/opt) and its shared core (common/opt_core) are not in it — they install editable on top (README.md 'Setup'). pip 26.2.1 is the
+# stack's pip, newer than the interpreter's bundled one: environment/Dockerfile installs this file's pip line first, then the whole file with --no-deps
+# (minus the stock line). Three lines are files of the PyTorch index, pinned by URL and sha256 — torch 2.13.0+cu130 and torchvision 0.28.0+cu130 (its CUDA
+# 13.0 builds) and triton 3.7.1 (the PyTorch index's build of that release, not PyPI's: other bytes); every other line is PyPI's file at that version.
+# torch loads the CUDA 13.0 runtime, cuBLAS, cuDNN 9.20.0 and NCCL 2.29.7 from the nvidia-* wheels below; triton and the cuEquivariance 0.11.1 cu13
+# ops build their kernels at first use. deepspeed 0.17.5, ihm 2.11 and modelcif 1.4 ship as source on PyPI and are built at install (ihm compiles one C
+# extension with the system gcc). protenix 2.0.0 is the wheel in protenix_v2/stock/ (its declared torch 2.7.1 / triton 3.3.1 / cuequivariance 0.8.0 cu12
+# pins do not hold on this stack, STOCK.md). The GPU driver is the host's and must run CUDA 13.0 (driver 580 or newer).
+absl-py==2.5.0
+annotated-types==0.8.0
+asttokens==3.0.2
+attrs==26.1.0
+biopython==1.85
+biotite==1.4.0
+biotraj==1.2.2
+certifi==2026.7.22
+charset-normalizer==3.4.9
+click==8.4.2
+colorama==0.4.6
+comm==0.2.3
+contourpy==1.3.3
+cuda-bindings==13.3.1
+cuda-pathfinder==1.6.0
+cuda-toolkit==13.0.3.0
+cuequivariance==0.11.1
+cuequivariance-ops-cu13==0.11.1
+cuequivariance-ops-torch-cu13==0.11.1
+cuequivariance-torch==0.11.1
+cycler==0.12.1
+decorator==5.3.1
+deepspeed==0.17.5
+dm-tree==0.1.10
+einops==0.8.2
+executing==2.2.1
+fair-esm==2.0.0
+filelock==3.32.3
+fonttools==4.63.0
+fsspec==2026.7.0
+gemmi==0.6.7
+gitdb==4.0.12
+GitPython==3.1.58
+hjson==3.1.0
+icecream==2.1.7
+idna==3.18
+ihm==2.11
+ipdb==0.13.13
+ipython==9.16.1
+ipython_pygments_lexers==1.1.1
+ipywidgets==8.1.7
+jedi==0.20.0
+Jinja2==3.1.6
+joblib==1.5.3
+jupyterlab_widgets==3.0.16
+kiwisolver==1.5.0
+MarkupSafe==3.0.3
+matplotlib==3.10.5
+matplotlib-inline==0.2.2
+ml_collections==1.1.0
+modelcif==1.4
+mpmath==1.3.0
+msgpack==1.2.1
+networkx==3.6.1
+ninja==1.13.0
+numpy==2.4.6
+nvidia-cublas==13.1.1.3
+nvidia-cuda-cupti==13.0.85
+nvidia-cuda-nvrtc==13.0.88
+nvidia-cuda-runtime==13.0.96
+nvidia-cudnn-cu13==9.20.0.48
+nvidia-cufft==12.0.0.61
+nvidia-cufile==1.15.1.6
+nvidia-curand==10.4.0.35
+nvidia-cusolver==12.0.4.66
+nvidia-cusparse==12.6.3.3
+nvidia-cusparselt-cu13==0.8.1
+nvidia-ml-py==13.610.43
+nvidia-nccl-cu13==2.29.7
+nvidia-nvjitlink==13.3.33
+nvidia-nvshmem-cu13==3.4.5
+nvidia-nvtx==13.0.85
+opt_einsum==3.4.0
+optree==0.17.0
+packaging==26.3
+pandas==2.3.1
+parso==0.8.7
+pdbeccdutils==1.0.0
+pexpect==4.9.0
+pillow==12.3.0
+pip==26.2.1
+platformdirs==4.11.3
+prompt_toolkit==3.0.53
+protenix==2.0.0
+protobuf==6.31.1
+psutil==7.2.2
+ptyprocess==0.7.0
+pure_eval==0.2.3
+py-cpuinfo==9.0.0
+py3Dmol==2.5.2
+pydantic==2.13.4
+pydantic_core==2.46.4
+Pygments==2.20.0
+pyparsing==3.3.2
+python-dateutil==2.9.0.post0
+pytz==2026.3.post1
+PyYAML==6.0.2
+rdkit==2025.9.3
+requests==2.34.2
+scikit-learn==1.7.1
+scikit-learn-extra==0.3.0
+scipy==1.17.1
+sentry-sdk==2.66.1
+setuptools==78.1.0
+six==1.17.0
+smmap==5.0.3
+stack-data==0.6.3
+sympy==1.14.0
+threadpoolctl==3.6.0
+torch @ https://download.pytorch.org/whl/cu130/torch-2.13.0%2Bcu130-cp311-cp311-manylinux_2_28_x86_64.whl#sha256=794664c05a3470a5e738447b54495cc6bbf1efca48bf2794270a897d9f4356c4
+torchvision @ https://download.pytorch.org/whl/cu130/torchvision-0.28.0%2Bcu130-cp311-cp311-manylinux_2_28_x86_64.whl#sha256=67893cf4fb4ace73da60968637b1eb6bbd8cb3226995f12322ec0041fbae98a1
+tqdm==4.70.0
+traitlets==5.16.1
+triton @ https://download.pytorch.org/whl/triton-3.7.1-cp311-cp311-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl#sha256=410d3786b2dcf1ef792046670787dc742ba8f800cf2c6dddf56e0656f2260db6
+typing-inspection==0.4.2
+typing_extensions==4.16.0
+tzdata==2026.3
+urllib3==2.7.0
+wandb==0.21.1
+wcwidth==0.8.2
+widgetsnbextension==4.0.15
+wrapt==2.3.0

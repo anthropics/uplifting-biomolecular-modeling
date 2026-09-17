@@ -1,0 +1,14 @@
+OpenFold3 fast-inference add-on — third-party attributions.
+
+This add-on contains code derived from OpenFold3 0.4.1 (https://github.com/aqlaboratory/openfold-3, tag 0.4.1),
+"Copyright 2026 AlQuraishi Laboratory" as printed in the upstream LICENSE, licensed under the Apache License, Version 2.0 (its licence text is
+carried beside this file as OPENFOLD3_LICENSE; the kit-level notices file is openfold3/THIRD_PARTY_NOTICES.md).
+Contents: of3_levers/of3_fastinit.py and of3_levers/of3_graphs.py replace OpenFold3 0.4.1 functions at import time (installed by
+of3_levers/sitecustomize.py) — the weight-initialisation functions (core/model/primitives/initialization.py and primitives/linear.py, whose
+headers print "Copyright 2026 AlQuraishi Laboratory" and "Copyright 2021 DeepMind Technologies Limited") and the diffusion denoising step
+(core/model/structure/diffusion_module.py, header "Copyright 2026 AlQuraishi Laboratory", "Copyright 2026 Advanced Micro Devices, Inc.",
+"Copyright 2021 DeepMind Technologies Limited"; core/utils/atomize_utils.py, header "Copyright 2026 AlQuraishi Laboratory") — and are
+modified works of the OpenFold3 statements they name in their module text, under the Apache License, Version 2.0; config/stock_predict.yml
+is a configuration overlay over OpenFold3's configuration keys. No OpenFold3 source file is copied into this directory.
+The barnase and barstar sequences in tests/public_inputs.py are the entity sequences of RCSB PDB entry 1BRS, embedded as string constants
+with their provenance line (nothing is fetched at run time); PDB archive data are CC0 1.0 (wwPDB).

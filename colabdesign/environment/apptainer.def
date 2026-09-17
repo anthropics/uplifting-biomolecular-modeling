@@ -1,0 +1,29 @@
+# ColabDesign optimization kit — Apptainer / Singularity image made FROM the container image of colabdesign/environment/Dockerfile: the same stack and
+# the same /kit, for hosts that run Apptainer instead of Docker. The source is the image tagged colabdesign-kit:dev in the local Docker daemon (build it
+# first: README.md 'Setup'); no image is published — the source is always the locally built one.
+#   apptainer build colabdesign.sif colabdesign/environment/apptainer.def
+#   apptainer run --nv --cleanenv --bind /path/to/af2:/weights --env COLABDESIGN_PARAMS_DIR=/weights --bind "$PWD/out":/out colabdesign.sif \
+#     design --config h100 --mode fast --starting-pdb /kit/colabdesign/stock/src/bindcraft/example/PDL1.pdb --chains A --binder-len 65 --target-hotspot-residues 56 --seed 0 --out /out/fast
+# The image is read-only: give every verb an --out on a bound, writable path; jax's caches go under $HOME (bound by default). The runscript execs
+# `run.sh "$@"`; the Docker entrypoint's `micromamba activate` is not involved: the image's PATH and LD_LIBRARY_PATH already put the environment
+# first; %environment keeps a host user site-packages (PEP 370) from shadowing the pinned stack, --cleanenv keeps the host's variables out.
+Bootstrap: docker-daemon
+From: colabdesign-kit:dev
+
+%environment
+    export PYTHONNOUSERSITE=1
+    # Triton <= 3.5 links its launcher stub with -lcuda: offer the unversioned name when --nv bound only libcuda.so.1
+    if [ -z "${TRITON_LIBCUDA_PATH:-}" ] && [ -e /opt/culib/libcuda.so ]; then export TRITON_LIBCUDA_PATH=/opt/culib; fi
+
+%post
+    mkdir -p /opt/culib && ln -s /.singularity.d/libs/libcuda.so.1 /opt/culib/libcuda.so && ln -s /.singularity.d/libs/libcuda.so.1 /opt/culib/libcuda.so.1
+
+%runscript
+    cd /kit/colabdesign && exec bash /kit/colabdesign/run.sh "$@"
+
+%help
+    ColabDesign optimization kit: drop-in modes that make BindCraft's binder-hallucination design step (BindCraft @ efb5bfeb on stock
+    ColabDesign 1.1.3 @ e31a56fe with the AlphaFold-Multimer v3 weights) faster without changing how it is called — off = stock exactly;
+    fast = small documented numeric differences, faster (the default).
+    `apptainer run --nv colabdesign.sif <verb> ...` = `bash /kit/colabdesign/run.sh <verb> ...` (verbs: install, design, check, warm;
+    /kit/colabdesign/README.md inside the image). Requires an NVIDIA driver that loads the environment's CUDA 12.9 libraries (tested with driver 575; CUDA 12 minor-version compatibility from R525 on, untested here) and COLABDESIGN_PARAMS_DIR naming the weights root.

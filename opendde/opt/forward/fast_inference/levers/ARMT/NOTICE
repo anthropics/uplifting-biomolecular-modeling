@@ -1,0 +1,15 @@
+OpenDDE optimization kit — the trunk arms (odde_arm_t: arms Z, T, U).
+Original code of this package: Copyright 2026 Anthropic, PBC; licensed under the Apache License, Version 2.0 (the package's LICENSE file,
+../../../../../LICENSE). Portions derived from Protenix (Apache-2.0, ByteDance) through OpenDDE 1.1.1 (Apache-2.0, Aureka AI Research):
+odde_arm_t/__init__.py restates the body of upstream's TriangleAttention.forward (opendde/model/triangular/triangular.py) with the LayerNorm
+output cast to bf16 once (make_castonce_ta_forward; its text describes the change), and third_party/fpf_transition_odde follows, statement by
+statement, the arithmetic of upstream's pair Transition (opendde/model/modules/primitives.py) as one bf16 composition (its text says so). The LICENSE file in this directory is the Apache License, Version 2.0 text as
+distributed with Protenix (appendix line "Copyright 2024 ByteDance and/or its affiliates."), kept for those portions and for the OpenDDE and Protenix
+functions the arms wrap; the kit-level table is ../../../../../THIRD_PARTY_NOTICES.md.
+This add-on changes the run-time behaviour of OpenDDE (Copyright 2026 Aureka AI Research, Apache-2.0, PyPI 'opendde'; itself derived from
+Protenix, Copyright 2024 ByteDance and/or its affiliates, Apache-2.0) by wrapping its functions in the running process; no file of the installed
+package is modified.
+third_party/fpf_transition_odde — the FlashPairformer transition adapter for OpenDDE (the lean bf16 composition `sep16`).
+odde_triattn_bind.py, odde_trimul_bind.py and odde_transition_bind.py bind the triangle-attention, triangle-multiplication and pair-transition sites
+to the shared core's providers (the opt_core package, ../common/opt_core); no triangle-attention or triangle-multiplication kernel is included here.
+It calls, and does not include, PyTorch (BSD-3-Clause), NVIDIA cuEquivariance (NVIDIA licence, as installed) and Triton (MIT).

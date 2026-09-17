@@ -1,0 +1,37 @@
+# af2ig_opt — explicit interface to the AF2 initial-guess (dl_binder_design) optimization kit.
+# Install editable from this directory: `pip install -e af2ig/opt`. The kit code it wraps lives beside the package (forward/af2ig_kit/ — the
+# patches, the PyRosetta-free driver predict_pdb.py, the public inputs) and is resolved from the package location, so the install
+# must stay editable (or point AF2IG_OPT_KIT / AF2IG_OPT_HOME at the tree). No install-time dependency on the stack (jax, dm-haiku,
+# tensorflow-cpu, ...: stock/PINS.json): the pins are checked at activation. Every lever of this kit is a command-line flag of the kit's driver,
+# so there is no import-time hook and no .pth (the build backend below adds none): the modes are reachable through this package's command line (`af2ig-opt pred --mode M`) or
+# the environment variable AF2IG_OPT read by it. The package stands on the tree's shared core (`common/opt_core`, pinned below by path and
+# minimum version; installed beside this package: `pip install -e $TREE/common/opt_core -e $TREE/af2ig/opt` — never from an index).
+[build-system]
+requires = ["setuptools>=64", "wheel"]
+build-backend = "_build_backend"                 # the core's template (common/opt_core/kit_template/_build_backend.py, carried byte-for-byte): plain setuptools wheels for a kit without an autoload .pth
+backend-path = ["."]
+
+[project]
+name = "af2ig_opt"
+dynamic = ["version"]
+description = "AF2 initial-guess (dl_binder_design) inference optimizations: modes off/exact/fast/big, the stock caller, the deterministic switch, the activation report"
+requires-python = ">=3.10"
+classifiers = ["Private :: Do Not Upload"]
+dependencies = []
+
+[project.optional-dependencies]
+test = ["pytest"]                                  # the package's CPU tests (no jax, no tensorflow, no upstream needed)
+
+[project.scripts]
+af2ig-opt = "af2ig_opt.__main__:main"              # `af2ig-opt pred|check|warm ...` == `python -m af2ig_opt ...`
+
+[tool.setuptools]
+packages = ["af2ig_opt", "af2ig_opt.tests"]
+include-package-data = false
+
+[tool.setuptools.dynamic]
+version = {attr = "af2ig_opt.__version__"}
+
+[tool.opt_core]
+path = "../../common/opt_core"
+version = "0.5.123.0"

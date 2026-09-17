@@ -1,0 +1,19 @@
+OpenDDE optimization kit — the diffusion-sampler levers (levers/SAMPLER: odde_sampler.py, odde_apb_bind.py, third_party/opendde_fpf_ditfast).
+Original code of this package: Copyright 2026 Anthropic, PBC; licensed under the Apache License, Version 2.0 (the package's LICENSE file,
+../../../../../LICENSE). Portions derived from Protenix (Apache-2.0, ByteDance) through OpenDDE 1.1.1 (Apache-2.0, Aureka AI Research):
+third_party/opendde_fpf_ditfast/dit_fast.py restates a few statements of upstream's AttentionPairBias.standard_multihead_attention (pair-bias
+construction, opendde/model/modules/transformer.py), marked in the file; the fused schedules of dit_fast.py and atom_fast.py re-implement, on the
+model's own weights, the arithmetic of upstream's DiffusionTransformerBlock, AtomTransformerBlock and DiffusionConditioning. The LICENSE file in
+this directory is the Apache License, Version 2.0 text as distributed with Protenix (appendix line "Copyright 2024 ByteDance and/or its
+affiliates."), kept for those portions and for the OpenDDE and Protenix modules these levers patch; the kit-level table is
+../../../../../THIRD_PARTY_NOTICES.md. third_party/opendde_fpf_ditfast/NOTICE is the notice of the shared core's fused row-kernel package
+(opt_core.kernels.apb.ditfast, ../common/opt_core; original code of this release, Apache-2.0), carried byte-identical with the core's copy; it
+describes that package's first publication, and the statements above are the ones that describe this directory.
+odde_sampler.py, odde_apb_bind.py: the sampler's two attention sites (the DiffusionTransformer's AttentionPairBias modules and the atom transformers'
+  windowed attention) bound to the shared core's pair-bias-attention provider (opt_core.kernels.apb); no attention kernel is included here.
+third_party/opendde_fpf_ditfast: fused DiffusionTransformer / AtomTransformer block schedules and the conditioning de-duplication, bound to OpenDDE's
+  modules (its NOTICE inside); the row kernels it launches are the shared core's (opt_core.kernels.apb.ditfast).
+These files change the run-time behaviour of OpenDDE (Copyright 2026 Aureka AI Research, Apache-2.0, PyPI 'opendde'; itself derived from
+Protenix, Copyright 2024 ByteDance and/or its affiliates, Apache-2.0) by run-time instance/module patches selected by their switches; no upstream
+(OpenDDE) file is edited.
+They call, and do not include, PyTorch (BSD-3-Clause) and Triton (MIT).

@@ -1,0 +1,37 @@
+# opendde_opt — explicit interface to the OpenDDE inference optimizations.
+# Install editable from this directory: `pip install -e opendde/opt`. The kit code it wraps lives beside the package (forward/:
+# one directory per kit, bytes as shipped) and is resolved from the package location or from MODEL_OPT (configs/<gpu>.env), so the
+# install must stay editable or MODEL_OPT must point at the tree. Install = the core plus this kit: `pip install -e common/opt_core -e opendde/opt`
+# (opt_core is stdlib-only and not on any index; the kit pins it by path and a minimum version under [tool.opt_core]). No install-time dependency on
+# the upstream package (opendde, stock/PINS.json): its version is checked at activation and by stock/check_pins.py. The build backend is
+# the core's kit template (a byte-identical copy of common/opt_core/kit_template/_build_backend.py): setuptools plus one step that ships
+# opendde_opt_autoload.pth at the wheel root, which is what makes `OPENDDE_OPT=<mode>` activate without code changes (opendde_opt/_autoload.py).
+[build-system]
+requires = ["setuptools>=64", "wheel"]
+build-backend = "_build_backend"
+backend-path = ["."]
+
+[tool.opt_core]
+path = "../../common/opt_core"
+version = "0.5.220.1"
+
+[project]
+name = "opendde_opt"
+dynamic = ["version"]
+description = "OpenDDE inference optimizations: modes off/exact/fast/big, kit lines by name, upstream flags passed through, lazy autoload, activation report"
+requires-python = ">=3.10"
+classifiers = ["Private :: Do Not Upload"]        # not for PyPI: an index rejects uploads carrying this classifier
+dependencies = ["ninja>=1.11", "cuda-bindings>=12.6,<13"]   # ninja: the pinned stock's LayerNorm backend (LAYERNORM_TYPE=fast_layernorm) JIT-compiles upstream's fast_layer_norm_cuda_v2 with ninja + nvcc at first use; without ninja upstream silently computes LayerNorm with torch — the census refuses that by name (opendde_opt/lncensus.py); cuda-bindings: the CUDA driver-API bindings the shared core's native triangle-multiplication loader uses when present (it falls back to ctypes over libcuda.so.1 without them; the tested tree has the wheel; environment/requirements.lock pins 12.8.0 for the image)
+
+[project.optional-dependencies]
+test = ["pytest", "numpy", "triton==3.3.1"]        # the package's CPU tests; numpy = the TP diffusion tests' reference math; triton = the kit's own FPF TriMul bytes import it (the S1 activation test runs them; torch is the route's prerequisite)
+
+[project.scripts]
+opendde-opt = "opendde_opt.__main__:main"          # `opendde-opt pred|check|warm ...` == `python -m opendde_opt ...`
+
+[tool.setuptools]
+packages = ["opendde_opt", "opendde_opt.tests"]
+include-package-data = false
+
+[tool.setuptools.dynamic]
+version = {attr = "opendde_opt.__version__"}

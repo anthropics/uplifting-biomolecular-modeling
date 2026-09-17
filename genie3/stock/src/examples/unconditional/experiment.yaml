@@ -1,0 +1,21 @@
+experiment:
+  name: unconditional_example
+
+paths:
+  rootdir: examples/unconditional/output
+
+generation:
+  dataset:
+    source: unconditional
+    min_length: 50
+    max_length: 50
+    length_step: 50
+    n_sample: 5
+  sampler:
+    sampler:
+      direction_scale: 0.8
+
+evaluation:
+  version: unconditional
+  folding:
+    model_name: esmfold

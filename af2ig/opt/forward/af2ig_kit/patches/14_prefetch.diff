@@ -1,0 +1,161 @@
+--- a/af2_initial_guess/predict_pdb.py
++++ b/af2_initial_guess/predict_pdb.py
+@@ -104,6 +104,8 @@
+ parser.add_argument( "-fused_trimul", action="store_true", default=False, help='L11 (changes numerics slightly, see CHANGES.md): every TriangleMultiplication module (outgoing / incoming; Evoformer and template pair stack) computed by the model-opt tree\'s fused triangle-multiplication block (opt_core.kernels.fpf_pallas_serve.trimul_block via af2ig_opt.fused_trimul: input LayerNorm + left|right projections and gates + mask in a Pallas prologue, one batched TF32 GEMM, centre LayerNorm + output projection + gate in a Pallas epilogue, float32) instead of the stock body; calls the block refuses run the stock body and are counted by reason' )
+ parser.add_argument( "-opm_reassoc", action="store_true", default=False, help='L12 (changes numerics slightly, see CHANGES.md): every OuterProductMean module (Evoformer and extra-MSA stacks) computed re-associated by the kit adapter af2ig_opt.opm: the output weight folded into the right projection, then one GEMM over (MSA row, channel) — no [N, N, 32x32] outer-product intermediate and ~6.6x fewer FLOPs at this model\'s 5-row MSA (pure JAX, float32, XLA default-precision products as stock\'s einsums); an input the body does not expect runs the stock body, counted by reason' )
+ parser.add_argument( "-subbatch", type=int, default=0, help='L9: the row sub-batch of every Attention module and every Transition (alphafold global_config.subbatch_size, run through mapping.inference_subbatch; stock 4 rows, sized for 16 GB cards) set to N rows: the same per-row math in N-row chunks, N/rows scan iterations of large GEMMs instead of many small ones; the decision record is the model-opt tree\'s shared sub-batch policy (opt_core.jax_design.subbatch_policy via af2ig_opt.subbatch). 0 = stock' )
++parser.add_argument( "-prefetch", type=int, default=0, help='L15 (exact): N > 0 — the inputs of the next N designs are read and featurised (PDB parse, template / single-sequence MSA features, chain-break detection, the TensorFlow feature pipeline: host CPU work) on one background worker thread while the current design runs on the GPU, and taken by the loop when their turn comes (af2ig_opt.prefetch). The featurisation, its one-at-a-time order and its results are unchanged — only when it runs moves — so the outputs, the scores and the order of every record are those of N = 0; a featurisation error surfaces at the design\'s turn as before. Host memory: at most N featurised inputs queued. 0 = off (stock: read, featurise, predict, write, serially per design)' )
++parser.add_argument( "-overlap_output", type=int, default=0, help='L16 (exact): N > 0 — each design\'s output step (confidence metrics, RMSDs, the PDB file, the score line, then the checkpoint line) runs on one background writer thread, in the loop\'s order, while the next design\'s forward runs; at most N outputs wait behind the writer (af2ig_opt.prefetch.OutputWriter). The step\'s code and inputs are unchanged, so every file, score and line order is that of N = 0; a failing step is reported as the loop reports it and the design is still checkpointed. Host memory: up to N+1 designs\' outputs alive. 0 = off (stock: the loop writes each design\'s outputs before it reads the next)' )
+ parser.add_argument( "-fast", action="store_true", default=False, help='Recommended exact stack: -host_outputs -device_params -sort_by_length (all exact: the stock output bytes)' )
+ parser.add_argument( "-trimul_chunk", type=str, default='', help='M1 memory lever (changes numerics slightly, see CHANGES.md): "<rows>:<min residues>" — TriangleMultiplication evaluated in row chunks of <rows> pair rows once the compiled length reaches <min residues>, through the model-opt tree\'s shared row-chunk producer (opt_core.mem.rowpair_jax.rowchunk via af2ig_opt.pairstack); shorter lengths run the stock body' )
+ 
+@@ -160,6 +162,11 @@
+ # Timers (pure instrumentation)
+ #################################
+ 
++PREFETCHLIB = None   # af2ig_opt.prefetch: the inputs of the next designs featurised ahead of the loop on a worker thread (L15 -prefetch)
++PREFETCH = None      # L15: the Prefetcher of this process (built after the precompile pass, before the loop)
++WRITER = None        # L16: the OutputWriter of this process (built before the loop)
++if args.prefetch > 0 or args.overlap_output > 0:
++    from af2ig_opt import prefetch as PREFETCHLIB
+ PROGLIB = None       # af2ig_opt.programs: the model program prepared ahead of its call (L7 -precompile) and kept across processes (L13 -program_cache)
+ PROGRAMS = None      # L13: the serialized-program store (af2ig_opt.programs.Store)
+ if args.precompile > 0 or args.program_cache:
+@@ -204,10 +211,11 @@
+         if path:
+             d = os.path.dirname(os.path.abspath(path))
+             os.makedirs(d, exist_ok=True)
++    _lock = threading.Lock()     # L16: the writer thread appends records too
+     def emit(self, kind, **kw):
+         if not self.path: return
+         kw.update(kind=kind, t=time.time(), pid=os.getpid())
+-        with open(self.path, 'a') as f:
++        with Timers._lock, open(self.path, 'a') as f:
+             f.write(json.dumps(kw, default=str) + '\n')
+ 
+ timers = Timers(args.timers)
+@@ -579,11 +587,21 @@
+         t_start = time.time()
+ 
+         pre = self.prepared.pop(tag, None)
++        t_prefetch_wait = None
+         if pre is not None:
+             # L7: featurized by the precompile pass — the same inputs, built once
+             feat_holder, feature_dict, initial_guess = pre
++        elif PREFETCH is not None:
++            # L15: featurized ahead of its turn by the prefetch worker (the same prepare_struct, one input at a time, in this loop's order);
++            # blocks only if the worker is still on it; a featurization error re-raises here, where stock's would surface
++            pre, t_prefetch_wait = PREFETCH.take(tag)
++            if pre is None:
++                # not scheduled on the worker (or featurized by the precompile pass meanwhile): prepared here, as stock
++                pre = self.prepared.pop(tag, None) or self.prepare_struct(tag)
++            feat_holder, feature_dict, initial_guess = pre
+         else:
+             feat_holder, feature_dict, initial_guess = self.prepare_struct(tag)
++        feat_holder.t_prefetch_wait = t_prefetch_wait
+         usetag, binderlen, monomer = feat_holder.tag, feat_holder.binderlen, feat_holder.monomer
+         t_feat = time.time()
+ 
+@@ -621,6 +639,19 @@
+ 
+         print(f'Tag: {feat_holder.tag} finished AF2 prediction in {timer() - start} seconds')
+ 
++        if WRITER is not None:
++            # L16: the output step below (and this design's records, then its checkpoint line) runs on the writer thread, in order, while the
++            # loop moves on; the closure holds this design's outputs (host memory) until it has run
++            t_submit = time.time()
++            def _output_job():
++                self._finish_struct(feat_holder, feature_dict, prediction_result, prog_rec, new_shape, L, usetag, binderlen, monomer, t_start, t_feat, t_model, t_submit)
++            WRITER.submit(usetag, _output_job, always=lambda: self.struct_manager.record_checkpoint(usetag))
++            return
++        self._finish_struct(feat_holder, feature_dict, prediction_result, prog_rec, new_shape, L, usetag, binderlen, monomer, t_start, t_feat, t_model, None)
++
++    def _finish_struct(self, feat_holder, feature_dict, prediction_result, prog_rec, new_shape, L, usetag, binderlen, monomer, t_start, t_feat, t_model, t_submit):
++        '''The output step of process_struct and the design's records (runs on the loop's thread, or on the L16 writer thread)'''
++        t_out0 = time.time()
+         # Process outputs
+         self.process_output(feat_holder, feature_dict, prediction_result)
+         t_out = time.time()
+@@ -648,7 +679,9 @@
+             timers.emit('subbatch', L_compiled=L, **SUBBATCH.record(L))
+         timers.emit('design', tag=usetag, L=L, L_compiled=L, binderlen=binderlen, monomer=monomer, new_shape=new_shape,
+                     t_load=feat_holder.t_load, t_feat=feat_holder.t_feat, t_tf=feat_holder.t_tf,
+-                    t_wait_inputs=t_feat - t_start, t_model=t_model - t_feat, t_output=t_out - t_model, t_total=t_out - t_start,
++                    t_wait_inputs=t_feat - t_start, t_model=t_model - t_feat, t_output=t_out - t_out0, t_total=t_out - t_start,
++                    t_prefetch_wait=getattr(feat_holder, 't_prefetch_wait', None),
++                    t_main=(t_submit or t_out) - t_start, t_output_lag=(t_out0 - t_submit) if t_submit else None, output_overlapped=t_submit is not None,
+                     pae_interaction=float(feat_holder.score_dict['pae_interaction']),
+                     plddt_total=float(feat_holder.score_dict['plddt_total']), peak_bytes_in_use=_peak_bytes_in_use())
+ 
+@@ -888,6 +921,37 @@
+ if args.precompile > 0:
+     precompile_shapes(list(struct_manager.iterate()), args.precompile)
+ 
++if PREFETCHLIB is not None:
++    # L15: one worker thread featurizes the next -prefetch N inputs of the loop's order ahead of their turn (inputs the precompile pass
++    # featurized are skipped, not featurized twice); built here, after the precompile pass, so no two featurizations ever run at once
++    _todo = list(struct_manager.iterate())
++    try:
++        # the worker's featurization keeps OFF the GPU: its only device work is af2_util.parse_initial_guess's jax.numpy array construction
++        # (zeros that are discarded, then one array built from host coordinates: a dtype conversion and a copy, no arithmetic), which on the
++        # GPU device would queue behind the running program (PjRt admits a bounded number of computations in flight per device and parks the
++        # thread that exceeds it until the program ends — the worker would wait for the very forward it is meant to overlap). On jax's CPU
++        # device the same calls run at once; the initial guess is handed over as host memory holding the same float32 values, and the model
++        # call puts it on the GPU as it does any host input (the feature dict already is host memory). Bytes out are unchanged.
++        _PREFETCH_CPU = jax.devices('cpu')[0]
++    except Exception:      # no CPU backend in this process (JAX_PLATFORMS without cpu): the worker featurizes as the loop would, on the default device
++        _PREFETCH_CPU = None
++    def _prepare_ahead(tag):
++        if _PREFETCH_CPU is None:
++            return af2_runner.prepare_struct(tag)
++        with jax.default_device(_PREFETCH_CPU):
++            feat_holder, feature_dict, initial_guess = af2_runner.prepare_struct(tag)
++        return feat_holder, feature_dict, np.asarray(initial_guess)
++    PREFETCH = PREFETCHLIB.Prefetcher(_prepare_ahead, _todo, depth=args.prefetch, skip=lambda p: p in af2_runner.prepared,
++                                      info={'offdevice': _PREFETCH_CPU is not None})
++    print(f"prefetch: {PREFETCHLIB.IMPL} depth={args.prefetch} workers=1 offdevice={_PREFETCH_CPU is not None} inputs={len(_todo)} (already featurized by the precompile pass: {len(af2_runner.prepared)})")
++
++if PREFETCHLIB is not None and args.overlap_output > 0:
++    def _output_failed(tag, exc):
++        print( "Struct with tag %s failed in its output step with error: %s"%( tag, type(exc) ) )
++        timers.emit('failed', tag=tag, err=repr(exc))
++    WRITER = PREFETCHLIB.OutputWriter(depth=args.overlap_output, on_error=_output_failed)
++    print(f"overlap_output: thread_writer depth={args.overlap_output}")
++
+ n_done = 0
+ 
+ def _run_one(pdb):
+@@ -901,16 +965,32 @@
+         except KeyboardInterrupt: sys.exit( "Script killed by Control+C, exiting" )
+ 
+         except:
++            if WRITER is not None:
++                WRITER.drain()      # L16: earlier designs' outputs and checkpoint lines land before this failure is recorded, as in the serial loop
+             seconds = int(timer() - t0)
+             print( "Struct with tag %s failed in %i seconds with error: %s"%( pdb, seconds, sys.exc_info()[0] ) )
+             timers.emit('failed', tag=pdb, err=repr(sys.exc_info()[1]))
+ 
+     # We are done with one pdb, record that we finished
+-    struct_manager.record_checkpoint('.'.join(os.path.basename(pdb).split('.')[:-1]))
++    tagbase = '.'.join(os.path.basename(pdb).split('.')[:-1])
++    if WRITER is not None and WRITER.submitted(tagbase):
++        return              # L16: the writer records the checkpoint right after it writes this design's outputs (order kept)
++    struct_manager.record_checkpoint(tagbase)
+ 
+ for pdb in struct_manager.iterate():
+     _run_one(pdb)
+     n_done += 1
++
++if WRITER is not None:
++    # L16: every queued output is written before the exit records; then the writer's census as the output_writer record and its LEVER line
++    _ow = WRITER.close()
++    timers.emit('output_writer', **_ow)
++    print(PREFETCHLIB.writer_line(_ow), file=sys.stderr, flush=True)
++if PREFETCH is not None:
++    # L15 evidence at exit: the prefetcher's census (queued / taken / ready-without-waiting / wait and worker seconds) as the prefetch record, and its LEVER line on stderr
++    _pf = PREFETCH.close()
++    timers.emit('prefetch', **_pf)
++    print(PREFETCHLIB.line(_pf), file=sys.stderr, flush=True)
+ 
+ if FLASH_ATTN is not None:
+     # L8 evidence at exit: the whole run's census as the last flash_attn record, and the tree's per-lever line on stderr

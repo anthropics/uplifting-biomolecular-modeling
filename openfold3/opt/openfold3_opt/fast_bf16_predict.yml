@@ -1,0 +1,16 @@
+# The fast line's `--precision bf16` variant of the stock inference configuration (opt/forward/fast_inference/config/stock_predict.yml:
+# the same model_update block — the DS4Sci evoformer attention off) plus upstream's own precision switch: `pl_trainer_args.precision`
+# (openfold3/entry_points/validator.py:123, default "32-true") reaches `pl.Trainer(**pl_trainer_args)` (entry_points/experiment_runner.py:263-275),
+# so Lightning runs predict_step under a bf16 autocast: the template / MSA-module / pairformer trunk and the confidence heads compute in bf16
+# (projects/of3_all_atom/model.py:410-411 casts the heads to the trunk's dtype), the diffusion rollout stays fp32 (model.py:376-377,
+# `torch.amp.autocast(dtype=torch.float32)`), parameters stay fp32. Numerics change against stock's fp32/TF32: a fast-tier word,
+# never an equality word; the mode table names it (`fast` · `--precision bf16`).
+pl_trainer_args:
+  precision: bf16-mixed
+model_update:
+  presets: [predict]
+  custom:
+    settings:
+      memory:
+        eval:
+          use_deepspeed_evo_attention: false

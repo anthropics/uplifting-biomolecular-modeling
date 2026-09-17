@@ -1,0 +1,43 @@
+$ nvcc -cubin -arch=sm_90a -O3 -std=c++17 -DNDEBUG --expt-relaxed-constexpr -Xptxas -v -I csrc -Xptxas --warn-on-spills -DTMN_CZ=128 -DTMN_CH=384 -o /tmp/tn_build_12mqlftl/tmn90w_z128_h384.cubin csrc/tmn_sm90_wide.cu
+ptxas info    : (C7517) warpgroup.wait is injected in around line 33403 by compiler to allow use of registers defined by GMMA in function 'tmn_k3w_z128_h384_b_t2x64_s4a2_l1'
+ptxas warning : Registers are spilled to local memory in function 'tmn_k3w_z128_h384_b_t2x64_s4a1_l1', 52 bytes spill stores, 68 bytes spill loads
+ptxas info    : (C7517) warpgroup.wait is injected in around line 15694 by compiler to allow use of registers defined by GMMA in function 'tmn_k1_z128_h384_b_t2x64_s8k2_m1_l2_v0'
+ptxas info    : (C7517) warpgroup.wait is injected in around line 11380 by compiler to allow use of registers defined by GMMA in function 'tmn_k1_z128_h384_b_t2x64_s8k2_m0_l2_v0'
+ptxas info    : (C7517) warpgroup.wait is injected in around line 7101 by compiler to allow use of registers defined by GMMA in function 'tmn_k1_z128_h384_b_t2x64_s8k2_m1_l1_v0'
+ptxas info    : (C7517) warpgroup.wait is injected in around line 3345 by compiler to allow use of registers defined by GMMA in function 'tmn_k1_z128_h384_b_t2x64_s8k2_m0_l1_v0'
+ptxas info    : 0 bytes gmem
+ptxas info    : Compiling entry function 'tmn_info' for 'sm_90a'
+ptxas info    : Function properties for tmn_info
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 26 registers, used 0 barriers
+ptxas info    : Compile time = 2.150 ms
+ptxas info    : Compiling entry function 'tmn_k3w_z128_h384_b_t2x64_s4a2_l1' for 'sm_90a'
+ptxas info    : Function properties for tmn_k3w_z128_h384_b_t2x64_s4a2_l1
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 168 registers, used 16 barriers
+ptxas info    : Compile time = 280.495 ms
+ptxas info    : Compiling entry function 'tmn_k3w_z128_h384_b_t2x64_s4a1_l1' for 'sm_90a'
+ptxas info    : Function properties for tmn_k3w_z128_h384_b_t2x64_s4a1_l1
+    56 bytes stack frame, 52 bytes spill stores, 68 bytes spill loads
+ptxas info    : Used 168 registers, used 16 barriers, 56 bytes cumulative stack size
+ptxas info    : Compile time = 220.327 ms
+ptxas info    : Compiling entry function 'tmn_k1_z128_h384_b_t2x64_s8k2_m1_l2_v0' for 'sm_90a'
+ptxas info    : Function properties for tmn_k1_z128_h384_b_t2x64_s8k2_m1_l2_v0
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 168 registers, used 16 barriers
+ptxas info    : Compile time = 111.600 ms
+ptxas info    : Compiling entry function 'tmn_k1_z128_h384_b_t2x64_s8k2_m0_l2_v0' for 'sm_90a'
+ptxas info    : Function properties for tmn_k1_z128_h384_b_t2x64_s8k2_m0_l2_v0
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 168 registers, used 16 barriers
+ptxas info    : Compile time = 108.339 ms
+ptxas info    : Compiling entry function 'tmn_k1_z128_h384_b_t2x64_s8k2_m1_l1_v0' for 'sm_90a'
+ptxas info    : Function properties for tmn_k1_z128_h384_b_t2x64_s8k2_m1_l1_v0
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 168 registers, used 16 barriers
+ptxas info    : Compile time = 98.963 ms
+ptxas info    : Compiling entry function 'tmn_k1_z128_h384_b_t2x64_s8k2_m0_l1_v0' for 'sm_90a'
+ptxas info    : Function properties for tmn_k1_z128_h384_b_t2x64_s8k2_m0_l1_v0
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 168 registers, used 16 barriers
+ptxas info    : Compile time = 95.676 ms

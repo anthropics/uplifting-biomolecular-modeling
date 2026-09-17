@@ -1,0 +1,32 @@
+[project]
+name = "joltz"
+version = "0.1.0"
+description = "JAX translation of Boltz-1"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "boltz>=2.0.3",
+    "einops>=0.8.0",
+    "equinox>=0.11.10",
+    "jaxtyping>=0.2.36",
+    "marimo>=0.13.15",
+    "numpy>=1.26.3",
+]
+
+[dependency-groups]
+jax-cpu = [
+  "jax[cpu]",
+]
+jax-cuda = [
+  "jax[cuda]",
+]
+
+[tool.uv]
+package = true
+conflicts = [
+    [
+      { group = "jax-cpu" },
+      { group = "jax-cuda" },
+    ],
+]
+override-dependencies = ["scipy==1.15.1"]

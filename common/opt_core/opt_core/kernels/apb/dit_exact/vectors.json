@@ -1,0 +1,17 @@
+{
+ "lever": "dit_attn_exact",
+ "what": "load-time check vectors: inputs regenerated deterministically by loadcheck_cases() in __init__.py (seeded CPU generator, torch 2.13.0); expected outputs as sha256 of the fp32 output bytes; the same digests are in prebuilt/<key>/manifest.json and re-checked per process with torch.equal against F.scaled_dot_product_attention",
+ "expected_output_sha256": [
+  "f902edd315402bf7a8063273c3e1bdf886034f1c2e6237555aa989e5641e6201",
+  "a3537288faab6c336ba577cf389c0b93ca83d2e5c8a424f93ca629c327e0367e",
+  "efc61a9806f577b6ee96fd802615a7f2796d4604a41ac1e191bd450a486f51c4"
+ ],
+ "cases": 3,
+ "stack": {
+  "torch": "2.13.0+cu130",
+  "cuda": "13.0",
+  "arch": [
+   "sm90"
+  ]
+ }
+}

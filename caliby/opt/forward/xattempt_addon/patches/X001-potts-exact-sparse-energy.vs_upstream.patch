@@ -1,0 +1,457 @@
+--- a/caliby/model/seq_denoiser/denoisers/seq_design/potts.py
++++ b/caliby/model/seq_denoiser/denoisers/seq_design/potts.py
+@@ -440,6 +440,13 @@
+         )
+ 
+         return S_sample, U_sample
++
++    def sample_multiseq(self, n_seqs: int, *args, **kwargs):
++        """== [self.sample(*args, **kwargs) for _ in range(n_seqs)] draw for draw, the sequences' sweeps issued concurrently
++        (X010, sample_potts_multiseq): a list of n_seqs (S, U) pairs."""
++        kwargs.setdefault("temperature", 0.1)      # this method's defaults are sample()'s, not sample_potts()'s
++        kwargs.setdefault("verbose", False)
++        return sample_potts_multiseq(n_seqs, *args, **kwargs)
+ 
+ 
+ def compute_potts_energy(
+@@ -665,6 +672,16 @@
+         U_trajectory (list[torch.Tensor]): List of sampled energies through time
+             each with shape `(num_batch)`.
+     """
++    _lvl = _fast_sampler_level()
++    if _lvl > 0:
++        _why = _x_fs.refusal(proposal, rejection_step, differentiable_penalty, bool(h.is_cuda), return_trajectory)  # FAST: the fast sampler's one served-call predicate (caliby_opt.fast_sampler; caliby_opt.multiseq composes it)
++        if _why is None:
++            return _sample_potts_fast(
++                h, J, edge_idx, mask_i, mask_ij, S, mask_sample, num_sweeps, temperature, temperature_init,
++                annealing_fraction, penalty_func, verbose, _lvl,
++            )
++        _x_fs.note_stock(_why)  # a call outside the fast sampler's path: upstream's sweep loop below, said once per call on stderr and counted (the run ends NOT ACTIVE by name)
++
+     S_reduced, h, J, mask_sample_reduced = normalize_potts_inputs(
+         S=S,
+         h=h,
+@@ -787,6 +804,423 @@
+     else:
+         return S, U
+ 
++
++# ======================================================================================================================
++# FAST SAMPLER (inference-optimisation kit, 2026-08-22).  Selected by env CALIBY_FAST_SAMPLER:
++#   unset/"0" -> stock sample_potts (unchanged, below)
++#   "1"       -> eager, host-sync-free sweep loop: masks hoisted out of the loop, the redundant per-sweep trailing energy
++#                evaluation dropped (its value is only consumed after the LAST sweep), Categorical/multinomial replaced by
++#                the identical op sequence without their host-side validity checks.  Same ops, same order, same RNG draws.
++#   "2"       -> "1" + the per-sweep body captured ONCE per call into a CUDA graph and replayed num_sweeps times.
++# Only the campaign configuration takes the fast path (proposal="dlmc", no rejection step, no trajectory,
++# differentiable penalty, CUDA tensors); anything else falls through to the stock code and says so once per call on stderr
++# ("[CALIBY_FAST_SAMPLER] <reason> -> stock sampler for this call"), counted for caliby_opt's exit line -- the predicate, the line and the
++# count live in caliby_opt.fast_sampler.
++# ======================================================================================================================
++import os as _os
++
++import caliby_opt.fast_sampler as _x_fs  # the served-call predicate, the stock-sampler line and its count live in caliby_opt (no torch there)
++
++
++def _fast_sampler_level() -> int:
++    try:
++        return int(_os.environ.get("CALIBY_FAST_SAMPLER", "0"))
++    except ValueError:
++        return 0
++
++
++def _categorical_sample_nocheck(logits_in: torch.Tensor, generator: Optional[torch.Generator] = None) -> torch.Tensor:
++    """Bitwise replica of torch.distributions.Categorical(logits=logits_in).sample() (n_sample=1 multinomial fast path:
++    q ~ Exp(1); argmax(p / q)) without the host-synchronising argument/probability validity checks.  ``generator``: the Philox
++    generator the draw reads (None = the device default, which is what Categorical.sample() reads; a generator positioned at the
++    default generator's (seed, offset) draws the same numbers)."""
++    B, N, C = logits_in.shape
++    logits = logits_in - logits_in.logsumexp(dim=-1, keepdim=True)   # Categorical.__init__
++    probs = F.softmax(logits, dim=-1)                                 # Categorical.probs
++    probs_2d = probs.reshape(-1, C)                                   # Categorical.sample
++    q = torch.empty_like(probs_2d).exponential_(1, generator=generator)  # multinomial fast path (Distributions.cpp)
++    q = probs_2d / q
++    S = q.argmax(dim=-1, keepdim=True)                                # argmax_out(result, q, -1, keepdim=True)
++    return S.T.reshape(B, N)
++
++
++
++# ======================================================================================================================
++# XATTEMPT add-on (2026-08-23), lever L-A "exact sparse energy".  Selected by env CALIBY_X_SPARSE_EXACT (read per call):
++#   unset/"0" -> kit behaviour (with CALIBY_FAST_POTTS_PARAMS=2 that is the kit's P2: 48-term sparse sum, NOT bitwise in U)
++#   "1"       -> when the Potts couplings arrive SPARSE (B,N,K<N,C,C) (i.e. CALIBY_FAST_POTTS_PARAMS=2), the per-sweep energy
++#                rebuilds the STOCK dense gathered tensor J_ij (B,N,N,C) bit-for-bit (zeros + one row-write per edge, values
++#                (J+0.0)*mask exactly as _fold_symmetry_pos/index_add_ + J*mask_ij produce them) and reduces it with the
++#                IDENTICAL stock op J_ij.sum(2) -> J_i, U_i, U bitwise identical to the dense (P1/stock) path, without ever
++#                materialising or gathering from the (B,N,N,C,C) dense coupling tensor.  Fresh zeros buffer per sweep.
++#   "2"       -> as "1" but one persistent (B,N,N,C) buffer per sampler call, zero_()'d each sweep.
++# Guard (checked once per call, on device, no host sync inside the sweep): every edge_idx row must hold pairwise-distinct
++# in-range indices (torch.topk guarantees it); otherwise the call falls back to the kit path and says so on stderr.
++# ======================================================================================================================
++
++
++def _x_sparse_exact_level() -> int:
++    try:
++        return int(_os.environ.get("CALIBY_X_SPARSE_EXACT", "0"))
++    except ValueError:
++        return 0
++
++
++class _XSparseExactEnergy:
++    """Bitwise emulation of the stock dense Potts energy from sparse (B,N,K,C,C) couplings (see block comment above)."""
++
++    def __init__(self, J, edge_idx, mask_i, mask_ij, level):
++        B, N, K, C, C2 = J.shape
++        assert C == C2 and edge_idx.shape == (B, N, K)
++        dev = J.device
++        self.B, self.N, self.K, self.C, self.level = B, N, K, C, level
++        ei = edge_idx.long()
++        # ---- guard: indices in range and pairwise distinct per row (else dense index_add_ would sum duplicates) -------------
++        in_range = bool(((ei >= 0) & (ei < N)).all().item())
++        srt = ei.sort(dim=-1).values
++        distinct = bool((srt[..., 1:] != srt[..., :-1]).all().item()) if K > 1 else True
++        self.ok = in_range and distinct
++        if not self.ok:
++            return
++        # ---- masks exactly as _fold_symmetry_pos builds them for the dense tensor --------------------------------------------
++        # dense: mask_ij_d[b,i,j] = (edge_counts[b,i,j] > 0) * (mask_i[b,i] * mask_i[b,j]),  edge_counts[b,i,j] = mask_ij[b,i,k]
++        mi = mask_i
++        mi_j = torch.gather(mi, 1, ei.reshape(B, N * K)).reshape(B, N, K)
++        m = (mask_ij > 0) * (mi[:, :, None] * mi_j)                      # bool * float -> float, same op types as stock
++        # dense: J_d[b,i,j] = zeros.index_add_(J[b,i,k]) = (0.0 + J) ; J_m = J_d * mask_ij_d[..., None, None]
++        J_m = (J.new_zeros(()) + J) * m[..., None, None]                 # (B,N,K,C,C), bitwise == dense J_m at the edge slots
++        # per-edge table transposed so that selecting the neighbour state s_j is a contiguous row: T[e, s_j, c] = J_m[b,i,k,c,s_j]
++        self.T = J_m.transpose(-1, -2).contiguous().view(B * N * K, C, C)
++        b_ar = torch.arange(B, device=dev)[:, None, None]
++        i_ar = torch.arange(N, device=dev)[None, :, None]
++        self.lin = ((b_ar * N + i_ar) * N + ei).reshape(-1)               # row index into the (B*N*N, C) view of the buffer
++        self.jflat = (b_ar * N + ei).reshape(-1)                          # index into S.view(-1) giving s_j per edge
++        self.e_ar = torch.arange(B * N * K, device=dev)
++        self.buf = torch.zeros(B, N, N, C, device=dev, dtype=J.dtype) if level >= 2 else None
++
++    def fork(self):
++        """A copy sharing the read-only tables (T, lin, jflat, e_ar) with a buffer of its own: one per concurrent user (X010)."""
++        import copy as _copy
++        o = _copy.copy(self)
++        o.buf = torch.zeros_like(self.buf) if self.buf is not None else None
++        return o
++
++    def energy(self, S, h_m):
++        """== _compute_potts_energy_reduced(S=S, h=h_m, J=J_m_dense, edge_idx=dense_idx, mask_i=None, mask_ij=None)."""
++        B, N, K, C = self.B, self.N, self.K, self.C
++        s_j = S.reshape(-1)[self.jflat]                                   # (E,)
++        vals = self.T[self.e_ar, s_j]                                     # (E, C): J_m[b,i,k,:,s_j]
++        if self.buf is None:
++            J_ij = torch.zeros(B, N, N, C, device=S.device, dtype=vals.dtype)
++        else:
++            J_ij = self.buf
++            J_ij.zero_()
++        J_ij.view(B * N * N, C).index_copy_(0, self.lin, vals)            # one write per edge; untouched slots stay +0.0
++        # ---- from here on: the stock lines, verbatim (same op, same shape/strides/dtype -> same reduction order) ------------
++        J_i = J_ij.sum(2)
++        U_i = h_m + J_i
++        U = (torch.gather(U_i, -1, S[..., None]) - 0.5 * torch.gather(J_i, -1, S[..., None])).sum((1, 2))
++        return U, U_i
++
++
++def _x_sparse_try_build(J, edge_idx, mask_i, mask_ij):
++    lvl = _x_sparse_exact_level()
++    if lvl <= 0 or J.dim() != 5 or J.shape[2] == J.shape[1] or not J.is_cuda or mask_i is None or mask_ij is None:
++        return None
++    xe = _XSparseExactEnergy(J, edge_idx, mask_i, mask_ij, lvl)
++    if not xe.ok:
++        import sys as _sys
++        print("[CALIBY_X_SPARSE_EXACT] edge_idx rows not distinct/in-range -> kit path for this call", file=_sys.stderr)
++        return None
++    return xe
++
++
++def _anneal_schedule(num_sweeps, temperature, temperature_init, annealing_fraction):
++    """The stock temperature schedule of sample_potts (same statements)."""
++    num_iterations = num_sweeps
++    num_iterations_annealing = int(annealing_fraction * num_iterations)
++    temperatures = np.linspace(temperature_init, temperature, num_iterations_annealing).tolist() + [temperature] * (
++        num_iterations - num_iterations_annealing
++    )
++    return temperatures
++
++
++def _mask_h(h, mask_S, temperature):
++    """The stock h masking of sample_potts (same statements)."""
++    h_numerical_zero = h.max() + 1e3 * max(1.0, temperature)
++    return torch.where(mask_S > 0, h, h_numerical_zero * torch.ones_like(h))
++
++
++def _hoisted_constants(h, J, mask_i, mask_ij, _xe, S_reduced, mask_mutatable):
++    """Hoisted constants (stock recomputes these inside every sweep from the same inputs -> identical values)."""
++    h_m = h * mask_i[..., None] if mask_i is not None else h
++    if _xe is None:
++        J_m = J * mask_ij[..., None, None] if mask_ij is not None else J
++    else:
++        J_m = None  # XATTEMPT L-A: masking folded into _xe (sparse, exact); the dense/kit J_m is never formed
++    mask_update = torch.ones_like(S_reduced) > 0
++    if mask_mutatable is not None:
++        mask_update = mask_update * (mask_mutatable > 0)
++    return h_m, J_m, mask_update
++
++
++def _make_sweep(h_m, J_m, _xe, edge_idx, mask_update, penalty_func, C, generator=None):
++    """One DLMC sweep == _potts_proposal_dlmc(S_cur, h, J, ..., T=T_i, penalty_func, differentiable_penalty=True) followed by
++    Categorical(logits=logP_ij).sample() and the mask_update select, with hoisted masks.  ``generator``: the Philox generator the
++    sweep's one draw reads (None = the device default)."""
++    dt = 0.1
++
++    def sweep(S_cur, T_scalar, invT_tensor):
++        if _xe is None:
++            U, U_i = _compute_potts_energy_reduced(S=S_cur, h=h_m, J=J_m, edge_idx=edge_idx, mask_i=None, mask_ij=None)
++        else:
++            U, U_i = _xe.energy(S_cur, h_m)  # XATTEMPT L-A
++        if penalty_func is not None:
++            O = F.one_hot(S_cur, C).float()
++            with torch.enable_grad():
++                O.requires_grad = True
++                U_penalty = penalty_func(O)
++                U_i_adjustment = torch.autograd.grad(U_penalty.sum(), [O])[0].detach()
++                U_penalty = U_penalty.detach()
++                U_i_adjustment = U_i_adjustment - torch.gather(U_i_adjustment, -1, S_cur[..., None])
++            U_i = U_i + U_i_adjustment
++            U = U + U_penalty
++        if invT_tensor is None:
++            logP_j = F.log_softmax(-U_i / T_scalar, dim=-1)
++        else:
++            # CUDA's tensor/cpu-scalar true division computes a * (1/b) in float32 (BinaryDivTrueKernel.cu); replicate it
++            # with a device-resident reciprocal so the graph has no host scalar.
++            logP_j = F.log_softmax((-U_i) * invT_tensor, dim=-1)
++        O = F.one_hot(S_cur, C).float()
++        logP_i = torch.gather(logP_j, -1, S_cur[..., None])
++        log_Q_ij = F.logsigmoid(logP_j - logP_i)
++        rate = torch.exp(log_Q_ij - logP_j)
++        logP_ij = logP_j + (-(-dt * rate).expm1()).log()
++        p_flip = ((1.0 - O) * logP_ij.exp()).sum(-1, keepdim=True)
++        logP_ii = (1.0 - p_flip).clamp(1e-5).log()
++        logP_ij = (1.0 - O) * logP_ij + O * logP_ii
++        # == Categorical(logits=logP_ij).sample() ; S_new = where(mask_update, S_new, S_cur)
++        S_new = _categorical_sample_nocheck(logP_ij, generator)
++        return torch.where(mask_update, S_new, S_cur)
++
++    return sweep
++
++
++def _final_energy(S_reduced, h_m, J_m, _xe, edge_idx):
++    if _xe is None:
++        U, _ = _compute_potts_energy_reduced(S=S_reduced, h=h_m, J=J_m, edge_idx=edge_idx, mask_i=None, mask_ij=None)
++    else:
++        U, _ = _xe.energy(S_reduced, h_m)  # XATTEMPT L-A
++    return U
++
++
++def _sample_potts_fast(
++    h, J, edge_idx, mask_i, mask_ij, S, mask_sample, num_sweeps, temperature, temperature_init, annealing_fraction,
++    penalty_func, verbose, level,
++):
++    S_reduced, h, J, mask_sample_reduced = normalize_potts_inputs(S=S, h=h, J=J, mask_i=mask_i, mask_S=mask_sample)
++    _xe = _x_sparse_try_build(J, edge_idx, mask_i, mask_ij)  # XATTEMPT L-A (None unless CALIBY_X_SPARSE_EXACT>0 and J is sparse)
++    mask_S, mask_mutatable, S_reduced = init_sampling_masks(-h, mask_sample_reduced, S_reduced)
++    h = _mask_h(h, mask_S, temperature)
++
++    temperatures = _anneal_schedule(num_sweeps, temperature, temperature_init, annealing_fraction)
++    num_iterations = num_sweeps
++
++    h_m, J_m, mask_update = _hoisted_constants(h, J, mask_i, mask_ij, _xe, S_reduced, mask_mutatable)
++    B, N, C = h.shape
++    sweep = _make_sweep(h_m, J_m, _xe, edge_idx, mask_update, penalty_func, C)
++
++    if level >= 2 and S_reduced.is_cuda:
++        dev = S_reduced.device
++        S_static = S_reduced.clone()
++        invT_static = torch.empty((), dtype=torch.float32, device=dev)
++        invT_sched = torch.tensor(
++            [float(np.float32(1.0) / np.float32(T_i)) for T_i in temperatures], dtype=torch.float32, device=dev
++        )
++        # warm-up on a side stream (required before capture); it consumes RNG, so the generator state is restored after
++        rng_state = torch.cuda.get_rng_state(dev)
++        s = torch.cuda.Stream(device=dev)
++        s.wait_stream(torch.cuda.current_stream(dev))
++        with torch.cuda.stream(s):
++            invT_static.copy_(invT_sched[0])
++            for _ in range(2):
++                sweep(S_static, None, invT_static)
++        torch.cuda.current_stream(dev).wait_stream(s)
++        torch.cuda.synchronize(dev)
++        torch.cuda.set_rng_state(rng_state, dev)
++        g = torch.cuda.CUDAGraph()
++        with torch.cuda.graph(g):
++            S_out = sweep(S_static, None, invT_static)
++            S_static.copy_(S_out)
++        for i in range(num_iterations):
++            invT_static.copy_(invT_sched[i])
++            g.replay()
++        S_reduced = S_static
++    else:
++        for T_i in temperatures:
++            S_reduced = sweep(S_reduced, T_i, None)
++
++    U = _final_energy(S_reduced, h_m, J_m, _xe, edge_idx)
++    if verbose:
++        eff = num_iterations * float(mask_update.float().sum(1).mean().item()) / S_reduced.shape[1]
++        print(f"Effective number of sweeps: {eff}")
++    S = map_potts_indices_to_af3(S_reduced)
++    return S, U
++
++
++# ======================================================================================================================
++# X010 (caliby_opt 0.3), lever "concurrent multi-sequence sampling".  Selected by env CALIBY_X_MULTISEQ (read per call; caliby_opt.multiseq):
++#   unset/"0" -> the num_seqs_per_pdb sequences of a batch are that many SERIAL sample_potts calls (the loop in
++#                AtomMPNNDenoiser.potts_sample)
++#   "1"       -> sample_potts_multiseq: the same calls' work issued CONCURRENTLY -- one CUDA stream and one Philox generator per
++#                sequence, sweep i of every sequence captured in ONE CUDA graph (S independent chains, forked from and joined to the
++#                capture stream) replayed num_sweeps times.  Sequence s draws its initial sequence with the default generator positioned where the
++#                serial loop's call s starts (base + s*unit; unit = one initial-sequence draw + num_sweeps sweep draws, the Philox
++#                increment MEASURED on this call's shapes), its sweeps from a generator of its own positioned right after that draw,
++#                and the default generator is left where the serial loop leaves it (base + S*unit).  Same kernels, same operand
++#                shapes, same draws as the serial calls: the same bytes; only the issue order on the device differs (the S chains of
++#                one replay run concurrently, and one launch per sweep replaces S).
++# Served only where the fast sampler's graph path is (CALIBY_FAST_SAMPLER>=2, CUDA tensors, proposal dlmc, no rejection step,
++# differentiable penalty); any other call runs the serial calls and says so on stderr ("[CALIBY_X_MULTISEQ] <reason> -> serial
++# fallback ..."), counted for caliby_opt's exit line -- the switch word (a malformed value is a usage error), that predicate, the line
++# and the census live in caliby_opt.multiseq.  The graph is captured here, by the sampler's own statements, not through
++# opt_core.capture.GraphCache: it replays num_sweeps (500) times per call on S forked capture streams with S registered generators, and
++# GraphCache's per-call run path costs tens of microseconds per replay inside the loop this lever exists to shorten; the capture
++# converges on the core's raw-replay handle (opt_core.capture GraphCache.handle() / ReplayHandle, core >= 0.5.15).  Memory: one graph pool
++# holding S sweeps' temporaries (with CALIBY_X_SPARSE_EXACT=2 that includes S (B,N,N,C) fp32 buffers).
++# ======================================================================================================================
++import caliby_opt.multiseq as _x_ms
++
++
++def _x_multiseq_level() -> int:
++    return _x_ms.level()
++
++
++def _x_multiseq_refusal(h, n_seqs, proposal, rejection_step, differentiable_penalty, return_trajectory=False) -> Optional[str]:
++    """None when the concurrent path serves this call, else the reason it is the serial calls."""
++    return _x_ms.refusal(_fast_sampler_level(), proposal, rejection_step, differentiable_penalty, bool(h.is_cuda), return_trajectory)
++
++
++def sample_potts_multiseq(
++    n_seqs: int,
++    h: torch.Tensor,
++    J: torch.Tensor,
++    edge_idx: torch.LongTensor,
++    mask_i: torch.Tensor,
++    mask_ij: torch.Tensor,
++    S: Optional[torch.LongTensor] = None,
++    mask_sample: Optional[torch.Tensor] = None,
++    num_sweeps: int = 100,
++    temperature: float = 1.0,
++    temperature_init: float = 1.0,
++    annealing_fraction: float = 0.8,
++    penalty_func: Optional[Callable[[torch.LongTensor], torch.Tensor]] = None,
++    differentiable_penalty: bool = True,
++    rejection_step: bool = False,
++    proposal: Literal["dlmc", "chromatic"] = "dlmc",
++    verbose: bool = False,
++    edge_idx_coloring: Optional[torch.LongTensor] = None,
++    mask_ij_coloring: Optional[torch.Tensor] = None,
++):
++    """== [sample_potts(h, J, edge_idx, mask_i, mask_ij, S=S, ...) for _ in range(n_seqs)], draw for draw (X010, block comment
++    above): a list of n_seqs (S, U) pairs."""
++    reason = _x_multiseq_refusal(h, n_seqs, proposal, rejection_step, differentiable_penalty)
++    if reason is not None or n_seqs < 2:
++        if reason is not None:
++            _x_ms.note_serial(reason)
++        return [
++            sample_potts(h, J, edge_idx, mask_i, mask_ij, S=S, mask_sample=mask_sample, num_sweeps=num_sweeps,
++                         temperature=temperature, temperature_init=temperature_init, annealing_fraction=annealing_fraction,
++                         penalty_func=penalty_func, differentiable_penalty=differentiable_penalty,
++                         rejection_step=rejection_step, proposal=proposal, verbose=verbose,
++                         edge_idx_coloring=edge_idx_coloring, mask_ij_coloring=mask_ij_coloring)
++            for _ in range(n_seqs)
++        ]
++    return _sample_potts_multiseq(n_seqs, h, J, edge_idx, mask_i, mask_ij, S, mask_sample, num_sweeps, temperature,
++                                  temperature_init, annealing_fraction, penalty_func, verbose)
++
++
++def _sample_potts_multiseq(n_seqs, h, J, edge_idx, mask_i, mask_ij, S, mask_sample, num_sweeps, temperature,
++                           temperature_init, annealing_fraction, penalty_func, verbose):
++    from opt_core.diffusion_loop import rng as _rng
++
++    dev = h.device
++    S_given, h, J, mask_sample_reduced = normalize_potts_inputs(S=S, h=h, J=J, mask_i=mask_i, mask_S=mask_sample)
++    xe0 = _x_sparse_try_build(J, edge_idx, mask_i, mask_ij)   # XATTEMPT L-A (None unless CALIBY_X_SPARSE_EXACT>0 and J is sparse)
++    B, N, C = h.shape
++
++    # ---- RNG positions: the serial loop's call s = one initial-sequence draw (init_sampling_masks: Categorical over (B,N,C) ==
++    #      one exponential_ over (B*N, C)) + num_sweeps sweep draws (one exponential_ over (B*N, C) each), all from the default
++    #      generator; the increment of that one op at this shape is measured, never assumed.
++    g0 = _rng.default_generator(dev)
++    seed, base = int(g0.initial_seed()), int(g0.get_offset())
++    inc = _rng.philox_increment(lambda g: torch.empty(B * N, C, device=dev, dtype=h.dtype).exponential_(1, generator=g), dev, seed)
++    unit = (1 + num_sweeps) * inc
++    items = []
++    mask_S = mask_mutatable = None
++    for s in range(n_seqs):
++        g0.set_offset(base + s * unit)                                              # where the serial loop's call s starts
++        mask_S, mask_mutatable, S_s = init_sampling_masks(-h, mask_sample_reduced, S_given)   # call s's initial-sequence draw
++        gen = _rng.positioned_generator(dev, seed, base + s * unit + inc)          # call s's sweep draws start right after it
++        items.append((S_s, gen))
++    g0.set_offset(base + n_seqs * unit)                                             # where the serial loop leaves the default generator
++    rng_record = {"seed": seed, "base": base, "increment": inc, "unit": unit, "after": base + n_seqs * unit}
++
++    h = _mask_h(h, mask_S, temperature)                                             # mask_S depends on the masks only: one value for every call
++    temperatures = _anneal_schedule(num_sweeps, temperature, temperature_init, annealing_fraction)
++    invT_sched = torch.tensor([float(np.float32(1.0) / np.float32(T_i)) for T_i in temperatures], dtype=torch.float32, device=dev)
++    invT_static = torch.empty((), dtype=torch.float32, device=dev)                 # the sweep's temperature, refreshed before each replay
++
++    cur = torch.cuda.current_stream(dev)
++    chains = []                                                                     # per sequence: (sweep, S_static, stream, xe, h_m, J_m, mask_update, generator)
++    for s, (S_s, gen) in enumerate(items):
++        xe = xe0 if s == 0 else (xe0.fork() if xe0 is not None else None)          # per-sequence energy buffer, shared tables
++        h_m, J_m, mask_update = _hoisted_constants(h, J, mask_i, mask_ij, xe, S_s, mask_mutatable)
++        sweep = _make_sweep(h_m, J_m, xe, edge_idx, mask_update, penalty_func, C, generator=gen)
++        S_static = S_s.clone()
++        # warm-up on a side stream (required before capture); it consumes the sequence's generator, restored after
++        with _rng.generator_checkpoint([gen], dev):
++            side = torch.cuda.Stream(device=dev)
++            side.wait_stream(cur)
++            with torch.cuda.stream(side):
++                invT_static.copy_(invT_sched[0])
++                for _ in range(2):
++                    sweep(S_static, None, invT_static)
++            cur.wait_stream(side)
++            torch.cuda.synchronize(dev)
++        chains.append((sweep, S_static, torch.cuda.Stream(device=dev), xe, h_m, J_m, mask_update, gen))
++
++    # ONE graph holds sweep i of every sequence: each sequence's sweep is captured on a stream of its own, forked from the capture
++    # stream and joined back, so the graph carries S independent chains that the device runs concurrently; each sequence's generator
++    # is registered with the graph and advances per replay exactly as its eager sweep would. One replay per sweep (num_sweeps launches
++    # per call, whatever S is).
++    graph = torch.cuda.CUDAGraph()
++    _rng.register_generators(graph, [c[7] for c in chains], dev)
++    with torch.cuda.graph(graph):
++        cap = torch.cuda.current_stream(dev)
++        for c in chains:
++            c[2].wait_stream(cap)
++        for sweep, S_static, st, *_ in chains:
++            with torch.cuda.stream(st):
++                S_out = sweep(S_static, None, invT_static)
++                S_static.copy_(S_out)
++        for c in chains:
++            cap.wait_stream(c[2])
++    torch.cuda.synchronize(dev)
++    for i in range(num_sweeps):
++        invT_static.copy_(invT_sched[i])
++        graph.replay()
++
++    out = []
++    for sweep, S_static, st, xe, h_m, J_m, mask_update, gen in chains:
++        U = _final_energy(S_static, h_m, J_m, xe, edge_idx)
++        if verbose:
++            eff = num_sweeps * float(mask_update.float().sum(1).mean().item()) / S_static.shape[1]
++            print(f"Effective number of sweeps: {eff}")
++        out.append((map_potts_indices_to_af3(S_static), U))
++    _x_ms.note_served(n_seqs, rng_record)
++    del chains, graph
++    return out
+ 
+ def init_sampling_masks(
+     logits_init: torch.Tensor,

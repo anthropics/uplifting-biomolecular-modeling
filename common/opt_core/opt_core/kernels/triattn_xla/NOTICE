@@ -1,0 +1,45 @@
+triattn_xla -- provenance of the parts.
+
+csrc/cubin_launch.cc, csrc/triattn_cuda_abi.h, csrc/triattn_mw_cuda.cu, csrc/build.py, the Python modules: written in this repository
+for this package.  cubin_launch.cc derives from the XLA-FFI cubin-launch prototype written in this repository for the JAX
+triangle-attention transfer study (same authors, same licence).
+
+The CUDA kernel sources (triattn_mw.cu, mw_ptx.h) are NOT copied here: they are kernels/triattn/cuda_sm90a/csrc/, carried by the torch
+triangle-attention provider (this repository's own sm_90a kernel, fpf_triattn_cuda 1.2.0 sources; sha256 in manifest.json).
+
+bin/cuda/sm_90a/libtriattn_mw_cuda.so: compiled by csrc/build.py from exactly those sources (device section unmodified) plus
+csrc/triattn_mw_cuda.cu, with nvcc, static CUDA runtime (NVIDIA CUDA Toolkit EULA permits redistribution of the static runtime inside
+an application binary).
+
+bin/k2b/sm_*/*.cubin: machine code produced by the Triton compiler (MIT licence) and NVIDIA ptxas from kernels/fpf_triatt_k2b/triatt_k2b.py
+(this repository; portions of that kernel derive from Protenix, Apache-2.0 -- see kernels/fpf_triatt_k2b/NOTICE and the licence text
+kernels/fpf_flashpairformer.PROTENIX_LICENSE).  The sidecar .json of each cubin records the compiler version, options and source sha256.
+
+bin/launcher/ffi-*/libtriattn_xla_launch.so: compiled by csrc/build.py from csrc/cubin_launch.cc against the XLA FFI API headers shipped in
+jaxlib (Apache-2.0, header-only use) and cuda.h.
+
+The differentiable row (vjp=...): csrc/k2b_lse_kernel.py is kernels/fpf_triatt_k2b's forward kernel with one added output (the per-row
+log-sum-exp) -- same licence and provenance as that carried kernel (its NOTICE; portions derive from Protenix, Apache-2.0); the cubins
+bin/k2b/sm_*/k2bl_fwd_* are compiled from it.  The backward kernels are NOT in this package: they are kernels/pallas_triatt (this
+repository's own Pallas triangle-attention kernels, carried from the AF2-design kit; its NOTICE) and kernels/pallas_attn (its NOTICE),
+imported at run time.
+
+bin/cuda/sm_90a/libtriattn_mw_cuda_lse.so (the differentiable row's forward on compute capability 9.0): compiled from the SAME carried kernel
+sources (kernels/triattn/cuda_sm90a/csrc/, sha256 in manifest.json) with csrc/cuda_lse.patch applied to the device section -- five added lines,
+none removed: a `float* lse` member of the launch parameters and one fp32 store per query row in the output epilogue (the row's log2-sum-exp,
+m + log2(l) of the kernel's running offset and sum) -- plus the host translation unit csrc/triattn_mw_cuda.cu compiled with -DTXLA_LSE.  The
+patch is this repository's own work; the sealed library libtriattn_mw_cuda.so beside it is built from the unpatched sources and is unchanged.
+
+bin/cuda/sm_90a/libtriattn_m1_xla.so (row triattn_native): the M1 kernel header of kernels/triattn/triattn_native (package generation 11, its cuda_b kernel directory:
+csrc/m1/triattn_m1_sm90.cuh + csrc/fa3_utils.h, sha256 in manifest.json) compiled unmodified, plus csrc/triattn_m1_xla.cu (this package: the
+kernel directory's torch host code -- csrc/m1/launch_m1.cuh, csrc/m1/m1_binding.cu -- restated over raw device pointers for the XLA-FFI launcher).  The kernel
+and its torch host code are this repository's own work (described in kernels/triattn/triattn_native/DESIGN.md); fa3_utils.h carries portions adapted
+from FlashAttention-3 (BSD-3-Clause, notice inside the file).  Built against the CUTLASS headers (BSD-3-Clause, NVIDIA), release 4.7.1; no
+CUTLASS source is carried in this package.
+
+bin/cuda/sm_80/libtriattn_sm80_xla.so (row cuda_80): the sm_80 member of the same kernel family (package generation 11, its cuda_80 kernel directory:
+csrc/triattn_sm80.cuh device code, csrc/launch_sm80.cuh launch template, csrc/inst_sm80.h + csrc/inst_d16.cu / inst_d32.cu / inst_d64.cu instantiation
+units, sha256 in manifest.json) compiled unmodified with that directory's own nvcc flags, plus csrc/triattn_sm80_xla.cu (this package: the kernel
+directory's torch host code -- csrc/sm80_binding.cu: bias staging, mask staging, the forward -- restated over raw device pointers and caller-provided
+scratch for the XLA-FFI launcher; C ABI csrc/triattn_sm80_abi.h).  The kernel, its launch template and its torch binding are this repository's own work
+(described in kernels/triattn/triattn_native/DESIGN.md); no third-party source; plain CUDA C++ (no CUTLASS), static CUDA runtime.

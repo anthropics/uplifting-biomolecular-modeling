@@ -1,0 +1,12 @@
+RFdiffusion fast-inference kit (RFDIFFUSION1_FAST_INFERENCE_KIT)
+
+This kit contains:
+  * the resident driver, runtime lever modules and tests written for this kit;
+  * drivers/rfd_fastpath.py, drivers/rfd_fullgraph.py and drivers/rfd_prep.py transcribe control flow from RFdiffusion's util_module.py, Embeddings.py,
+    RoseTTAFoldModel.py, Track_module.py and inference/model_runners.py (https://github.com/RosettaCommons/RFdiffusion, commit 86507b65,
+    Copyright (c) 2023 University of Washington, BSD 3-Clause) and are derivative works of RFdiffusion under the same licence;
+  * two example input structures copied unmodified from RFdiffusion examples/input_pdbs/ (insulin_target.pdb — a theoretical model, not a
+    wwPDB entry; 5TPN.pdb — coordinates from Protein Data Bank entry 5TPN, CC0 1.0); inputs_public/SOURCES.md says which is which.
+Not included and separately licensed: RFdiffusion model weights (fetched from the upstream URLs by `run.sh install --weights DIR`), NVIDIA
+SE3Transformer (MIT, part of the RFdiffusion repository), PyTorch, DGL, Triton, opt_einsum, e3nn, hydra (installed from their package indexes).
+See LICENSES.md for the per-file table.

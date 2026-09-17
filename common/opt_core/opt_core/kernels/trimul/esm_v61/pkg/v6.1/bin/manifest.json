@@ -1,0 +1,494 @@
+{
+ "built_on": {
+  "device": "NVIDIA H100 80GB HBM3",
+  "cc": "9.0",
+  "torch": "2.13.0+cu130",
+  "cuda": "13.0",
+  "python": "3.12.10",
+  "triton": "3.7.1",
+  "nvidia_cutlass": "4.2.0.0",
+  "nvidia_cuda_cccl": "13.0.85",
+  "cuda_bindings": "13.3.1",
+  "nvidia_cuda_nvrtc": "13.0.88"
+ },
+ "image": "the kit's image of record + header wheels nvidia-cutlass 4.2.0.0 / nvidia-cuda-cccl 13.0.85 (variant image)",
+ "how": "compiled on an H100 through src/ef2_trimul_v6.py _compile (NVRTC) from the FIXED K3_SRC (sha256 below); loaded through the CUDA driver API by python/face.py after cubin-sha, K3_SRC-sha, cfg and device (sm_90) checks",
+ "fix": "k3v6 release-ordering fix (src/PATCHES/k3v6_release_ordering_fix.diff): both consumer-side slot releases (empty_stage after the x^T/z ldmatrix copies, empty_res after the residual ldmatrix) are issued only after every ldmatrix instruction that read the slot has returned its data \u2014 one destination register per ldmatrix XOR-ed, warp-reduced (__reduce_or_sync), AND-ed with a run-time zero (%dynamic_smem_size >> 20) and added to the arrive's address, so the SYNCS.ARRIVE carries a true data dependency on the loads (SASS: every LDSM between the slot's PHASECHK and its release is covered by a scoreboard wait, its own or a later in-order LDSM's) \u2014 plus fence.proxy.async.shared::cta before the arrive (generic-proxy reads ordered before the async-proxy TMA write the release permits). Arithmetic unchanged: the v6 sealed vectors replay BITWISE with these cubins.",
+ "kernels": [
+  {
+   "kernel": "k3v6",
+   "generation": "v6.1",
+   "fastsig": 1,
+   "lnfold": 1,
+   "arch": "sm_90a",
+   "cubin": "k3v6.1_fastsig1_lnfold1.sm_90a.cubin",
+   "cubin_sha256": "7fb328f9bff9ea39f9d32f3c81844b118f7c0cde7baa304ee471443abdc332af",
+   "cubin_bytes": 819808,
+   "source_sha256": {
+    "K3_SRC": "558a71ac1cc047bfe3301d9d603ed56b44478b990dd4d6d585a86533b516ca1f",
+    "ef2_trimul_v6.py": "4d87a31e105303f49439231a045116436a176d362cfecd1a9fec1a39fcb511ea"
+   },
+   "cfg": {
+    "NSLOT": 4,
+    "NRES": 2,
+    "NOUT": 1,
+    "NACC": 2,
+    "BT": 128,
+    "BNO": 32
+   },
+   "defines": {
+    "FASTSIG": 1,
+    "LNFOLD": 1,
+    "NSLOT": 4,
+    "NRES": 2,
+    "NOUT": 1,
+    "NACC": 2,
+    "CONS_REGS": 232,
+    "PROD_REGS": 40
+   },
+   "options": [
+    "--gpu-architecture=sm_90a",
+    "-std=c++17",
+    "-default-device",
+    "-diag-suppress=47",
+    "-DFASTSIG=1",
+    "-DLNFOLD=1",
+    "-DNSLOT=4",
+    "-DNRES=2",
+    "-DNOUT=1",
+    "-DNACC=2",
+    "-I<nvidia-cutlass 4.2.0.0>/cutlass_library/source/include",
+    "-I<site>/nvidia/cu13/include/cccl",
+    "-I<site>/nvidia/cu13/include"
+   ],
+   "nvrtc": "13.0.88",
+   "regs": 168,
+   "lmem": 0,
+   "smem_bytes": 226448,
+   "block": [
+    384,
+    1,
+    1
+   ],
+   "ptxas": [
+    "info    : (C7517) warpgroup.wait is injected in around line 10050 by compiler to allow use of registers defined by GMMA in function 'k3v6'",
+    "0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads",
+    "info    : Used 168 registers, used 16 barriers"
+   ],
+   "ptxas_fingerprint": "0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads; 168 registers; 16 barriers; C7517 (warpgroup.wait injected) present \u2014 a rebuild that reports any spill or C7512 is NOT this kernel's register schedule: run the determinism stress before use",
+   "determinism_stress": {
+    "protocol": "10000 back-to-back launches per (N in 384/768/1024, direction), GPU-side compare with launch 0",
+    "launches": 60000,
+    "differing": 0,
+    "worst_max_abs_err_vs_fp32": 0.0304,
+    "control_same_run": {
+     "build": "v6 fastsig1 lnfold0 (unfixed, sha ebf999a68a48)",
+     "launches": 60000,
+     "differing": 3
+    }
+   },
+   "sass_release_coverage": [
+    {
+     "site": "x^T/z STAGE release (empty_stage)",
+     "arrive_pc": "66e0",
+     "phasechk_pc": "0d60",
+     "n_ldsm": 32,
+     "own": 12,
+     "via_later": 20,
+     "uncovered": 0,
+     "own_pcs": [
+      "11e0(sb2)->13f0",
+      "1240(sb3)->1400",
+      "1280(sb4)->1460",
+      "1310(sb5)->1500",
+      "13b0(sb1)->1530",
+      "1420(sb2)->1620",
+      "1490(sb3)->1690",
+      "1c40(sb1)->1f10",
+      "1c80(sb2)->1fe0",
+      "42c0(sb4)->4400",
+      "4310(sb2)->4420",
+      "4350(sb5)->4450"
+     ],
+     "via_later_pcs": [
+      "12b0(sbNone)=>ldsm 1310(sb5)->1500",
+      "12e0(sbNone)=>ldsm 1310(sb5)->1500",
+      "1340(sb1)=>ldsm 13b0(sb1)->1530",
+      "13e0(sbNone)=>ldsm 1420(sb2)->1620",
+      "1450(sbNone)=>ldsm 1490(sb3)->1690",
+      "14e0(sbNone)=>ldsm 1c40(sb1)->1f10",
+      "1510(sbNone)=>ldsm 1c40(sb1)->1f10",
+      "3f80(sbNone)=>ldsm 42c0(sb4)->4400",
+      "4020(sbNone)=>ldsm 42c0(sb4)->4400",
+      "4070(sbNone)=>ldsm 42c0(sb4)->4400",
+      "40e0(sbNone)=>ldsm 42c0(sb4)->4400",
+      "4120(sbNone)=>ldsm 42c0(sb4)->4400",
+      "4180(sbNone)=>ldsm 42c0(sb4)->4400",
+      "41b0(sbNone)=>ldsm 42c0(sb4)->4400",
+      "41e0(sbNone)=>ldsm 42c0(sb4)->4400",
+      "4240(sb3)=>ldsm 42c0(sb4)->4400",
+      "4260(sbNone)=>ldsm 42c0(sb4)->4400",
+      "4280(sb1)=>ldsm 42c0(sb4)->4400",
+      "42a0(sbNone)=>ldsm 42c0(sb4)->4400",
+      "42f0(sbNone)=>ldsm 4310(sb2)->4420"
+     ],
+     "scoreboard_rearmed_before_wait": [
+      {
+       "ldsm_pc": "1340",
+       "sb": 1,
+       "rearmed_by_pc": "13b0",
+       "rearmed_by": "LDSM.16.MT88.4 R28, [R30]"
+      },
+      {
+       "ldsm_pc": "4240",
+       "sb": 3,
+       "rearmed_by_pc": "4380",
+       "rearmed_by": "MEMBAR.ALL.CTA"
+      },
+      {
+       "ldsm_pc": "4280",
+       "sb": 1,
+       "rearmed_by_pc": "4370",
+       "rearmed_by": "MUFU.RSQ R67, R88"
+      }
+     ],
+     "branches_between_loads_and_arrive": 0,
+     "labels_between": [],
+     "fences_between_last_load_and_arrive": {
+      "membar_all_cta": true,
+      "fence_view_async_s": true,
+      "membar_sc_cta": false
+     },
+     "arrive_address_dependency": {
+      "pc": "66a0",
+      "ins": "@!P2 IADD3 R222, R222, 0x37008, R6"
+     },
+     "reviewer_scan": "pending (to be added by the root after the confirmatory S1/S1c scan)"
+    },
+    {
+     "site": "residual slot release, first-half epilogue (empty_res)",
+     "arrive_pc": "9910",
+     "phasechk_pc": "9790",
+     "n_ldsm": 2,
+     "own": 1,
+     "via_later": 1,
+     "uncovered": 0,
+     "own_pcs": [
+      "9850(sb3)->98b0"
+     ],
+     "via_later_pcs": [
+      "9820(sbNone)=>ldsm 9850(sb3)->98b0"
+     ],
+     "scoreboard_rearmed_before_wait": [],
+     "branches_between_loads_and_arrive": 0,
+     "labels_between": [],
+     "fences_between_last_load_and_arrive": {
+      "membar_all_cta": true,
+      "fence_view_async_s": true,
+      "membar_sc_cta": false
+     },
+     "arrive_address_dependency": {
+      "pc": "9900",
+      "ins": "@!P2 IADD3 R16, R16, 0x37070, R17"
+     },
+     "reviewer_scan": "pending (to be added by the root after the confirmatory S1/S1c scan)"
+    },
+    {
+     "site": "weight-slot release (empty_w) \u2014 this thread issues no shared load of that slot (B operand read by wgmma; released after wgmma.wait_group)",
+     "arrive_pc": "ad00",
+     "n_ldsm": 0,
+     "own": 0,
+     "via_later": 0,
+     "uncovered": 0
+    },
+    {
+     "site": "weight-slot release (empty_w) \u2014 this thread issues no shared load of that slot (B operand read by wgmma; released after wgmma.wait_group)",
+     "arrive_pc": "ad10",
+     "n_ldsm": 0,
+     "own": 0,
+     "via_later": 0,
+     "uncovered": 0
+    },
+    {
+     "site": "residual slot release, second-half epilogue (empty_res)",
+     "arrive_pc": "af10",
+     "phasechk_pc": "ae00",
+     "n_ldsm": 2,
+     "own": 1,
+     "via_later": 1,
+     "uncovered": 0,
+     "own_pcs": [
+      "ae70(sb1)->aea0"
+     ],
+     "via_later_pcs": [
+      "ae60(sbNone)=>ldsm ae70(sb1)->aea0"
+     ],
+     "scoreboard_rearmed_before_wait": [],
+     "branches_between_loads_and_arrive": 0,
+     "labels_between": [],
+     "fences_between_last_load_and_arrive": {
+      "membar_all_cta": true,
+      "fence_view_async_s": true,
+      "membar_sc_cta": false
+     },
+     "arrive_address_dependency": {
+      "pc": "af00",
+      "ins": "@!P2 IADD3 R16, R16, 0x37070, R17"
+     },
+     "reviewer_scan": "pending (to be added by the root after the confirmatory S1/S1c scan)"
+    }
+   ],
+   "sass_artifact": "b59d1705-fcc8-460c-b30b-585c3d426c83"
+  },
+  {
+   "kernel": "k3v6",
+   "generation": "v6.1",
+   "fastsig": 0,
+   "lnfold": 1,
+   "arch": "sm_90a",
+   "cubin": "k3v6.1_fastsig0_lnfold1.sm_90a.cubin",
+   "cubin_sha256": "ef4b5b2f3ef0d24c7550ffe7c294d5f31537c2070499b0431263ec2c6e2881ce",
+   "cubin_bytes": 820320,
+   "source_sha256": {
+    "K3_SRC": "558a71ac1cc047bfe3301d9d603ed56b44478b990dd4d6d585a86533b516ca1f",
+    "ef2_trimul_v6.py": "4d87a31e105303f49439231a045116436a176d362cfecd1a9fec1a39fcb511ea"
+   },
+   "cfg": {
+    "NSLOT": 4,
+    "NRES": 2,
+    "NOUT": 1,
+    "NACC": 2,
+    "BT": 128,
+    "BNO": 32
+   },
+   "defines": {
+    "FASTSIG": 0,
+    "LNFOLD": 1,
+    "NSLOT": 4,
+    "NRES": 2,
+    "NOUT": 1,
+    "NACC": 2,
+    "CONS_REGS": 232,
+    "PROD_REGS": 40
+   },
+   "options": [
+    "--gpu-architecture=sm_90a",
+    "-std=c++17",
+    "-default-device",
+    "-diag-suppress=47",
+    "-DFASTSIG=0",
+    "-DLNFOLD=1",
+    "-DNSLOT=4",
+    "-DNRES=2",
+    "-DNOUT=1",
+    "-DNACC=2",
+    "-I<nvidia-cutlass 4.2.0.0>/cutlass_library/source/include",
+    "-I<site>/nvidia/cu13/include/cccl",
+    "-I<site>/nvidia/cu13/include"
+   ],
+   "nvrtc": "13.0.88",
+   "regs": 168,
+   "lmem": 0,
+   "smem_bytes": 226448,
+   "block": [
+    384,
+    1,
+    1
+   ],
+   "ptxas": [
+    "info    : (C7517) warpgroup.wait is injected in around line 10098 by compiler to allow use of registers defined by GMMA in function 'k3v6'",
+    "0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads",
+    "info    : Used 168 registers, used 16 barriers"
+   ],
+   "ptxas_fingerprint": "0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads; 168 registers; 16 barriers; C7517 (warpgroup.wait injected) present \u2014 a rebuild that reports any spill or C7512 is NOT this kernel's register schedule: run the determinism stress before use",
+   "determinism_stress": {
+    "protocol": "10000 back-to-back launches per (N in 384/768/1024, direction), GPU-side compare with launch 0",
+    "launches": 60000,
+    "differing": 0,
+    "worst_max_abs_err_vs_fp32": 0.0304,
+    "control_same_run": {
+     "build": "v6 fastsig1 lnfold0 (unfixed, sha ebf999a68a48)",
+     "launches": 60000,
+     "differing": 3
+    }
+   },
+   "sass_release_coverage": [
+    {
+     "site": "x^T/z STAGE release (empty_stage)",
+     "arrive_pc": "66e0",
+     "phasechk_pc": "0d60",
+     "n_ldsm": 32,
+     "own": 12,
+     "via_later": 20,
+     "uncovered": 0,
+     "own_pcs": [
+      "11e0(sb2)->13f0",
+      "1240(sb3)->1400",
+      "1280(sb4)->1460",
+      "1310(sb5)->1500",
+      "13b0(sb1)->1530",
+      "1420(sb2)->1620",
+      "1490(sb3)->1690",
+      "1c40(sb1)->1f10",
+      "1c80(sb2)->1fe0",
+      "42c0(sb4)->4400",
+      "4310(sb2)->4420",
+      "4350(sb5)->4450"
+     ],
+     "via_later_pcs": [
+      "12b0(sbNone)=>ldsm 1310(sb5)->1500",
+      "12e0(sbNone)=>ldsm 1310(sb5)->1500",
+      "1340(sb1)=>ldsm 13b0(sb1)->1530",
+      "13e0(sbNone)=>ldsm 1420(sb2)->1620",
+      "1450(sbNone)=>ldsm 1490(sb3)->1690",
+      "14e0(sbNone)=>ldsm 1c40(sb1)->1f10",
+      "1510(sbNone)=>ldsm 1c40(sb1)->1f10",
+      "3f80(sbNone)=>ldsm 42c0(sb4)->4400",
+      "4020(sbNone)=>ldsm 42c0(sb4)->4400",
+      "4070(sbNone)=>ldsm 42c0(sb4)->4400",
+      "40e0(sbNone)=>ldsm 42c0(sb4)->4400",
+      "4120(sbNone)=>ldsm 42c0(sb4)->4400",
+      "4180(sbNone)=>ldsm 42c0(sb4)->4400",
+      "41b0(sbNone)=>ldsm 42c0(sb4)->4400",
+      "41e0(sbNone)=>ldsm 42c0(sb4)->4400",
+      "4240(sb3)=>ldsm 42c0(sb4)->4400",
+      "4260(sbNone)=>ldsm 42c0(sb4)->4400",
+      "4280(sb1)=>ldsm 42c0(sb4)->4400",
+      "42a0(sbNone)=>ldsm 42c0(sb4)->4400",
+      "42f0(sbNone)=>ldsm 4310(sb2)->4420"
+     ],
+     "scoreboard_rearmed_before_wait": [
+      {
+       "ldsm_pc": "1340",
+       "sb": 1,
+       "rearmed_by_pc": "13b0",
+       "rearmed_by": "LDSM.16.MT88.4 R28, [R30]"
+      },
+      {
+       "ldsm_pc": "4240",
+       "sb": 3,
+       "rearmed_by_pc": "4380",
+       "rearmed_by": "MEMBAR.ALL.CTA"
+      },
+      {
+       "ldsm_pc": "4280",
+       "sb": 1,
+       "rearmed_by_pc": "4370",
+       "rearmed_by": "MUFU.RSQ R67, R88"
+      }
+     ],
+     "branches_between_loads_and_arrive": 0,
+     "labels_between": [],
+     "fences_between_last_load_and_arrive": {
+      "membar_all_cta": true,
+      "fence_view_async_s": true,
+      "membar_sc_cta": false
+     },
+     "arrive_address_dependency": {
+      "pc": "66a0",
+      "ins": "@!P2 IADD3 R222, R222, 0x37008, R6"
+     },
+     "reviewer_scan": "pending (to be added by the root after the confirmatory S1/S1c scan)"
+    },
+    {
+     "site": "residual slot release, first-half epilogue (empty_res)",
+     "arrive_pc": "9910",
+     "phasechk_pc": "9790",
+     "n_ldsm": 2,
+     "own": 1,
+     "via_later": 1,
+     "uncovered": 0,
+     "own_pcs": [
+      "9850(sb3)->98b0"
+     ],
+     "via_later_pcs": [
+      "9820(sbNone)=>ldsm 9850(sb3)->98b0"
+     ],
+     "scoreboard_rearmed_before_wait": [],
+     "branches_between_loads_and_arrive": 0,
+     "labels_between": [],
+     "fences_between_last_load_and_arrive": {
+      "membar_all_cta": true,
+      "fence_view_async_s": true,
+      "membar_sc_cta": false
+     },
+     "arrive_address_dependency": {
+      "pc": "9900",
+      "ins": "@!P2 IADD3 R16, R16, 0x37070, R17"
+     },
+     "reviewer_scan": "pending (to be added by the root after the confirmatory S1/S1c scan)"
+    },
+    {
+     "site": "weight-slot release (empty_w) \u2014 this thread issues no shared load of that slot (B operand read by wgmma; released after wgmma.wait_group)",
+     "arrive_pc": "adf0",
+     "n_ldsm": 0,
+     "own": 0,
+     "via_later": 0,
+     "uncovered": 0
+    },
+    {
+     "site": "weight-slot release (empty_w) \u2014 this thread issues no shared load of that slot (B operand read by wgmma; released after wgmma.wait_group)",
+     "arrive_pc": "ae00",
+     "n_ldsm": 0,
+     "own": 0,
+     "via_later": 0,
+     "uncovered": 0
+    },
+    {
+     "site": "residual slot release, second-half epilogue (empty_res)",
+     "arrive_pc": "b000",
+     "phasechk_pc": "aef0",
+     "n_ldsm": 2,
+     "own": 1,
+     "via_later": 1,
+     "uncovered": 0,
+     "own_pcs": [
+      "af60(sb1)->af90"
+     ],
+     "via_later_pcs": [
+      "af50(sbNone)=>ldsm af60(sb1)->af90"
+     ],
+     "scoreboard_rearmed_before_wait": [],
+     "branches_between_loads_and_arrive": 0,
+     "labels_between": [],
+     "fences_between_last_load_and_arrive": {
+      "membar_all_cta": true,
+      "fence_view_async_s": true,
+      "membar_sc_cta": false
+     },
+     "arrive_address_dependency": {
+      "pc": "aff0",
+      "ins": "@!P2 IADD3 R16, R16, 0x37070, R17"
+     },
+     "reviewer_scan": "pending (to be added by the root after the confirmatory S1/S1c scan)"
+    }
+   ],
+   "sass_artifact": "e6a320c8-82af-4f77-adb5-c004e0f82e37"
+  }
+ ],
+ "not_shipped": {
+  "lnfold0": "LNFOLD=0 builds are not part of the sealed set (the configuration of record folds the LN affine). With the fix, the LNFOLD=0 fastsig1 build passed 0/60000 (run 8) and 0/60000 (run 7, dep-lite form) next to 3/60000 and 8/60000 for the unfixed build; it can be built with NVRTC for investigation (face.ALLOW_UNSEALED_LNFOLD0)."
+ },
+ "register_split_rule": "setmaxnreg budgets must satisfy 128*PROD_REGS + 256*CONS_REGS <= 168*384 = 64512 (the CTA's launch allocation), not 65536: CONS 232 / PROD 48 deadlocks in setmaxnreg.inc. PROD_REGS below the producer path's allocated maximum (R26 as built) would be a register-cap violation; keep 232/40.",
+ "coverage_rule": "every LDSM between a slot's SYNCS.PHASECHK (full wait) and its release SYNCS.ARRIVE is covered before the arrive by a wait-mask on its OWN scoreboard ('own') or on the scoreboard of a LATER LDSM of the same warp ('via_later': shared-memory loads of a warp return in order \u2014 the basis on which ptxas itself elides scoreboards of earlier loads). Per site lists below; acceptance of 'via_later' is the reviewer's ruling to make.",
+ "evidence": {
+  "same_run_control": "run 8: fixed fs1/lf1 0/60000, fixed fs0/lf1 0/60000, fixed fs1/lf0 (positive-control configuration) 0/60000, UNFIXED fs1/lf0 3/60000",
+  "dep_family_total": "fixed builds of the failing fs1/lf0 configuration (dep, dep-res-only, dep+fence, dep-lite+fence, dep-lite+fence local-zero): 0/220800 launches next to 20 failures of the unfixed binary (ebf999a68a48) in the same runs; unfixed binary over the day 28/320400 (fix runs) + 5/468 (morning diag protocol)",
+  "package_stress": "tests/test_vectors.py --stress 3000: 0/12000 (sealing box)",
+  "artifacts": {
+   "stress_json": [
+    "0ee2f73d",
+    "b0a74d25",
+    "a8a76e4d",
+    "87c71776",
+    "087f6bb7",
+    "14498cc7",
+    "894ff4cf",
+    "ac0b43fc"
+   ],
+   "sass_fs1": "b59d1705-fcc8-460c-b30b-585c3d426c83",
+   "sass_fs0": "e6a320c8-82af-4f77-adb5-c004e0f82e37",
+   "patch_diff": "1ec53032"
+  }
+ }
+}

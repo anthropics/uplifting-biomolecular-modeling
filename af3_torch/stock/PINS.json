@@ -1,0 +1,158 @@
+{
+ "model": "af3_torch",
+ "upstream": {
+  "name": "xfold",
+  "repo": "https://github.com/Shenggan/xfold",
+  "commit": "22bdeedfa309ef4ff6f9199910d8403915de69d6",
+  "commit_date": "2026-07-03T07:29:26Z",
+  "license": "Apache-2.0 (LICENSE in the archive)",
+  "archive": {
+   "file": "xfold-22bdeed.tar.gz",
+   "bytes": 2206718,
+   "recipe": "https://github.com/Shenggan/xfold/archive/22bdeedfa309ef4ff6f9199910d8403915de69d6.tar.gz (GitHub's archive of the commit; member prefix xfold-22bdeedfa309ef4ff6f9199910d8403915de69d6/)",
+   "install": "stock/fetch_upstream.py (run by `run.sh install`): present in the tree, or fetched from the recipe's URL when the tree arrives without it; read by the stock route (`run.sh stock`) and the kit's byte tests only \u2014 no run mode opens it"
+  },
+  "port": {
+   "kit_copy": "opt/forward/af3t/af3_torch/xfold",
+   "changed_files": [
+    "xfold/alphafold3.py",
+    "xfold/fastnn/attention.py",
+    "xfold/fastnn/gated_linear_unit.py",
+    "xfold/fastnn/layer_norm.py",
+    "xfold/nn/atom_cross_attention.py",
+    "xfold/nn/attention.py",
+    "xfold/nn/diffusion_head.py",
+    "xfold/nn/diffusion_transformer.py",
+    "xfold/params.py"
+   ],
+   "added_files": [
+    "xfold/of3.py",
+    "xfold/nn/fourier_constants.py",
+    "xfold/nn/paircond_rows.py"
+   ]
+  }
+ },
+ "kit_patches": {
+  "root": "opt/forward/af3t/",
+  "patches": [
+   {
+    "id": "AF3_WEIGHT_PORT-04-equivalent",
+    "file": "patches/04_equivalent_template_gap.diff",
+    "reason": "correctness under the OpenFold3 weights: the ported template aatype embeddings were trained on GAP one-hots for absent template slots; ALA one-hots on all N^2 pairs of the 4 padded slots bias interface confidences (the reference fork's report \u00a75.3); declared as a patch on the carried kit \u2014 both arms, the stock CLI runs on this package",
+    "what": "with the OpenFold3 weights (xfold.of3.OF3), absent (padding) template slots are featurised as GAP (restype index 21, OpenFold3's convention) instead of restype 0 (ALA) in SingleTemplateEmbedding.construct_input (template_restype_for_one_hot); a slot with any atom present and the AlphaFold 3 layout are unchanged",
+    "applies": "patch -p1 in opt/forward/af3t/; the touched file is otherwise the xfold archive member (it is not one of upstream.port's changed files)",
+    "touches": [
+     "af3_torch/xfold/nn/template.py"
+    ]
+   },
+   {
+    "id": "AF3T-PATCH05-oom-propagates",
+    "file": "patches/05_oom_propagates_through_kernel_adapters.diff",
+    "reason": "an out-of-memory error is the user's to see, never a reason to run a different kernel: the kit adapter's kernel-error route (a lever whose kernel raises is disabled for the process and the stock path serves) must not swallow a CUDA OOM",
+    "what": "af3_kernels.py imports the shared core's one recogniser (`from opt_core.oom import is_oom`) and every `except Exception as e:` handler that routes to `_kernel_error` (trimul, triattn, transition, selfattn/apb, apb pair logits, the pairformer graph capture, the diffusion-transformer prologue and graph capture \u2014 8 handlers) begins with `if is_oom(e): raise`; every non-OOM exception takes the kernel-error route unchanged",
+    "applies": "patch -p1 in opt/forward/af3t/ on kernels/af3_kernels.py (a kit-original file, outside the xfold upstream archive)",
+    "touches": [
+     "kernels/af3_kernels.py"
+    ]
+   }
+  ]
+ },
+ "reference": {
+  "name": "alphafold3-open (sokrypton fork)",
+  "repo": "https://github.com/sokrypton/alphafold3",
+  "commit": "bc32b22ff5902e3daffd5d1f7203d7f2ab6cb997",
+  "patch": {
+   "file": "patches/04_of3_empty_template_restype_gap.diff",
+   "what": "the OpenFold3 empty-template convention on the fork's side (absent template slots featurised as GAP under of3 weights; alphafold3/model/network/template_modules.py) \u2014 applied to the source tree before the wheel is built (environment/Dockerfile); the tested stack's JAX venv and /app/alphafold carry exactly this change (`patch -p1` in the fork's top directory)"
+  },
+  "role": "featurisation and the output writers (the image's JAX venv; featurise.py / postprocess.py), and the weight converter (convert_of3_weights.py at the checkout root: variants.p2.converter)",
+  "artefacts": {
+   "dir": "stock/wheels",
+   "note": "binary files of the tested stack with no public URL, read by environment/Dockerfile's prebuilt route (--build-arg WHEELS_FROM=prebuilt) from stock/wheels/ and checked against these digests (README.md 'Setup' says where they come from); the default route makes both from the fork's source at `commit` instead \u2014 the wheel by the fork's own build, the data by its `build_data` step, whose pickles are not byte-stable across runs",
+   "files": [
+    {
+     "file": "alphafold3_open-3.1.4-cp312-cp312-linux_x86_64.whl",
+     "sha256": "64af0275f0f6e7b4856a1fccd04f2c6c995bd8b5db3dd450ceeaa4e1c5ad218f",
+     "bytes": 248099430,
+     "what": "alphafold3-open 3.1.4: the fork built as a wheel for CPython 3.12 / x86-64 Linux (scikit-build-core; one compiled extension, alphafold3/cpp; libcifpp's components.cif inside) with the OpenFold3 empty-template convention in alphafold3/model/network/template_modules.py (STOCK.md) \u2014 the package of the JAX venv (environment/requirements-jax.lock names it, installed --no-deps)"
+    },
+    {
+     "file": "alphafold3-build_data.tar.gz",
+     "sha256": "8142169f71520bc66343e566c31c216e8a36e868a34346cca98027d36e1bf6b7",
+     "bytes": 99208089,
+     "what": "the chemical-components data AlphaFold 3's `build_data` step writes into the installed package (alphafold3/constants/converters/ccd.pickle, ccd_codes.txt, chemical_component_sets.pickle; paths relative to site-packages), as generated in the tested stack \u2014 the step's pickles are not byte-stable across runs, so its output ships instead of the step"
+    }
+   ]
+  }
+ },
+ "image": {
+  "tested_on": "the pinned stack `9.0|2.13.0+cu130` \u2014 Ubuntu 24.04.1 LTS; torch venv: torch 2.13.0+cu130 / triton 3.7.1; JAX venv: Python 3.12.1, jax 0.10.2 + sokrypton/alphafold3 @ bc32b22f with stock/patches/04_equivalent_template_gap.diff applied to alphafold3/model/network/template_modules.py (the fork's haiku template network, which this kit's JAX-venv steps import but never execute); NVIDIA H100 80GB HBM3, driver 580.95.05, cc 9.0 \u2014 documentation only: nothing reads or compares this line",
+  "env": {
+   "XLA_FLAGS": "--xla_gpu_enable_triton_gemm=false",
+   "XLA_PYTHON_CLIENT_PREALLOCATE": "true",
+   "XLA_CLIENT_MEM_FRACTION": "0.95"
+  },
+  "env_note": "the fork's XLA variables (its own docker environment's), set by the package on the JAX-venv processes; those run on CPU (JAX_PLATFORMS=cpu) \u2014 the torch process owns the GPU"
+ },
+ "check_packages": {
+  "torch_python": {
+   "torch": "2.13.0",
+   "triton": "3.7.1"
+  },
+  "jax_python": {
+   "jax": "0.10.2",
+   "jaxlib": "0.10.2"
+  },
+  "_note": "distribution versions as importlib.metadata reports them (what check_pins.py queries); torch's build string is 2.13.0+cu130 (image.tested_on)"
+ },
+ "cuda": "13.0",
+ "variants": {
+  "p2": {
+   "name": "OpenFold3-preview2",
+   "layout": "of3-preview2",
+   "checkpoint": {
+    "file": "of3-p2-155k.pt",
+    "url": "https://openfold.s3.amazonaws.com/staging/of3-p2-155k.pt",
+    "sha256": "3ae79a701f55dbc184002d010c92d347a35faabb981314c2fd1325211af40b77",
+    "bytes": 2287928519,
+    "license": "Apache-2.0 (the OpenFold3 parameters, github.com/aqlaboratory/openfold-3)",
+    "what": "the public OpenFold3-preview2 training checkpoint (a torch state dict; `run.sh install --weights DIR --fetch` downloads it into DIR/checkpoint/ and checks this digest before converting)"
+   },
+   "converter": {
+    "script": "convert_of3_weights.py",
+    "python": "AF3_TORCH_JAX_PY",
+    "cwd": "AF3_TORCH_JAX_REPO",
+    "args": "--of3_checkpoint <DIR>/checkpoint/of3-p2-155k.pt --output_dir <DIR>",
+    "what": "the reference fork's own converter at `reference.commit` (OpenFold3-preview2 state dict -> AlphaFold 3's parameter-record format, of3_ported_weights.bin.zst, EMA weights); it needs the JAX venv's torch (CPU build, environment/requirements-jax.lock) and zstandard and runs on the CPU in about two minutes; af3_torch_opt/weights.py fetch_and_convert drives it"
+   },
+   "converted": {
+    "file": "of3_ported_weights.bin.zst",
+    "sha256": "0c9a00607352395486e33a98367810e1ad56c87459289f40974579525d3959cf",
+    "bytes": 1369240911
+   },
+   "source": "the public OpenFold3-preview2 checkpoint (`checkpoint`) converted by the reference fork's converter (`converter`) \u2014 `run.sh install --weights DIR --fetch` does both and judges the result against `converted`; a file converted elsewhere and placed in DIR is judged the same way (`run.sh install --weights DIR`)",
+   "conventions": {
+    "file": "of3_conventions.json",
+    "sha256": "cfe982d2e997aa84b8c9ed7e9a8549c1c38e862519d871c44cf0906f8f76b39b",
+    "bytes": 151
+   }
+  }
+ },
+ "stock_proof": {
+  "must_be_absent_prefixes": [
+   "AF3_TORCH_OPT"
+  ],
+  "levers_applied": [],
+  "dtk": false
+ },
+ "hardware": {
+  "tested": [
+   "H100 80GB (cc 9.0)",
+   "A100 80GB (cc 8.0)",
+   "A100 40GB (cc 8.0)"
+  ],
+  "kernel_cells": {},
+  "gate": "one CUDA device; the kit carries no kernel cell table (tests/test_kit_bytes.py holds this block empty; the shared core's providers carry the per-card cells)",
+  "triangle_attention": "no kit cell table: the shared core's triangle-attention provider (opt_core.kernels.triattn) carries the per-card cells and lever triattn asks it for the mode's tier word (fast | big) at every (card, dtype, head dim, heads, size) cell"
+ }
+}

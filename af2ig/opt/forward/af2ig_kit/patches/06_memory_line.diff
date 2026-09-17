@@ -1,0 +1,60 @@
+# Patch: 06_memory_line.diff
+# Lever: M1, the memory line's pair-stack hook of predict_pdb.py: -trimul_chunk <rows>:<min residues> (TriangleMultiplication in row chunks of the pair representation through the model-opt tree's shared row-chunk producer, opt_core.mem.rowpair_jax.rowchunk, installed in the driver process by af2ig_opt.pairstack)
+# Numerics class: TIER-2: changes numerics (row-chunked evaluation re-associates sums; not bitwise vs the stock body); lengths below <min residues> run the stock body untouched
+# Default: off; enabled only by predict_pdb.py -trimul_chunk (the af2ig_opt memory mode `big` passes it)
+# Applies to: nrbennet/dl_binder_design @ cafa3853ac94dceb1b908c8d9e6954d71749871a with 00-05 applied; apply with: patch -p1 < 06_memory_line.diff  (from the repository root)
+# Licence: MIT, same as upstream dl_binder_design
+#
+--- a/af2_initial_guess/predict_pdb.py
++++ b/af2_initial_guess/predict_pdb.py
+@@ -99,6 +99,7 @@
+ parser.add_argument( "-precompile", type=int, default=0, help='L7: before the prediction loop, featurize one input per distinct length and trigger the XLA compilations of the jitted model for all of them from N host threads in parallel (0 = off). The compiled executables are the ones the loop would have compiled serially; outputs unchanged' )
+ parser.add_argument( "-flash_attn", action="store_true", default=False, help='L8 (changes numerics slightly, see CHANGES.md): the attention core (logits + bias, softmax, weighted sum) of every eligible alphafold Attention call computed by the kit adapter af2ig_opt.flash_attn over the shared Pallas flash-attention kernel of the model-opt tree (opt_core.kernels.pallas_attn) instead of the three XLA ops; ineligible calls run the stock ops and are counted in the flash_attn timer record' )
+ parser.add_argument( "-fast", action="store_true", default=False, help='Recommended exact stack: -host_outputs -device_params -sort_by_length (all exact: the stock output bytes)' )
++parser.add_argument( "-trimul_chunk", type=str, default='', help='M1 memory lever (changes numerics slightly, see CHANGES.md): "<rows>:<min residues>" — TriangleMultiplication evaluated in row chunks of <rows> pair rows once the compiled length reaches <min residues>, through the model-opt tree\'s shared row-chunk producer (opt_core.mem.rowpair_jax.rowchunk via af2ig_opt.pairstack); shorter lengths run the stock body' )
+ 
+ args = parser.parse_args()
+ if args.fast:
+@@ -111,6 +112,14 @@
+     from af2ig_opt import flash_attn as FLASH_ATTN
+     _probe = FLASH_ATTN.setup()
+     print(f"flash_attn: kernel {FLASH_ATTN.census()['impl']} origin={FLASH_ATTN.census()['origin']} jax={_probe.get('jax')} tested={_probe.get('tested')} min_tokens={_probe.get('min_tokens')} scope={'all' if _probe.get('all_calls') else 'pair_bias'}")
++PAIRSTACK = None
++if args.trimul_chunk:
++    # M1: the memory line's pair-stack lever, installed ONCE here, before the model runner is built: the kit's
++    # adapter rebinds the stock alphafold TriangleMultiplication class in this process to its row-chunked form.
++    # A core without the shared producer stops the run with the reason named instead of running the stock body silently.
++    from af2ig_opt import pairstack as PAIRSTACK
++    _ps = PAIRSTACK.install(trimul=PAIRSTACK.parse_trimul(args.trimul_chunk))
++    print(f"pairstack: trimul_chunk={_ps['trimul_chunk']}")
+ 
+ #################################
+ # Timers (pure instrumentation)
+@@ -512,6 +521,9 @@
+         if FLASH_ATTN is not None and new_shape:
+             # L8 evidence: the adapter's trace-time census of Attention calls routed to the kernel / left on the stock ops (cumulative over the shapes compiled so far)
+             timers.emit('flash_attn', L_compiled=L, **FLASH_ATTN.census())
++        if PAIRSTACK is not None and new_shape:
++            # M1 evidence: the pair-stack install's census (trimul_chunk traces engaged / disengaged)
++            timers.emit('pairstack', L_compiled=L, **PAIRSTACK.census())
+         timers.emit('design', tag=usetag, L=L, L_compiled=L, binderlen=binderlen, monomer=monomer, new_shape=new_shape,
+                     t_load=feat_holder.t_load, t_feat=feat_holder.t_feat, t_tf=feat_holder.t_tf,
+                     t_wait_inputs=t_feat - t_start, t_model=t_model - t_feat, t_output=t_out - t_model, t_total=t_out - t_start,
+@@ -720,6 +732,8 @@
+             timers.emit('precompile_shape', L_compiled=L, dt=dt)
+             if FLASH_ATTN is not None:
+                 timers.emit('flash_attn', L_compiled=L, **FLASH_ATTN.census())
++            if PAIRSTACK is not None:
++                timers.emit('pairstack', L_compiled=L, **PAIRSTACK.census())
+     timers.emit('precompile_done', n_shapes=len(prepared), threads=num_threads, dt=time.time() - t0)
+     print(f'precompile: done in {time.time() - t0:.1f} s')
+ 
+@@ -754,4 +768,8 @@
+     # L8 evidence at exit: the whole run's census as the last flash_attn record, and the tree's per-lever line on stderr
+     timers.emit('flash_attn', L_compiled=None, final=True, **FLASH_ATTN.census())
+     FLASH_ATTN.emit()
++if PAIRSTACK is not None:
++    # M1 evidence at exit: the whole run's pair-stack census as the last pairstack record, and the per-lever lines on stderr
++    timers.emit('pairstack', L_compiled=None, final=True, **PAIRSTACK.census())
++    PAIRSTACK.print_lines()
+ timers.emit('proc_end', n_done=n_done, t_since_proc0=time.time() - T_PROC0)

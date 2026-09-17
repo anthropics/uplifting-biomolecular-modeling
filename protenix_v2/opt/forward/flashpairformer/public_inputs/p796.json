@@ -1,0 +1,27 @@
+[
+ {
+  "name": "1BRS_barnase_barstar_4to4",
+  "sequences": [
+   {
+    "proteinChain": {
+     "sequence": "AQVINTFDGVADYLQTYHKLPDNYITKSEAQALGWVASKGNLADVAPGKSIGGDIFSNREGKLPGKSGRTWREADINYTSGFRNSDRILYSSDWLIYKTTDHYQTFTKIR",
+     "count": 4,
+     "msa": {
+      "precomputed_msa_dir": "__KIT__/public_inputs/ssmsa/barnase",
+      "pairing_db": "uniref100"
+     }
+    }
+   },
+   {
+    "proteinChain": {
+     "sequence": "KKAVINGEQIRSISDLHQTLKKELALPEYYGENLDALWDALTGWVEYPLVLEWRQFEQSKQLTENGAESVLQVFREAKAEGADITIILS",
+     "count": 4,
+     "msa": {
+      "precomputed_msa_dir": "__KIT__/public_inputs/ssmsa/barstar",
+      "pairing_db": "uniref100"
+     }
+    }
+   }
+  ]
+ }
+]

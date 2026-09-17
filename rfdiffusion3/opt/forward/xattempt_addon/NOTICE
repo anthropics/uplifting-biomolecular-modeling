@@ -1,0 +1,9 @@
+RFD3_XATTEMPT_ADDON — NOTICE
+- Contains source files from RosettaCommons foundry (https://github.com/RosettaCommons/foundry), BSD 3-Clause,
+  Copyright (c) 2025, Institute for Protein Design, University of Washington, at commit 4010e3e2e7350edada3e25a45c908c6bf407df4d:
+  rfd3/model/inference_sampler.py, rfd3/model/RFD3_diffusion_module.py,
+  rfd3/model/layers/{attention,blocks,block_utils,encoders,layer_utils,pairformer_layers}.py — each modified as marked
+  ([RFD3_CUDAGRAPH] / [RFD3_HOIST] / [RFD3_FZT] / [RFD3_COMPILE] / [RFD3_TOKEN_SDPA] comments). Foundry's licence file is reproduced
+  verbatim as LICENSE_foundry_BSD-3-Clause.md.
+- rfd3/model/hoist.py and rfd3/model/cudagraph_sampler.py are new files of this overlay.
+- No model weights are included; the RFdiffusion3 checkpoint is distributed by the foundry project.

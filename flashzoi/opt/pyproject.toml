@@ -1,0 +1,32 @@
+# flashzoi_opt — explicit interface to the Flashzoi (borzoi-pytorch) inference optimizations.
+# Install editable from this directory: `pip install -e flashzoi/opt`. The kit code it wraps lives beside the package
+# (forward/kits_v1_25 — the kit's one PYTHONPATH root, found relative to the package location, or under $MODEL_OPT, run.sh's
+# convention), so the install must stay editable. No install-time dependency on the upstream package
+# (borzoi-pytorch: stock/PINS.json): its version is checked at activation. The build backend is setuptools plus one step that
+# ships flashzoi_opt_autoload.pth at the wheel root, which is what makes `FLASHZOI_OPT=<mode>` activate without code changes
+# (see flashzoi_opt/_autoload.py).
+[build-system]
+requires = ["setuptools>=64"]
+build-backend = "_build_backend"
+backend-path = ["."]
+
+[project]
+name = "flashzoi_opt"
+dynamic = ["version"]
+description = "Flashzoi inference optimizations: modes exact (default) / off, pinned settings, lazy autoload, activation report, fail-closed partial exit"
+requires-python = ">=3.10"
+classifiers = ["Private :: Do Not Upload"]
+dependencies = []
+
+[project.optional-dependencies]
+test = ["pytest", "numpy"]                           # the package's CPU tests
+
+[project.scripts]
+flashzoi-opt = "flashzoi_opt.__main__:main"        # `flashzoi-opt pred|check|warm ...` == `python -m flashzoi_opt ...`
+
+[tool.setuptools]
+packages = ["flashzoi_opt", "flashzoi_opt.tests"]
+include-package-data = false
+
+[tool.setuptools.dynamic]
+version = {attr = "flashzoi_opt.__version__"}

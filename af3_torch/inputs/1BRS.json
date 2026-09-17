@@ -1,0 +1,30 @@
+{
+ "name": "1BRS",
+ "dialect": "alphafold3",
+ "version": 2,
+ "sequences": [
+  {
+   "protein": {
+    "id": "A",
+    "sequence": "AQVINTFDGVADYLQTYHKLPDNYITKSEAQALGWVASKGNLADVAPGKSIGGDIFSNREGKLPGKSGRTWREADINYTSGFRNSDRILYSSDWLIYKTTDHYQTFTKIR",
+    "modifications": [],
+    "templates": [],
+    "unpairedMsa": ">query\nAQVINTFDGVADYLQTYHKLPDNYITKSEAQALGWVASKGNLADVAPGKSIGGDIFSNREGKLPGKSGRTWREADINYTSGFRNSDRILYSSDWLIYKTTDHYQTFTKIR\n",
+    "pairedMsa": ""
+   }
+  },
+  {
+   "protein": {
+    "id": "B",
+    "sequence": "KKAVINGEQIRSISDLHQTLKKELALPEYYGENLDALWDALTGWVEYPLVLEWRQFEQSKQLTENGAESVLQVFREAKAEGADITIILS",
+    "modifications": [],
+    "templates": [],
+    "unpairedMsa": ">query\nKKAVINGEQIRSISDLHQTLKKELALPEYYGENLDALWDALTGWVEYPLVLEWRQFEQSKQLTENGAESVLQVFREAKAEGADITIILS\n",
+    "pairedMsa": ""
+   }
+  }
+ ],
+ "modelSeeds": [
+  1
+ ]
+}

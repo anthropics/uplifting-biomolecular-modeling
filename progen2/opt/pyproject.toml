@@ -1,0 +1,29 @@
+# progen2_opt — the ProGen2 inference optimizations behind the stock's own command line.
+# Install editable from this directory: `pip install -e progen2/opt`. The kit code it wraps lives beside the package (serving/, forward/)
+# and is resolved from the package location, so the install must stay editable. No install-time
+# dependency on the upstream stack (torch 2.8.0+cu128 / transformers 4.16.2 / tokenizers 0.10.3 on python 3.9: stock/PINS.json): the
+# versions are checked at activation, and the kits assert the same pins themselves at apply.
+[build-system]
+requires = ["setuptools>=64"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "progen2_opt"
+dynamic = ["version"]
+description = "ProGen2 inference optimizations: sample.py's and likelihood.py's own flags plus --mode exact|off, activation report"
+requires-python = ">=3.9"
+classifiers = ["Private :: Do Not Upload"]        # not for PyPI: uploads carrying this classifier are rejected
+dependencies = []
+
+[project.optional-dependencies]
+test = ["pytest"]                                 # the package's CPU tests and the elementwise kit's own unit tests
+
+[project.scripts]
+progen2-opt = "progen2_opt.__main__:main"        # `progen2-opt sample|score|check ...` == `python -m progen2_opt ...`
+
+[tool.setuptools]
+packages = ["progen2_opt", "progen2_opt.tests"]
+include-package-data = false
+
+[tool.setuptools.dynamic]
+version = {attr = "progen2_opt.__version__"}

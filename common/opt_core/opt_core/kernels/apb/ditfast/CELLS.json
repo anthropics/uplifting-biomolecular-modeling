@@ -1,0 +1,199 @@
+{
+ "unit": "protenix_fpf_ditfast",
+ "levers": [
+  "cond_dedupe",
+  "dit_fused",
+  "dit_lowp",
+  "atom_fused"
+ ],
+ "class": "TOLERANCE (fast/big tiers; yardstick ACCEPT #5/#6)",
+ "key_fields": [
+  "cc",
+  "dtype(word)",
+  "c_a",
+  "c_s",
+  "heads",
+  "head_dim",
+  "N_token",
+  "n_sample",
+  "direction"
+ ],
+ "method": "24-block token DiffusionTransformer stack captured in a CUDA graph, variants replayed interleaved, medians of 30, per-LAYER ms = stack/24; S=5 samples batched; H100 80GB HBM3 (sm_90), torch 2.13.0+cu130, SM clock 1980 MHz; attention inside the fused layer = protenix_fpf_apb.dit_apb 0.2.0; indicative numbers",
+ "incumbent": "stock DiffusionTransformerBlock fp32/TF32 as the kit's exact and (pre-lever) fast tiers run it inside the sampler graph",
+ "rows": [
+  {
+   "cc": "sm_90",
+   "word": "stock fp32/tf32 (incumbent)",
+   "c_a": 768,
+   "c_s": 384,
+   "heads": 16,
+   "head_dim": 48,
+   "N_token": 256,
+   "n_sample": 5,
+   "direction": "fwd",
+   "ms_per_layer": 0.3
+  },
+  {
+   "cc": "sm_90",
+   "word": "stock fp32/tf32 (incumbent)",
+   "c_a": 768,
+   "c_s": 384,
+   "heads": 16,
+   "head_dim": 48,
+   "N_token": 512,
+   "n_sample": 5,
+   "direction": "fwd",
+   "ms_per_layer": 0.66
+  },
+  {
+   "cc": "sm_90",
+   "word": "stock fp32/tf32 (incumbent)",
+   "c_a": 768,
+   "c_s": 384,
+   "heads": 16,
+   "head_dim": 48,
+   "N_token": 1024,
+   "n_sample": 5,
+   "direction": "fwd",
+   "ms_per_layer": 1.818
+  },
+  {
+   "cc": "sm_90",
+   "word": "dit_fused + dit_lowp=bf16",
+   "c_a": 768,
+   "c_s": 384,
+   "heads": 16,
+   "head_dim": 48,
+   "N_token": 256,
+   "n_sample": 5,
+   "direction": "fwd",
+   "ms_per_layer": 0.0895,
+   "vs_incumbent": 3.35
+  },
+  {
+   "cc": "sm_90",
+   "word": "dit_fused + dit_lowp=bf16",
+   "c_a": 768,
+   "c_s": 384,
+   "heads": 16,
+   "head_dim": 48,
+   "N_token": 512,
+   "n_sample": 5,
+   "direction": "fwd",
+   "ms_per_layer": 0.176,
+   "vs_incumbent": 3.75
+  },
+  {
+   "cc": "sm_90",
+   "word": "dit_fused + dit_lowp=bf16",
+   "c_a": 768,
+   "c_s": 384,
+   "heads": 16,
+   "head_dim": 48,
+   "N_token": 1024,
+   "n_sample": 5,
+   "direction": "fwd",
+   "ms_per_layer": 0.365,
+   "vs_incumbent": 4.98
+  },
+  {
+   "cc": "sm_90",
+   "word": "dit_fused + dit_lowp=bf16 + cond_dedupe",
+   "c_a": 768,
+   "c_s": 384,
+   "heads": 16,
+   "head_dim": 48,
+   "N_token": 256,
+   "n_sample": 5,
+   "direction": "fwd",
+   "ms_per_layer": 0.071,
+   "vs_incumbent": 4.23
+  },
+  {
+   "cc": "sm_90",
+   "word": "dit_fused + dit_lowp=bf16 + cond_dedupe",
+   "c_a": 768,
+   "c_s": 384,
+   "heads": 16,
+   "head_dim": 48,
+   "N_token": 512,
+   "n_sample": 5,
+   "direction": "fwd",
+   "ms_per_layer": 0.139,
+   "vs_incumbent": 4.75
+  },
+  {
+   "cc": "sm_90",
+   "word": "dit_fused + dit_lowp=bf16 + cond_dedupe",
+   "c_a": 768,
+   "c_s": 384,
+   "heads": 16,
+   "head_dim": 48,
+   "N_token": 1024,
+   "n_sample": 5,
+   "direction": "fwd",
+   "ms_per_layer": 0.291,
+   "vs_incumbent": 6.25
+  },
+  {
+   "cc": "sm_90",
+   "word": "dit_fused + dit_lowp=fp16 (cell of the fast tier)",
+   "c_a": 768,
+   "c_s": 384,
+   "heads": 16,
+   "head_dim": 48,
+   "N_token": 512,
+   "n_sample": 5,
+   "direction": "fwd",
+   "ms_per_layer": 0.1757,
+   "note": "fp16 word == bf16 word speed (0.1757 vs 0.1759 ms)"
+  },
+  {
+   "cc": "sm_90",
+   "word": "dit_fused alone (dit_lowp=off, fp32/tf32x3 attention)",
+   "c_a": 768,
+   "c_s": 384,
+   "heads": 16,
+   "head_dim": 48,
+   "N_token": 512,
+   "n_sample": 5,
+   "direction": "fwd",
+   "ms_per_layer": null,
+   "note": "engineering-only word; e2e sampler -4..-8 % vs kit fast at 800 tokens (probe run); per-layer row not isolated"
+  }
+ ],
+ "atom_fused_rows": {
+  "note": "atom_fused (fp32) e2e: sampler_s 3.76 -> 3.59 s at 800 tokens with the stock local attention; with protenix_fpf_apb.atom_apb the atom path drops to ~1.5 ms/step @800 (probe run); op-level RMS rel vs stock 7e-6..1.7e-5 (TF32 order)"
+ },
+ "e2e_rows": {
+  "clock": "fwd_s (Protenix.forward only), bench_e2e 3 targets x 2 rounds, medians",
+  "fast_tip_vs_fast_tip_plus_unit": {
+   "xl0400": [
+    5.32,
+    4.21
+   ],
+   "xl0800": [
+    15.29,
+    13.27
+   ],
+   "xl1400": [
+    46.59,
+    42.92
+   ]
+  },
+  "sampler_s": {
+   "xl0400": [
+    2.36,
+    1.21
+   ],
+   "xl0800": [
+    4.6,
+    2.55
+   ],
+   "xl1400": [
+    8.65,
+    5.33
+   ]
+  }
+ }
+}

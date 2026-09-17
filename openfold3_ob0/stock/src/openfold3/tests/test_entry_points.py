@@ -1,0 +1,1120 @@
+# Copyright 2026 AlQuraishi Laboratory
+# Copyright 2026 Outpace Bio, Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import json
+import os
+import shutil
+import tempfile
+import textwrap
+import unittest
+from dataclasses import dataclass
+from pathlib import Path
+from unittest.mock import patch
+
+import ml_collections as mlc
+import pytest
+from click.testing import CliRunner
+from pytorch_lightning.loggers import WandbLogger
+
+import openfold3.core.model.primitives.initialization as initialization
+from openfold3 import run_openfold, setup_openfold
+from openfold3.core.config import config_utils
+from openfold3.core.data.framework.data_module import DataModuleConfig
+from openfold3.entry_points.experiment_runner import (
+    InferenceExperimentRunner,
+    TrainingExperimentRunner,
+    WandbHandler,
+    _accelerator_will_use_mps,
+    skip_random_init,
+)
+from openfold3.entry_points.parameters import (
+    CHECKPOINT_ROOT_FILENAME,
+    DEFAULT_CHECKPOINT_NAME,
+    LEGACY_CHECKPOINTS,
+    OPENFOLD_MODEL_CHECKPOINT_REGISTRY,
+    CheckpointEntry,
+)
+from openfold3.entry_points.validator import (
+    InferenceExperimentConfig,
+    TrainingExperimentConfig,
+    TrainingExperimentSettings,
+    WandbConfig,
+)
+from openfold3.projects.of3_all_atom.config.inference_query_format import (
+    InferenceQuerySet,
+)
+from openfold3.projects.of3_all_atom.project_entry import ModelUpdate, OF3ProjectEntry
+from openfold3.setup_openfold import OpenFoldSetupConfig
+
+
+@pytest.fixture
+def dummy_ckpt_file(tmp_path: Path) -> Path:
+    dummy_ckpt = tmp_path / "dummy.ckpt"
+    dummy_ckpt.write_text("dummy content")
+    return dummy_ckpt
+
+
+@pytest.fixture
+def minimal_query_json(tmp_path: Path) -> Path:
+    query_json = tmp_path / "query.json"
+    query_json.write_text(
+        '{"queries":{"query":{"chains":[{"molecule_type":"protein",'
+        '"chain_ids":["A"],"sequence":"TEST"}]}}}'
+    )
+    return query_json
+
+
+def _create_fake_file(path: Path) -> None:
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    with open(path, "w") as f:
+        f.write("dummy content")
+
+
+def _fake_download_s3_file(unused_bucket: str, unused_key: str, local_path: Path):
+    local_path.parent.mkdir(parents=True, exist_ok=True)
+    local_path.touch()
+
+
+class TestTrainingExperiment:
+    @pytest.fixture
+    def expt_runner(self, tmp_path):
+        """Minimal runner yaml containing only dataset configs."""
+        test_dummy_file = tmp_path / "test.json"
+        test_dummy_file.write_text("test")
+
+        test_yaml_str = textwrap.dedent(f"""\
+            data_module_args:
+                data_seed: 114
+                num_workers: 0
+
+            model_update:
+                presets:
+                    - train
+                custom:
+                    settings:
+                        model_selection_weight_scheme: fine_tuning
+                    architecture:
+                        shared:
+                            diffusion:
+                                no_samples: 32
+
+            dataset_configs:
+                train:
+                    weighted-pdb:
+                        dataset_class: WeightedPDBDataset
+                        weight: 1
+                        config:
+                            debug_mode: true
+                            crop:
+                                token_crop:
+                                    token_budget: 640
+                                chain_crop:
+                                    enabled: true
+                                    n_chains: 25
+                            loss:
+                                bond: 4.0
+                                smooth_lddt: 0.0
+
+                validation:
+                    val-weighted-pdb:
+                        dataset_class: ValidationPDBDataset
+                        config:
+                            template:
+                                n_templates: 4
+
+            dataset_paths:
+                weighted-pdb:
+                    alignments_directory: null
+                    alignment_db_directory: null
+                    alignment_array_directory: {tmp_path}
+                    target_structures_directory: {tmp_path}
+                    target_structure_file_format: npz
+                    dataset_cache_file: {test_dummy_file}
+                    reference_molecule_directory: {tmp_path}
+                    template_cache_directory: {tmp_path}
+                    template_structure_array_directory: {tmp_path}
+                    template_structures_directory: null
+                    template_file_format: pkl
+                    ccd_file: null
+
+                val-weighted-pdb:
+                    alignments_directory: null
+                    alignment_db_directory: null
+                    alignment_array_directory: {tmp_path}
+                    target_structures_directory: {tmp_path}
+                    target_structure_file_format: npz
+                    dataset_cache_file: {test_dummy_file}
+                    reference_molecule_directory: {tmp_path}
+                    template_cache_directory: {tmp_path}
+                    template_structure_array_directory: {tmp_path}
+                    template_structures_directory: null
+                    template_file_format: pkl
+                    ccd_file: null
+                """)
+        test_yaml_file = tmp_path / "runner.yml"
+        test_yaml_file.write_text(test_yaml_str)
+
+        expt_config = TrainingExperimentConfig.model_validate(
+            config_utils.load_yaml(test_yaml_file)
+        )
+
+        expt_runner = TrainingExperimentRunner(expt_config)
+        expt_runner.setup()
+        return expt_runner
+
+    def test_model_config_update(self, expt_runner):
+        assert (
+            expt_runner.model_config.settings.model_selection_weight_scheme
+            == "fine_tuning"
+        )
+        assert expt_runner.model_config.architecture.shared.diffusion.no_samples == 32
+        # Check that default settings are not overwritten
+        # See openfold3.projects.of3_all_atom.config.model_config
+        assert (
+            expt_runner.model_config.settings.memory.eval.per_sample_token_cutoff == 750
+        )
+
+    def test_model(self, expt_runner):
+        # Check model creation
+
+        assert expt_runner.lightning_module.model
+        assert (
+            expt_runner.lightning_module.model.aux_heads.distogram.linear.in_features
+            == 128
+        )
+
+    def test_data_module(self, expt_runner):
+        # Check data_module creation
+        assert expt_runner.data_module_config.data_seed == 114
+
+        assert len(expt_runner.data_module_config.datasets) == 2
+        assert expt_runner.data_module_config.datasets[0].name == "weighted-pdb"
+        assert expt_runner.data_module_config.datasets[1].name == "val-weighted-pdb"
+
+        weighted_pdb_spec = expt_runner.data_module_config.datasets[0]
+        assert weighted_pdb_spec.weight == 1
+        assert weighted_pdb_spec.config.crop.token_crop.token_budget == 640
+        assert weighted_pdb_spec.config.crop.chain_crop.enabled is True
+        assert weighted_pdb_spec.config.crop.chain_crop.n_chains == 25
+
+    @pytest.mark.parametrize("pl_checkpoint_option", [None, "last", "hpc", "registry"])
+    def test_pl_checkpoint_load_options(self, pl_checkpoint_option):
+        expt_config = TrainingExperimentSettings.model_validate(
+            {"restart_checkpoint_path": pl_checkpoint_option}
+        )
+        assert expt_config.restart_checkpoint_path == pl_checkpoint_option
+
+    def test_pl_checkpoint_load_from_path(self, tmp_path):
+        dummy_ckpt = tmp_path / "dummy.ckpt"
+        dummy_ckpt.write_text("test")
+        expt_config = TrainingExperimentSettings.model_validate(
+            {"restart_checkpoint_path": str(dummy_ckpt)}
+        )
+        assert expt_config.restart_checkpoint_path == str(dummy_ckpt)
+
+        # check that loading fails when given an invalid string / path
+        non_existant_path = "nonexistant.ckpt"
+        with pytest.raises(ValueError):
+            TrainingExperimentSettings.model_validate(
+                {"restart_checkpoint_path": non_existant_path}
+            )
+
+    @pytest.mark.parametrize(
+        "data_seed, model_seed, expected_data_seed", [(114, 42, 114), (None, 123, 123)]
+    )
+    def test_synchronize_seeds_respects_data_seed(
+        self, data_seed, model_seed, expected_data_seed, tmp_path
+    ):
+        test_yaml_str = textwrap.dedent(f"""\
+            experiment_settings:
+                seed: {model_seed}
+            """)
+
+        if data_seed:
+            test_yaml_str += textwrap.dedent(f"""\
+                    data_module_args:
+                        data_seed: {data_seed}
+            """)
+
+        test_yaml_file = tmp_path / "runner.yml"
+        test_yaml_file.write_text(test_yaml_str)
+
+        expt_config = TrainingExperimentConfig(
+            dataset_paths={},
+            dataset_configs={},
+            **config_utils.load_yaml(test_yaml_file),
+        )
+        assert expt_config.experiment_settings.seed == model_seed
+        assert expt_config.data_module_args.data_seed == expected_data_seed
+
+
+class TestModelUpdate:
+    def test_bad_model_update_fails(self):
+        """Verify that a model update that has an invalid field is not allowed."""
+        model_update = ModelUpdate(custom={"nonexistant_field": "bad"})
+        project_entry = OF3ProjectEntry()
+
+        with pytest.raises(KeyError, match="config is locked"):
+            project_entry.get_model_config_with_update(model_update)
+
+    def test_model_update_with_diffusion_samples(self, tmp_path, dummy_ckpt_file):
+        """Test application of model update and num_diffusion_samples cli argument."""
+        test_yaml_str = textwrap.dedent("""\
+            model_update:
+              custom:
+                architecture:
+                  shared:
+                    num_recycles: 1
+        """)
+        test_yaml_file = tmp_path / "runner.yml"
+        test_yaml_file.write_text(test_yaml_str)
+        expt_config = InferenceExperimentConfig(
+            inference_ckpt_path=dummy_ckpt_file,
+            **config_utils.load_yaml(test_yaml_file),
+        )
+        expt_runner = InferenceExperimentRunner(expt_config)
+        expected_num_diffusion_samples = 17
+        expt_runner.set_num_diffusion_samples(expected_num_diffusion_samples)
+        model_config = expt_runner.model_config
+        assert (
+            model_config.architecture.shared.diffusion.no_full_rollout_samples
+            == expected_num_diffusion_samples
+        )
+        # Verify settings from model_update section are also applied
+        assert model_config.architecture.shared.num_recycles == 1
+
+    def test_low_mem_model_config_preset(self, tmp_path, dummy_ckpt_file):
+        test_dummy_file = tmp_path / "test.json"
+        test_dummy_file.write_text("test")
+
+        test_yaml_str = textwrap.dedent("""\
+            data_module_args:
+                data_seed: 114
+
+            model_update:
+                presets:
+                    - predict
+                    - low_mem
+            """)
+
+        test_yaml_file = tmp_path / "runner.yml"
+        test_yaml_file.write_text(test_yaml_str)
+
+        expt_config = InferenceExperimentConfig(
+            inference_ckpt_path=dummy_ckpt_file,
+            **config_utils.load_yaml(test_yaml_file),
+        )
+
+        expt_runner = InferenceExperimentRunner(expt_config)
+        model_cfg = expt_runner.model_config
+
+        # check that inference mode set correctly
+        assert not model_cfg.architecture.msa.msa_module_embedder.subsample_main_msa
+        assert model_cfg.architecture.msa.msa_module_embedder.subsample_all_msa
+
+        # check low memory settings set correctly
+        assert model_cfg.settings.memory.eval.chunk_size == 1024
+        assert model_cfg.settings.memory.eval.offload_inference.confidence_heads
+        assert model_cfg.settings.memory.eval.offload_inference.token_cutoff == 0
+
+        # test existing setting in experiment runner is not overwritten
+        assert not model_cfg.settings.memory.eval.use_lma
+
+    def test_model_update_with_pae_enabled_triggers_warning(self):
+        with patch(
+            "openfold3.projects.of3_all_atom.project_entry.logger"
+        ) as mock_logger:
+            ModelUpdate.model_validate({"presets": ["predict", "pae_enabled"]})
+        warning_messages = [call.args[0] for call in mock_logger.warning.call_args_list]
+        assert any("model preset is deprecated" in msg for msg in warning_messages)
+
+    def test_mps_preset_applied_for_default_accelerator(self, dummy_ckpt_file):
+        """Default pl_trainer_args.accelerator ("gpu") resolves to MPS
+        whenever MPS is available, so the mps preset must apply even without
+        an explicit accelerator: mps override.
+        """
+        expt_config = InferenceExperimentConfig(inference_ckpt_path=dummy_ckpt_file)
+        expt_runner = InferenceExperimentRunner(expt_config)
+
+        with patch(
+            "openfold3.entry_points.experiment_runner._accelerator_will_use_mps",
+            return_value=True,
+        ):
+            model_cfg = expt_runner.model_config
+
+        assert not model_cfg.settings.memory.eval.use_triton_triangle_kernels
+        assert not model_cfg.settings.memory.eval.offload_inference.msa_module
+        assert model_cfg.architecture.msa.msa_module.clear_cache_between_blocks
+        assert model_cfg.architecture.pairformer.clear_cache_between_blocks
+        assert model_cfg.architecture.template.template_pair_stack.clear_cache_between_blocks
+
+    def test_mps_preset_not_applied_when_mps_wont_run(self, dummy_ckpt_file):
+        expt_config = InferenceExperimentConfig(inference_ckpt_path=dummy_ckpt_file)
+        expt_runner = InferenceExperimentRunner(expt_config)
+
+        with patch(
+            "openfold3.entry_points.experiment_runner._accelerator_will_use_mps",
+            return_value=False,
+        ):
+            model_cfg = expt_runner.model_config
+
+        assert model_cfg.settings.memory.eval.use_triton_triangle_kernels
+        assert not model_cfg.architecture.msa.msa_module.clear_cache_between_blocks
+        assert not model_cfg.architecture.pairformer.clear_cache_between_blocks
+
+
+class TestAcceleratorWillUseMps:
+    """_accelerator_will_use_mps mirrors PyTorch Lightning's own accelerator
+    resolution, so MPS-specific defaults aren't silently skipped when a user
+    runs with the default ("gpu") or "auto" instead of explicitly typing
+    "mps".
+    """
+
+    @pytest.mark.parametrize("accelerator", ["cpu", "cuda"])
+    def test_explicit_non_mps_accelerator_never_matches(self, accelerator):
+        with patch(
+            "pytorch_lightning.accelerators.MPSAccelerator.is_available",
+            return_value=True,
+        ):
+            assert not _accelerator_will_use_mps(accelerator)
+
+    @pytest.mark.parametrize("mps_available", [True, False])
+    @pytest.mark.parametrize("accelerator", ["mps", "gpu", "auto"])
+    def test_resolving_accelerator_follows_mps_availability(
+        self, accelerator, mps_available
+    ):
+        with patch(
+            "pytorch_lightning.accelerators.MPSAccelerator.is_available",
+            return_value=mps_available,
+        ):
+            assert _accelerator_will_use_mps(accelerator) is mps_available
+
+
+class DummyWandbExperiment:
+    def __init__(self, directory):
+        self.dir = directory
+        self.saved_files = []
+
+    def save(self, filepath):
+        self.saved_files.append(filepath)
+
+
+class DummyWandbLogger:
+    def __init__(self, experiment):
+        self.experiment = experiment
+
+
+class TestWandbHandler(unittest.TestCase):
+    def setUp(self):
+        self.temp_dir = tempfile.mkdtemp()
+        self.wandb_args = WandbConfig.model_validate(
+            {
+                "project": "test_project",
+                "entity": "test_entity",
+                "group": "test_group",
+                "experiment_name": "test_experiment",
+                "offline": True,
+                "id": "test_id",
+            }
+        )
+
+    def tearDown(self):
+        shutil.rmtree(self.temp_dir)
+
+    @patch("wandb.init")
+    def test_init_logger(self, mock_wandb_init):
+        # Test that the logger is initialized and wandb.init is called for rank-zero.
+        _wandb_handler = WandbHandler(
+            self.wandb_args, is_rank_zero=True, output_dir=Path(".")
+        )
+        _wandb_handler._init_logger()
+        self.assertIsNotNone(_wandb_handler.logger)
+        mock_wandb_init.assert_called_once()
+
+    @patch("wandb.init")
+    def test_wandb_is_called_on_logger(self, mock_wandb_init):
+        # Test that the logger is initialized and wandb.init is called for rank-zero.
+        _wandb_handler = WandbHandler(
+            self.wandb_args, is_rank_zero=True, output_dir=Path(".")
+        )
+        assert isinstance(_wandb_handler.logger, WandbLogger)
+        mock_wandb_init.assert_called_once()
+
+    @patch("os.system", return_value=0)
+    def test_store_configs_creates_files(self, mock_os_system):
+        _wandb_handler = WandbHandler(
+            self.wandb_args, is_rank_zero=True, output_dir=Path(self.temp_dir)
+        )
+
+        # Create dummy configuration objects with a to_dict() method.
+        dummy_runner_args = TrainingExperimentConfig(
+            dataset_configs={}, dataset_paths={}
+        )
+        dummy_data_module_config = DataModuleConfig(datasets=[])
+        dummy_model_config = mlc.ConfigDict({"model": "dummy"})
+
+        # Set up a dummy experiment with our temporary directory.
+        dummy_experiment = DummyWandbExperiment(self.temp_dir)
+        dummy_logger = DummyWandbLogger(dummy_experiment)
+        _wandb_handler._logger = dummy_logger
+
+        _wandb_handler.store_configs(
+            dummy_runner_args, dummy_data_module_config, dummy_model_config
+        )
+
+        expected_files = [
+            "package_versions.txt",
+            "runner.json",
+            "data_config.json",
+            "model_config.json",
+        ]
+        expected_files = [
+            os.path.join(self.temp_dir, fname) for fname in expected_files
+        ]
+        assert set(dummy_experiment.saved_files) == set(expected_files)
+
+        for fpath in expected_files:
+            if fpath.endswith("package_versions.txt"):
+                # Ignore this file, since i am patching its generation
+                continue
+
+            with open(fpath) as f:
+                data = json.load(f)
+                if fpath.endswith("runner.json"):
+                    self.assertEqual(data, dummy_runner_args.model_dump(mode="json"))
+                elif fpath.endswith("data_config.json"):
+                    self.assertEqual(data, dummy_data_module_config.model_dump())
+                elif fpath.endswith("model_config.json"):
+                    self.assertEqual(data, dummy_model_config.to_dict())
+
+
+@dataclass
+class FlagResolutionCase:
+    """One row of the use_templates / use_msa_server resolution matrix.
+
+    ``yaml`` and ``cli`` use ``None`` to mean "not provided" (field absent from
+    the runner yaml / flag omitted on the CLI), and ``True``/``False`` for an
+    explicit value. ``expected`` is the value the runner should resolve to.
+    """
+
+    yaml: bool | None
+    cli: bool | None
+    expected: bool
+
+
+# Resolution rule: the CLI arg wins when provided; otherwise the yaml value
+# wins; otherwise the config default (True). The two cases marked "BUG #250"
+# are the regressions this matrix guards against.
+_FLAG_RESOLUTION_CASES = [
+    pytest.param(
+        FlagResolutionCase(yaml=None, cli=None, expected=True),
+        id="yaml_unset+cli_omitted->default_on",
+    ),
+    pytest.param(
+        FlagResolutionCase(yaml=None, cli=True, expected=True),
+        id="yaml_unset+cli_true->on",
+    ),
+    pytest.param(
+        FlagResolutionCase(yaml=None, cli=False, expected=False),
+        id="yaml_unset+cli_false->off",
+    ),
+    pytest.param(
+        FlagResolutionCase(yaml=True, cli=None, expected=True),
+        id="yaml_true+cli_omitted->on",
+    ),
+    pytest.param(
+        FlagResolutionCase(yaml=True, cli=True, expected=True),
+        id="yaml_true+cli_true->on",
+    ),
+    pytest.param(
+        FlagResolutionCase(yaml=True, cli=False, expected=False),
+        id="yaml_true+cli_false->off(BUG#250)",
+    ),
+    pytest.param(
+        FlagResolutionCase(yaml=False, cli=None, expected=False),
+        id="yaml_false+cli_omitted->off(BUG#250)",
+    ),
+    pytest.param(
+        FlagResolutionCase(yaml=False, cli=True, expected=True),
+        id="yaml_false+cli_true->on",
+    ),
+    pytest.param(
+        FlagResolutionCase(yaml=False, cli=False, expected=False),
+        id="yaml_false+cli_false->off",
+    ),
+]
+
+
+class TestInferenceCommandLineSettings:
+    @pytest.mark.parametrize("setting", ["use_templates", "use_msa_server"])
+    @pytest.mark.parametrize("case", _FLAG_RESOLUTION_CASES)
+    def test_cli_and_yaml_resolution(self, setting, case, tmp_path, dummy_ckpt_file):
+        """CLI arg (when provided) overrides yaml; otherwise yaml/config default wins."""
+        runner_args = {}
+        if case.yaml is not None:
+            test_yaml_file = tmp_path / "runner.yml"
+            test_yaml_file.write_text(
+                textwrap.dedent(f"""\
+                    experiment_settings:
+                        {setting}: {str(case.yaml).lower()}
+                    """)
+            )
+            runner_args = config_utils.load_yaml(test_yaml_file)
+
+        expt_config = InferenceExperimentConfig(
+            inference_ckpt_path=dummy_ckpt_file, **runner_args
+        )
+
+        cli_kwargs = {} if case.cli is None else {setting: case.cli}
+        expt_runner = InferenceExperimentRunner(expt_config, **cli_kwargs)
+
+        assert getattr(expt_runner, setting) is case.expected
+
+    def test_seeding_from_num_seeds(self, dummy_ckpt_file):
+        expt_config = InferenceExperimentConfig(inference_ckpt_path=dummy_ckpt_file)
+        num_seeds = 7
+        expt_runner = InferenceExperimentRunner(expt_config, num_model_seeds=num_seeds)
+        assert len(expt_runner.seeds) == num_seeds
+        msa_settings = expt_config.msa_computation_settings
+        assert msa_settings.saved_output_directory == (
+            expt_runner.output_dir / "msas" / msa_settings.run_directory_name
+        )
+
+    def test_predict_calls_cleanup_after_failure(
+        self, minimal_query_json, dummy_ckpt_file
+    ):
+        with (
+            patch(
+                "openfold3.entry_points.experiment_runner.InferenceExperimentRunner"
+            ) as mock_runner_class,
+        ):
+            mock_runner_class.return_value.run.side_effect = RuntimeError("failed")
+            result = CliRunner().invoke(
+                run_openfold.cli,
+                [
+                    "predict",
+                    "--query-json",
+                    str(minimal_query_json),
+                    "--inference-ckpt-path",
+                    str(dummy_ckpt_file),
+                ],
+            )
+
+        assert result.exit_code != 0
+        mock_runner_class.return_value.cleanup_msa_workspace.assert_called_once()
+
+    @pytest.mark.parametrize("fails", [False, True])
+    def test_align_msa_server_always_cleans_its_workspace(
+        self, tmp_path, minimal_query_json, fails
+    ):
+        output_dir = tmp_path / "alignments"
+        settings_yaml = tmp_path / "msa-settings.yml"
+        settings_yaml.write_text(f"msa_output_directory: {output_dir}\n")
+        workspaces = []
+
+        def fake_preprocess(inference_query_set, compute_settings):
+            workspace = compute_settings.workspace_directory
+            workspaces.append(workspace)
+            compute_settings.create_workspace()
+            if fails:
+                raise RuntimeError("failed")
+
+            compute_settings.saved_output_directory.mkdir(parents=True)
+            saved_msa = compute_settings.saved_output_directory / "main/alignment.a3m"
+            saved_msa.parent.mkdir(parents=True)
+            saved_msa.write_text(">query\nTEST")
+            inference_query_set.queries["query"].chains[0].main_msa_file_paths = [
+                saved_msa
+            ]
+            return inference_query_set
+
+        with (
+            patch(
+                "openfold3.core.data.tools.colabfold_msa_server.preprocess_colabfold_msas",
+                side_effect=fake_preprocess,
+            ),
+        ):
+            result = CliRunner().invoke(
+                run_openfold.cli,
+                [
+                    "align-msa-server",
+                    "--query-json",
+                    str(minimal_query_json),
+                    "--output-dir",
+                    str(output_dir),
+                    "--msa-computation-settings-yaml",
+                    str(settings_yaml),
+                ],
+            )
+
+        assert result.exit_code == (1 if fails else 0)
+        assert workspaces and not workspaces[0].exists()
+        if not fails:
+            saved_query = InferenceQuerySet.from_json(output_dir / "query_msa.json")
+            for chain in saved_query.queries["query"].chains:
+                assert all(path.exists() for path in chain.main_msa_file_paths)
+
+    def test_seeding_from_list(self, tmp_path, dummy_ckpt_file):
+        test_yaml_str = textwrap.dedent("""\
+            experiment_settings:
+                seeds:
+                  - 17
+                  - 101
+            """)
+        test_yaml_file = tmp_path / "runner.yml"
+        test_yaml_file.write_text(test_yaml_str)
+
+        expt_config = InferenceExperimentConfig(
+            inference_ckpt_path=dummy_ckpt_file,
+            **config_utils.load_yaml(test_yaml_file),
+        )
+        assert expt_config.experiment_settings.seeds == [17, 101]
+
+    @pytest.mark.parametrize(
+        "data_seed, model_seed, expected_data_seed", [(114, 42, 114), (None, 123, 123)]
+    )
+    def test_synchronize_seeds_respects_data_seed(
+        self,
+        data_seed,
+        model_seed,
+        expected_data_seed,
+        tmp_path,
+        dummy_ckpt_file,
+    ):
+        test_yaml_str = textwrap.dedent(f"""\
+            experiment_settings:
+                seeds:
+                  - {model_seed}
+                  - 101
+            """)
+
+        if data_seed:
+            test_yaml_str += textwrap.dedent(f"""\
+                    data_module_args:
+                        data_seed: {data_seed}
+            """)
+
+        test_yaml_file = tmp_path / "runner.yml"
+        test_yaml_file.write_text(test_yaml_str)
+
+        expt_config = InferenceExperimentConfig(
+            inference_ckpt_path=dummy_ckpt_file,
+            **config_utils.load_yaml(test_yaml_file),
+        )
+        assert expt_config.experiment_settings.seeds == [model_seed, 101]
+        assert expt_config.data_module_args.data_seed == expected_data_seed
+
+
+class TestInferenceCheckpointLoading:
+    def test_inference_ckpt_path_respects_user_defined(self, dummy_ckpt_file):
+        expt_config = InferenceExperimentConfig.model_validate(
+            {"inference_ckpt_path": dummy_ckpt_file}
+        )
+        assert expt_config.inference_ckpt_path == dummy_ckpt_file
+
+    def test_inference_ckpt_path_finds_default_ckpt_with_cache_name(self, tmp_path):
+        expected_ckpt_path = (
+            tmp_path
+            / OPENFOLD_MODEL_CHECKPOINT_REGISTRY[DEFAULT_CHECKPOINT_NAME].file_name
+        )
+        # create a fake file with correct ckpt path using tmp_path as the cache dir
+        _create_fake_file(expected_ckpt_path)
+
+        # Try to find the chekcpoint path
+        expt_config = InferenceExperimentConfig.model_validate({"cache_path": tmp_path})
+        expected_ckpt_path = (
+            tmp_path
+            / OPENFOLD_MODEL_CHECKPOINT_REGISTRY[DEFAULT_CHECKPOINT_NAME].file_name
+        )
+        assert expt_config.inference_ckpt_name == DEFAULT_CHECKPOINT_NAME
+        assert expt_config.inference_ckpt_path == expected_ckpt_path
+
+    def test_inference_errors_when_default_not_found(self, tmp_path):
+        # specify tmp_path to ensure clean cache directory
+        # make a file path to old checkpoint to ensure error still raises when
+        # old checkpoints are present
+        legacy_checkpoint_name = "openfold3-p2-155k"
+        legacy_ckpt_path = (
+            tmp_path
+            / OPENFOLD_MODEL_CHECKPOINT_REGISTRY[legacy_checkpoint_name].file_name
+        )
+        _create_fake_file(legacy_ckpt_path)
+
+        with pytest.raises(ValueError, match="Default checkpoint .* not found"):
+            InferenceExperimentConfig.model_validate({"cache_path": tmp_path})
+
+    def test_loads_selected_ckpt_name(self, tmp_path, dummy_ckpt_file):
+        # Introduce a dummy checkpoint into the registry to test if it can be selected
+        dummy_ckpt_name = "dummy_ckpt"
+
+        with (
+            patch.dict(
+                "openfold3.entry_points.parameters.OPENFOLD_MODEL_CHECKPOINT_REGISTRY",
+                {
+                    dummy_ckpt_name: CheckpointEntry(
+                        file_name=dummy_ckpt_file.name, version_compatibility=">0.3.0"
+                    )
+                },
+            ),
+        ):
+            expt_config = InferenceExperimentConfig.model_validate(
+                {"cache_path": tmp_path, "inference_ckpt_name": dummy_ckpt_name}
+            )
+
+        expected_ckpt_path = dummy_ckpt_file
+        assert expt_config.inference_ckpt_name == dummy_ckpt_name
+        assert expt_config.inference_ckpt_path == expected_ckpt_path
+
+    def test_load_legacy_ckpt_name_fails(self):
+        legacy_ckpt_name = "openfold3-p2-155k"
+        with pytest.raises(
+            ValueError,
+            match=f"Selected checkpoint {legacy_ckpt_name} is not compatible",
+        ):
+            InferenceExperimentConfig.model_validate(
+                {"inference_ckpt_name": legacy_ckpt_name}
+            )
+
+
+class TestTemplatePreprocessorSettings:
+    def test_overwrite_output_dir(self, tmp_path, dummy_ckpt_file):
+        test_yaml_str = textwrap.dedent(f"""\
+        template_preprocessor_settings:
+            output_directory: {tmp_path / "custom_dir"}
+        """)
+        test_yaml_file = tmp_path / "runner.yml"
+        test_yaml_file.write_text(test_yaml_str)
+        expt_config = InferenceExperimentConfig(
+            inference_ckpt_path=dummy_ckpt_file,
+            **config_utils.load_yaml(test_yaml_file),
+        )
+
+        assert expt_config.template_preprocessor_settings.output_directory == (
+            tmp_path / "custom_dir"
+        ), "Expected structure directory to match config file setting"
+
+
+class TestRemoveQuerySetDuplicates:
+    @pytest.fixture
+    def dummy_output_path(self, tmp_path):
+        # Creates the following directories:
+        # <output_directory>
+        #  ├── query_1
+        # 	 └── seed_42
+        #         ├── query_1_seed_42_sample_1_model.cif
+        #         ├── query_1_seed_42_sample_2_model.cif
+        # 	 └── seed_43
+        #         ├── query_1_seed_43_sample_1_model.cif
+        #         ├── query_1_seed_43_sample_2_model.cif
+        #  ├── query_2
+        # 	 └── seed_42
+        #         ├── query_1_seed_42_sample_1_model.cif
+        #         ├── query_1_seed_42_sample_2_model.cif
+        # 	 └── seed_43
+        #         ├── query_1_seed_43_sample_1_model.cif
+        #         ├── <Missing sample 2>
+
+        expected_fnames = [
+            "query_1/seed_42/query_1_seed_42_sample_1_model.cif",
+            "query_1/seed_42/query_1_seed_42_sample_2_model.cif",
+            "query_1/seed_43/query_1_seed_43_sample_1_model.cif",
+            "query_1/seed_43/query_1_seed_43_sample_2_model.cif",
+            "query_2/seed_42/query_2_seed_42_sample_1_model.cif",
+            "query_2/seed_42/query_2_seed_42_sample_2_model.cif",
+            "query_2/seed_43/query_2_seed_43_sample_1_model.cif",
+        ]
+
+        for fname in expected_fnames:
+            _create_fake_file(tmp_path / fname)
+
+        return tmp_path
+
+    def test_remove_duplicates(self, dummy_ckpt_file, dummy_output_path):
+        input_query_set = InferenceQuerySet.model_validate(
+            {
+                "queries": {
+                    "query_1": {
+                        "chains": [
+                            {
+                                "molecule_type": "protein",
+                                "chain_ids": ["A"],
+                                "sequence": "TEST",
+                            }
+                        ]
+                    },
+                    "query_2": {
+                        "chains": [
+                            {
+                                "molecule_type": "protein",
+                                "chain_ids": ["A"],
+                                "sequence": "TESTING",
+                            }
+                        ]
+                    },
+                    "query_3": {
+                        "chains": [
+                            {
+                                "molecule_type": "protein",
+                                "chain_ids": ["A"],
+                                "sequence": "TESTTEST",
+                            }
+                        ]
+                    },
+                }
+            }
+        )
+
+        experiment_config = InferenceExperimentConfig.model_validate(
+            {
+                "experiment_settings": {"seeds": [42, 43]},
+                "inference_ckpt_path": dummy_ckpt_file,
+            }
+        )
+        expt_runner = InferenceExperimentRunner(
+            experiment_config, num_diffusion_samples=2, output_dir=dummy_output_path
+        )
+
+        deduplicated_set = expt_runner.remove_completed_queries_from_query_set(
+            input_query_set
+        )
+
+        assert set(deduplicated_set.queries.keys()) == set(["query_2", "query_3"])
+
+
+class TestUserDefaultRunnerYaml:
+    """Tests for the automatic loading of ``~/.openfold3/runner.yml``."""
+
+    def test_no_default_runner_yaml(self, dummy_ckpt_file):
+        """Scenario 1: no runner.yml in cache → defaults, path is None."""
+        cfg = InferenceExperimentConfig(inference_ckpt_path=dummy_ckpt_file)
+
+        assert cfg.user_default_runner_yaml_path is None
+        assert cfg.output_writer_settings.structure_format == "cif"
+
+    def test_default_runner_yaml_applied(self, tmp_path, dummy_ckpt_file):
+        """Scenario 2: runner.yml in cache → settings applied, path recorded."""
+        cache = tmp_path / ".openfold3"
+        cache.mkdir()
+        runner_yaml = cache / "runner.yml"
+        runner_yaml.write_text(
+            textwrap.dedent("""\
+                output_writer_settings:
+                    structure_format: pdb
+                experiment_settings:
+                    skip_existing: true
+                data_module_args:
+                    num_workers: 4
+                """)
+        )
+        cfg = InferenceExperimentConfig(
+            inference_ckpt_path=dummy_ckpt_file,
+            user_default_runner_yaml_path=runner_yaml.resolve(),
+            **config_utils.load_yaml(runner_yaml),
+        )
+
+        assert cfg.user_default_runner_yaml_path == (cache / "runner.yml").resolve()
+        assert cfg.output_writer_settings.structure_format == "pdb"
+        assert cfg.experiment_settings.skip_existing is True
+        assert cfg.data_module_args.num_workers == 4
+
+    def test_explicit_runner_yaml_overrides_cache(self, tmp_path, dummy_ckpt_file):
+        """Scenario 3: cache runner.yml + explicit override → merge, CLI wins."""
+        cache = tmp_path / ".openfold3"
+        cache.mkdir()
+        runner_yaml = cache / "runner.yml"
+        runner_yaml.write_text(
+            textwrap.dedent("""\
+                output_writer_settings:
+                    structure_format: pdb
+                experiment_settings:
+                    skip_existing: true
+                data_module_args:
+                    num_workers: 4
+                """)
+        )
+        override = tmp_path / "override.yml"
+        override.write_text(
+            textwrap.dedent("""\
+                experiment_settings:
+                    skip_existing: false
+                data_module_args:
+                    num_workers: 8
+                """)
+        )
+
+        runner_args = config_utils.load_yaml(runner_yaml)
+        config_utils.deep_update(runner_args, config_utils.load_yaml(override))
+
+        cfg = InferenceExperimentConfig(
+            inference_ckpt_path=dummy_ckpt_file,
+            user_default_runner_yaml_path=runner_yaml.resolve(),
+            **runner_args,
+        )
+
+        assert cfg.user_default_runner_yaml_path == (cache / "runner.yml").resolve()
+        # inherited from cache default
+        assert cfg.output_writer_settings.structure_format == "pdb"
+        # overridden by explicit yaml
+        assert cfg.experiment_settings.skip_existing is False
+        assert cfg.data_module_args.num_workers == 8
+
+    def test_corrupted_runner_yaml_raises_error(self, tmp_path, dummy_ckpt_file):
+        """Scenario 4: cache runner.yml is corrupted → fails gracefully with yaml error."""
+        import yaml
+
+        cache = tmp_path / ".openfold3"
+        cache.mkdir()
+
+        runner_yaml = cache / "runner.yml"
+
+        # Write an intentionally malformed YAML (indentation error)
+        runner_yaml.write_text(
+            textwrap.dedent("""\
+                output_writer_settings:
+                  structure_format: pdb
+                 bad_indentation: true
+                """)
+        )
+
+        # Verify that when attempting to build the configuration,
+        # the system raises a YAML error, preventing silent failures.
+        with pytest.raises(yaml.YAMLError):
+            config_utils.load_yaml(runner_yaml)
+
+
+class TestSetupOpenFold:
+    def test_non_interactive(self, tmp_path):
+        env_patch = patch.dict(os.environ, {"HOME": str(tmp_path)}, clear=False)
+        s3_patch = patch(
+            "openfold3.setup_openfold.download_s3_file",
+            side_effect=_fake_download_s3_file,
+        )
+        with env_patch, s3_patch:
+            os.environ.pop("OPENFOLD_CACHE", None)
+            result = CliRunner().invoke(setup_openfold.main, ["--non-interactive"])
+
+        assert result.exit_code == 0, result.output
+        expected_cache = tmp_path / ".openfold3"
+        assert (expected_cache / CHECKPOINT_ROOT_FILENAME).exists()
+        assert (expected_cache / CHECKPOINT_ROOT_FILENAME).read_text() == str(
+            expected_cache
+        )
+        assert (
+            expected_cache
+            / OPENFOLD_MODEL_CHECKPOINT_REGISTRY[DEFAULT_CHECKPOINT_NAME].file_name
+        ).exists()
+
+    def test_existing_parameter_installation(self, tmp_path):
+        # Pre-seed the checkpoint file and ckpt_root as if a prior install ran.
+        existing_ckpt = (
+            tmp_path
+            / OPENFOLD_MODEL_CHECKPOINT_REGISTRY[DEFAULT_CHECKPOINT_NAME].file_name
+        )
+        pre_existing_content = "pre-existing dummy content"
+        existing_ckpt.write_text(pre_existing_content)
+        (tmp_path / CHECKPOINT_ROOT_FILENAME).write_text(str(tmp_path))
+
+        # force_download_parameters defaults to False, so the existing file should
+        # be left untouched.
+        config = OpenFoldSetupConfig(
+            openfold_cache=tmp_path,
+            param_directory=tmp_path,
+            selected_parameters="default",
+            run_integration_tests=False,
+        )
+        config_file = tmp_path / "input_setup_config.json"
+        config_file.write_text(config.model_dump_json())
+
+        with patch(
+            "openfold3.setup_openfold.download_s3_file",
+            side_effect=_fake_download_s3_file,
+        ):
+            result = CliRunner().invoke(
+                setup_openfold.main, ["--config", str(config_file)]
+            )
+
+        assert result.exit_code == 0, result.output
+        assert (tmp_path / CHECKPOINT_ROOT_FILENAME).read_text() == str(tmp_path)
+        # Content must be unchanged — download_model_parameters skips files that
+        # already exist when force_download_parameters=False.
+        assert existing_ckpt.read_text() == pre_existing_content
+
+    def test_fresh_parameter_default_download(self, tmp_path):
+        config = OpenFoldSetupConfig(
+            openfold_cache=tmp_path,
+            param_directory=tmp_path,
+            selected_parameters="default",
+            run_integration_tests=False,
+        )
+        config_file = tmp_path / "input_setup_config.json"
+        config_file.write_text(config.model_dump_json())
+
+        with patch(
+            "openfold3.setup_openfold.download_s3_file",
+            side_effect=_fake_download_s3_file,
+        ):
+            result = CliRunner().invoke(
+                setup_openfold.main, ["--config", str(config_file)]
+            )
+
+        assert result.exit_code == 0, result.output
+        assert (tmp_path / CHECKPOINT_ROOT_FILENAME).exists()
+        assert (tmp_path / CHECKPOINT_ROOT_FILENAME).read_text() == str(tmp_path)
+        assert (
+            tmp_path
+            / OPENFOLD_MODEL_CHECKPOINT_REGISTRY[DEFAULT_CHECKPOINT_NAME].file_name
+        ).exists()
+
+    def test_fresh_parameter_download_all(self, tmp_path):
+        config = OpenFoldSetupConfig(
+            openfold_cache=tmp_path,
+            param_directory=tmp_path,
+            selected_parameters="all",
+            run_integration_tests=False,
+        )
+        config_file = tmp_path / "input_setup_config.json"
+        config_file.write_text(config.model_dump_json())
+
+        with patch(
+            "openfold3.setup_openfold.download_s3_file",
+            side_effect=_fake_download_s3_file,
+        ):
+            result = CliRunner().invoke(
+                setup_openfold.main, ["--config", str(config_file)]
+            )
+
+        assert result.exit_code == 0, result.output
+        assert (tmp_path / CHECKPOINT_ROOT_FILENAME).exists()
+        assert (tmp_path / CHECKPOINT_ROOT_FILENAME).read_text() == str(tmp_path)
+
+        expected_checkpoints = list(
+            set(OPENFOLD_MODEL_CHECKPOINT_REGISTRY.keys()) - set(LEGACY_CHECKPOINTS)
+        )
+        for ckpt_name in expected_checkpoints:
+            assert (
+                tmp_path / OPENFOLD_MODEL_CHECKPOINT_REGISTRY[ckpt_name].file_name
+            ).exists()
+
+
+def test_skip_random_init_context_manager():
+    original_func = initialization.trunc_normal_init_
+
+    with skip_random_init():
+        # function should be noop
+        assert initialization.trunc_normal_init_ is not original_func
+        assert initialization.trunc_normal_init_.__name__ == "noop_init"
+
+    # function should be restored
+    assert initialization.trunc_normal_init_ is original_func

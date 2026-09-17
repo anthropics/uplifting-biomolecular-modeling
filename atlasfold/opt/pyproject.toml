@@ -1,0 +1,26 @@
+[build-system]
+requires = ["setuptools>=64", "wheel"]
+build-backend = "_build_backend"
+backend-path = ["."]
+
+[project]
+name = "atlasfold_opt"
+version = "0.2.44"
+description = "Explicit interface to the AtlasFold (AtlasLM-3B + Pairformer + diffusion) inference optimizations: off | exact | fast"
+requires-python = ">=3.10"
+dependencies = []          # torch / cuequivariance / atlasfold come from the pinned stack (environment/requirements.lock); opt_core from [tool.opt_core]
+
+[project.scripts]
+atlasfold-opt = "atlasfold_opt.cli:main"
+
+[tool.setuptools]
+packages = ["atlasfold_opt", "atlasfold_opt.hooks", "atlasfold_opt.tests"]
+
+[tool.setuptools.package-data]
+atlasfold_opt = ["cells/pair_fused/README.md"]   # the pair_fused levers' pointer to the core table (the TriMul levers read the shared provider's cells: no kit table)
+
+[tool.opt_core]
+# The shared engine-agnostic core this kit composes (opt_core.trimul / kernels.flash_triattn_serve / counters / report / autoload / gates).
+# `path` is relative to this file; `version` is the MINIMUM core version (the kit's _core_gate refuses an older or absent core: exit 3).
+path = "../../common/opt_core"
+version = "0.5.134.2"

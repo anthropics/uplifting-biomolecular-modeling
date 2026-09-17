@@ -1,0 +1,1 @@
+2475421477ab414b571149ad4a875c390ff8a35d (Protenix v2.0.0) — the upstream commit the Protenix-derived files named in NOTICE are taken from

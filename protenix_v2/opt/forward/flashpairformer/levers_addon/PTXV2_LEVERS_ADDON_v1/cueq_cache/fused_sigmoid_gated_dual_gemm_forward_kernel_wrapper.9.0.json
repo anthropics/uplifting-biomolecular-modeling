@@ -1,0 +1,52 @@
+{
+    "f5b8fec3cfb7ef6308f056c1653a6e96ceb0257af361c3e7a28edd3cf8d5b59e": {
+        "gpu_information": {
+            "total_memory": 80,
+            "multi_processor_count": 132,
+            "power_limit": 700,
+            "clock_rate": 1980,
+            "major": 9,
+            "minor": 0
+        },
+        "262144_512_256_torch.float16_None_torch.float16_torch.float16_torch.float16_False_False_False_default": {
+            "config": {
+                "TILE_M": 128,
+                "TILE_N": 128,
+                "TILE_K": 64,
+                "num_stages": 4,
+                "num_warps": 8
+            },
+            "time": 3.738253173828125
+        },
+        "262144_256_256_torch.float16_torch.float16_torch.float16_torch.float16_torch.float16_True_False_False_default": {
+            "config": {
+                "TILE_M": 64,
+                "TILE_N": 128,
+                "TILE_K": 64,
+                "num_stages": 3,
+                "num_warps": 4
+            },
+            "time": 2.08655517578125
+        },
+        "40448_512_256_torch.float16_None_torch.float16_torch.float16_torch.float16_False_False_False_default": {
+            "config": {
+                "TILE_M": 128,
+                "TILE_N": 64,
+                "TILE_K": 64,
+                "num_stages": 3,
+                "num_warps": 4
+            },
+            "time": 0.06799680328369141
+        },
+        "40448_256_256_torch.float16_torch.float16_torch.float16_torch.float16_torch.float16_True_False_False_default": {
+            "config": {
+                "TILE_M": 128,
+                "TILE_N": 64,
+                "TILE_K": 32,
+                "num_stages": 4,
+                "num_warps": 4
+            },
+            "time": 0.06306022262573242
+        }
+    }
+}

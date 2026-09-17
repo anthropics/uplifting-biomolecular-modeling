@@ -1,0 +1,44 @@
+{
+ "cell": {
+  "c_in": 256,
+  "hidden": 1024,
+  "dtype": "bf16"
+ },
+ "generator": "numpy.random.RandomState(seed).standard_normal, float32, scaled, cast to bf16 (see make_case)",
+ "reference": {
+  "torch": "2.13.0+cu130",
+  "cuda": "13.0",
+  "device": "NVIDIA H100 80GB HBM3"
+ },
+ "cases": [
+  {
+   "name": "M8",
+   "rows": 8,
+   "seed": 11,
+   "store_bytes": true,
+   "sha256_residual": "2aa0f4e5435af91f36f43fd497e2492dc0e80c8a0af473bb938ffc5d8b61d3fb",
+   "sha256_update": "b0b80df0abc5e3e78f20078eb0ecee8b173c33f676737eb0316371028656a5d4",
+   "layernorm": "FusedLayerNorm",
+   "residual_bytes_file": "expected_M8.bf16"
+  },
+  {
+   "name": "M333",
+   "rows": 333,
+   "seed": 12,
+   "store_bytes": true,
+   "sha256_residual": "6c9c42e9a1f59f00ad01492cc802401b73aadb425ca00ffa67bb64948d26c362",
+   "sha256_update": "909d6266e1a789280e06bae0f9d3dd4f76121a691072bdae6cbc0e7d93acf628",
+   "layernorm": "FusedLayerNorm",
+   "residual_bytes_file": "expected_M333.bf16"
+  },
+  {
+   "name": "M4096",
+   "rows": 4096,
+   "seed": 13,
+   "store_bytes": false,
+   "sha256_residual": "9fbdd3260222662fa4a4831221b66543839285bcde05db7798261ae475f60c24",
+   "sha256_update": "9b927a7a505a03a3b4b8674ffe8e2602858ad1fc7fd20de1a8f4b2ffae55f5a2",
+   "layernorm": "FusedLayerNorm"
+  }
+ ]
+}

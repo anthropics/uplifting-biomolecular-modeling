@@ -1,0 +1,98 @@
+{
+ "record": "the K1 kernels' per-architecture table, keyed by CUDA compute capability (cuda-<major><minor>): the fp32 conv tile, the per-batch tiles, the default route per mode, the tensor-core conv tile and the counts head's summation order; read by chrombpnet_k1/forward.py and by the kit's route table (chrombpnet_fastkit/fastdefault.py)",
+ "rule": "the tile is chosen by the GPU arch (cuda-<major><minor>) at apply; BLOCK_K = 16 on every entry (the k-step accumulation order = cuDNN's serial order -> bitwise across arches); an arch not listed gets a tile chosen by the device's opt-in shared memory (forward.select_tile) unless tile= is given explicitly, said on the printed line; each entry's certificate field states the measurement its row rests on",
+ "fields": [
+  "by_batch: [{max_B, tile}] ascending; the first entry with B <= max_B wins, else the arch's tile; listed only for arches where the per-batch tiles were measured bitwise equal and faster (an arch without the field uses its tile at every B, said on the printed line)",
+  "default_route: {route: k1|tf|stock, basis} per arch, or one such row per mode {prod, det} \u2014 the route of the documented no-flags call on that class (K1 is the default only where it is never slower than the pinned stock's own default; K1 can always be asked for explicitly); a listed arch without the field routes to k1 (its tile row stands), an unlisted arch is decided by the caller's class table"
+ ],
+ "entries": {
+  "cuda-90": {
+   "tile": "64x512x16x16x3",
+   "shared_B": 133120,
+   "classes": [
+    "NVIDIA H100",
+    "NVIDIA H200"
+   ],
+   "certificate": "H100, H200: bitwise equal to the stock's deterministic run; every tile listed here (tile, by_batch) gives the same outputs, and the forward is faster than the stock's own default at every batch size (default_route, by_batch_basis)",
+   "note_h200": "a Triton cache populated on H200 differs from the H100-populated one only in the source-location lines of the gap_serial and head_serial kernels' IR (ttir/ttgir/llir/ptx); the IR/PTX are identical after loc normalisation and the cubin built on H100 is the one that runs on H200 (same cuda-90-32 key), so one shipped cache entry serves both classes",
+   "by_batch": [
+    {
+     "max_B": 2,
+     "tile": "32x256x16x8x3"
+    },
+    {
+     "max_B": 32,
+     "tile": "64x256x16x8x3"
+    }
+   ],
+   "by_batch_basis": "the tile is chosen per call from the batch size (rows by max_B): the narrower tiles are faster at small batches, the class tile at large ones; every tile computes the same per-output FMA chain, so all tiles are bitwise equal to each other and to stock under the deterministic recipe. With these rows K1 is faster than stock's default at every batch size on H100. Printed once, counted per call.",
+   "default_route": {
+    "prod": {
+     "route": "k1",
+     "basis": "K1 is the default on H100/H200 in both modes: bitwise equal to stock under the deterministic recipe and faster than stock's own default at every batch size (the per-batch tile rows)"
+    },
+    "det": {
+     "route": "k1",
+     "basis": "K1 is the default on H100/H200 under the deterministic recipe: bitwise equal to stock's deterministic run and faster than stock's default"
+    }
+   },
+   "tc_tile": "256x128x32x8x3"
+  },
+  "cuda-80": {
+   "tile": "64x512x16x16x3",
+   "shared_B": 133120,
+   "max_shared_mem_B": 166912,
+   "classes": [
+    "NVIDIA A100"
+   ],
+   "certificate": "A100: profile logits bitwise equal to the stock's deterministic run, log-counts not at every batch shape on this arch (default_route.det: det routes to the stock's own graph here, prod to the tensor-core kernels); the full region panel was run at this fp32 tile on the SXM4 40 GB part, and the row serves the 80 GB part too",
+   "sweep_verdict": "a full tile grid on A100 (BLOCK_M {16,32,64,128} x BLOCK_N {128,256,512} x BLOCK_K 16 x num_warps {4,8,16} x num_stages {2,3,4}; every tile bitwise equal to this tile's heads and to itself run twice) has no fp32 tile materially faster than this one at any measured batch size (the best candidates lie within 0.7 %); 4-warp tiles at BLOCK_M 128 spill registers and are far slower, 16-warp tiles at BLOCK_M 16 are slower, 128x512x16 exceeds the shared-memory limit (264,192 B > 166,912 B). On sm_80 the stock's default convolutions run in TF32 on tensor cores and the fp32 CUDA-core roofline of this forward (24.34 GFLOP per region over the 16 Conv1D layers of both sub-models) lies below that, so no tile of an fp32-exact (IEEE FMA-chain) kernel reaches the stock's default speed on this arch: prod uses the tensor-core kernels (tc_tile) and det the stock's own graph (default_route)",
+   "populated_on": "NVIDIA A100-SXM4-40GB; the row is keyed by arch (cuda-80) and serves the 40 GB and 80 GB parts alike, the device name being printed for information only",
+   "default_route": {
+    "prod": {
+     "route": "k1",
+     "basis": "K1 with tensor-core (TF32) convolutions is the default on A100 at shipped numerics: about x4 stock's own TF32 cuDNN forward per region at 1,024 regions per call (0.44 vs 1.82 ms); stock's shipped precision class (outputs within ~1e-3 relative of stock's), not bitwise"
+    },
+    "det": {
+     "route": "stock",
+     "basis": "stock's own graph under the deterministic recipe on A100: bitwise equal to stock's deterministic run by construction; K1's fp32 kernels match the A100 stock's profile logits bitwise but not its log-counts at every batch shape (the sm_80 counts-head dense order changes with the rows per call), so K1 is not this card's route under the recipe; the package refuses `exact` by name on this arch (no bitwise Triton route), --mode off --det 1 is the deterministic run"
+    }
+   },
+   "tc_tile": "64x128x32x4x3"
+  },
+  "cuda-89": {
+   "tile": "64x256x16x8x3",
+   "shared_B": 66560,
+   "max_shared_mem_B": 101376,
+   "classes": [
+    "NVIDIA L40S"
+   ],
+   "certificate": "L40S: at this tile, with counts_form, every output file of the full region panel is byte-identical to the L40S stock's own deterministic run (counts_form.certificate)",
+   "alternatives_bitwise": {
+    "64x256x16x16x3": "66560 B, 0.757 ms/unit",
+    "32x512x16x8x3": "69632 B, 0.801 ms/unit"
+   },
+   "refused": {
+    "64x512x16x16x3": "133120 B > 101376",
+    "64x512x16x16x2": "133120 B (smem not stage-scaled)"
+   },
+   "default_route": {
+    "prod": {
+     "route": "tf",
+     "basis": "stock's own graph is the default on L40S at shipped numerics: inside the kit's pipeline it is faster than K1 on this card and its files are bitwise equal to stock's default run; K1's output equals stock's deterministic run, not its default run"
+    },
+    "det": {
+     "route": "k1",
+     "basis": "K1 is the default on L40S under the deterministic recipe: bitwise equal to the L40S stock's own deterministic run on every output file (h5, bigWig, metrics, preds.bed) over the full 62,929-region panel, about twice as fast"
+    }
+   },
+   "counts_form": {
+    "form": "groups_prod_bfly_seq",
+    "group": 128,
+    "basis": "the sm_89 stock's own dense order for the counts head: pool = the sequential float32 sum / L; dense = per-element products, a stride-halving butterfly within contiguous groups of 128, groups summed sequentially, bias last \u2014 bitwise equal to the L40S stock's own logcounts on both heads (C=512 nobias, C=128 bias); the H100 lane order does not reproduce them on this arch",
+    "certificate": "L40S, the full 62,929-region panel: with this summation order the K1 command line (-bs 64 -bw) writes every output file (h5, bigWig, metrics, preds.bed) byte-identical to the L40S stock's own deterministic run (-bs 64 -t 0 -bw), and four different L40S cards give the same bytes. The order matches at the stock's deterministic batch geometry (-bs 64: one (64x512)\u00b7(512x1) GEMM per call); the stock's own count bytes at -bs 512 differ (a batch-dependent kernel choice in the stock's stack), which is outside this recipe",
+    "batch_geometry": "the stock's DET recipe -bs 64 (the target string); the K1 form is elementwise (batch-independent); the stock's own string at B=512 differs \u2014 the certificate holds for this recipe"
+   }
+  }
+ }
+}

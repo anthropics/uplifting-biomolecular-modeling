@@ -1,0 +1,37 @@
+# RoseTTAFold3 optimization kit — Apptainer / Singularity image made FROM the container image of rosettafold3/environment/Dockerfile: the same
+# stack, the same two interpreters and the same /kit, for hosts that run Apptainer instead of Docker. The source is the image tagged
+# rosettafold3-kit:dev in the local Docker daemon (build it first: rosettafold3/environment/Dockerfile); for a published tag the two header lines read
+# `Bootstrap: docker` / `From: <registry>/rosettafold3-kit:<tag>`.
+#   apptainer build rosettafold3.sif rosettafold3/environment/apptainer.def
+#   apptainer run --nv --cleanenv --bind /path/to/weights:/weights --env ROSETTAFOLD3_OPT_CKPT=/weights/rf3_foundry_01_24_latest_remapped.ckpt \
+#     --bind "$PWD/out":/out rosettafold3.sif pred --config h100 --mode fast --input /kit/rosettafold3/opt/forward/rf3_xattempt_addon/public_inputs/1brs_tiles.json --out_dir /out/fast
+# The image is read-only: give every verb an --out_dir on a bound, writable path; the JIT caches and the weights digest memo go under $HOME/.cache
+# (bound by default); %environment keeps a host user site-packages (PEP 370) from shadowing the pinned stack, --cleanenv keeps the host's variables out
+# (the image's own PATH and ROSETTAFOLD3_OPT_STOCK_PYTHON stay). The container image already carries the add-on's five rf3 files in
+# /kit/rosettafold3/opt/venv (applied when that image was built); %post runs the kit's install command from /kit/rosettafold3 once more, which
+# checks them (and applies them on a source image built without them) and reads both interpreters' file states; /usr/local/bin/python stays
+# pristine. A .sif belongs to one kit version: when the kit is updated, rebuild the container image and then this .sif.
+Bootstrap: docker-daemon
+From: rosettafold3-kit:dev
+
+%post
+    cd /kit/rosettafold3 && opt/venv/bin/python -m rosettafold3_opt install --stock-python /usr/local/bin/python --opt-python /kit/rosettafold3/opt/venv/bin/python || exit 1
+    mkdir -p /opt/culib && ln -s /.singularity.d/libs/libcuda.so.1 /opt/culib/libcuda.so && ln -s /.singularity.d/libs/libcuda.so.1 /opt/culib/libcuda.so.1
+
+%environment
+    export PYTHONNOUSERSITE=1
+    # Triton <= 3.5 links its launcher stub with -lcuda: offer the unversioned name when --nv bound only libcuda.so.1
+    if [ -z "${TRITON_LIBCUDA_PATH:-}" ] && [ -e /opt/culib/libcuda.so ]; then export TRITON_LIBCUDA_PATH=/opt/culib; fi
+
+%runscript
+    cd /kit/rosettafold3 && exec bash /kit/rosettafold3/run.sh "$@"
+
+%help
+    RoseTTAFold3 optimization kit: drop-in modes that make stock RoseTTAFold3 (`rf3 fold`, rc-foundry 0.2.1.dev13 at commit 4010e3e2e) faster and
+    lighter on GPU memory without changing how it is called — off = stock exactly; exact = identical outputs, faster; fast = small documented
+    numeric differences, faster still (the default); big = lowest memory, `--n_gpu 2|4|8` to shard one prediction. `apptainer run --nv
+    rosettafold3.sif <verb> ...` = `bash /kit/rosettafold3/run.sh <verb> ...` (verbs: install, pred, check, warm; /kit/rosettafold3/README.md inside
+    the image). Requires an NVIDIA driver that runs CUDA 13.0 (580 or newer) and ROSETTAFOLD3_OPT_CKPT naming the checkpoint file. The add-on's
+    five patched rf3 files were put into /kit/rosettafold3/opt/venv when this image was built, from the kit tree at /kit/rosettafold3 of the same
+    build (`bash run.sh check --config h100` reports the tree state); the image is read-only, so a kit update means rebuilding the container
+    image and then this .sif.

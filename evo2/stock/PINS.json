@@ -1,0 +1,138 @@
+{
+ "model": "evo2",
+ "what": "The stock this kit is exact against, pinned: the upstream packages (the PyPI archives carried in stock/, byte-identical to the published files; an install is checked file by file against the wheel), the checkpoints (Hugging Face repository, revision, sha256), the two library stacks the kit was measured on (img_full: with Transformer Engine \u2014 the FP8 routes; img_a100: without \u2014 upstream's bf16 projections), and the GPU classes the kit's bit-identity with the stock was measured on (gpus). Read by stock/check_pins.py (run.sh install), opt/evo2_opt/pins.py (the ACTIVE line), opt/evo2_opt/weights.py (run.sh install --weights).",
+ "upstream": {
+  "evo2": {
+   "version": "0.6.0",
+   "install": "pip install evo2==0.6.0",
+   "pypi": "https://pypi.org/project/evo2/0.6.0/",
+   "archives": {
+    "wheel": {
+     "file": "stock/evo2-0.6.0-py3-none-any.whl",
+     "bytes": 45298,
+     "pypi_upload_time": "2026-06-19T04:51:48.468868Z",
+     "url": "https://files.pythonhosted.org/packages/01/29/0b5c9b283bbd9a43e177625a81238d5ee47108347fc9e3d8aa9a045a209c/evo2-0.6.0-py3-none-any.whl"
+    },
+    "sdist": {
+     "file": "stock/evo2-0.6.0.tar.gz",
+     "bytes": 45665,
+     "pypi_upload_time": "2026-06-19T04:51:49.418580Z",
+     "url": "https://files.pythonhosted.org/packages/dc/9e/b70f920f0b6f88ef9c5d4f1fa85d809ffd75bf5191bac26ef9d98341a5d8/evo2-0.6.0.tar.gz"
+    }
+   }
+  },
+  "vtx": {
+   "version": "1.1.0",
+   "install": "pip install vtx==1.1.0",
+   "pypi": "https://pypi.org/project/vtx/1.1.0/",
+   "archives": {
+    "wheel": {
+     "file": "stock/vtx-1.1.0-py3-none-any.whl",
+     "bytes": 6449134,
+     "pypi_upload_time": "2026-06-16T21:24:35.354306Z",
+     "url": "https://files.pythonhosted.org/packages/e2/ed/9dab64893b6b78f832e4d18522bbd6696350a415c20e0af6bcea1b0f8152/vtx-1.1.0-py3-none-any.whl"
+    },
+    "sdist": {
+     "file": "stock/vtx-1.1.0.tar.gz",
+     "bytes": 3327041,
+     "pypi_upload_time": "2026-06-16T21:24:37.039528Z",
+     "url": "https://files.pythonhosted.org/packages/45/f7/38fd51db739d11d22d4231bb096769a98d1972447f9c39ee483da362e773/vtx-1.1.0.tar.gz"
+    }
+   }
+  }
+ },
+ "checkpoints": {
+  "evo2_7b": {
+   "file": "evo2_7b.pt",
+   "sha256": "c66645929dc1b9c631f5be656da8726f38946315dc9167000a615dd626fcecf4",
+   "bytes": 13766621200,
+   "hf_repo": "arcinstitute/evo2_7b",
+   "hf_commit": "bda0089f92582d5baabf0f22d9fc85f3588f6b58"
+  },
+  "evo2_40b": {
+   "file": "evo2_40b.pt",
+   "sha256": "dd299612b1c1cdded0dfdcaf4d16f98fc97458261d80f4d662429f0ccb316bc3",
+   "bytes": 82253491694,
+   "hf_repo": "arcinstitute/evo2_40b",
+   "hf_commit": "d529aa57c30771814217ad89baaeaf6e2315c7d7",
+   "parts": [
+    {
+     "file": "evo2_40b.pt.part0",
+     "sha256": "3b74fa4e6158d49265e3e270ba8869390d064358f8bf3d2af0b3e1772728f485"
+    },
+    {
+     "file": "evo2_40b.pt.part1",
+     "sha256": "bdc4a76e0f23f8295e7061c2f0deff24f723bd916dc4cdc4d9216cac9c2d49d5"
+    }
+   ]
+  },
+  "evo2_1b_base": {
+   "file": "evo2_1b_base.pt",
+   "sha256": "8ffba7d0e6445a8f2c92d9ff1c4e772c7f73ca9179f5e0c699b8b0ca1b966f64",
+   "bytes": 2698327083,
+   "hf_repo": "arcinstitute/evo2_1b_base",
+   "hf_commit": "2279e1df422c991037470302360edd40d0d2ea1e"
+  }
+ },
+ "stacks": {
+  "img_full": {
+   "pins": {
+    "python": "3.11.5",
+    "torch": "2.7.1+cu128",
+    "cuda": "12.8",
+    "cudnn": 90701,
+    "triton": "3.3.1",
+    "flash_attn": "2.8.0.post2",
+    "numpy": "2.2.6",
+    "einops": "0.8.1",
+    "huggingface_hub": "1.28.0",
+    "evo2": "0.6.0",
+    "vtx": "1.1.0",
+    "transformer_engine": "2.3.0"
+   },
+   "serves": [
+    "evo2_7b",
+    "evo2_40b"
+   ],
+   "what": "upstream's Full install (Transformer Engine 2.3.0 + flash-attn): FP8 input projections on both models \u2014 the vortex-kernels / torch-conv routes"
+  },
+  "img_a100": {
+   "pins": {
+    "python": "3.11.5",
+    "torch": "2.7.1+cu128",
+    "cuda": "12.8",
+    "cudnn": 90701,
+    "triton": "3.3.1",
+    "flash_attn": "2.8.0.post2",
+    "numpy": "2.2.6",
+    "einops": "0.8.1",
+    "huggingface_hub": "1.28.0",
+    "evo2": "0.6.0",
+    "vtx": "1.1.0",
+    "transformer_engine": "absent"
+   },
+   "serves": [
+    "evo2_7b"
+   ],
+   "what": "the same stack without Transformer Engine (upstream's Light install, for cards where FP8 cannot execute, e.g. A100): bf16 input projections \u2014 the bf16 route; the 40b needs FP8 and is not served"
+  }
+ },
+ "stock_environment": {
+  "must_be_absent_names": [
+   "EVO2_OPT"
+  ],
+  "what": "a stock process (run.sh score --mode off) has EVO2_OPT unset: the autoload hook then imports nothing of the kit and route/evo2_route.py prints ENV-CLEAN"
+ },
+ "gpus": {
+  "h100": {
+   "name": "NVIDIA H100 80GB HBM3",
+   "sm": "sm_90",
+   "memory_mib": 81559
+  },
+  "a100_80gb": {
+   "name": "NVIDIA A100-SXM4-80GB",
+   "sm": "sm_80",
+   "memory_mib": 81152
+  }
+ }
+}

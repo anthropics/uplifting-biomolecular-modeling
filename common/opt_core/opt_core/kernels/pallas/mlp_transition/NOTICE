@@ -1,0 +1,6 @@
+mlp_transition -- fused Transition forward (LayerNorm -> Linear1 -> ReLU | SwiGLU -> Linear2, the 4C intermediate never
+leaves the SM) as one Pallas (Triton lowering) kernel; forward only (make_transition_op(bwd='reference') differentiates the
+XLA statement).  Origin: the JAX kernel-optimisation study's pallas_transition package (version 0.3) in this repository's
+history, file mlp_transition_pallas.py carried byte for byte; its serve / census helper and branch notes are not carried.
+The formula follows AlphaFold 2's Transition (DeepMind, Apache-2.0) and AlphaFold 3's SwiGLU transition; no upstream source
+is copied here.

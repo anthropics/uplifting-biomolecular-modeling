@@ -1,0 +1,9 @@
+line-length = 90
+indent-width = 4
+target-version = "py310"
+
+[lint]
+select = ["E", "F", "B", "UP", "I", "T203"]
+ignore = ["B006", "B028"]
+[lint.per-file-ignores]
+"__init__.py" = ["F401", "E402"]

@@ -1,0 +1,44 @@
+# complexa_opt — one interface to Proteina-Complexa binder generation: the stock route (`off` = upstream's `complexa generate` in a
+# proven-clean child, taking upstream's Hydra overrides after `--` verbatim), the kit modes `exact` / `fast` / `big` (the same command
+# with COMPLEXA_OPT=<mode> in the child's environment: the autoload hook installs the mode's lever set inside upstream's generation process —
+# complexa_opt/levers.py; `fast` is the default), the stock pins and the census lines. Install editable with the core: `pip install -e common/opt_core -e complexa/opt`, into the interpreter
+# that runs upstream's `complexa` console script. The upstream package (proteinfoundation at the pin) and the weights are checked at run time by
+# stock/check_pins.py, never at install (stock/PINS.json). The build backend is the core's template copy, byte for byte (`_build_backend.py`);
+# it lays `complexa_opt_autoload.pth` (generated: `python _build_backend.py complexa_opt COMPLEXA_OPT complexa-opt`) at the wheel root, so the
+# interpreter runs `import complexa_opt._autoload` at start — inert unless COMPLEXA_OPT names a kit mode. The core pin gate
+# (`complexa_opt/_core_gate.py`, the core's template copy byte for byte; `complexa_opt.core_gate()` is statement one of every entry) refuses by
+# name with exit 3 on an absent or older core before anything of the core is imported (a newer core passes: the pin below is a minimum
+# version, a floor).
+[build-system]
+requires = ["setuptools>=64", "wheel"]
+build-backend = "_build_backend"
+backend-path = ["."]
+
+[project]
+name = "complexa_opt"
+dynamic = ["version"]
+description = "Proteina-Complexa binder generation behind one interface: mode off (the stock route) and the kit modes exact / fast / big (lever sets installed inside upstream's own command by an autoload hook), upstream's Hydra overrides verbatim, monitoring lines"
+requires-python = ">=3.9"
+classifiers = ["Private :: Do Not Upload"]
+dependencies = []
+
+[project.optional-dependencies]
+test = ["pytest", "setuptools>=64"]                 # the package's CPU tests (no torch, no proteinfoundation; setuptools: the tests execute _build_backend.py)
+
+[project.scripts]
+complexa-opt = "complexa_opt.__main__:main"        # `complexa-opt design|check ...` == `python -m complexa_opt ...`
+
+[tool.setuptools]
+packages = ["complexa_opt", "complexa_opt.tests"]
+include-package-data = false
+
+[tool.setuptools.dynamic]
+version = {attr = "complexa_opt.__version__"}
+
+# The shared core this kit stands on (common/opt_core): pinned by path and by minimum version (a floor: a newer installed core passes,
+# an older or absent one is refused by name); pip install -e <that path> -e <this directory>. The core pin gate compares this table's
+# version against the installed core's own __version__. The table header line carries nothing but the header (the gate's no-tomllib
+# reader matches it whole).
+[tool.opt_core]
+path = "../../common/opt_core"
+version = "0.5.18.20"

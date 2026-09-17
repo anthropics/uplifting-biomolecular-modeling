@@ -1,0 +1,174 @@
+[project]
+name = "esm"
+version = "3.3.0"
+description = "EvolutionaryScale open model repository"
+readme = "README.md"
+requires-python = ">=3.12,<3.13"
+license = {file = "LICENSE.md"}
+
+authors = [
+  {name = "EvolutionaryScale Team"}
+]
+
+maintainers = [
+  {name = "Zeming Lin", email = "zeming+esm@evolutionaryscale.ai" }
+]
+
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Topic :: Scientific/Engineering :: Bio-Informatics",
+  "Programming Language :: Python :: 3.12",
+]
+
+dependencies = [
+  "torch>=2.2.0",
+  "transformers @ git+https://github.com/Biohub/transformers.git@main",
+  "ipython",
+  "einops",
+  "biotite>=1.0.0",
+  "rdkit",
+  "msgpack-numpy",
+  "biopython",
+  "scikit-learn",
+  "brotli",
+  "attrs",
+  "pandas",
+  "cloudpathlib",
+  "httpx",
+  "tenacity",
+  "zstd",
+  "ipywidgets",
+  "py3dmol",
+  "pydssp",
+  "boto3",
+  "pygtrie",
+  "dna_features_viewer",
+  "accelerate",
+  # Fork adding numpy-2 support on top of upstream v2.1.2. That upstream release
+  # renamed the RMSD keys (iRMSD/LRMSD) and dropped the DockQ_F1 output, which
+  # protein_complex.py recomputes from F1.
+  "dockq @ git+https://github.com/nrontsis/DockQ.git@ba4df5adaad7c77fd60851d0b7b05f2b77061ba2",
+]
+# Pytest
+[tool.pytest.ini_options]
+addopts = """
+  --cov=esm
+	--cov-report term-missing:skip-covered
+	-n auto
+	--ignore=tests/oss_pytests/test_oss_client.py
+"""
+
+[tool.setuptools]
+package-dir = {"" = "."}
+include-package-data = true
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["esm*"]
+
+[tool.setuptools.package-data]
+esm = ["data/*"]
+
+[tool.pixi.workspace]
+channels = ["conda-forge"]
+platforms = ["linux-64", "osx-arm64"]
+
+# These are build dependencies, to ensure pip support, keep run-time deps above in `dependencies`
+[tool.pixi.dependencies]
+pkg-config = "*"
+cmake = "*"
+pip = "*"
+twine = "*"
+python = "3.12.*"
+
+[tool.pixi.pypi-dependencies]
+esm = { path = ".", editable = true }
+
+[tool.pixi.tasks]
+build-wheel = "python -m pip wheel --no-deps -w dist ."
+upload-wheel = "python -m twine upload --repository pypi"
+
+[tool.pixi.feature.dev.dependencies]
+matplotlib = "*"
+numpy = ">=2.0.0,<2.4"
+pre-commit = "*"
+pytest = "*"
+pytest-cov = "*"
+pytest-xdist = "*"
+seaborn = "*"
+ty = "==0.0.49"
+
+[tool.pixi.feature.dev.tasks]
+lint-all = "pre-commit run --all-files --show-diff-on-failure"
+cov-test = "pytest -v --junitxml=pytest.xml --cov=esm"
+
+[tool.pixi.environments]
+default = {features = [], solve-group = "default"}
+dev = {features = ["dev"], solve-group = "default"}
+
+[tool.ruff]
+extend-include = ["*.ipynb"]
+
+[tool.ruff.lint]
+# Enable Pyflakes (`F`) and a subset of the pycodestyle (`E`), sort imports ('I')
+select = ["E4", "E7", "E9", "F", "I"]
+ignore = [
+    # allow variable == False (tensors should do this)
+    "E712",
+    # allow assigning of lambdas
+    "E731",
+    # Allow ambiguous variables, e.g. we use O for oxygen
+    "E741",
+    # Ignore errors from jaxtyping hints
+    # https://docs.kidger.site/jaxtyping/faq/#flake8-or-ruff-are-throwing-an-error
+    "F722",
+    # TODO: Fix the few offenders in a follow up PR
+    "E721",
+]
+
+[tool.ruff.lint.isort]
+split-on-trailing-comma = false
+known-third-party = ["wandb"]
+
+[tool.ruff.format]
+skip-magic-trailing-comma = true
+docstring-code-format = true
+docstring-code-line-length = "dynamic"
+
+[tool.isort]
+known_third_party = ["wandb"]
+
+[tool.ty.src]
+# gitignore-style globs. Skip notebooks, tests, and the Modal-app tutorial whose deps
+# (modal, abnumber) and dynamic decorators aren't resolvable in the lint env.
+exclude = [
+    "**/*.ipynb",
+    "**/*_test.py",
+    "**/test_*.py",
+    "**/tests/",
+    "**/conftest.py",
+    "cookbook/tutorials/binder_design.py",
+]
+
+[tool.ty.rules]
+# Strict LSP override-compatibility checking that pyright `basic` never enforced; low
+# value for duck-typed ML code.
+invalid-method-override = "ignore"
+# flash_attn resolves only where it's installed (a GPU environment); the ignores it
+# requires there read as unused/redundant in this CPU lint env where it's absent.
+unused-ignore-comment = "ignore"
+unused-type-ignore-comment = "ignore"
+
+[tool.ty.analysis]
+# ty can't introspect optional/compiled deps absent from this lint env (flash_attn is
+# GPU-only; zstd is a C-extension), so it falsely reports them unresolved. Treat as Any
+# rather than disabling unresolved-import, so genuinely-broken first-party imports still
+# surface.
+replace-imports-with-any = [
+    "flash_attn",
+    "flash_attn.**",
+    "zstd",
+]
+
+[tool.importlinter]
+root_package = "esm"

@@ -1,0 +1,43 @@
+# caliby_opt — explicit interface to the Caliby / SolubleCaliby inference optimizations.
+# Install editable from this directory: `pip install -e caliby/opt`. The install must stay editable: the core pin gate reads
+# `[tool.opt_core]` from this file, above the package, on every entry (a copied, non-editable install refuses with
+# `core_pin_unreadable`, exit 3), and the kit code the package wraps (forward/fast_inference, forward/xattempt_addon) lives beside it
+# in this tree ($MODEL_OPT names a caliby/ tree for the kit code and the pins; it is never a substitute for the editable install).
+# No install-time dependency on the upstream packages (caliby / atomworks-caliby / protpardelle: stock/PINS.json): their
+# pins are checked at activation. The build backend is the shared core's template (common/opt_core/kit_template/_build_backend.py,
+# carried byte-for-byte): setuptools plus one step that ships caliby_opt_autoload.pth at the wheel root, which is what makes
+# `CALIBY_OPT=<mode>` reach a process without code changes (see caliby_opt/_autoload.py); the .pth text is generated, never hand-written
+# (`python _build_backend.py caliby_opt CALIBY_OPT caliby-opt`), and the backend refuses to build a wheel around any other text.
+# Install = the core and this kit: `pip install -e common/opt_core -e caliby/opt`.
+[build-system]
+requires = ["setuptools>=64", "wheel"]
+build-backend = "_build_backend"
+backend-path = ["."]
+
+# the shared core this kit runs on (common/opt_core): pinned by path and a MINIMUM version. The core pin gate (caliby_opt/_core_gate.py,
+# statement one of every entry) refuses by name with exit 3 on an absent or older core before anything of the core is imported; a newer
+# core passes (the pin is a floor).
+[tool.opt_core]
+path = "../../common/opt_core"
+version = "0.5.18.20"
+
+[project]
+name = "caliby_opt"
+dynamic = ["version"]
+description = "Caliby / SolubleCaliby inference optimizations: modes off/fast/exact, variants single/ensemble32, upstream's knobs passed through, import-hook activation, activation report"
+requires-python = ">=3.10"
+classifiers = ["Private :: Do Not Upload"]
+dependencies = []
+
+[project.optional-dependencies]
+test = ["pytest", "setuptools>=64"]                 # the package's CPU tests; setuptools at the [build-system] floor: the tests execute opt/_build_backend.py (setuptools' build_meta behind it) outside a build, and a bare venv ships none
+
+[project.scripts]
+caliby-opt = "caliby_opt.__main__:main"            # `caliby-opt design|check|warm ...` == `python -m caliby_opt ...`
+
+[tool.setuptools]
+packages = ["caliby_opt", "caliby_opt.tests"]
+include-package-data = false
+
+[tool.setuptools.dynamic]
+version = {attr = "caliby_opt.__version__"}

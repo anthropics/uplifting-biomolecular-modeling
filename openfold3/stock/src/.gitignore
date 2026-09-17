@@ -1,0 +1,18 @@
+.vscode/
+.idea/
+__pycache__/
+*.egg-info
+build
+dist
+.DS_Store
+
+# files from script downloads
+openfold3/resources/
+tests/test_data/sample_feats.pickle
+cutlass/
+
+# User-specific claude settings
+.claude/
+
+# User-specific pre-commit settings
+.pre-commit-config.yaml

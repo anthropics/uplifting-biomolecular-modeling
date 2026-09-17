@@ -1,0 +1,20 @@
+OF3-OFFLOAD add-on — the one-GPU `big` line's row-block units for OpenFold3. Third-party attributions.
+Portions derive from OpenFold3 (https://github.com/aqlaboratory/openfold-3, tag 0.4.1; Apache License, Version 2.0;
+"Copyright 2026 AlQuraishi Laboratory" as printed in the upstream LICENSE). OpenFold3's licence text is carried beside this file as
+OPENFOLD3_LICENSE; the kit-level notices file is openfold3/THIRD_PARTY_NOTICES.md. The OpenFold3 source files whose statements the
+modules below restate (projects/of3_all_atom/model.py, core/metrics/confidence.py, core/utils/atomize_utils.py, core/utils/relpos.py and
+the model layers, embedders, latent stacks and primitives under core/model/) print in their headers, besides the line above, "Copyright 2021
+DeepMind Technologies Limited", "Copyright 2026 Advanced Micro Devices, Inc." and, for core/model/latent/template_module.py, pairformer.py,
+base_stacks.py and core/model/primitives/attention.py, "Copyright 2025 NVIDIA Corporation" — all under the Apache License, Version 2.0.
+The three modules are modified works of those statements, distributed under the Apache License, Version 2.0.
+
+This add-on contains:
+    of3o/of3o_confidence.py — a modified copy of OpenFold3 0.4.1 confidence-scoring statements (row-chunked); its header keeps the
+    upstream copyright line and marks the change.
+    of3o/of3o_blockreduce.py — row-block reductions that apply OpenFold3 0.4.1's single-device finishing statements verbatim on
+    row-block tensors; marked in the source.
+    of3o/of3_offload.py — replaces OpenFold3 0.4.1 functions at import time (installed by of3o/sitecustomize.py); the functions it
+    installs restate the stock statements with stock chunk boundaries, changing tensor residency only; marked in the source.
+  * config/stock_predict_c16.yml, config/shipped_predict_c16.yml — configuration overlays over OpenFold3's configuration keys.
+Third-party software USED (not redistributed): OpenFold3 (Apache-2.0), PyTorch (BSD-3-Clause), NVIDIA cuEquivariance (its own licence;
+installed by the user).

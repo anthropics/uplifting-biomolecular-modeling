@@ -1,0 +1,53 @@
+--- a/src/protpardelle/core/models.py
++++ b/src/protpardelle/core/models.py
+@@ -2131,13 +2131,29 @@
+                 torch.sqrt(sigma_next**2 + self.sigma_data**2), xt
+             )
+             scaled_xt = xt * xt_scale
+-            xt_traj.append(scaled_xt.cpu())
+-            x0_traj.append(x0.cpu())
+-            st_traj.append(s_hat.cpu())
+-            s0_traj.append(s_logprobs.cpu())
++            if _x_pp_nosync_level() >= 1:
++                # XATTEMPT add-on lever L-H (env CALIBY_X_PP_NOSYNC=1): keep the per-step trajectory snapshots on the GPU (a clone
++                # holds exactly the values the stock .cpu() copy would hold; s_hat can be modified in place by fill_motif_seq in a
++                # later step, hence clone rather than a reference) and copy them to the host once after the loop.  Removes 4 blocking
++                # device->host copies per denoising step (600 per batch of the 150-step partial-diffusion protocol) so kernel launches
++                # of consecutive steps overlap; the computation itself is untouched -> identical samples.
++                xt_traj.append(scaled_xt.detach().clone())
++                x0_traj.append(x0.detach().clone())
++                st_traj.append(s_hat.detach().clone())
++                s0_traj.append(s_logprobs.detach().clone())
++            else:
++                xt_traj.append(scaled_xt.cpu())
++                x0_traj.append(x0.cpu())
++                st_traj.append(s_hat.cpu())
++                s0_traj.append(s_logprobs.cpu())
+ 
+             pbar.update(1)
+         pbar.close()
++        if _x_pp_nosync_level() >= 1:  # XATTEMPT L-H: one host transfer per trajectory list, same list-of-CPU-tensors result
++            xt_traj[:] = [t.cpu() for t in xt_traj]
++            x0_traj[:] = [t.cpu() for t in x0_traj]
++            st_traj[:] = [t.cpu() for t in st_traj]
++            s0_traj[:] = [t.cpu() for t in s0_traj]
+ 
+         atom_mask = atom37_mask_from_aatype(s_hat, seq_mask)
+         return {
+@@ -2159,6 +2175,16 @@
+         }
+ 
+ 
++def _x_pp_nosync_level() -> int:
++    """CALIBY_X_PP_NOSYNC (XATTEMPT L-H): 0/unset = stock per-step .cpu() trajectory copies; 1 = deferred single transfer."""
++    import os as _os
++
++    try:
++        return int(_os.environ.get("CALIBY_X_PP_NOSYNC", "0"))
++    except ValueError:
++        return 0
++
++
+ def load_model(
+     config_path: StrPath, checkpoint_path: StrPath, device: Device = None
+ ) -> Protpardelle:

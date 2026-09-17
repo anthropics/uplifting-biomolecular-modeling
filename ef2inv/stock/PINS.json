@@ -1,0 +1,434 @@
+{
+ "engine": "ef2inv",
+ "model": "ESMFold2 binder inversion (hallucination): the ESM cookbook's gradient-guided binder design through ESMFold2-Experimental-Fast(-Cutoff2025) distograms with an ESMC-6B pseudo-perplexity term, scored by four hero critics (the file's own docstring: 'Algorithm 11 Gradient-Guided Binder Sequence Optimization', l.982)",
+ "upstream": {
+  "repo": "https://github.com/Biohub/esm",
+  "commit": "d0207ea3c8cbf072679ece3bb332787d25e06852",
+  "version": "3.4.0",
+  "tag": null,
+  "commit_subject": "Oss sync: esm 3.4.0 (#382)",
+  "commit_date": "2026-08-21T18:24:15-07:00",
+  "file": "cookbook/tutorials/binder_design.py",
+  "install": "an editable checkout of the repo at the commit (pip install -e; direct_url.json dir_info.editable; git HEAD d0207ea3, porcelain clean); the file is read from <esm package dir>/../cookbook/tutorials/binder_design.py, or from EF2INV_COOKBOOK_STOCK when set (README.md §Variables)",
+  "archive": "stock/esm-d0207ea3.tar.gz",
+  "git_describe": "v3.2.3-27-gd0207ea (no tag at the commit)",
+  "file_last_changed_by": "1b52073 2026-08-20T13:44:59-07:00 'OSS sync: esm 4.0.0 (#376)' (the last commit touching cookbook/tutorials/binder_design.py at or before d0207ea3)",
+  "ancestry": "ba4d7124 -> 26b0bc2b -> d0207ea3 (each an ancestor of the next)"
+ },
+ "archive_recipe": "git archive --format=tar --prefix=esm-d0207ea3/ d0207ea3c8cbf072679ece3bb332787d25e06852 -- cookbook/tutorials/binder_design.py esm/models/esmfold2 esm/utils/structure esm/utils/constants pyproject.toml LICENSE.md README.md | gzip -n -9",
+ "python": "3.12.14",
+ "pinned_stack": {
+  "tested_on": "the pinned stack: the base environment below + the two wheels of image_recipe; a documentation line — nothing compares against it",
+  "python": "3.12.14",
+  "torch": "2.11.0+cu128",
+  "triton": "3.6.0",
+  "cuda": "12.8",
+  "cudnn": "91900",
+  "cuequivariance": "0.10.0",
+  "xformers": "0.0.35",
+  "flash_attn": "2.8.3",
+  "transformer_engine": "2.15.0+42b8400",
+  "numpy": "2.5.2",
+  "esm": "3.4.0 @ d0207ea3 (editable checkout)",
+  "transformers": "4.57.6 @ ef32577f55da19a4989cd7b22e004dc43a4998cb (pip VCS install, direct_url.json vcs_info.commit_id)",
+  "arch_variants": {
+   "sm80": {
+    "for_cards": "compute capability 8.0 — the A100, 80 GB or 40 GB (`NVIDIA A100-SXM4-80GB` / `NVIDIA A100 80GB PCIe`: nvidia-smi 81920 MiB; `NVIDIA A100-SXM4-40GB`: 40960 MiB); configs/a100.env",
+    "what_differs": "only the two compiled wheels of image_recipe, built from the SAME sources (flash-attn 2.8.3 PyPI sdist sha256 1e71dd64…; NVIDIA/TransformerEngine @ 42b840051647) against the same torch 2.11.0+cu128 / CUDA 12.8 / python 3.12.14 for CUDA archs 80;90 (sm_80 added, sm_90 kept: the variant also runs on the H100) — every other package, version string and environment variable of pinned_stack is identical, so stock/check_pins.py's version comparison holds unchanged on this variant",
+    "built": "by environment/Dockerfile with `--build-arg STACK=img_ef2inv_a100` (README.md Setup): the file's one arch table gives this stack FLASH_ATTN_CUDA_ARCHS=80;90, NVTE_CUDA_ARCHS=80;90 and TORCH_CUDA_ARCH_LIST=8.0;9.0, and its build route (WHEELS_FROM=build — the only route for this stack; WHEELS_FROM=prebuilt is refused by name) compiles both wheels inside the image with every other setting of image_recipe (sources, compiler, MAX_JOBS rule, transformer_engine's python dependencies, image_env) — the two wheel files are that build's own product: no published sm_80 wheel pair exists, so no wheel sha256 is pinned for this variant (image_recipe's shas are the sm_90 pair's and name STACK=img_ef2inv only)"
+   }
+  },
+  "image_recipe": {
+   "layer": "on the base environment (python / torch / triton / cuequivariance / xformers / numpy / esm / transformers as above): `sha256sum -c` of both wheels against the shas below, then `pip install --no-deps --no-cache-dir <flash-attn wheel> <transformer_engine wheel>`, then `pip install --no-deps` of transformer_engine's pure-python dependencies pinned below, with image_env exported; nothing else installed, nothing up- or downgraded (the base + exactly these 14 distributions), no torch / CUDA / python change",
+   "flash_attn_wheel": {
+    "file": "flash_attn-2.8.3-cp312-cp312-linux_x86_64.whl",
+    "sha256": "bed264468d7e1764cabbdc10402fe52b21fac12024f646487937ed462d50d368",
+    "source": "PyPI sdist flash_attn-2.8.3.tar.gz sha256 1e71dd64a9e0280e0447b8a0c2541bad4bf6ac65bdeaa2f90e51a9e57de0370d = the cookbook script's own image pin (stock file l.1377: flash-attn==2.8.3, written against torch 2.8.0); esm 3.4.0's `accel` extra pins flash-attn==2.7.4.post1 (stock/src/pyproject.toml l.63; its pixi feature l.141 pulls a prebuilt py312/torch2.11/cu13 wheel that does not fit this cu128 stack) — the same flash_attn_func / rotary API; no prebuilt 2.8.x wheel exists for torch 2.11 (the Dao-AILab release wheels of 2.8.3 stop at torch 2.9 for cu12/cp312)",
+    "built": "from that sdist against the base image's own torch 2.11.0+cu128 / python 3.12.14 (CPU-only build on the base image itself; cxx11 ABI as torch's; g++ 11.4.0), nvcc 12.8.93 (cuda-compiler-12-8 + cuda-libraries-dev-12-8 from NVIDIA's apt repository, installed for the build only — not in the image), ninja 1.11.1.4 (MAX_JOBS=80, NVCC_THREADS=4), FLASH_ATTN_CUDA_ARCHS=90 (sm90: H100 only), FLASH_ATTENTION_FORCE_BUILD=TRUE"
+   },
+   "transformer_engine_wheels": {
+    "files": [
+     "transformer_engine-2.15.0+42b8400-cp312-cp312-linux_x86_64.whl"
+    ],
+    "sha256": {
+     "transformer_engine-2.15.0+42b8400-cp312-cp312-linux_x86_64.whl": "bc279d77329548d6d6f7d3efc6224301a6880e52014266e9a775f6289a202979"
+    },
+    "source": "transformer-engine[pytorch]==2.15.0 = esm 3.4.0's `accel` extra (stock/src/pyproject.toml l.64, written for its torch 2.11 baseline); the cookbook script's image pins transformer-engine[core-cu12,pytorch]==2.13.0 against torch 2.8.0 (stock file l.1378)",
+    "built": "transformer_engine 2.15.0 @ commit 42b840051647 against the base image's torch 2.11.0+cu128 / python 3.12.14 (CPU-only build on the base image itself), nvcc 12.8.93 from the base's own /usr/local/cuda-12.8, cuDNN headers from pip nvidia-cudnn 9.19.0, NVTE_FRAMEWORK=pytorch NVTE_CUDA_ARCHS=90 NVTE_WITH_NCCL_EP=0 MAX_JOBS=64; the metadata version is 2.15.0+42b8400 (the string check_pins compares)",
+    "python_dependencies": [
+     "pydantic==2.13.5",
+     "pydantic-core==2.46.5",
+     "annotated-types==0.8.0",
+     "typing-inspection==0.4.4",
+     "nvdlfw-inspect==0.2.2",
+     "onnx==1.22.0",
+     "onnxscript==0.7.1",
+     "onnx_ir==1.0.0",
+     "ml_dtypes==0.6.0",
+     "protobuf==7.36.1",
+     "importlib-metadata==9.0.1",
+     "zipp==4.1.0"
+    ]
+   },
+   "attention_dispatch": "with flash-attn and transformer_engine importable the fork binds them at import / model build: modeling_esmfold2_common.FLASH_ATTN_AVAILABLE (l.25-41: the folds' atom sliding-window attention -> flash_attn_varlen_func / flash_attn_func, l.578-613), modeling_esmc._te_available (l.64-75: the ESM-C blocks are BUILT from te.LayerNormMLP / te.LayerNormLinear / te.Linear, l.543-577), _xformers_available (l.76-87: ESM-C attention stays on xformers, its first choice, l.629-637), _flash_attn_rotary_available (l.56-62: ESM-C's RoPE takes flash-attn's Triton kernel, l.424-426, a launcher outside autograd — left as imported unless the run carries --upstream-fix EF2INV-0003, which rebinds it to the torch branch, upstream_issues/EF2INV-0003_esmc_rope_autograd.py); the words esmc_mlp / esmc_attn / esmc_rope / fold_atom_attn on every route read the bound classes, flags and callables back (opt/ef2inv_opt/attention.py; FAST_ENV = te / xformers / flash_triton (torch exempt under EF2INV-0003) / flash_attn, enforced by EF2INV_REQUIRE_FAST_ENV=1)",
+   "image_env": {
+    "XFORMERS_IGNORE_FLASH_VERSION_CHECK": "1",
+    "NVTE_FRAMEWORK": "pytorch",
+    "why": "the cookbook script's own image sets both (stock file l.1394, l.1403-1405): xformers accepts the installed flash-attn build for its flash forward op; transformer_engine loads its pytorch framework binding"
+   }
+  },
+  "gpu": {
+   "name": "NVIDIA H100 80GB HBM3",
+   "nvidia_smi_memory_total_mib": 81559,
+   "torch_total_mib": 81079,
+   "rule": "the gate compares `nvidia-smi --query-gpu=name,memory.total` to name + nvidia_smi_memory_total_mib before any pass (opt/ef2inv_opt/hardware.py); torch's total_memory is recorded beside it, never gated on"
+  }
+ },
+ "transformers_fork": {
+  "repo": "https://github.com/Biohub/transformers",
+  "commit": "ef32577f55da19a4989cd7b22e004dc43a4998cb",
+  "version": "4.57.6",
+  "archive": "none in this tree: environment/requirements.lock installs this commit (its `transformers @ git+…@ef32577f…` line) from github.com/huggingface/transformers, which serves the fork's commits unchanged; the Biohub/transformers repository itself is no longer public",
+  "gap": "the design kit pins no fork commit of its own: the pin is the commit the pinned stack's installed package carries plus the sha256 of the installed modeling files below",
+  "installed_files_sha256": {
+   "src/transformers/models/esmfold2/modeling_esmfold2_experimental.py": "ca15778cceb69e8c018d1b933952971677c9787692f4807cd1a8df62eda18e6c",
+   "src/transformers/models/esmfold2/modeling_esmfold2_common.py": "1fdb0449cb10c9c7d6b8aecaa4bbb05e0471a4f06f7babc5b1e23409f6213c60",
+   "src/transformers/models/esmfold2/modeling_esmfold2.py": "3c36128a70a063aab1278ea2ed1bafbe97787e4c8f5e69639dfb399c96c3f38c",
+   "src/transformers/models/esmfold2/kernels/trimul_with_residual.py": "3214e8c985c245e29c79b32aa33ddc40bcca055d50de2012b60a4f5d01de5c7b",
+   "src/transformers/models/esmfold2/kernels/fused_ln_residual.py": "e86b222bfc0876d7fb2dff2019d2c3aee773c8842320cf0ee01dfe6c3dd793ab",
+   "src/transformers/models/esmfold2/kernels/fused_lnlin_swiglu.py": "fd3d5aaa8e44e090b6221241856ca4e59f47c72c9aa783142f3972799175843c",
+   "src/transformers/models/esmfold2/kernels/trimul_einsum_triton.py": "efb91c083455fde1c6fcba327205ccbe873452c00e7201bffa3f04e038b0713c",
+   "src/transformers/models/esmc/modeling_esmc.py": "43e937f2e0aebb1560886d3f84a7ab299c88876e66b4e993b21c2732f8d23917",
+   "src/transformers/models/esmc/tokenization_esmc.py": "e06f3d4c7313fc75db72211aa49fc7143180fb57c7e6ffb65e3e19034a47322d"
+  }
+ },
+ "weights": {
+  "biohub/ESMFold2": {
+   "snapshot_commit": "1ebf0e3481a5184eb6171d40615c79e384b48796",
+   "refs_main": "1ebf0e3481a5184eb6171d40615c79e384b48796",
+   "role": "the CCD pickle only (ccd.pkl, l.642-644 _ensure_ccd_loaded); not a model of the loop",
+   "config": {
+    "architectures": [
+     "ESMFold2Model"
+    ],
+    "msa_encoder.enabled": true,
+    "disable_msa_features": false,
+    "lm_dropout": 0.0,
+    "force_lm_dropout_during_inference": false,
+    "lm_mask_pct": null,
+    "num_loops": 3,
+    "num_diffusion_samples": 32,
+    "confidence_head.enabled": true,
+    "confidence_head.distogram_bins": 39,
+    "folding_trunk.n_layers": 48,
+    "folding_trunk.dropout": 0.25,
+    "lm_encoder": {
+     "enabled": true,
+     "lm_dropout": 0.25,
+     "n_layers": 4,
+     "per_loop_lm_dropout": true
+    },
+    "dtype": "float32",
+    "esmc_id": "biohub/ESMC-6B"
+   },
+   "files": {
+    "README.md": {
+     "sha256": "47557276c26c32cfbe5860c19c25fcf95726751be0f6a8d5a48196b74c1d6c13",
+     "size_bytes": 10573
+    },
+    "ccd.pkl": {
+     "sha256": "9ff44b1927c6b9198e38ffe0928706827a09a350c15530beeeabebfa88038fc5",
+     "size_bytes": 417306584
+    },
+    "config.json": {
+     "sha256": "e9ec2496ec433a1dce18627ed4bf3785b4ce0c1d69e4bb4663dad1ab895da012",
+     "size_bytes": 2337
+    },
+    "model.safetensors": {
+     "sha256": "138fd4350d6892b81ce6be7ff9bf5a93ae9d4d3751f46a27438a3f9f0dcefa0e",
+     "size_bytes": 939505228
+    },
+    "images/folding_evals.png": {
+     "sha256": "207eeb14a3217cf31318bb8b50598a654def4119e34ef01a5a5ae848aacfca7c",
+     "size_bytes": 121956
+    }
+   }
+  },
+  "biohub/ESMFold2-Experimental": {
+   "snapshot_commit": "0515a1177d6e6aab93750cbadf7b54da77bac592",
+   "refs_main": "0515a1177d6e6aab93750cbadf7b54da77bac592",
+   "role": "hero critic 3",
+   "config": {
+    "architectures": [
+     "ESMFold2ExperimentalModel"
+    ],
+    "msa_encoder.enabled": true,
+    "disable_msa_features": false,
+    "lm_dropout": 0.0,
+    "force_lm_dropout_during_inference": false,
+    "lm_mask_pct": null,
+    "num_loops": 3,
+    "num_diffusion_samples": 8,
+    "confidence_head.enabled": true,
+    "confidence_head.distogram_bins": 128,
+    "folding_trunk.n_layers": 48,
+    "folding_trunk.dropout": 0.25,
+    "lm_encoder": null,
+    "dtype": "float32",
+    "esmc_id": "biohub/ESMC-6B"
+   },
+   "files": {
+    "README.md": {
+     "sha256": "19937c11f9c419a9f90c23001973b92adf1e28678b611e7e72d72360bd2c8fcf",
+     "size_bytes": 800
+    },
+    "config.json": {
+     "sha256": "82cb65b90547adf0dad9b6d33263e0cb4e9697f76c2b39b773f408fb2fab2be1",
+     "size_bytes": 2073
+    },
+    "model.safetensors": {
+     "sha256": "a584de4e3c8e3ec07ed1132f8408d602190e29781e712c8afb9eb90998e95484",
+     "size_bytes": 903213480
+    }
+   }
+  },
+  "biohub/ESMFold2-Experimental-Cutoff2025": {
+   "snapshot_commit": "56f94f5c1069ecde17512c96928850518340d287",
+   "refs_main": "56f94f5c1069ecde17512c96928850518340d287",
+   "role": "hero critic 4",
+   "config": {
+    "architectures": [
+     "ESMFold2ExperimentalModel"
+    ],
+    "msa_encoder.enabled": true,
+    "disable_msa_features": false,
+    "lm_dropout": 0.0,
+    "force_lm_dropout_during_inference": false,
+    "lm_mask_pct": null,
+    "num_loops": 3,
+    "num_diffusion_samples": 8,
+    "confidence_head.enabled": true,
+    "confidence_head.distogram_bins": 128,
+    "folding_trunk.n_layers": 48,
+    "folding_trunk.dropout": 0.25,
+    "lm_encoder": null,
+    "dtype": "float32",
+    "esmc_id": "biohub/ESMC-6B"
+   },
+   "files": {
+    "README.md": {
+     "sha256": "19937c11f9c419a9f90c23001973b92adf1e28678b611e7e72d72360bd2c8fcf",
+     "size_bytes": 800
+    },
+    "config.json": {
+     "sha256": "82cb65b90547adf0dad9b6d33263e0cb4e9697f76c2b39b773f408fb2fab2be1",
+     "size_bytes": 2073
+    },
+    "model.safetensors": {
+     "sha256": "01358c317428d38535e3db513cab177336fc0f7fab0d84002e64b7741d5181b3",
+     "size_bytes": 903213480
+    }
+   }
+  },
+  "biohub/ESMFold2-Experimental-Fast": {
+   "snapshot_commit": "04dec820ede9283c9893e318e5ca5a9ac2ab93bc",
+   "refs_main": "04dec820ede9283c9893e318e5ca5a9ac2ab93bc",
+   "role": "inversion model 1 (the gradient flows through it) + hero critic 1 (stock file l.1273-1282)",
+   "config": {
+    "architectures": [
+     "ESMFold2ExperimentalModel"
+    ],
+    "msa_encoder.enabled": false,
+    "disable_msa_features": true,
+    "lm_dropout": 0.0,
+    "force_lm_dropout_during_inference": false,
+    "lm_mask_pct": null,
+    "num_loops": 3,
+    "num_diffusion_samples": 8,
+    "confidence_head.enabled": true,
+    "confidence_head.distogram_bins": 128,
+    "folding_trunk.n_layers": 24,
+    "folding_trunk.dropout": 0.25,
+    "lm_encoder": null,
+    "dtype": "float32",
+    "esmc_id": "biohub/ESMC-6B"
+   },
+   "files": {
+    "README.md": {
+     "sha256": "19937c11f9c419a9f90c23001973b92adf1e28678b611e7e72d72360bd2c8fcf",
+     "size_bytes": 800
+    },
+    "config.json": {
+     "sha256": "42a9d813421bcf50a285cbe9c6952db17cee14ddd6f8264f4fa2c32427ee68c7",
+     "size_bytes": 2073
+    },
+    "model.safetensors": {
+     "sha256": "3a28003d6c0aab7558a5ba4681a273f8e31648f36e950ba9462fe3d83120e8f5",
+     "size_bytes": 717341848
+    }
+   }
+  },
+  "biohub/ESMFold2-Experimental-Fast-Cutoff2025": {
+   "snapshot_commit": "74b88548bf19688b8727432db0d698cb2e1d8783",
+   "refs_main": "74b88548bf19688b8727432db0d698cb2e1d8783",
+   "role": "inversion model 2 + hero critic 2",
+   "config": {
+    "architectures": [
+     "ESMFold2ExperimentalModel"
+    ],
+    "msa_encoder.enabled": false,
+    "disable_msa_features": true,
+    "lm_dropout": 0.0,
+    "force_lm_dropout_during_inference": false,
+    "lm_mask_pct": null,
+    "num_loops": 3,
+    "num_diffusion_samples": 8,
+    "confidence_head.enabled": true,
+    "confidence_head.distogram_bins": 128,
+    "folding_trunk.n_layers": 24,
+    "folding_trunk.dropout": 0.25,
+    "lm_encoder": null,
+    "dtype": "float32",
+    "esmc_id": "biohub/ESMC-6B"
+   },
+   "files": {
+    "README.md": {
+     "sha256": "19937c11f9c419a9f90c23001973b92adf1e28678b611e7e72d72360bd2c8fcf",
+     "size_bytes": 800
+    },
+    "config.json": {
+     "sha256": "42a9d813421bcf50a285cbe9c6952db17cee14ddd6f8264f4fa2c32427ee68c7",
+     "size_bytes": 2073
+    },
+    "model.safetensors": {
+     "sha256": "4e903b740ad6ad704ec60881bfd593e0d6c874a630ffa0f0838276e0b665088f",
+     "size_bytes": 717341848
+    }
+   }
+  },
+  "biohub/ESMC-6B": {
+   "snapshot_commit": "45b0fa5d7fb06faefbd5e3b89bdcef35d564e79a",
+   "refs_main": "45b0fa5d7fb06faefbd5e3b89bdcef35d564e79a",
+   "role": "the LM: ESMC trunk shared by the fold models (esmc_id) and the pPPL loss head (l.1272, l.1338)",
+   "config": {
+    "architectures": [
+     "ESMCForMaskedLM"
+    ],
+    "n_layers": 80,
+    "d_model": 2560,
+    "vocab_size": 64
+   },
+   "files": {
+    "README.md": {
+     "sha256": "59867d6e974fc0b2f6841615901e85c9a8144098534b03553828212ac611c7a4",
+     "size_bytes": 14887
+    },
+    "config.json": {
+     "sha256": "c5566fab6a17fd674141331fe75de917b7904d99fb7a410d2b1593c21e576913",
+     "size_bytes": 341
+    },
+    "model-00001-of-00006.safetensors": {
+     "sha256": "bd90149ff223e6ac1a0cac6147a5ae0df20d3a21df4f65356a1f19cd14f4aa8a",
+     "size_bytes": 4864457920
+    },
+    "model-00002-of-00006.safetensors": {
+     "sha256": "f75e2144d8269fe2eb4b3e0823fb089b94f176d8024153e85b8fb573a42294fa",
+     "size_bytes": 4971211344
+    },
+    "model-00003-of-00006.safetensors": {
+     "sha256": "f699f01ecc9691d9c6470492765fe54b8b5d2e9f277c139e89427433ffdfe0b2",
+     "size_bytes": 4863752992
+    },
+    "model-00004-of-00006.safetensors": {
+     "sha256": "46add1b7be098bbfdc3073884851ba3057f1b33ea23a158b650a37007dabd13d",
+     "size_bytes": 4971211344
+    },
+    "model-00005-of-00006.safetensors": {
+     "sha256": "1e1cb62f060a34e18f54a31a76683ef888b8cec59e73315f5b31d25d45a1f88c",
+     "size_bytes": 4863752992
+    },
+    "model-00006-of-00006.safetensors": {
+     "sha256": "56c73e13ae96e777ce65eee99364056069ef93b646470f352f83c5f1037b1b18",
+     "size_bytes": 873762296
+    },
+    "model.safetensors.index.json": {
+     "sha256": "6846456e20e6ee2c37461f7bfc21d316d69bdaf165b925691afcb39e583244da",
+     "size_bytes": 97349
+    },
+    "special_tokens_map.json": {
+     "sha256": "0b7245ec86c8c3aeaf61523ba70dfa79be137e6283f127bd651adc30b4f15c74",
+     "size_bytes": 171
+    },
+    "tokenizer.json": {
+     "sha256": "8d3447b278176e65fb3ef0224472927bf5fee3be46ea2bd77fad0111423cee1f",
+     "size_bytes": 2879
+    },
+    "tokenizer_config.json": {
+     "sha256": "e8d8e40c9f92b334f0272e80bb65ed4043cb9836523cbae899e9859e8cbb8833",
+     "size_bytes": 1392
+    },
+    "images/contact_pal.png": {
+     "sha256": "5cdea45ca020c0489c8f46f98ef49825cf7d329a1dfe1bc1fc4f69d3dc8fe54d",
+     "size_bytes": 30187
+    }
+   }
+  }
+ },
+ "entry_point": {
+  "class": "ESMFold2Design (stock file l.1271)",
+  "load": "load(use_scaling_critics) l.1285-1323: the 2 inversion models (lm_dropout 0.5, l.1296), the 4 hero critics (lm_dropout 0.25, l.1305-1308), the ESMC-6B LM head in float32 (l.1311)",
+  "design": "design(target_name, target_sequence, binder_name, binder_sequence, is_antibody, seed, batch_size, target_hotspot_ids, epitope_contact_distance) l.1325-1355 -> design_binder l.966",
+  "implementation": "the transformers fork's ESMFold2ExperimentalModel (transformers.models.esmfold2.modeling_esmfold2_experimental, l.45-49, from_pretrained l.1238) and ESMCForMaskedLM (transformers.models.esmc, l.33-34); esm.models.esmfold2 for input building and constants only (l.51-64); kernel backend fused when the fork's Triton kernels are available (l.1247-1252)",
+  "confidence": "calculate_confidence=temperature<0.05 is passed per design step (l.1139); the fork's experimental model ignores the flag and runs the confidence head on every step"
+ },
+ "library_defaults": {
+  "STEPS": 150,
+  "LOG_INTERVAL": 5,
+  "LEARNING_RATE": 0.1,
+  "TEMPERATURE_MIN": 0.01,
+  "ESMC_MASK_FRACTION": 0.15,
+  "LM_LOSS_BATCH_SIZE": 128,
+  "LM_MASK_PASSES": 4,
+  "COMPILE": true,
+  "REUSE_ESMC": true,
+  "LOSS_WEIGHTS": {
+   "intra_contact": 0.5,
+   "inter_contact": 0.5,
+   "glob": 0.2,
+   "epitope": 0.5
+  },
+  "binder_factory_minibinder": "uniform 60-200 per seed (l.137)",
+  "pd-l1": "TARGET_SEQUENCES['pd-l1'] l.167 (115 residues)"
+ },
+ "stock_environment": {
+  "reads": [
+   "HF_HOME",
+   "HF_HUB_OFFLINE",
+   "ESMCFOLD_CCD_PATH",
+   "XFORMERS_IGNORE_FLASH_VERSION_CHECK (the file's own cloud image env, `modal.Image`, never the local route)"
+  ],
+  "kit_reads": {
+   "EF2_FAST_KIT": "the design kit's switch: a kit arm's environment (launch.py), installed on the module by opt/ef2inv_opt/fastkit.py, read by the k/ modules",
+   "EF2_FAST_KIT_D59": "opt/ef2inv_opt/fastkit.py enable (guard mode)",
+   "EF2_FAST_KIT_PPPL": "opt/ef2inv_opt/fastkit.py enable (pPPL graph on/off)",
+   "EF2_FAST_KIT_CKPT": "k/ef2_autograd_kernels.py l.783 (checkpoint policy override)",
+   "MODEL_OPT_LEVERS_OFF": "the ablation word (a comma list of LEVER census names): resolved by name in the launcher (cli.launch_context) and once at install in a kit arm (opt/ef2inv_opt/fastkit.py resolve_levers_off); a kit arm's second allowed variable, stripped from the stock arm"
+  },
+  "must_be_absent_prefixes": [
+   "EF2_",
+   "EF2INV_",
+   "ESMFOLD2_",
+   "CUBLAS_WORKSPACE_CONFIG",
+   "NVIDIA_TF32_OVERRIDE",
+   "CUDA_MPS_",
+   "TORCH_COMPILE_DISABLE",
+   "TORCHDYNAMO_DISABLE",
+   "MODEL_OPT_LEVERS_OFF"
+  ],
+  "allowed_exceptions": [
+   "EF2_HF_HOME",
+   "EF2_CCD_PATH"
+  ],
+  "kit_arm_exception": "EF2_FAST_KIT=<the mode's value>, exactly, and MODEL_OPT_LEVERS_OFF=<the operator's word> when set (launch.py)"
+ }
+}

@@ -1,0 +1,33 @@
+{
+ "so": "flash_transition_sm90a.so",
+ "module_name": "flash_transition_sm90a",
+ "so_sha256": "99d63df40709fcd14c2eb35a5a18ec7984367c42c880063a47dc1ec678e9c63d",
+ "source_sha256": {
+  "flash_transition_sm90.cu": "7ee9e32427ea94bce41ae04efbfde6b40e14b313fdfb4cbede8de2c589c2fead",
+  "build.py": "83ab2c2987d8d28d64c71d8cdeff76a7e661bce22d734161e2f752f24b3b8fba"
+ },
+ "torch": "2.13.0+cu130",
+ "cuda": "13.0",
+ "python_tag": "cp311",
+ "arch": [
+  "sm_90a"
+ ],
+ "cutlass_headers": "4.2.0",
+ "nvcc": "Build cuda_13.0.r13.0/compiler.36424714_0",
+ "gpu_at_build": "NVIDIA H100 80GB HBM3",
+ "source_commit": "d235cdcd58e6",
+ "built_utc": "2026-09-11T05:51:52Z",
+ "build_s": 67.4,
+ "cuda_flags": [
+  "-O3",
+  "-std=c++17",
+  "--expt-relaxed-constexpr",
+  "-gencode=arch=compute_90a,code=sm_90a",
+  "-Xcompiler=-Wno-psabi",
+  "-DNDEBUG",
+  "-diag-suppress=177,550,20012",
+  "-Xptxas=--register-usage-level=10"
+ ],
+ "smem_bytes": 230400,
+ "hidden_chunk": 32
+}

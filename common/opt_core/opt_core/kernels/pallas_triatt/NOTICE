@@ -1,0 +1,10 @@
+Triangle-attention Pallas kernels (forward + backward) -- provenance and attributions.
+- triatt_attn.py and attbwd_dkdv.py are this repository's own work, written in the AF2-design kit (its `triatt` lever; kit package
+  version 0.6.0, files as of tree 94a83bd1923a) and carried here so that programs outside that kit can differentiate triangle attention.
+  Each file is the kit's byte for byte EXCEPT (a) its one import of the sibling module, rewritten from the kit's package path to a
+  package-relative import (`from . import attbwd_dkdv as A` / `from . import triatt_attn as T`) so the pair is importable from here, and
+  (b) comment / docstring wording only: triatt_attn.py 2 lines, attbwd_dkdv.py 1 line restated in release vocabulary (no code changed):
+    triatt_attn.py   kit sha256 70b34c6b98fd2dd24d02359c1ab8bdb68cb3c8002256256d25c04835d04797cb   carried sha256 9c4657fc76f7168f5e0405aef5f272952cc5b3a21aa836441bbbd4061396cc4d
+    attbwd_dkdv.py   kit sha256 62654fbb87021550c1d3aca85a576ba7563ef94113178d4b537f7ea1e544bd55   carried sha256 4cf88326dc9cc06d76c4d3fcb39c33c75e16472a12e39f59439a69b48abb05a9
+- The mathematics mirrors alphafold/model/modules.py::Attention (AlphaFold 2, Copyright 2021 DeepMind Technologies Limited, Apache-2.0);
+  no AlphaFold or ColabDesign (github.com/sokrypton/ColabDesign, licence "THE BEER-WARE LICENSE" (Revision 42), its LICENSE.txt) source is copied.  No model parameters are included.

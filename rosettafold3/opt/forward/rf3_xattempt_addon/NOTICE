@@ -1,0 +1,7 @@
+The kit's patched rf3 files — NOTICE
+- Contains source files from RosettaCommons foundry (https://github.com/RosettaCommons/foundry), BSD 3-Clause,
+  commit 4010e3e2e7350edada3e25a45c908c6bf407df4d: rf3/diffusion_samplers/inference_sampler.py, rf3/model/RF3_structure.py,
+  rf3/model/layers/af3_diffusion_transformer.py, rf3/loss/loss.py — each modified as marked in the file ([rf3_cudagraph] /
+  [xattempt_hoist] comments); rf3/graph_flags.py is new.
+- public_inputs/1brs_tiles.json: sequences of PDB entry 1BRS (wwPDB / RCSB PDB, CC0 1.0).
+- No model weights are included.

@@ -1,0 +1,64 @@
+[build-system]
+requires = ["setuptools>=61", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "protpardelle"
+authors = [
+    { name = "Tianyu Lu", email = "tianyulu@stanford.edu" },
+    { name = "Richard Shuai", email = "rshuai@stanford.edu" },
+    { name = "Petr Kouba", email = "petrkouba3@gmail.com" },
+    { name = "Zhaoyang Li", email = "zhaoyangli@stanford.edu" },
+    { name = "Yilin Chen", email = "yilinc5@stanford.edu" },
+    { name = "Akio Shirali", email = "akios@stanford.edu" },
+    { name = "Jinho Kim", email = "zhkim216@stanford.edu" },
+    { name = "Po-Ssu Huang", email = "possu@stanford.edu" },
+]
+license = { file = "LICENSE" }
+dynamic = ["version"]
+description = "Conditional Protein Structure Generation with Protpardelle-1c"
+readme = "README.md"
+requires-python = ">=3.10"
+
+# Required dependencies
+dependencies = [
+    "biopython",
+    "biotite",
+    "dm-tree",
+    "einops",
+    "huggingface_hub",
+    "hydra-core",
+    "jaxtyping",
+    "jupyter",
+    "ml_collections",
+    "modelcif",
+    "numpy",
+    "omegaconf",
+    "pandas",
+    "prody",
+    "pyyaml",
+    "scipy",
+    "torch>=2.6.0",
+    "tqdm",
+    "transformers",
+    "typer",
+    "wandb",
+]
+
+[project.optional-dependencies]
+dev = ["pytest", "pytest-cov", "pre-commit"]
+viz = ["py3dmol", "matplotlib", "seaborn"]
+
+[tool.pytest.ini_options]
+addopts = "-v -s"
+testpaths = ["tests"]
+
+[tool.setuptools.dynamic]
+version = { attr = "protpardelle.__version__" }
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["protpardelle", "protpardelle.*"]
+
+[tool.setuptools.package-data]
+protpardelle = ["configs/**/*.yaml"]

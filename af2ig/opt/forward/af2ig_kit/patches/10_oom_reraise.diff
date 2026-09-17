@@ -1,0 +1,30 @@
+# Patch: 10_oom_reraise.diff
+# Lever: none (error routing of L7 -precompile): the two broad `except Exception` handlers of precompile_shapes (an unreadable or unfeaturizable input is skipped from the warm-up set, named on stdout) re-raise an out-of-memory FIRST — `if is_oom(e): raise`, the model-opt tree's one classifier opt_core.oom.is_oom (JAX RESOURCE_EXHAUSTED, CUDA OOM, MemoryError) — so an OOM propagates out of the driver instead of becoming a skipped input or a failed design; every other exception keeps its named route. The per-design `except:` of the prediction loop (_run_one) is the stock's own (dl_binder_design predict.py) and is unchanged.
+# Numerics class: NONE (no computation changes)
+# Default: always (the handlers only run under -precompile, i.e. on the exact and fast lines)
+# Applies to: af2_initial_guess/predict_pdb.py as left by patches 00-09 (apply in numeric order with `patch -p1` from the dl_binder_design checkout root)
+--- a/af2_initial_guess/predict_pdb.py
++++ b/af2_initial_guess/predict_pdb.py
+@@ -738,12 +738,14 @@
+     warm-up calls are discarded.
+     '''
+     import concurrent.futures
++    from opt_core.oom import is_oom                                  # an out-of-memory is never a skipped input: it propagates (the model-opt tree's one OOM classifier)
+     t0 = time.time()
+     reps = {}
+     for pth in paths:
+         try:
+             seq, chl, _, _ = read_pdb_structure(pth)
+         except Exception as e:
++            if is_oom(e): raise
+             print(f'precompile: skipping {pth}: {e!r}'); continue
+         L = len(seq) if (len(chl) > 1 and not args.force_monomer) else chl[0]
+         if L not in reps: reps[L] = pth
+@@ -754,6 +756,7 @@
+         try:
+             prepared.append((L, af2_runner.prepare_struct(pth)))
+         except Exception as e:
++            if is_oom(e): raise
+             print(f'precompile: featurization failed for {pth}: {e!r}')
+     def _compile(item):
+         L, (fh, feat, ig) = item

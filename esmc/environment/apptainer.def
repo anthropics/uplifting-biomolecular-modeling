@@ -1,0 +1,32 @@
+# ESM C optimization kit — Apptainer / Singularity image made FROM the container image of esmc/environment/Dockerfile: the same stack and the
+# same /kit, for hosts that run Apptainer instead of Docker. The source is the image tagged esmc-kit:dev in the local Docker daemon (build it
+# first: README.md 'Setup', route A); for a published tag the two header lines read `Bootstrap: docker` / `From: <registry>/esmc-kit:<tag>`.
+#   apptainer build esmc.sif esmc/environment/apptainer.def
+#   apptainer run --nv --cleanenv --bind /path/to/weights:/weights --env HF_HOME=/weights/hf --env HF_HUB_OFFLINE=1 esmc.sif check --variant 6b
+#   apptainer exec --nv --cleanenv --bind /path/to/weights:/weights --env HF_HOME=/weights/hf --env ESMC_OPT=exact --bind "$PWD":/work esmc.sif \
+#     python /work/your_script.py                     # your own ESM C code with the kit on (README.md 'Run'); ESMC_OPT unset = stock
+# The image is read-only: write outputs to a bound path; the JIT caches go under $HOME (bound by default) unless TRITON_CACHE_DIR names a bound path. $HOME is
+# the invoking user's bound home, so the image's prebuilt extension cache (/root/.cache/esmc_sdkfused) is not on the lookup path: the first kit-mode
+# load per user builds the extension once (nvcc and ninja are in the image) into ~/.cache/esmc_sdkfused on the host and later runs import it; keep
+# the home bind or bind a persistent directory over ~/.cache; root may pass --no-home to use the image's copy. %environment keeps a
+# host user site-packages (PEP 370) from shadowing the pinned stack, --cleanenv keeps the host's variables out.
+Bootstrap: docker-daemon
+From: esmc-kit:dev
+
+%post
+    mkdir -p /opt/culib && ln -s /.singularity.d/libs/libcuda.so.1 /opt/culib/libcuda.so && ln -s /.singularity.d/libs/libcuda.so.1 /opt/culib/libcuda.so.1
+
+%environment
+    export PYTHONNOUSERSITE=1
+    # Triton <= 3.5 links its launcher stub with -lcuda: offer the unversioned name when --nv bound only libcuda.so.1
+    if [ -z "${TRITON_LIBCUDA_PATH:-}" ] && [ -e /opt/culib/libcuda.so ]; then export TRITON_LIBCUDA_PATH=/opt/culib; fi
+
+%runscript
+    cd /kit/esmc && exec bash /kit/esmc/run.sh "$@"
+
+%help
+    ESM C optimization kit: drop-in modes that make stock ESM C (Biohub esm 3.4.0, sizes 300m / 600m / 6b) faster through the SDK route
+    without changing its outputs — off = stock exactly; exact = identical outputs, faster (the default). `apptainer run --nv esmc.sif <verb> ...`
+    = `bash /kit/esmc/run.sh <verb> ...` (verbs: install, check; `apptainer exec ... python your_script.py` with ESMC_OPT=exact runs your own
+    code with the kit on; /kit/esmc/README.md inside the image). Requires an NVIDIA driver
+    that runs CUDA 13.0 (580 or newer) and HF_HOME naming the weights.

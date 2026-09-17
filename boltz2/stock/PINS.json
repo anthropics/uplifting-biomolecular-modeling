@@ -1,0 +1,186 @@
+{
+ "model": "boltz2",
+ "boltz_version": "2.2.1",
+ "upstream": {
+  "repo": "https://github.com/jwohlwend/boltz",
+  "tag": "v2.2.1",
+  "commit": "cb04aeccdd480fd4db707f0bbafde538397fa2ac",
+  "wheel": {
+   "file": "stock/boltz-2.2.1-py3-none-any.whl",
+   "source": "PyPI boltz==2.2.1"
+  },
+  "archive": {
+   "file": "stock/boltz-cb04aecc.tar.gz",
+   "recipe": "git archive --format=tar --prefix=boltz-cb04aecc/ cb04aeccdd480fd4db707f0bbafde538397fa2ac src/boltz pyproject.toml LICENSE README.md | gzip -n -9"
+  },
+  "install": "pip install --no-deps stock/boltz-2.2.1-py3-none-any.whl   (or: pip install --no-deps stock/boltz-cb04aecc.tar.gz; or: pip install boltz==2.2.1)",
+  "installed_tree": {
+   "sha256_all_py_concat": "b6d1305a81aa6bbacb63c5e911e76c04208e78734e635418b49019f200d9c238",
+   "n_py_files": 107,
+   "recipe": "sha256 over the concatenated bytes of sorted(glob('<site-packages>/boltz/**/*.py', recursive=True)); the wheel's boltz/ tree and src/boltz at cb04aecc are byte-identical (107 files)",
+   "key_files_sha256": {
+    "data/const.py": "d4cfbcf19e8791f298e8c90db6a723ddbf4ffa85fdc445e5ba1dea33fbbc74d5",
+    "main.py": "b5ded4dac1552af2e079c335d56e64ea580b4d5ca0202a9542385ce3e318c3b3",
+    "model/layers/triangular_attention/attention.py": "deaaa0c28d2864d630d83c586d3d6b3f3499909cad01579753ce1c35a9c465c7",
+    "model/models/boltz2.py": "c3f21a4c5e31bdcb81709da131b201944c48d11e00e52aaadd15b3e2512568ab",
+    "model/modules/diffusionv2.py": "9eacc8cf7daeb62dffa81a09a1f93d2e268a4b7b68b5b88c2058c5ebf5ca4057"
+   }
+  },
+  "license": "MIT (LICENSE at cb04aecc: Copyright (c) 2024 Jeremy Wohlwend, Gabriele Corso, Saro Passaro)",
+  "entry_point": "boltz = boltz.main:cli (pyproject.toml [project.scripts]); `boltz predict <yaml|dir> ...`"
+ },
+ "weights": {
+  "root_env": "BOLTZ_CACHE",
+  "upstream_reads_env": "boltz.main.get_cache_path (main.py:262-278): BOLTZ_CACHE, else ~/.boltz; `--cache` on the command line overrides",
+  "files": {
+   "boltz2_conf.ckpt": {
+    "sha256": "090e82ac8c92f5e943fa1b39e7410a44027bea7243c0bbb3caa67a77fc1428e1"
+   },
+   "boltz2_aff.ckpt": {
+    "sha256": "dcc5cd3722b1c9eaa34267e4ae32f55cbbf1963f4c19319381ccfa30fdd2ca9e"
+   },
+   "ccd.pkl": {
+    "sha256": "2d3b2f03a3c5665944adba51e33263511e51b21c9cd05d902f9c4b7c1e58d2f4"
+   },
+   "mols.tar": {
+    "sha256": "39e076d96dbec6b4e86982bbda16f3a53a2a60c9bdc17828d88f6f9a0c7d1fd7",
+    "unpacked_to": "mols/ (checked for presence; the archive carries the digest)"
+   }
+  }
+ },
+ "pinned_stack": {
+  "python": "3.11",
+  "torch": "2.12.0+cu130",
+  "torch_dist_version": "2.12.0",
+  "torch_source": "PyTorch cu130 wheel (nvidia-*-cu13 / nvidia-* 13.x runtime wheels per the freeze)",
+  "triton": "3.7.0",
+  "cuda": "13.0",
+  "cuequivariance": "0.10.0 (cu13 ops)",
+  "pytorch_lightning": "2.5.0",
+  "numpy": "1.26.4",
+  "freeze": "environment/requirements.lock",
+  "tested_on": "NVIDIA H100 80GB HBM3 with this stack (environment/requirements.lock)"
+ },
+ "full_freeze": "environment/requirements.lock (pip freeze --all of the tested stack: the pinned stack plus pip, setuptools, wheel)",
+ "declared_requirements": {
+  "source": "pyproject.toml at cb04aecc (23 dependencies, requires-python >=3.10,<3.13; no Dockerfile, lock or conda file in the tree)",
+  "satisfied_by_freeze": "23/23",
+  "cuda_extra": "cuequivariance_ops_cu12>=0.5.0, cuequivariance_ops_torch_cu12>=0.5.0, cuequivariance_torch>=0.5.0 (the freeze carries the cu13 builds 0.10.0 instead)"
+ },
+ "system": {
+  "compiler": "gcc/cc + Python headers required at run time for the Triton kernels (the flash triangle attention and the fused cells); without them those levers are inert (kit fallback)"
+ },
+ "cli_defaults": {
+  "recycling_steps": 3,
+  "sampling_steps": 200,
+  "diffusion_samples": 1,
+  "max_parallel_samples": 5,
+  "step_scale": 1.5,
+  "num_workers": 2,
+  "seed": null,
+  "output_format": "mmcif",
+  "max_msa_seqs": 8192,
+  "subsample_msa": false,
+  "use_kernels": true,
+  "model": "boltz2",
+  "sampling_steps_affinity": 200,
+  "diffusion_samples_affinity": 5,
+  "source": "main.py:818-1041 (click options), predict() defaults main.py:1042-1080; checkpoint / affinity_checkpoint / method None = not given; preprocessing_threads None = main.py's own default (multiprocessing.cpu_count() of the box; the worker parses one input per child, 1 thread)",
+  "write_full_pae": false,
+  "write_full_pde": false,
+  "override": false,
+  "no_kernels": false,
+  "checkpoint": null,
+  "use_msa_server": false,
+  "msa_server_url": "https://api.colabfold.com",
+  "msa_pairing_strategy": "greedy",
+  "use_potentials": false,
+  "method": null,
+  "preprocessing_threads": null,
+  "affinity_mw_correction": false,
+  "affinity_checkpoint": null,
+  "num_subsampled_msa": 1024,
+  "write_embeddings": false
+ },
+ "stock_environment": {
+  "reads": [
+   "BOLTZ_CACHE",
+   "BOLTZ_MSA_USERNAME",
+   "BOLTZ_MSA_PASSWORD",
+   "CUEQ_DEFAULT_CONFIG",
+   "CUEQ_DISABLE_AOT_TUNING",
+   "TRITON_CACHE_DIR"
+  ],
+  "must_be_absent_prefixes": [
+   "BOLTZ_PREFETCH", "BOLTZ_WRITER",
+   "BOLTZ_LEVERS",
+   "BOLTZ_GRAPH_",
+   "BOLTZ_DIT_",
+   "BOLTZ_PRECISION",
+   "BOLTZ_TRIATTN",
+   "BOLTZ_CHUNK",
+   "BOLTZ_XL",
+   "BOLTZ_FPF_",
+   "FPF_",
+   "PF_TRIMUL",
+   "PF_TRANSITION",
+   "PF_BOLTZ",
+   "PTX_TRIATTN_",
+   "CUEQ_",
+   "BZ_",
+   "BOLTZ2_OPT",
+   "MODEL_OPT_STACK_KEY",
+   "BOLTZ_OPM_ROWS",
+   "BOLTZ_RECYCLING_STEPS",
+   "BOLTZ_SAMPLING_STEPS",
+   "BOLTZ_TP",
+   "ROWPAIR_TAG",
+   "ROWPAIR_PARK_ZINIT",
+   "ROWPAIR_MSA_HOST",
+   "ROWPAIR_CONF_PARK_ZTRUNK",
+   "ROWPAIR_TRANSPOSE_INPLACE",
+   "ROWPAIR_FREE_ZTRUNK",
+   "ROWPAIR_MSA_M_LAYOUT",
+   "ROWPAIR_TRIATT_CORE",
+   "ROWPAIR_TRIMUL_KERNELS",
+   "ROWPAIR_DIFF_NOISE_SYNC",
+   "ROWPAIR_HOST_SLAB",
+   "ROWPAIR_RANK_THREADS",
+   "ROWPAIR_TRIATT_STAGE",
+   "BOLTZ_PAIRBLOCK",
+   "BOLTZ_TRANSITION",
+   "BOLTZ_SAMPLER_",
+   "BOLTZ_TRIMUL_",
+   "BOLTZ_ATOM",
+   "BOLTZ_WASTE",
+   "BOLTZ_EXACTLN", "BOLTZ_TEMPL_SKIP",
+   "BOLTZ_PAIRFUSE",
+   "BOLTZ_MSA2",
+   "BOLTZ_CONF",
+   "OPT_CORE_PF_"
+  ],
+  "note": "every entry is a name prefix: the kits' switch families (BOLTZ_LEVERS / BOLTZ_GRAPH_* / BOLTZ_DIT_* / BOLTZ_TRIATTN* / BOLTZ_CHUNK / BOLTZ_XL* / BOLTZ_FPF_* / FPF_* / PF_* / PTX_TRIATTN_*; the pair-track adapters' BOLTZ_PAIRBLOCK* / BOLTZ_TRANSITION*; the BOLTZ2-FASTER levers' BOLTZ_SAMPLER_* / BOLTZ_TRIMUL_* / BOLTZ_ATOM* / BOLTZ_WASTE* / BOLTZ_EXACTLN* / BOLTZ_PAIRFUSE* / BOLTZ_MSA2* / BOLTZ_CONF* \u2014 BOLTZ_GRAPH_TRUNK* and BOLTZ_DIT_EXACT* fall under BOLTZ_GRAPH_* / BOLTZ_DIT_* \u2014 and the core's pair-fused candidate gate OPT_CORE_PF_*; never the stock's own BOLTZ_MSA_USERNAME / BOLTZ_MSA_PASSWORD reads: BOLTZ_MSA2 is a full-word prefix), the row-sharding line's words (BOLTZ_TP, ROWPAIR_TAG, and the ROWPAIR_* placement / kernel / sync words of modes.TP_EXPORTS \u2014 the mode's row sets them; a caller's copy never reaches the worker or the stock process), the cuEquivariance tuning words (CUEQ_*), the harness-era BZ_* words, the package's own BOLTZ2_OPT*, the derived MODEL_OPT_STACK_KEY and the retired count words BOLTZ_OPM_ROWS / BOLTZ_RECYCLING_STEPS / BOLTZ_SAMPLING_STEPS",
+  "kit_module_prefixes": [
+   "boltz_trunk_levers",
+   "boltz_graph_patch",
+   "boltz_dit_hoist",
+   "boltz_flash_triattn_patch",
+   "flash_triattn",
+   "boltz_fpf_",
+   "fpf_msa",
+   "fpf_trimul",
+   "bz_",
+   "boltz2_opt",
+   "boltz_graph_trunk",
+   "bz2_trimul",
+   "boltz_atom",
+   "boltz_waste_levers",
+   "aligncap",
+   "dx_token",
+   "exactln",
+   "msa2",
+   "cond_levers",
+   "template_levers"
+  ]
+ }
+}

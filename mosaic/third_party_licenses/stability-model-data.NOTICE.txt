@@ -1,0 +1,12 @@
+Stability model (stability.eqx)
+-------------------------------
+Trained on the "Mega-scale" protein folding stability dataset (licensed CC BY
+4.0, https://creativecommons.org/licenses/by/4.0/). The dataset authors are
+credited below.
+
+Dataset citation: Tsuboyama et al., "Mega-scale experimental analysis of protein
+folding stability in biology and design", Nature 620, 434-444 (2023).
+doi:10.1038/s41586-023-06328-6 / dataset doi:10.5281/zenodo.7992926
+
+Data split from EsmTherm (https://github.com/SimonKitSangChu/EsmTherm),
+MIT License.

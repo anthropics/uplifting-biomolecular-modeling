@@ -1,0 +1,14 @@
+{
+ "archs": [
+  "sm_80",
+  "sm_90"
+ ],
+ "cuda": "12.6",
+ "name": "fast_layer_norm_cuda_v2_cs",
+ "sites_patched": 25,
+ "so_bytes": 1494720,
+ "so_sha256": "6407b1634db48dce9aab22a6efbe39be94e7c85aac1d74d8eb5be9fb787a47f0",
+ "source_sha16": "f13a9ff77d6a5cc1",
+ "stack": "torch2.7.1-cu126-cp311-cxx11abi1",
+ "torch": "2.7.1+cu126"
+}

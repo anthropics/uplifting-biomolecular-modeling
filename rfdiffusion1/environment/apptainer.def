@@ -1,0 +1,34 @@
+# RFdiffusion-1 optimization kit — Apptainer / Singularity image made FROM the container image of rfdiffusion1/environment/Dockerfile: the same
+# stack, the same /opt/rfd checkout and the same /kit, for hosts that run Apptainer instead of Docker. The source is the image tagged
+# rfdiffusion1-kit:dev in the local Docker daemon (build it first with that Dockerfile, whose header has the command); for a published tag the two header lines read
+# `Bootstrap: docker` / `From: <registry>/rfdiffusion1-kit:<tag>`.
+#   apptainer build rfdiffusion1.sif rfdiffusion1/environment/apptainer.def
+#   T=opt/forward/fast_inference/inputs_public/insulin_target.pdb      (a bundled example target; %runscript runs from /kit/rfdiffusion1, so kit-relative paths resolve)
+#   apptainer run --nv --cleanenv --writable-tmpfs --bind /path/to/rfd_weights:/weights --env WEIGHTS=/weights --bind "$PWD/out":/kit/rfdiffusion1/out \
+#     rfdiffusion1.sif design --config h100 --mode fast inference.input_pdb=$T \
+#     'contigmap.contigs=[A1-115/0 80-80]' 'ppi.hotspot_res=[A59,A83,A91]' inference.num_designs=4 inference.output_prefix=out/fast/des
+# The image is read-only: outputs go under a bound, writable path (out/ above; relative paths resolve from /kit/rfdiffusion1), and
+# --writable-tmpfs takes what stock RFdiffusion writes beside its own files — Hydra's run log (outputs/ under the working directory, `--mode off`);
+# its IGSO(3) schedule cache (first run only) goes to ${TMPDIR:-/tmp}/rfdiffusion1_schedules-uid<uid>, which `design` and `warm` pass to upstream
+# because /opt/rfd/schedules is root's (opt/rfdiffusion1_opt/schedules.py); the Triton cache of `fast` goes under $HOME/.cache
+# (bound by default). %environment keeps a host user site-packages (PEP 370) from shadowing the pinned stack, --cleanenv keeps the host's variables out.
+Bootstrap: docker-daemon
+From: rfdiffusion1-kit:dev
+
+%environment
+    export PYTHONNOUSERSITE=1
+    # Triton <= 3.5 links its launcher stub with -lcuda: offer the unversioned name when --nv bound only libcuda.so.1
+    if [ -z "${TRITON_LIBCUDA_PATH:-}" ] && [ -e /opt/culib/libcuda.so ]; then export TRITON_LIBCUDA_PATH=/opt/culib; fi
+
+%post
+    mkdir -p /opt/culib && ln -s /.singularity.d/libs/libcuda.so.1 /opt/culib/libcuda.so && ln -s /.singularity.d/libs/libcuda.so.1 /opt/culib/libcuda.so.1
+
+%runscript
+    cd /kit/rfdiffusion1 && exec bash /kit/rfdiffusion1/run.sh "$@"
+
+%help
+    RFdiffusion-1 optimization kit: drop-in modes that make stock RFdiffusion 1.1.0 (RosettaCommons/RFdiffusion @ 86507b65) faster on one
+    GPU without changing its inputs, sampler settings or output files — off = the stock command line; exact = the same output bytes at the same
+    seed, faster; fast = small documented numeric differences, faster still. `apptainer run --nv rfdiffusion1.sif <verb> ...` =
+    `bash /kit/rfdiffusion1/run.sh <verb> ...` (verbs: install, design, check, warm; /kit/rfdiffusion1/README.md inside the image). Requires an
+    NVIDIA driver that runs CUDA 12.4 (550 or newer) and WEIGHTS naming the directory that holds Complex_base_ckpt.pt.

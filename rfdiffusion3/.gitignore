@@ -1,0 +1,4 @@
+# an apex wheel a `--build-arg WHEELS_FROM=prebuilt` container build installs (stock/PINS.json "pinned_stack" "apex" names the file and its
+# sha256; no such wheel is distributed with this tree): placed here before such a build, never committed; the default build compiles apex instead
+stock/wheels/*
+!stock/wheels/.keep

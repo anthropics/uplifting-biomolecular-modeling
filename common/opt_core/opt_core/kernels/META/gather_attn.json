@@ -1,0 +1,12 @@
+{
+ "exports": {},
+ "kind": "module",
+ "license": "in-house Triton kernel written for the core (no third-party kernel bytes); Triton itself is MIT",
+ "mechanism": "attn.index_set_attention (strategy F5.gather_attn: fused gather attention over per-query listed key sets with an additive pair bias read in its native [B|1,LQ,LK,H] layout and an output gate; forward; no LQ x LK allocation)",
+ "name": "gather_attn",
+ "not_carried": {},
+ "runtime_imports": [],
+ "runtime_imports_note": "imports torch at module import and triton inside a try (absence = HAVE_TRITON False -> every call refused by name 'no-triton'); no opt_core import",
+ "served_note": "gather_attn(q, k, v, bias, idx, n_head, gate=None, scale=None, out=None, ensure_sorted=True, allow_candidate=None): CUDA, q/k fp32|bf16|fp16 [B,LQ,H*dh], v bf16|fp16, dh <= 128, idx int32 [B|1,LQ,k] sorted rows (-1 = padding, duplicates once), bias [B|1,LQ,LK,H] any strides, no live autograd; cells (dh,k,v.dtype) certified on the device's capability are served - CELLS ((32,128,bf16), (48,32,bf16): H100, torch 2.13.0+cu130 / triton 3.7.1, max|d| vs fp32 <= 1.1e-2, rel-RMS 3.2e-3, run-to-run bitwise), or the capability's ROWS_BY_CC row when it has one ('8.0|*': the same two cells, A100-SXM4-80GB, same error class, run-to-run bitwise; geometry per row, resolved by opt_core.kernels.safe_settings), every other cell inside the envelope is 'candidate' and served only under allow_candidate / OPT_CORE_GATHER_ALLOW_CANDIDATE=1; everything else raises Refusal(reason) - no fallback inside the module",
+ "version": "gather_attn/1.0 (KC/BQ/num_warps table CONFIGS by head-dim class: 32:(8,16,4) 64:(4,16,4) 128:(4,16,4); a capability's ROWS_BY_CC row carries its own)"
+}

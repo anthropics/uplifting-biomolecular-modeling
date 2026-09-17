@@ -1,0 +1,59 @@
+# Patch: 12_opm_reassoc.diff
+# Lever: L12, the re-associated OuterProductMean of predict_pdb.py: -opm_reassoc installs the kit adapter af2ig_opt.opm as alphafold OuterProductMean.__call__ before any design (alphafold/model/*.py untouched): the output weight is folded into the right projection ([S, 32, N, c_z] float32) and one GEMM over (MSA row, channel) produces the [N, N, c_z] update — no [rows, N, 32x32] outer-product intermediate and ~6.6x fewer FLOPs at this model's 5-row MSA; mask, normalisation and epsilon as stock; a call on an unexpected input runs the stock body, counted by reason; the census is written as `opm_reassoc` timer records and the per-lever line at exit
+# Numerics class: TIER-2: changes numerics (re-associated float32 sums, XLA default-precision products as stock's einsums; deterministic; not bitwise vs the stock body)
+# Default: off; enabled only by predict_pdb.py -opm_reassoc (the af2ig_opt mode `fast` passes it after -fused_trimul, and `big` on its fast base)
+# Applies to: af2_initial_guess/predict_pdb.py as left by patches 00-11 (apply in numeric order with `patch -p1` from the dl_binder_design checkout root)
+--- a/af2_initial_guess/predict_pdb.py
++++ b/af2_initial_guess/predict_pdb.py
+@@ -100,6 +100,7 @@
+ parser.add_argument( "-flash_attn", action="store_true", default=False, help='L8 (changes numerics slightly, see CHANGES.md): the attention core (logits + bias, softmax, weighted sum) of every eligible alphafold Attention call computed by the kit adapter af2ig_opt.flash_attn over the shared Pallas flash-attention kernel of the model-opt tree (opt_core.kernels.pallas_attn) instead of the three XLA ops; ineligible calls run the stock ops and are counted in the flash_attn timer record' )
+ parser.add_argument( "-fused_triattn", action="store_true", default=False, help='L10 (changes numerics slightly, see CHANGES.md): every TriangleAttention module (starting / ending node; Evoformer and template pair stack) computed by the model-opt tree\'s fused triangle-attention block (opt_core.kernels.fpf_pallas_serve.tri_attn_block via af2ig_opt.triattn: LayerNorm + pair bias + q|k|v|gate projections + flash core + gating + output projection in one Pallas program, float32 with TF32 products) instead of the stock body; calls the block refuses run the stock body and are counted by reason' )
+ parser.add_argument( "-fused_trimul", action="store_true", default=False, help='L11 (changes numerics slightly, see CHANGES.md): every TriangleMultiplication module (outgoing / incoming; Evoformer and template pair stack) computed by the model-opt tree\'s fused triangle-multiplication block (opt_core.kernels.fpf_pallas_serve.trimul_block via af2ig_opt.fused_trimul: input LayerNorm + left|right projections and gates + mask in a Pallas prologue, one batched TF32 GEMM, centre LayerNorm + output projection + gate in a Pallas epilogue, float32) instead of the stock body; calls the block refuses run the stock body and are counted by reason' )
++parser.add_argument( "-opm_reassoc", action="store_true", default=False, help='L12 (changes numerics slightly, see CHANGES.md): every OuterProductMean module (Evoformer and extra-MSA stacks) computed re-associated by the kit adapter af2ig_opt.opm: the output weight folded into the right projection, then one GEMM over (MSA row, channel) — no [N, N, 32x32] outer-product intermediate and ~6.6x fewer FLOPs at this model\'s 5-row MSA (pure JAX, float32, XLA default-precision products as stock\'s einsums); an input the body does not expect runs the stock body, counted by reason' )
+ parser.add_argument( "-subbatch", type=int, default=0, help='L9: the row sub-batch of every Attention module and every Transition (alphafold global_config.subbatch_size, run through mapping.inference_subbatch; stock 4 rows, sized for 16 GB cards) set to N rows: the same per-row math in N-row chunks, N/rows scan iterations of large GEMMs instead of many small ones; the decision record is the model-opt tree\'s shared sub-batch policy (opt_core.jax_design.subbatch_policy via af2ig_opt.subbatch). 0 = stock' )
+ parser.add_argument( "-fast", action="store_true", default=False, help='Recommended exact stack: -host_outputs -device_params -sort_by_length (all exact: the stock output bytes)' )
+ parser.add_argument( "-trimul_chunk", type=str, default='', help='M1 memory lever (changes numerics slightly, see CHANGES.md): "<rows>:<min residues>" — TriangleMultiplication evaluated in row chunks of <rows> pair rows once the compiled length reaches <min residues>, through the model-opt tree\'s shared row-chunk producer (opt_core.mem.rowpair_jax.rowchunk via af2ig_opt.pairstack); shorter lengths run the stock body' )
+@@ -137,6 +138,13 @@
+     from af2ig_opt import fused_trimul as FUSED_TRIMUL
+     _mprobe = FUSED_TRIMUL.setup()
+     print(f"fused_trimul: block {FUSED_TRIMUL.IMPL} origin=core jax={_mprobe.get('jax')} cc={_mprobe.get('cc')} tiles={_mprobe.get('tiles')} precision={_mprobe.get('precision')}")
++OPM = None
++if args.opm_reassoc:
++    # L12: the kit's re-associated OuterProductMean (pure JAX: no kernel, no card rule), installed as OuterProductMean's __call__ before any design;
++    # a call on an input the body does not expect runs the stock body and is counted by reason, never silently.
++    from af2ig_opt import opm as OPM
++    _oprobe = OPM.setup()
++    print(f"opm_reassoc: impl {OPM.IMPL} origin=kit jax={_oprobe.get('jax')} backend={_oprobe.get('backend')} matmul_precision={_oprobe.get('matmul_precision')} dtype={_oprobe.get('dtype')}")
+ PAIRSTACK = None
+ if args.trimul_chunk:
+     # M1: the memory line's pair-stack lever, installed ONCE here, before the model runner is built: the kit's
+@@ -555,6 +563,9 @@
+         if FUSED_TRIMUL is not None and new_shape:
+             # L11 evidence: the same census for the TriangleMultiplication calls
+             timers.emit('fused_trimul', L_compiled=L, **FUSED_TRIMUL.census())
++        if OPM is not None and new_shape:
++            # L12 evidence: the same census for the OuterProductMean calls (served shapes name the MSA depth per stack)
++            timers.emit('opm_reassoc', L_compiled=L, **OPM.census())
+         if PAIRSTACK is not None and new_shape:
+             # M1 evidence: the pair-stack install's census (trimul_chunk traces engaged / disengaged)
+             timers.emit('pairstack', L_compiled=L, **PAIRSTACK.census())
+@@ -787,6 +798,8 @@
+                 timers.emit('fused_triattn', L_compiled=L, **FUSED_TRIATTN.census())
+             if FUSED_TRIMUL is not None:
+                 timers.emit('fused_trimul', L_compiled=L, **FUSED_TRIMUL.census())
++            if OPM is not None:
++                timers.emit('opm_reassoc', L_compiled=L, **OPM.census())
+             if PAIRSTACK is not None:
+                 timers.emit('pairstack', L_compiled=L, **PAIRSTACK.census())
+             if SUBBATCH is not None:
+@@ -833,6 +846,10 @@
+     # L11 evidence at exit, likewise
+     timers.emit('fused_trimul', L_compiled=None, final=True, **FUSED_TRIMUL.census())
+     FUSED_TRIMUL.emit()
++if OPM is not None:
++    # L12 evidence at exit, likewise
++    timers.emit('opm_reassoc', L_compiled=None, final=True, **OPM.census())
++    OPM.emit()
+ if PAIRSTACK is not None:
+     # M1 evidence at exit: the whole run's pair-stack census as the last pairstack record, and the per-lever lines on stderr
+     timers.emit('pairstack', L_compiled=None, final=True, **PAIRSTACK.census())

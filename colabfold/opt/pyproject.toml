@@ -1,0 +1,37 @@
+# colabfold_opt — explicit interface to the ColabFold (AlphaFold-Multimer v3) inference optimization.
+# Install editable, on the interpreter that carries colabfold, beside the shared core it pins below: `pip install -e common/opt_core -e colabfold/opt`. The kit code it
+# wraps lives beside the package (forward/af2_pallas_flash/af2_pallas_flash/af2_pallas_attn.py, the flash-attention adapter; the kernel it
+# drives is the shared core's) and is resolved from the package location, so the install must stay editable (or point
+# COLABFOLD_OPT_KIT / COLABFOLD_OPT_HOME at the tree). No install-time dependency on the upstream packages (colabfold,
+# alphafold-colabfold: stock/PINS.json): their versions are checked at activation. The build backend is setuptools plus one step that
+# ships colabfold_opt_autoload.pth at the wheel root, which is what makes `COLABFOLD_OPT=<mode>` activate without code changes
+# (see colabfold_opt/_autoload.py).
+[build-system]
+requires = ["setuptools>=64", "wheel"]
+build-backend = "_build_backend"
+backend-path = ["."]
+
+[project]
+name = "colabfold_opt"
+dynamic = ["version"]
+description = "ColabFold inference optimization: modes off/exact/fast/big over colabfold_batch's own command line, lazy autoload, activation report"
+requires-python = ">=3.10"
+classifiers = ["Private :: Do Not Upload"]        # not for PyPI: an upload carrying this classifier is rejected
+dependencies = []
+
+[project.optional-dependencies]
+test = ["pytest"]                                    # the package's CPU tests
+
+[project.scripts]
+colabfold-opt = "colabfold_opt.__main__:main"      # `colabfold-opt pred|check|warm ...` == `python -m colabfold_opt ...`
+
+[tool.setuptools]
+packages = ["colabfold_opt", "colabfold_opt.tests"]
+include-package-data = false
+
+[tool.setuptools.dynamic]
+version = {attr = "colabfold_opt.__version__"}
+
+[tool.opt_core]
+path = "../../common/opt_core"
+version = "0.5.215.0"

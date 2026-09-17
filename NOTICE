@@ -1,0 +1,292 @@
+Copyright 2026 Anthropic, PBC
+
+This tree contains 36 model packages and one shared library (common/opt_core).
+
+Original code in this tree — each package's opt/ directory, its run.sh
+command-line wrapper, configuration, container recipes, documentation and
+tests, the shared library common/opt_core (including its kit_template/ and
+tools/ directories) and common/mps_packing — is licensed under the Apache
+License, Version 2.0 (the "License"); see the LICENSE file in this directory.
+You may not use these files except in compliance with the License. Unless
+required by applicable law or agreed to in writing, software distributed under
+the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+CONDITIONS OF ANY KIND, either express or implied. Nothing in this NOTICE
+relicenses third-party code or data.
+
+UPSTREAM RELEASES UNDER stock/
+
+Each package's stock/ directory carries the upstream project at a pinned
+release, under that project's own licence: the release archive or wheel as
+published (apart from the exceptions listed below) and, in most packages, an
+unpacked reading copy of it or of the upstream repository at the pinned commit
+(stock/src/). The package's LICENSE file names the upstream licence, whose
+text travels inside stock/ and under the package's third_party_licenses/.
+Beside the upstream files every stock/ directory holds two files written for
+this tree, PINS.json (versions and SHA-256 pins) and check_pins.py; some also
+hold this tree's install helpers and patch files
+(af3_jax/stock/unpack_src.sh and stock/patches/,
+af3_torch/stock/fetch_upstream.py and stock/patches/,
+openfold3_ob0/stock/install_upstream.py), the PyPI metadata and provenance
+records of the pinned wheel (opendde/stock/pypi_*.json), the
+model card and configuration of the pinned checkpoint (enformer/stock/snapshot/,
+from the model repository named in enformer/STOCK.md) and, in e1, the Hugging
+Face hub kernel that stock E1 loads (e1/stock/hub_kernel/: the kernel's files
+and their BSD-3-Clause LICENSE, plus SOURCE.md written for this tree).
+
+The upstream files under stock/ are byte-identical to the pinned releases with
+these exceptions, each declared in the package's STOCK.md:
+  - af3_jax: stock/src/src/alphafold3/model/network/template_modules.py
+    carries the package's one declared bug-fix patch (nine added lines); the
+    archive stock/alphafold3-bc32b22f.tar.gz is unmodified.
+  - pxdesign: the PXDesign reading copy and archive leave out two font files
+    of upstream's pxdesign/pxd_server/ directory (Helvetica-Regular.ttf,
+    TimesNewRoman.ttf: proprietary typefaces of Linotype and Monotype that
+    upstream bundles for its server page), which nothing in the package
+    reads (pxdesign/STOCK.md).
+  - colabdesign: the BindCraft reading copy and archive leave out the two
+    pre-compiled third-party executables upstream bundles under functions/:
+    dssp, which run.sh install fetches from the BindCraft repository at the
+    pinned commit and verifies by digest, and DAlphaBall.gcc, which is not
+    distributed, not fetched and not used by any route of the package
+    (colabdesign/STOCK.md, colabdesign/THIRD_PARTY_NOTICES.md).
+  - complexa: the Proteina-Complexa archive leaves out one member,
+    src/proteinfoundation/result_analysis/sc, a pre-compiled third-party
+    executable that upstream's README says is obtained separately; nothing
+    the package runs reads it (complexa/STOCK.md 'Stock exceptions').
+PXDesignBench is not carried in this tree; pxdesign's run.sh install fetches it
+from upstream at its pinned commit, under its own licence.
+
+THIRD-PARTY MATERIAL OUTSIDE stock/
+
+Third-party source also lives inside the packages' own directories. Every such
+file is listed — with its upstream path, licence and copyright line — in the
+package's THIRD_PARTY_NOTICES.md (common/opt_core/THIRD_PARTY_NOTICES.md for
+the shared library), and its licence text is under the package's
+third_party_licenses/ or beside the file. The classes and their locations:
+
+(a) Vendored third-party code, unmodified:
+  - chrombpnet/opt/kit/torch/vendor/: bpnet-lite 1.0.0 and tangermeme 1.4.1
+    (MIT) with their dist-info licence files;
+    chrombpnet/opt/kit/torch/chrombpnet_k1/_vendor/typing_extensions.py
+    (PSF-2.0);
+  - caliby/opt/forward/xattempt_addon/stock/: eight files of Caliby
+    (Apache-2.0), Protpardelle-1c (MIT) and the Chroma modules Caliby carries
+    (Apache-2.0, Generate Biomedicines), kept as the unmodified counterparts of
+    the modified copies in ../fast/;
+  - common/opt_core: trimmed portions of FlashAttention-3's hopper/utils.h
+    and hopper/softmax.h (two copies of fa3_utils.h, BSD-3-Clause notice
+    kept) inside the triangle-attention kernel sources.
+
+(b) Modified copies of upstream files (the upstream header kept; the changes
+    marked in the file or described beside it):
+  - af2ig/opt/forward/af2ig_kit/patches/patched_files/ (dl_binder_design,
+    MIT, and the AlphaFold 2 files it carries, Apache-2.0, DeepMind);
+  - af3_jax/opt/forward/fast_inference/patches/patched_files/run_alphafold.py
+    (AlphaFold 3, Apache-2.0, DeepMind, as forked by alphafold3-open);
+  - af3_torch/opt/forward/af3t/af3_torch/xfold/ (the xfold model files, part
+    of them modified; see the note on their headers below);
+  - borzoi/opt/datapath/pipeline_tf/v17/borzoi_sad.py (Borzoi, Apache-2.0,
+    Calico);
+  - caliby/opt/forward/xattempt_addon/fast/ (the eight files named in (a));
+  - protenix_v1/opt/forward/v05_addon/lib/detpatch/scatter_utils.py and
+    protenix_v2/opt/forward/flashpairformer/src/detref/scatter_utils.py
+    (Protenix, Apache-2.0, ByteDance);
+  - rfdiffusion3/opt/forward/xattempt_addon/patched/rfd3/ and
+    rosettafold3/opt/forward/rf3_xattempt_addon/patched/rf3/ (foundry,
+    BSD-3-Clause);
+  - esmfold2/opt/forward/fast_inference/upstream/ (unified diffs against the
+    carried transformers fork; not applied by the package).
+
+(c) Prebuilt GPU binaries compiled from third-party or third-party-derived
+    source, each beside its source or a README/SOURCE file that names it:
+  - the fused LayerNorm extension carried by protenix_v1
+    (opt/forward/v05_addon/lib/fastln_prebuilt/), protenix_v2
+    (opt/forward/flashpairformer/third_party/fastln_prebuilt*/) and opendde
+    (opt/forward/fast_inference/levers/LNSTREAM/prebuilt/): Protenix's
+    layer-norm CUDA sources (Apache-2.0, ByteDance; portions by OneFlow and
+    HPC-AI Technology, Apache-2.0), themselves modified from NVIDIA Apex
+    (BSD-3-Clause), with this tree's changes; the modified sources sit in the
+    patched_src/ or src/ directory beside each binary;
+  - chrombpnet/opt/kit/torch/triton_cache_*/: Triton compiler output for the
+    package's own kernels, including Triton's runtime helper cuda_utils.so
+    (Triton, MIT);
+  - the shared library's extensions, cubins and XLA custom-call libraries under
+    common/opt_core/opt_core/kernels/ and the packages' own .so/.cubin files
+    are compiled from this tree's sources; the NVIDIA CUTLASS / CuTe,
+    FlashAttention-3, CCCL, PyTorch, pybind11, jaxlib XLA FFI and TensorFlow
+    headers they were built against (some binaries therefore contain object
+    code instantiated from those headers' templates), the Triton compiler that
+    produced the cubins, and the CUDA runtime code nvcc links in (statically in
+    four XLA libraries of the shared library and in protenix_v2's
+    libtriatt_procuda_sm90a.so) are named with their licences, binary by
+    binary, in the same notices files.
+
+(d) Files of this tree that restate, fuse or re-express statements of the
+    upstream model code they accelerate (kernels, levers, drivers) and
+    therefore derive from it. Such files exist in every package and in
+    common/opt_core; they derive from the project the package wraps and in
+    places from further projects (AlphaFold 2 and 3, OpenFold3, Protenix,
+    FlashAttention, PyTorch, xFormers, CPython), and each is attributed in
+    the package's THIRD_PARTY_NOTICES.md with the upstream file it derives
+    from. Several Protenix-derived directories in protenix_v1, protenix_v2,
+    pxdesign and opendde, and the OpenFold3-derived directories under
+    openfold3/opt/forward/ and openfold3_ob0/opt/forward/, carry a copy of the
+    upstream Apache-2.0 LICENSE (with ByteDance's or the AlQuraishi
+    Laboratory's copyright line) for that reason; the files in them are this
+    tree's work except where the notices name an upstream file.
+
+Notes on particular components:
+  - af3_torch: the model files carried from xfold keep the CC BY-NC-SA 4.0
+    header text they inherited from AlphaFold 3's initial source release;
+    xfold's own licence, like the licence of the AlphaFold 3 source carried in
+    af3_jax, is the Apache License, Version 2.0
+    (af3_torch/THIRD_PARTY_NOTICES.md lists the files and marks the ones this
+    tree modified).
+  - esmfold2: the carried stock/transformers-ef32577f.tar.gz is a snapshot of
+    a fork of Hugging Face transformers whose repository is no longer public;
+    it is redistributed under its Apache-2.0 licence, which travels inside the
+    archive (esmfold2/STOCK.md, esmfold2/THIRD_PARTY_NOTICES.md).
+  - No file of NVIDIA cuEquivariance (source, binary or packaged data) is
+    distributed in this tree; NVIDIA libraries are installed from NVIDIA's own
+    channels at install or build time under NVIDIA's terms. The tuning tables
+    in cuEquivariance's cache-file format under protenix_v2 were generated by
+    running that kit's own workloads through the library's tuner, and the
+    kernels in common/opt_core that return results bitwise identical to a
+    cuEquivariance operation were written independently against that
+    operation's observable inputs and outputs.
+  - Apart from the CUDA runtime code linked into the prebuilt binaries named
+    in (c), NVIDIA's CUDA toolkit, cuDNN, NCCL, TransformerEngine and CUDA
+    base images are not carried in this tree; the install routes fetch them
+    from NVIDIA's own distribution channels under NVIDIA's terms.
+
+PROFLUENT-E1 (package e1)
+
+e1 builds on Profluent-E1 (Profluent Bio Inc.), which is distributed under the
+Profluent-E1 Clickthrough License Agreement together with the Profluent-E1
+Attribution Guidelines; copies exactly as released are e1/stock/src/LICENSE,
+e1/stock/src/NOTICE and e1/stock/src/ATTRIBUTION. Recipients of e1 receive
+Profluent-E1 under that Agreement; downloading or using Profluent-E1 is
+acceptance of it. The Agreement and Guidelines require attribution to
+"Profluent-E1" in distributions and documentation and, for redistribution in
+object form, a display of "Profluent-E1" each time the resulting program runs:
+e1/README.md carries the statement "This project builds upon Profluent-E1 under
+the terms of the Profluent-E1 Clickthrough License Agreement", and e1/run.sh
+prints a one-line Profluent-E1 attribution naming the Agreement file at the
+start of every command. The Profluent-E1 model weights are not carried; e1's
+run.sh install --weights fetches them from the provider.
+
+MODEL WEIGHTS
+
+No package distributes the weights of the model it wraps, in this tree or in
+images built from it; users obtain them from the original providers under
+those providers' terms, and each package's STOCK.md names the source and the
+terms. Small parameter files that upstream projects ship inside their own
+source releases travel inside the carried archives exactly as released:
+colabdesign (ColabDesign archive: eight ProteinMPNN parameter files, MIT, and
+colabdesign/af/weights/template_dgram_head.npy, a small parameter array
+ColabDesign ships for AlphaFold 2's template distogram head; AlphaFold 2
+parameters are CC BY 4.0, DeepMind), mosaic (ProteinMPNN and AbMPNN weight
+files, MIT and CC BY 4.0, and a CC BY 4.0 trigram table), borzoi (Baskerville
+archive: tests/data/eval/model.h5, a small trained test model released with
+Baskerville, Apache-2.0) and enformer (enformer-pytorch's
+precomputed/tf_gammas.pt, a table of positional constants, MIT). They are
+listed in those packages' THIRD_PARTY_NOTICES.md files.
+
+DATA FILES IN CARRIED RELEASES AND IN THE PACKAGES
+
+Several upstream releases ship example or test data drawn from public sequence
+and structure databases; those files travel inside the carried archives and
+reading copies exactly as released, under the databases' own terms:
+  - rosettafold3: foundry archive member
+    models/rf3/docs/examples/msas/3en2_A.a3m.gz, an alignment of UniRef100
+    sequences (UniProt Consortium, CC BY 4.0); rfdiffusion3's foundry archive
+    carries the rfd3 documentation's example input structures (wwPDB-derived).
+  - pxdesign: stock/src/PXDesign/examples/ (also inside the archive): the PDL1
+    example alignments pairing.a3m and non_pairing.a3m hold UniRef100,
+    UniProtKB and UniParc sequences (CC BY 4.0), MGnify protein sequences
+    (EMBL-EBI: CC0 1.0, releases before 2019 CC BY 4.0) and sequences of the
+    ColabFold environmental database, which is built from BFD, MGnify and
+    metagenome assemblies (CC BY-SA 4.0); 5o45.cif is a wwPDB entry.
+  - openfold3, openfold3_ob0: stock/src/openfold3/tests/test_data/ holds
+    upstream's test alignments for PDB entry 2Q2K (hits drawn from UniRef90 and
+    UniProtKB, CC BY 4.0; MGnify, CC0 1.0 or CC BY 4.0 by release; BFD and
+    Uniclust30, CC BY-SA 4.0; and template searches against PDB chain
+    sequences), wwPDB mmCIF files and the NumPy/pickle snapshots produced by
+    upstream's tests.
+  - esm_if1: the fair-esm archive's examples/ hold alignments built from
+    UniRef (CC BY 4.0) and from Uniclust30 (hhblits_uniclust_2017_10_*.a3m;
+    Uniclust, CC BY-SA 4.0), the TEM-1 beta-lactamase mutational-scanning
+    data of the variant-prediction example (BLAT_ECOLX_Ranganathan2015*.csv,
+    P62593.fasta, as released with fair-esm), wwPDB coordinate files (4UV3,
+    5YH2, 2N2U) and the lm-design example data.
+  - af3_jax: the AlphaFold 3 archive's src/alphafold3/test_data/ holds
+    miniature_databases/ — small excerpts that upstream includes for its
+    tests, with the terms upstream states for them in
+    af3_jax/stock/src/README.md: BFD (Steinegger and Söding, CC BY-SA 4.0;
+    the excerpt as modified by Google DeepMind is stated there as CC BY 4.0),
+    MGnify, PDB mmCIF and seqres, Rfam and RNAcentral (CC0 1.0), UniProt and
+    UniRef90 (CC BY 4.0) and NCBI NT (NCBI's terms) — and upstream's
+    featurised example and stored model outputs (*.pkl, *.json) generated
+    from them.
+  - esmc, esmfold2: the esm archive's esm/data/ holds entry, hierarchy and
+    keyword tables derived from InterPro (EMBL-EBI, CC0 1.0) as released with
+    esm.
+  - complexa and genie3: the target structure sets of Proteina-Complexa
+    (assets/target_data/) and of Genie's binder benchmark
+    (data/design/binder_design/binderbench/) are crops, excerpts or prepared
+    models of wwPDB entries and published de novo binder targets as released by
+    those projects (Proteina-Complexa states CC BY 4.0 for its prepared data in
+    licenses/license_datasets.txt inside the archive); af2ig's dl_binder_design
+    archive carries its examples/ (wwPDB-derived target crops with the authors'
+    designed binder models) and the AlphaFold 2 test structures it vendors;
+    colabdesign's BindCraft copy carries example/PDL1.pdb (a crop of a
+    deposited PD-L1 structure); chrombpnet's archive carries the motif tables
+    of its data/ directory (position-weight matrices compiled by upstream from
+    JASPAR, CC BY 4.0, and HOCOMOCO, with upstream's own bias motifs); borzoi's
+    archives carry Borzoi's data/ tables and Baskerville's tests/data/
+    (including hg38_1m.fa.gz, a one-megabase excerpt of the GRCh38 human
+    reference assembly, and miniature training shards); opendde's reading copy
+    carries examples/2lwu.cif and 7pzb.pdb (wwPDB entries); flashzoi's wheel
+    carries Borzoi's track table (precomputed/targets.txt) and gpnstar's
+    archive a 128-bp alignment fixture of the store named below.
+wwPDB archive data are free of all copyright restrictions (CC0 1.0).
+
+Test and example inputs written into the packages themselves (tests/inputs,
+public_inputs, inputs_public, inputs/msa, inputs/targets, tests/specs,
+tests/fixtures and examples directories) are public records or synthetic:
+coordinate files are wwPDB entries or crops of them, named by their PDB
+identifiers, with two exceptions — boltzgen's PD-L1 test specification
+(opt/forward/fast_inference/tests/specs/PDL1_IgV_Q9NZQ7_18-132.pdb) is a
+trimmed AlphaFold Protein Structure Database model (AF-Q9NZQ7-F1; CC BY 4.0,
+DeepMind and EMBL-EBI), and rfdiffusion1's inputs_public/insulin_target.pdb is
+a computed structure model (its header reads EXPDTA THEORETICAL MODEL) — the
+insulin receptor target example distributed with RFdiffusion (BSD-3-Clause) —
+not a wwPDB entry. Test sequences are those entries' sequences or synthetic
+(e1's warm-up set); the alignment files (.a3m) in these directories are single-
+sequence (query-only) inputs and contain no database sequences; flashzoi's
+warm-up window (opt/forward/kits_v1_25/canary_window_0.npz) is a one-hot
+524,288-bp window of the GRCh38 human reference assembly; gpnstar's
+examples/msa/ is a 0.14-MiB excerpt of the public 100-vertebrate alignment
+store described in gpnstar/examples/README.md (Hugging Face dataset
+songlab/multiz100way, dataset card licence MIT; alignment origin UCSC hg38
+multiz100way). Where a directory needs entry-level attribution it or its parent
+carries a README, NOTICE, PROVENANCE or SOURCES file.
+
+COPYLEFT AND SHARE-ALIKE TERMS INSIDE CARRIED RELEASES
+
+Two kinds of file with copyleft or share-alike terms travel inside carried
+releases exactly as their upstream projects ship them, unmodified.
+OpenStructure's stereo_chemical_props.txt data table (LGPL-3.0), the file
+AlphaFold 2 and OpenFold obtain from OpenStructure, travels in four byte-
+identical copies: in colabfold's two wheels (colabfold-1.6.1, member
+colabfold/openstructure/ with the LGPL text beside it;
+alphafold_colabfold-2.3.13, member alphafold/common/), in af2ig's
+dl_binder_design archive (member af2_initial_guess/alphafold/common/) and in
+complexa's Proteina-Complexa archive (member
+community_models/openfold/resources/); colabfold/THIRD_PARTY_NOTICES.md
+describes the file and its licence. The alignment data drawn from BFD,
+Uniclust30 or the ColabFold metagenomic sets named above (esm_if1's Uniclust30
+alignment, the bfd_uniclust_hits.a3m files of openfold3 and openfold3_ob0, the
+environmental-database entries of pxdesign's non_pairing.a3m) are under CC BY-
+SA 4.0. No other GPL- family licence applies to a file in this tree or inside
+the carried archives.

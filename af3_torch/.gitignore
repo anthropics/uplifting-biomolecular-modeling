@@ -1,0 +1,4 @@
+# environment/Dockerfile's prebuilt route (--build-arg WHEELS_FROM=prebuilt) reads two binary files from stock/wheels/ (not in git; README.md 'Setup',
+# stock/PINS.json reference.artefacts); the directory itself stays in git through .keep
+stock/wheels/*
+!stock/wheels/.keep

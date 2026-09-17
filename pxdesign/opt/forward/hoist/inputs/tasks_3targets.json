@@ -1,0 +1,99 @@
+[
+ {
+  "name": "pdl1",
+  "condition": {
+   "structure_file": "opt/forward/hoist/inputs/targets/5o45.cif",
+   "filter": {
+    "chain_id": [
+     "A"
+    ],
+    "crop": {
+     "A": "1-116"
+    }
+   },
+   "msa": {}
+  },
+  "hotspot": {
+   "A": [
+    40,
+    99,
+    107
+   ]
+  },
+  "generation": [
+   {
+    "type": "protein",
+    "length": 75,
+    "count": 1
+   }
+  ]
+ },
+ {
+  "name": "tnfa",
+  "condition": {
+   "structure_file": "opt/forward/hoist/inputs/targets/1tnf.cif",
+   "filter": {
+    "chain_id": [
+     "A",
+     "B",
+     "C"
+    ],
+    "crop": {}
+   },
+   "msa": {}
+  },
+  "hotspot": {
+   "A": [
+    32,
+    65,
+    73,
+    75,
+    92,
+    144,
+    145,
+    146
+   ]
+  },
+  "generation": [
+   {
+    "type": "protein",
+    "length": 80,
+    "count": 1
+   }
+  ]
+ },
+ {
+  "name": "il7ra",
+  "condition": {
+   "structure_file": "opt/forward/hoist/inputs/targets/3di3.cif",
+   "filter": {
+    "chain_id": [
+     "B"
+    ],
+    "crop": {
+     "B": "21-213"
+    }
+   },
+   "msa": {}
+  },
+  "hotspot": {
+   "B": [
+    62,
+    63,
+    84,
+    86,
+    87,
+    143,
+    195,
+    196
+   ]
+  },
+  "generation": [
+   {
+    "type": "protein",
+    "length": 82,
+    "count": 1
+   }
+  ]
+ }
+]

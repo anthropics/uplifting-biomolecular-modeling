@@ -1,0 +1,40 @@
+{
+ "carried_digests": {
+  "CELLS.json": "9e8ed8d08c691146d9d75becd0b25d2bec72aae266a645bb0a5d126e174f0359",
+  "__init__.py": "4ef16e29f2e088bc8b81a8e74639d646e996a15a40053ba9d7d680aeba18aabb",
+  "_paths.py": "a9a8ff3b4f578d08fa03bd1a436f8428ab38751df97c942467146cfc7cf89461",
+  "_prebuilt/__init__.py": "fe366d8c351d7c243252bba4dbf09f1ef690f99900c9af92e8f0f417d5c608a2",
+  "_prebuilt/blobs/cuda_mma-v3.3-srca1ceadcb993c-sm_80-cuda12_6.cubin.xz": "2b6252db1fa01fc468764bfe546390b3d93f155241e394e7390a9d278758bb58",
+  "_prebuilt/blobs/cuda_mma-v3.3-srca1ceadcb993c-sm_80-cuda13_0.cubin.xz": "2493acd2126f77a2e2ff8af486859ec03aff173602b62a8a794cf65445c41de2",
+  "_prebuilt/blobs/cuda_mma-v3.3-srca1ceadcb993c-sm_90-cuda12_6.cubin.xz": "730ca9f4fbb1653995fb227831dc57cfb2423bce5331447ae91dc5df7cba6456",
+  "_prebuilt/blobs/cuda_mma-v3.3-srca1ceadcb993c-sm_90-cuda13_0.cubin.xz": "f4f1891ea2f8768f792ebee5bad03cab9edbb2af4a637073f6936aa5d0ce7849",
+  "_prebuilt/blobs/cuda_mma-v3.3-srca1ceadcb993c-sm_90a-cuda12_6.cubin.xz": "a284cdb9314b02c9de962e2adc3a22dfe70259c6637192e659530c00b64c0bb3",
+  "_prebuilt/blobs/cuda_mma-v3.3-srca1ceadcb993c-sm_90a-cuda13_0.cubin.xz": "9dde8fd77891b1de549bc1d033a61c24ea28c5a61ae433c3d0ddf4df7bd81b27",
+  "_prebuilt/cuda_mma.py": "f91170e2619c29ec7c4edea7ec3f13f763fbddc7b55ce2faa054ea2c93f39700",
+  "_prebuilt/driver.py": "c444545fda3705cde897e79478cef1eb772add6697d5c5f3fb9e61d73dee0798",
+  "_prebuilt/manifest.json": "00a1f8d5a25bceeb23c9422cdb02079c012ddafb13c5e8b5b530f0eca2da0509",
+  "csrc/cuda_mma/triattn_v3.cu": "d5365b4d1bc472f8853deb51649810af959ab45b7baaa5e750cc4e7388a02720",
+  "cuda_mma/__init__.py": "fad10acd7a4e4d4636c4dfbd7e9c3ba611c2b817173149f01ec9b0f6a3bd8635",
+  "face.py": "16a66a23e3e56c968e3c3feb77bc59bf4547776afbb6ac235cd6c1bb3de52267"
+ },
+ "carried_digests_note": "sha256 of every checkpoint-derived file (the same values UPSTREAM.json records beside the checkpoint id); tests/test_triattn_exact_row.py holds the directory to both and each to the other",
+ "exports": {},
+ "kind": "package",
+ "license": "original source, the package licence (third-party components: common/opt_core/THIRD_PARTY_NOTICES.md); no third-party code or vendor binary (the member is compiled from csrc/ at first use)",
+ "mechanism": "kernels.triattn row `triattn_exact` through kernels.triattn.exact_member (load / install / serve / counts); the import name `triattn_exact` is routed to this directory (opt_core.kernels.route)",
+ "name": "triattn_exact",
+ "not_byte_identical": {
+  "*.py": "byte-identical to the checkpoint named in UPSTREAM.json except cuda_mma/__init__.py and face.py (a few comments worded for this tree; AST-equal) and __init__.py (+ the __future__ import)",
+  "CELLS.json": "the checkpoint's proven cell rows of the carried kernel route reduced to the consumed keys; route_fingerprint re-stamped over this directory's bytes (UPSTREAM.json restamp/bridge)",
+  "README.md, UPSTREAM.json": "this tree's own files",
+  "_prebuilt/manifest.json": "build records of the carried kernel ABI reduced to the consumed keys; blobs byte-identical",
+  "csrc/*": "identical below its two header comment lines"
+ },
+ "not_carried": {
+  "the package's benchmarking and equality tooling, exploration members and their sources, the small-S member and its cells, dispatch-policy data, notes and result files": "only the face, the default member (cuda_mma, source csrc/cuda_mma/triattn_v3.cu), its prebuilt launcher and certified binaries (_prebuilt/) and the kernel route's proven cells are carried; UPSTREAM.json lists exactly what is"
+ },
+ "runtime_imports": [],
+ "runtime_imports_note": "torch at the package's own module level, reached only through kernels.triattn.exact_member.load() (never at opt_core import); the cuequivariance library inside the face's self-check; ctypes and an nvcc subprocess for the member build",
+ "served_note": "triattn_exact.face.triangle_attention(q, k, v, bias, mask=None, scale=None, kv_lengths=None): CUDA bf16 (fp16/fp32 where a cell says so) q/k/v [B,N,H,S,D] incl. strided views and 4-D B=1 forms, bias [B,1,H,S,S], bool key mask [B,N,1,1,S]; serves only calls covered by a `proven` row of CELLS.json for the live (library version, ops build, device class, dtype, head_dim, shape class, CUEQ_TRIATTN_FALLBACK_THRESHOLD state), refuses everything else by name before launch (triattn_exact.Refused); first call per (process, device, library version, route) self-checks against the live library; member cuda_mma built by nvcc at first use, cached under TRIATTN_EXACT_CACHE",
+ "version": "checkpoint 9fc43ae0ec47 (UPSTREAM.json)"
+}

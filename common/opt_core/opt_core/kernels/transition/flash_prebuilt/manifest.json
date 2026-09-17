@@ -1,0 +1,43 @@
+{
+ "binaries": {
+  "torch2.13.0+cu130-cpython-312-x86_64-linux-gnu-sm90": {
+   "arch": [
+    "sm_90a"
+   ],
+   "build_s": 65.0,
+   "built_utc": "2026-09-11T21:07:41Z",
+   "cuda": "13.0",
+   "cuda_flags": [
+    "-O3",
+    "-std=c++17",
+    "--expt-relaxed-constexpr",
+    "-gencode=arch=compute_90a,code=sm_90a",
+    "-Xcompiler=-Wno-psabi",
+    "-DNDEBUG",
+    "-diag-suppress=177,550,20012",
+    "-Xptxas=--register-usage-level=10"
+   ],
+   "cutlass_headers": "4.2.0",
+   "gpu_at_build": "NVIDIA H100 80GB HBM3",
+   "hidden_chunk": 32,
+   "loadcheck": {
+    "fresh_interpreter": true,
+    "silu_mismatch": 0
+   },
+   "note": "built in the AF3-family cp312 dev image (torch 2.13.0+cu130, CPython 3.12, nvcc 13.0, CUTLASS 4.2.0 headers) from the sealed csrc",
+   "nvcc": "Build cuda_13.0.r13.0/compiler.36424714_0",
+   "python_tag": "cp312",
+   "smem_bytes": 230400,
+   "so": "torch2.13.0+cu130-cpython-312-x86_64-linux-gnu-sm90/flash_transition_sm90a.so",
+   "so_sha256": "4172424874d2ece9d068afd072dbe88ff8eb639d8a8a81786d0ada9dfdd20494",
+   "soabi": "cpython-312-x86_64-linux-gnu",
+   "torch": "2.13.0+cu130"
+  }
+ },
+ "module_name": "flash_transition_sm90a",
+ "sources": {
+  "build.py": "83ab2c2987d8d28d64c71d8cdeff76a7e661bce22d734161e2f752f24b3b8fba",
+  "flash_transition_sm90.cu": "7ee9e32427ea94bce41ae04efbfde6b40e14b313fdfb4cbede8de2c589c2fead"
+ },
+ "unit": "flash_sm90a"
+}

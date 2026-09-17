@@ -1,0 +1,64 @@
+{
+"7bfaf620546489c72284f07096ed1f98448799ea11c66fa5dbb50ab8e6d9ec60": {
+"126976_256_256_torch.float16_torch.float16_torch.float16_torch.float16_torch.float16_True_False_False_default": {
+"config": {
+"TILE_K": 64,
+"TILE_M": 128,
+"TILE_N": 128,
+"num_stages": 3,
+"num_warps": 4
+},
+"time": 0.08681830596923829
+},
+"126976_512_256_torch.float16_None_torch.float16_torch.float16_torch.float16_False_False_False_default": {
+"config": {
+"TILE_K": 32,
+"TILE_M": 128,
+"TILE_N": 64,
+"num_stages": 4,
+"num_warps": 4
+},
+"time": 0.15787545776367187
+},
+"262144_256_256_torch.float16_torch.float16_torch.float16_torch.float16_torch.float16_True_False_False_default": {
+"config": {
+"TILE_K": 64,
+"TILE_M": 128,
+"TILE_N": 128,
+"num_stages": 3,
+"num_warps": 4
+},
+"time": 0.19028314208984376
+},
+"262144_512_256_torch.float16_None_torch.float16_torch.float16_torch.float16_False_False_False_default": {
+"config": {
+"TILE_K": 32,
+"TILE_M": 128,
+"TILE_N": 64,
+"num_stages": 4,
+"num_warps": 4
+},
+"time": 0.401170166015625
+},
+"34304_256_256_torch.float16_torch.float16_torch.float16_torch.float16_torch.float16_True_False_False_default": {
+"config": {
+"TILE_K": 64,
+"TILE_M": 128,
+"TILE_N": 128,
+"num_stages": 3,
+"num_warps": 8
+},
+"time": 0.039436161041259764
+},
+"34304_512_256_torch.float16_None_torch.float16_torch.float16_torch.float16_False_False_False_default": {
+"config": {
+"TILE_K": 32,
+"TILE_M": 128,
+"TILE_N": 64,
+"num_stages": 3,
+"num_warps": 4
+},
+"time": 0.04715315246582031
+}
+}
+}

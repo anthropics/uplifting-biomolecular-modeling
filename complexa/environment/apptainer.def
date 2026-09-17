@@ -1,0 +1,30 @@
+# Proteina-Complexa optimization kit — Apptainer / Singularity image made FROM the container image of complexa/environment/Dockerfile: the same
+# stack, the same /opt/pc and /kit, for hosts that run Apptainer instead of Docker. The source is the image tagged complexa-kit:dev in the local
+# Docker daemon (build it first with complexa/environment/Dockerfile); for a published tag the two header lines read `Bootstrap: docker` /
+# `From: <registry>/complexa-kit:<tag>`.
+#   apptainer build complexa.sif complexa/environment/apptainer.def
+#   apptainer run --nv --cleanenv --bind /path/to/complexa_weights:/weights --env CKPT_PATH=/weights --bind "$PWD/out":/out complexa.sif \
+#     design --config h100 --mode off --out /out/pdl1 -- ++generation.dataloader.dataset.nres.nsamples=2
+# The image is read-only: give every run an --out on a bound, writable path; the JIT caches go under $HOME/.cache (bound by default);
+# %environment keeps a host user site-packages (PEP 370) from shadowing the pinned stack, --cleanenv keeps the host's variables out.
+Bootstrap: docker-daemon
+From: complexa-kit:dev
+
+%post
+    mkdir -p /opt/culib && ln -s /.singularity.d/libs/libcuda.so.1 /opt/culib/libcuda.so && ln -s /.singularity.d/libs/libcuda.so.1 /opt/culib/libcuda.so.1
+
+%environment
+    export PYTHONNOUSERSITE=1
+    # Triton <= 3.5 links its launcher stub with -lcuda: offer the unversioned name when --nv bound only libcuda.so.1
+    if [ -z "${TRITON_LIBCUDA_PATH:-}" ] && [ -e /opt/culib/libcuda.so ]; then export TRITON_LIBCUDA_PATH=/opt/culib; fi
+
+%runscript
+    cd /kit/complexa && exec bash /kit/complexa/run.sh "$@"
+
+%help
+    Proteina-Complexa optimization kit: stock Proteina-Complexa 1.1.0 binder generation (upstream's `complexa generate`, the generation stage)
+    behind one interface — mode off = stock exactly, with your Hydra overrides after `--`; exact / fast / big = the same command with the
+    kit's levers inside upstream's process (exact, big: byte-identical designs, less memory; fast: faster still, tolerance class).
+    `apptainer run --nv complexa.sif <verb> ...` = `bash /kit/complexa/run.sh <verb> ...`
+    (verbs: install, design, check; /kit/complexa/README.md inside the image). Requires an NVIDIA driver that runs CUDA 12.6 (560 or newer)
+    and CKPT_PATH naming the directory that holds complexa.ckpt + complexa_ae.ckpt (`run.sh install --weights DIR` fetches them).

@@ -1,0 +1,2 @@
+# <sha256>  <file> of every cubin shipped in this directory (build_prebuilt.py writes the lines); none ships in this tree.
+# ef2_nvjit.shipped_cubin refuses by name a cubin that is not a line here or whose bytes hash to another digest.

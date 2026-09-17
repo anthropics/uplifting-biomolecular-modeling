@@ -1,0 +1,29 @@
+{
+ "description": "Public selftest inputs: barnase-barstar (PDB 1BRS) tiled 1:1..4:4 (199/398/597/796 protein tokens), single-sequence mode (no MSA files needed: chai-lab folds without MSAs when msa_directory has no matching .aligned.pqt), ESM embeddings on.",
+ "entries": [
+  {
+   "name": "1BRS_1to1",
+   "fasta": "1BRS_1to1.fasta",
+   "n_protein_tokens": 199,
+   "source": "RCSB PDB 1BRS (barnase chains A-C = entity 1, barstar chains D-F = entity 2); sequences from https://www.rcsb.org/fasta/entry/1BRS"
+  },
+  {
+   "name": "1BRS_2to2",
+   "fasta": "1BRS_2to2.fasta",
+   "n_protein_tokens": 398,
+   "source": "RCSB PDB 1BRS (barnase chains A-C = entity 1, barstar chains D-F = entity 2); sequences from https://www.rcsb.org/fasta/entry/1BRS"
+  },
+  {
+   "name": "1BRS_3to3",
+   "fasta": "1BRS_3to3.fasta",
+   "n_protein_tokens": 597,
+   "source": "RCSB PDB 1BRS (barnase chains A-C = entity 1, barstar chains D-F = entity 2); sequences from https://www.rcsb.org/fasta/entry/1BRS"
+  },
+  {
+   "name": "1BRS_4to4",
+   "fasta": "1BRS_4to4.fasta",
+   "n_protein_tokens": 796,
+   "source": "RCSB PDB 1BRS (barnase chains A-C = entity 1, barstar chains D-F = entity 2); sequences from https://www.rcsb.org/fasta/entry/1BRS"
+  }
+ ]
+}

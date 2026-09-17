@@ -1,0 +1,28 @@
+# ESM-IF1 optimization kit — Apptainer / Singularity image made FROM the container image of esm_if1/environment/Dockerfile: the same stack and the
+# same /kit, for hosts that run Apptainer instead of Docker. The source is the image tagged esm_if1-kit:dev in the local Docker daemon (build it
+# first: esm_if1/environment/Dockerfile); for a published tag the two header lines read `Bootstrap: docker` / `From: <registry>/esm_if1-kit:<tag>`.
+#   apptainer build esm_if1.sif esm_if1/environment/apptainer.def
+#   apptainer run --nv --cleanenv --bind /path/to/weights:/weights --env ESM_IF1_WEIGHTS=/weights/esm_if1_gvp4_t16_142M_UR50.pt --bind "$PWD/out":/out esm_if1.sif \
+#     design --config h100 --chain A --num-samples 8 --input /out/backbones --out /out/run
+# The image is read-only: give `design` an --out on a bound, writable path and keep MODEL_OPT_STATE / TORCH_HOME (default $HOME/.cache/esm_if1_opt,
+# bound by default) writable; %environment keeps a host user site-packages (PEP 370) from shadowing the pinned stack, --cleanenv keeps the host's variables out.
+Bootstrap: docker-daemon
+From: esm_if1-kit:dev
+
+%environment
+    export PYTHONNOUSERSITE=1
+    # Triton <= 3.5 links its launcher stub with -lcuda: offer the unversioned name when --nv bound only libcuda.so.1
+    if [ -z "${TRITON_LIBCUDA_PATH:-}" ] && [ -e /opt/culib/libcuda.so ]; then export TRITON_LIBCUDA_PATH=/opt/culib; fi
+
+%runscript
+    cd /kit/esm_if1 && exec bash /kit/esm_if1/run.sh "$@"
+
+%help
+    ESM-IF1 optimization kit: one command line around ESM-IF1 sequence design (facebookresearch/esm @ 2b369911, checkpoint
+    esm_if1_gvp4_t16_142M_UR50) — backbones in, S sampled sequences per backbone out; `--mode off` is stock (upstream's sample_sequences.py as
+    shipped); `--mode fast`, the default, is batched sampling over upstream's unmodified encoder and decoder (any other mode word exits 2 with one usage line).
+    `apptainer run --nv esm_if1.sif <verb> ...` = `bash /kit/esm_if1/run.sh <verb> ...` (verbs: install, design, check; /kit/esm_if1/README.md inside
+    the image). Requires an NVIDIA driver that runs CUDA 12.1 (530 or newer); ESM_IF1_WEIGHTS names the checkpoint (or TORCH_HOME holds it).
+
+%post
+    mkdir -p /opt/culib && ln -s /.singularity.d/libs/libcuda.so.1 /opt/culib/libcuda.so && ln -s /.singularity.d/libs/libcuda.so.1 /opt/culib/libcuda.so.1

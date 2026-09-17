@@ -1,0 +1,105 @@
+# GPN-Star optimization kit — the tested stack: `python -m pip freeze --all` of its interpreter, Python 3.13.15 (/usr/local/bin/python, the CPython of
+# the official `python:3.13.15-slim-bookworm` image: Debian 12), less this kit (gpnstar/opt) and the shared core (common/opt_core) — those two
+# install editable on top (README.md 'Setup'). pip 26.2.1 replaces the interpreter's bundled pip. torch 2.13.0 is PyPI's CUDA 13.0 build
+# (torch.__version__ 2.13.0+cu130): it loads the CUDA 13.0 runtime, cuBLAS 13.1, cuDNN 9.20 and NCCL 2.29 from the nvidia-* and cuda-toolkit wheels
+# below (no CUDA toolkit is installed beside them); triton 3.7.1 is torch's own dependency: idle on the kit's path — the model runs eager PyTorch in
+# fp32 with the attention math backend, nothing is compiled — and used by torch.compile's inductor backend only under upstream's `--torch-compile`
+# flag. transformers is held at 5.15.0, the release stock gpn itself pins; huggingface_hub 1.31.0,
+# safetensors 0.8.0, accelerate 1.15.0, numpy 2.5.3 and zarr 3.3.0 are the releases the kit was measured with; every other line is pip's resolution
+# of `torch==2.13.0 transformers==5.15.0 accelerate==1.15.0 huggingface_hub==1.31.0 numpy==2.5.3 safetensors==0.8.0 zarr==3.3.0
+# "gpn[inference] @ git+https://github.com/songlab-cal/gpn@6f28c81bcbfe7d65cb6d8ece9ce88f87ca583791"` on that interpreter. Stock gpn 0.9.0 is
+# songlab-cal/gpn at commit 6f28c81b (stock/PINS.json upstream), installed from the byte-frozen archive of that commit the bundle carries,
+# gpnstar/stock/gpn-6f28c81b.tar.gz: its line below is that archive's path relative to the bundle's top directory (the one holding gpnstar/ and
+# common/), and pip builds it with hatchling; its inference extra brings datasets, pandas, pyarrow, biopython and zarr. The GPU driver is the
+# host's and must run CUDA 13.0 (driver 580 or newer). environment/Dockerfile installs this file with --no-deps, the archive line filtered out
+# (the Dockerfile installs its own copy of the same archive); on its own the file is one-pass installable from the bundle's top directory:
+# `python -m pip install --no-deps -r gpnstar/environment/requirements.lock` (README.md 'Setup').
+accelerate==1.15.0
+aiohappyeyeballs==2.7.1
+aiohttp==3.14.3
+aiosignal==1.4.0
+annotated-doc==0.0.5
+anyio==4.15.1
+attrs==26.1.0
+biopython==1.88
+certifi==2026.7.22
+charset-normalizer==3.5.1
+click==8.5.0
+cuda-bindings==13.4.1
+cuda-pathfinder==1.8.1
+cuda-toolkit==13.0.3.0
+cyclopts==4.25.2
+datasets==5.0.1
+dill==0.4.1
+docstring_parser==0.18.0
+donfig==0.8.1.post1
+filelock==3.32.6
+frozenlist==1.8.0
+fsspec==2026.6.0
+google-crc32c==1.8.0
+# Stock gpn 0.9.0 at commit 6f28c81bcbfe7d65cb6d8ece9ce88f87ca583791: the byte-frozen archive in gpnstar/stock/ (sha256
+# cd419bb743cb464e2bcd8697d3087f1ccf928453c184fdc16ce9a47748823f22, as stock/PINS.json records), by its path from the bundle's top directory;
+# `gpn @ git+https://github.com/songlab-cal/gpn@6f28c81bcbfe7d65cb6d8ece9ce88f87ca583791` is the byte-equivalent line for a checkout without the archive.
+./gpnstar/stock/gpn-6f28c81b.tar.gz
+h11==0.16.0
+hf-xet==1.6.0
+httpcore==1.0.9
+httpx==0.28.1
+huggingface_hub==1.31.0
+idna==3.19
+jaxtyping==0.3.11
+Jinja2==3.1.6
+markdown-it-py==4.2.0
+MarkupSafe==3.0.3
+mdurl==0.1.2
+mpmath==1.3.0
+multidict==6.8.0
+multiprocess==0.70.19
+networkx==3.6.1
+numcodecs==0.16.5
+numpy==2.5.3
+nvidia-cublas==13.1.1.3
+nvidia-cuda-cupti==13.0.85
+nvidia-cuda-nvrtc==13.0.88
+nvidia-cuda-runtime==13.0.96
+nvidia-cudnn-cu13==9.20.0.48
+nvidia-cufft==12.0.0.61
+nvidia-cufile==1.15.1.6
+nvidia-curand==10.4.0.35
+nvidia-cusolver==12.0.4.66
+nvidia-cusparse==12.6.3.3
+nvidia-cusparselt-cu13==0.8.1
+nvidia-nccl-cu13==2.29.7
+nvidia-nvjitlink==13.4.52
+nvidia-nvshmem-cu13==3.4.5
+nvidia-nvtx==13.0.85
+packaging==26.3
+pandas==3.0.5
+pip==26.2.1
+propcache==0.5.2
+psutil==7.2.2
+pyarrow==25.0.1
+Pygments==2.21.0
+python-dateutil==2.9.0.post0
+PyYAML==6.0.3
+regex==2026.9.10
+requests==2.34.2
+rich-rst==2.1.0
+rich==15.0.0
+safetensors==0.8.0
+setuptools==84.0.0
+shellingham==1.5.4
+six==1.17.0
+sympy==1.14.0
+tokenizers==0.22.2
+torch==2.13.0
+tqdm==4.70.1
+transformers==5.15.0
+triton==3.7.1
+typer==0.27.2
+typing_extensions==4.16.0
+urllib3==2.7.0
+wadler_lindig==0.1.7
+xxhash==4.0.1
+yarl==1.24.5
+zarr==3.3.0

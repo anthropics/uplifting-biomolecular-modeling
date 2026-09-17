@@ -1,0 +1,141 @@
+{
+ "schema": "model-opt-release/PINS/v1 (as protenix_v2/stock/PINS.json: upstream + weights + stack + stock_environment)",
+ "engine": "atlasfold",
+ "upstream": {
+  "repo": "https://github.com/SeonghwanSeo/atlasfold",
+  "tag": "v1.0.0",
+  "commit": "992067e67df29b665c501e0d2e9ead9dd4ba9b69",
+  "commit_date": "2026-09-08T17:54:16+09:00",
+  "license": "MIT (LICENSE; pyproject license=MIT; README L226: code, model weights and released datasets under MIT)",
+  "paper": "bioRxiv 10.64898/2026.09.04.749352 (v2)",
+  "stock_src": "stock/src = the tagged tree minus docs/atlasfold.pdf and docs/images (byte-identical otherwise)",
+  "stock_src_tree_sha256": "cb8da752da3c41163c52885c93108523e6452edd31b34d2341f29b89ae695bfb",
+  "stock_src_tree_digest_rule": "sha256 over sorted (relpath, sha256(file)) pairs, __pycache__/*.pyc excluded (stock/check_pins.py)"
+ },
+ "weights": [
+  {
+   "repo": "SeonghwanSeo/atlasfold-260703",
+   "file": "config.json",
+   "revision": "d6e6193bb51e6ec68ca19f776f1cc85c0aa3de72",
+   "bytes": 3,
+   "sha256": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356",
+   "url": "https://huggingface.co/SeonghwanSeo/atlasfold-260703/resolve/d6e6193bb51e6ec68ca19f776f1cc85c0aa3de72/config.json",
+   "license": "MIT (HF card tag mit; README of SeonghwanSeo/atlasfold L226)"
+  },
+  {
+   "repo": "SeonghwanSeo/atlasfold-260703",
+   "file": "weights/atlasfold-260703.pth",
+   "revision": "d6e6193bb51e6ec68ca19f776f1cc85c0aa3de72",
+   "bytes": 859549307,
+   "sha256": "cbadb227d40e801a3d268d6e884e6ed3c6b9fb89d558739fcf5970492732e5ea",
+   "url": "https://huggingface.co/SeonghwanSeo/atlasfold-260703/resolve/d6e6193bb51e6ec68ca19f776f1cc85c0aa3de72/weights/atlasfold-260703.pth",
+   "license": "MIT (HF card tag mit; README of SeonghwanSeo/atlasfold L226)"
+  },
+  {
+   "repo": "SeonghwanSeo/atlasfold-260703",
+   "file": "README.md",
+   "revision": "d6e6193bb51e6ec68ca19f776f1cc85c0aa3de72",
+   "bytes": 1598,
+   "sha256": "ac8a9aec091aadd688a9b4d6fcbf5771adde772cebbeb961eb1741cc567ab2af",
+   "url": "https://huggingface.co/SeonghwanSeo/atlasfold-260703/resolve/d6e6193bb51e6ec68ca19f776f1cc85c0aa3de72/README.md",
+   "license": "MIT (HF card tag mit; README of SeonghwanSeo/atlasfold L226)"
+  },
+  {
+   "repo": "SeonghwanSeo/atlasfold-m-260725",
+   "file": "config.json",
+   "revision": "f6e1297299271b56a2ac191cf19a6daee74f3b39",
+   "bytes": 3,
+   "sha256": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356",
+   "url": "https://huggingface.co/SeonghwanSeo/atlasfold-m-260725/resolve/f6e1297299271b56a2ac191cf19a6daee74f3b39/config.json",
+   "license": "MIT (HF card tag mit; README of SeonghwanSeo/atlasfold L226)"
+  },
+  {
+   "repo": "SeonghwanSeo/atlasfold-m-260725",
+   "file": "weights/atlasfold-m-260725.pth",
+   "revision": "f6e1297299271b56a2ac191cf19a6daee74f3b39",
+   "bytes": 881306737,
+   "sha256": "210e3e9cfaac92d276ae44910d9b66d0673ecd5c225261e64dccf58c8dfe123a",
+   "url": "https://huggingface.co/SeonghwanSeo/atlasfold-m-260725/resolve/f6e1297299271b56a2ac191cf19a6daee74f3b39/weights/atlasfold-m-260725.pth",
+   "license": "MIT (HF card tag mit; README of SeonghwanSeo/atlasfold L226)"
+  },
+  {
+   "repo": "SeonghwanSeo/atlasfold-m-260725",
+   "file": "README.md",
+   "revision": "f6e1297299271b56a2ac191cf19a6daee74f3b39",
+   "bytes": 1708,
+   "sha256": "bec6d986cca1c7ade9e7251dd447eda1783bb96f676a0c8f0b7c116e10923679",
+   "url": "https://huggingface.co/SeonghwanSeo/atlasfold-m-260725/resolve/f6e1297299271b56a2ac191cf19a6daee74f3b39/README.md",
+   "license": "MIT (HF card tag mit; README of SeonghwanSeo/atlasfold L226)"
+  },
+  {
+   "repo": "SeonghwanSeo/atlaslm-3b-base",
+   "file": "config.json",
+   "revision": "109c9290c7e7cda1d6f3b830afcde18d574878f0",
+   "bytes": 3,
+   "sha256": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356",
+   "url": "https://huggingface.co/SeonghwanSeo/atlaslm-3b-base/resolve/109c9290c7e7cda1d6f3b830afcde18d574878f0/config.json",
+   "license": "MIT (HF card tag mit; README of SeonghwanSeo/atlasfold L226)"
+  },
+  {
+   "repo": "SeonghwanSeo/atlaslm-3b-base",
+   "file": "weights/atlaslm_3b_base.pth",
+   "revision": "109c9290c7e7cda1d6f3b830afcde18d574878f0",
+   "bytes": 6128042331,
+   "sha256": "8097cc4a234853f19ca97435844829d84fe7f13215c900e74659fa9682cc0ddb",
+   "url": "https://huggingface.co/SeonghwanSeo/atlaslm-3b-base/resolve/109c9290c7e7cda1d6f3b830afcde18d574878f0/weights/atlaslm_3b_base.pth",
+   "license": "MIT (HF card tag mit; README of SeonghwanSeo/atlasfold L226)"
+  },
+  {
+   "repo": "SeonghwanSeo/atlaslm-3b-base",
+   "file": "README.md",
+   "revision": "109c9290c7e7cda1d6f3b830afcde18d574878f0",
+   "bytes": 747,
+   "sha256": "7e494effb69b1eb665b9a3e5d6836681c3d0f71876c10f761533edb3750be055",
+   "url": "https://huggingface.co/SeonghwanSeo/atlaslm-3b-base/resolve/109c9290c7e7cda1d6f3b830afcde18d574878f0/README.md",
+   "license": "MIT (HF card tag mit; README of SeonghwanSeo/atlasfold L226)"
+  }
+ ],
+ "weights_bundle": {
+  "filename": "atlasfold_weights_v1.0.0.tar",
+  "layout": "a weights root holds the three Hugging Face repositories side by side, <root>/<hf-repo>/{config.json,README.md,weights/*.pth}, as `hf download SeonghwanSeo/<repo> --local-dir <root>/<repo>` writes them (README 'Setup'); `run.sh install --weights <root>` downloads nothing and compares each weights/*.pth with the 'weights' entries above (bytes and sha256); a root holding this archive extracted, <root>/atlasfold_weights_v1.0.0/<hf-repo>/..., is accepted as well",
+  "sha256": "240fb90409952a971e07dfba33a0a7f6f1f5d9409271995bcb2fab0c4cc21667",
+  "not_included": "SeonghwanSeo/atlaslm-600m-base (deprecated, gated) \u2014 not part of the layout; no mode reads it"
+ },
+ "stack": {
+  "opt_core": {
+   "path": "../../common/opt_core",
+   "min_version": "0.5.18.8"
+  },
+  "lock_A_h100_cu128_torch271": {
+   "python": "3.11",
+   "torch": "2.7.1+cu128",
+   "cuequivariance_torch": "0.10.0",
+   "cuequivariance_ops_torch_cu12": "0.10.0",
+   "triton": "present (image)",
+   "note": "authors profiled torch 2.10.0 / CUDA 12.8 / cuEquivariance 0.10.0 on B200; lock B (authors' stack) and lock C (cu130/torch 2.13, B300) are planned"
+  }
+ },
+ "stock_environment": {
+  "must_be_absent_prefixes": [
+   "ATLASFOLD_OPT",
+   "AFO_",
+   "FPF_",
+   "OPT_CORE_"
+  ],
+  "kernel_flag": "--kernel auto (=cuequiv when cuequivariance_torch imports on CUDA)",
+  "defaults": {
+   "monomer": {
+    "num_recycles": 4,
+    "mlm_prob": 0.15,
+    "num_samples": 5,
+    "num_steps": "20 (<=512) / 30 (<=1024) / 100 (>1024)"
+   },
+   "multimer": {
+    "num_recycles": 10,
+    "mlm_prob": 0.2,
+    "num_samples": 5,
+    "num_steps": 200
+   }
+  }
+ }
+}

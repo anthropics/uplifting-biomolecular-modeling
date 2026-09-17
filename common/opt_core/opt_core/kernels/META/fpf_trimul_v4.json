@@ -1,0 +1,18 @@
+{
+ "exports": {
+  "FPF_TRIMUL_V4_CELLS": {
+   "param": "cells",
+   "path": true,
+   "required": false,
+   "what": "the kit's own (cc|triton) cell table, cells.json (the rows this kit measured for its engine): OPTIONAL — a kit with none exports nothing and the package's own table.json serves every part; when exported, named per part as evidence; serves its own cells only at the parts the package's cells.json lists under kit_keys"
+  }
+ },
+ "kind": "package",
+ "license": "Apache-2.0 (this repository's own code: common/opt_core/LICENSE); portions derive from Protenix (Apache-2.0, Copyright 2024 ByteDance and/or its affiliates): NOTICE in the package directory, licence text kernels/fpf_flashpairformer.PROTENIX_LICENSE",
+ "mechanism": "attn.triangle_multiplication",
+ "name": "fpf_trimul_v4",
+ "not_carried": {},
+ "runtime_imports": [],
+ "runtime_imports_note": "trimul.py:fn's kernel-error route imports opt_core.oom.is_oom (the core's one out-of-memory classifier, standard library) and re-raises an out-of-memory instead of serving stock; the package imports no other carried kernel at run time.",
+ "version": "4.4.4"
+}

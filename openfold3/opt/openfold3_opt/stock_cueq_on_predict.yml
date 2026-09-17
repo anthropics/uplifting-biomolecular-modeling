@@ -1,0 +1,18 @@
+# OpenFold3 0.4.1 STOCK inference configuration of this tree: upstream's predict preset as shipped (the DS4Sci evoformer attention at its CUDA
+# default, ON: openfold3/projects/of3_all_atom/config/model_config.py:115) with the cuEquivariance triangle kernels ON (use_cueq_triangle_kernels:
+# cuequivariance_torch's fused triangle multiplicative update and triangle attention in the template pair stack, the MSA-module pair stack, the
+# Pairformer trunk and the confidence head's Pairformer; cuEquivariance takes precedence over DS4Sci, which serves only the attention shapes
+# cuEquivariance declines — openfold3/core/model/primitives/attention.py cueq_would_fall_back). What `pred --mode off` runs and what every arm is
+# timed against; the DS4Sci op must be built on the stack (cli.ds4sci_stack_check refuses by name without it).
+# Under the det recipe (`--det 1|2`) the stock arm and `exact` run stock_cueq_on_det_predict.yml instead: this file with the DS4Sci attention off.
+# Precision: Lightning's bf16-mixed (pl_trainer_args.precision) — the trunk, MSA module, template embedder and confidence heads under bf16 autocast where
+# upstream's predict entry point runs fp32; the diffusion rollout stays in upstream's own fp32 region. Part of what stock is: the documented setting that makes it faster.
+pl_trainer_args:
+  precision: bf16-mixed
+model_update:
+  presets: [predict]
+  custom:
+    settings:
+      memory:
+        eval:
+          use_cueq_triangle_kernels: true

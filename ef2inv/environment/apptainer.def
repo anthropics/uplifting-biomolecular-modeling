@@ -1,0 +1,28 @@
+# ef2inv optimization kit — Apptainer / Singularity image made FROM the container image of ef2inv/environment/Dockerfile: the same stack and the
+# same /kit, for hosts that run Apptainer instead of Docker. The source is the image tagged ef2inv-kit:dev in the local Docker daemon (build it
+# first: README.md §Setup — the default build for the H100, `--build-arg STACK=img_ef2inv_a100` for the A100 80GB); for a published tag the two header lines read `Bootstrap: docker` / `From: <registry>/ef2inv-kit:<tag>`.
+#   apptainer build ef2inv.sif ef2inv/environment/apptainer.def
+#   apptainer run --nv --cleanenv --bind /path/to/hf_home:/weights/hf --env HF_HOME=/weights/hf --bind "$PWD/out":/out ef2inv.sif \
+#     design --config h100 --mode fast --target-name pd-l1 --binder-len 80 --seed 0 --out /out/fast
+# The image is read-only: give every verb an --out on a bound, writable path; the JIT caches go under /tmp or $HOME/.cache (bound by default);
+# %environment keeps a host user site-packages (PEP 370) from shadowing the pinned stack, --cleanenv keeps the host's variables out.
+Bootstrap: docker-daemon
+From: ef2inv-kit:dev
+
+%environment
+    export PYTHONNOUSERSITE=1
+    # Triton <= 3.5 links its launcher stub with -lcuda: offer the unversioned name when --nv bound only libcuda.so.1
+    if [ -z "${TRITON_LIBCUDA_PATH:-}" ] && [ -e /opt/culib/libcuda.so ]; then export TRITON_LIBCUDA_PATH=/opt/culib; fi
+
+%post
+    mkdir -p /opt/culib && ln -s /.singularity.d/libs/libcuda.so.1 /opt/culib/libcuda.so && ln -s /.singularity.d/libs/libcuda.so.1 /opt/culib/libcuda.so.1
+
+%runscript
+    cd /kit/ef2inv && exec bash /kit/ef2inv/run.sh "$@"
+
+%help
+    ef2inv optimization kit: drop-in modes for the ESM cookbook's gradient-guided ESMFold2 binder design (esm 3.4.0) — the same 150-step design
+    loop, weights and output files behind one command; off = the stock script, kit inert; exact = stock's arithmetic unchanged, faster; fast = small
+    documented numeric differences, faster still (the default); big = lowest memory. `apptainer run --nv ef2inv.sif <verb> ...` =
+    `bash /kit/ef2inv/run.sh <verb> ...` (verbs: install, design, check, warm; /kit/ef2inv/README.md inside the image). Requires an NVIDIA H100 (or, from
+    the image built with --build-arg STACK=img_ef2inv_a100, an A100 80GB: --config a100) with a driver that runs CUDA 12.8 (570 or newer) and HF_HOME naming the directory that holds the six pinned weight snapshots.

@@ -1,0 +1,600 @@
+{
+ "model": "progen2",
+ "upstream": {
+  "progen": {
+   "repo": "https://github.com/salesforce/progen",
+   "commit": "c27a419c234a0997923761e1fe7daffcebf0eaf5",
+   "commit_date": "2026-06-02T14:14:15-04:00",
+   "tag": null,
+   "version": null,
+   "subdir": "progen2/",
+   "install": "not a package: a source checkout run from its own progen2/ directory (cd <checkout>/progen2; python sample.py …; python likelihood.py …)",
+   "archive": "stock/progen-c27a419c.tar.gz",
+   "src": "stock/src/ = progen2/ whole plus the repository-root LICENSE.txt and README.md, byte-for-byte",
+   "note": "no tag at this commit and no package metadata anywhere in the repository (no setup.py/pyproject.toml): the commit is the pin"
+  }
+ },
+ "archive_recipe": "the checkout at the commit without .git (13 files, git ls-files), copied under a directory named progen-c27a419c/ with modes 644 (files) / 755 (directories), then `tar --format=ustar --sort=name --mtime='1970-01-01 00:00:00 UTC' --owner=0 --group=0 --numeric-owner -cf - progen-c27a419c | gzip -n -9` (GNU tar 1.35, gzip 1.12); the bytes regenerate identically",
+ "archive_size_bytes": 18550,
+ "files": [
+  "LICENSE.txt",
+  "README.md",
+  "progen2/README.md",
+  "progen2/likelihood.py",
+  "progen2/models/progen/configuration_progen.py",
+  "progen2/models/progen/modeling_progen.py",
+  "progen2/requirements.txt",
+  "progen2/sample.py",
+  "progen2/tokenizer.json"
+ ],
+ "stock_files": {
+  "files": {
+   "progen2/sample.py": "6451430cb552e3f4b4820f2fb4b6fe95fabdc30af0f2a7bc4a02d924b4349ba1",
+   "progen2/likelihood.py": "f69f390a6d795ec20c0a4874697d4957dd75fe449465e641e5bf70660cc1b88a",
+   "progen2/models/progen/modeling_progen.py": "34fc2e84dae2d8558c0acc3bcbb0bcc7a7420cce885de6ddb780e3e57ecb5e10",
+   "progen2/models/progen/configuration_progen.py": "a366655a755ebbb11861bcba58a7b3f719c0ec43d7c9a729a44869d17942bd7e",
+   "progen2/tokenizer.json": "e56176ef2390f7a0ec29930aaa41983406085e026cb6f99f8a6e180b3b3a56bc",
+   "progen2/requirements.txt": "f2d45368843b9d280069312afe035a437668e41899c87082b2e30c3287ae10f8"
+  },
+  "note": "the files a stock run reads (the two CLIs, the model module and its config class, the tokenizer) plus the declared stack, each with its sha256 at the pinned commit (this tree's copy is the pinned commit byte for byte); check_pins.py and the package's activation hash them at the stock directory: a file missing or off its digest is not the stock the modes are defined against — refused by every mode (exit 3)"
+ },
+ "stock_dir": {
+  "env": "PROGEN2_STOCK_DIR",
+  "meaning": "the progen2/ directory the CLIs run from (their cwd): models.progen is imported from it (sample.py:14, likelihood.py:14), tokenizer.json is opened by relative name (sample.py:149, likelihood.py:156), the checkpoint is ./checkpoints/<progen2-size> (sample.py:136, likelihood.py:142)",
+  "default_in_tree": "stock/src/progen2"
+ },
+ "python": "3.9",
+ "pinned_stack": {
+  "tested_on": "NVIDIA H100 80GB; nvidia/cuda:12.8.1-devel-ubuntu22.04 with the stack below",
+  "python": "3.9.23",
+  "stock_dir": "stock/src/progen2 in this tree (/kit/progen2/stock/src/progen2 in the container image); PROGEN2_STOCK_DIR names another checkout",
+  "torch": "2.8.0+cu128",
+  "torch_wheel": "torch-2.8.0+cu128-cp39-cp39-manylinux_2_28_x86_64.whl",
+  "torch_wheel_sha256": "b9357a87595a3d7b2a565ba602b97392a37c56f0b85698f0ccf0a2c58fbef5ec",
+  "torch_index": "https://download.pytorch.org/whl/cu128",
+  "cuda": "12.8",
+  "cudnn": 91002,
+  "arch_list": [
+   "sm_70",
+   "sm_75",
+   "sm_80",
+   "sm_86",
+   "sm_90",
+   "sm_100",
+   "sm_120"
+  ],
+  "sass_in_libtorch_cuda": [
+   "sm_70",
+   "sm_75",
+   "sm_80",
+   "sm_86",
+   "sm_89",
+   "sm_90",
+   "sm_100",
+   "sm_120"
+  ],
+  "transformers": "4.16.2",
+  "tokenizers": "0.10.3",
+  "numpy": "2.0.2",
+  "base_image": "nvidia/cuda:12.8.1-runtime-ubuntu22.04",
+  "freeze": "environment/requirements.lock (pip freeze --all of the stack's interpreter; environment/Dockerfile installs exactly it)",
+  "status": "read from the image"
+ },
+ "pins": {
+  "python": "3.9",
+  "torch": "2.8.0+cu128",
+  "transformers": "4.16.2",
+  "tokenizers": "0.10.3",
+  "note": "the four values the kits assert at apply (their pin module's STACK_OF_RECORD); python at major.minor; check_pins.py refuses any other install"
+ },
+ "torch_build": {
+  "dist_version": "2.8.0+cu128",
+  "runtime_version": "2.8.0+cu128",
+  "cuda": "12.8",
+  "source": "PyTorch cu128 index wheel (local tag +cu128); the PyPI default torch 2.8.0 wheel is a different build (cu12.8 runtime wheels resolved separately) and does not carry the +cu128 tag",
+  "status": "read from the image"
+ },
+ "transformers_wheel": {
+  "file": "transformers-4.16.2-py3-none-any.whl",
+  "sha256": "c9430f2a91c729a4d765cb8251f9c2e93051d93204f111f419ed88f2a157b252",
+  "size_bytes": 3549167,
+  "source": "PyPI (hashed from the downloaded bytes)",
+  "members_sha256": {
+   "transformers/generation_utils.py": "f68317aaf417c97a65d09c08cd4fd1139b9ecb02dc0a421fdcb3ead1a9a13685",
+   "transformers/generation_logits_process.py": "8ba5af5580b5953603447df50eb0472999dd27de7ac1deedf6ff10db5751f8bc",
+   "transformers/modeling_utils.py": "d7ac398a86f809b0672d19fb7f8d9ccccb7b231398e1e9f77551044c356509b1"
+  },
+  "note": "the sampler (generate/sample and its warpers) and the loader live in the wheel, not in the checkout; check_pins.py hashes the three members of the installed distribution"
+ },
+ "tokenizers_wheel": {
+  "file": "tokenizers-0.10.3-cp39-cp39-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux2010_x86_64.whl",
+  "sha256": "18c495e700f4588b9a00e58b4c41dc459c36daaa7c39a27faf880eb8f5533ce1",
+  "size_bytes": 3260326,
+  "source": "PyPI (hashed from the downloaded bytes; equals PyPI's published digest)"
+ },
+ "requirements_txt": {
+  "path": "progen2/requirements.txt",
+   "lines": [
+   "--find-links https://download.pytorch.org/whl/torch_stable.html",
+   "torch==1.9.0+cu111",
+   "transformers==4.16.2",
+   "tokenizers==0.10.3"
+  ],
+  "deviation": "torch==1.9.0+cu111 (requirements.txt:2) is a CUDA 11.1 build with no sm_90 kernel image (Hopper needs CUDA >= 11.8): the pinned stack re-pins torch to 2.8.0+cu128 and the interpreter to 3.9 (upstream's README makes a python3.8 venv, progen2/README.md:28); transformers and tokenizers stay at upstream's pins (requirements.txt:3-4); the stock code is unchanged"
+ },
+ "entry_point": {
+  "cwd": "<stock dir> (the progen2/ directory)",
+  "sample": "python sample.py --model <progen2-size> [--device cuda:0 --rng-seed 42 --rng-deterministic true --p 0.95 --t 0.2 --max-length 256 --num-samples 1 --fp16 true --context 1 --sanity true]",
+  "likelihood": "python likelihood.py --model <progen2-size> [--device cuda:0 --rng-seed 42 --rng-deterministic true --fp16 true --context <422-char default> --sanity false]",
+  "model_load": "ProGenForCausalLM.from_pretrained(f'./checkpoints/{model}', revision='float16', torch_dtype=torch.float16, low_cpu_mem_usage=True) when fp16, else from_pretrained(ckpt) (sample.py:53-57 / likelihood.py:53-57), then .to(device) (sample.py:145 / likelihood.py:152)",
+  "tokenizer_load": "tokenizers.Tokenizer.from_str(open('tokenizer.json').read()) (sample.py:60-62, :149 / likelihood.py:60-62, :156)",
+  "generate_call": "model.generate(input_ids, do_sample=True, temperature=args.t, max_length=args.max_length, top_p=args.p, num_return_sequences=args.num_samples, pad_token_id=tokenizer.encode('<|pad|>').ids[0]) under torch.no_grad(), no autocast (sample.py:69-75, :193)",
+  "likelihood_call": "ll(tokens, reduction) = -cross_entropy over the shifted logits restricted to ids 5..29 under torch.no_grad() + torch.cuda.amp.autocast(enabled=args.fp16) (likelihood.py:174-200); both directions (the reversed string) averaged (likelihood.py:285-296)",
+  "script": "the tree's one stock caller runs exactly these command lines in a clean subprocess from the stock directory (opt/progen2_opt/stock_cli.py)"
+ },
+ "cli_defaults": {
+  "sample.py": {
+   "--model": {
+    "default": "progen2-large",
+    "choices": [
+     "progen2-small",
+     "progen2-medium",
+     "progen2-oas",
+     "progen2-base",
+     "progen2-large",
+     "progen2-BFD90",
+     "progen2-xlarge"
+    ],
+    "line": "sample.py:112 (choices sample.py:103-107)"
+   },
+   "--device": {
+    "default": "cuda:0",
+    "line": "sample.py:113"
+   },
+   "--rng-seed": {
+    "default": 42,
+    "line": "sample.py:114"
+   },
+   "--rng-deterministic": {
+    "default": true,
+    "line": "sample.py:115",
+    "effect": "set_seed(seed, deterministic): random.seed, PYTHONHASHSEED, torch.manual_seed, torch.cuda.manual_seed, cudnn.deterministic = deterministic, cudnn.benchmark = not deterministic (sample.py:38-45, :129)"
+   },
+   "--p": {
+    "default": 0.95,
+    "line": "sample.py:116"
+   },
+   "--t": {
+    "default": 0.2,
+    "line": "sample.py:117"
+   },
+   "--max-length": {
+    "default": 256,
+    "line": "sample.py:118",
+    "semantics": "the total token count including the context, generate()'s max_length (generation_utils.py:1117-1123; MaxLengthCriteria)"
+   },
+   "--num-samples": {
+    "default": 1,
+    "line": "sample.py:119",
+    "semantics": "generate(num_return_sequences=): the context is expanded N-fold and sampled as one batch (generation_utils.py:1192-1197)"
+   },
+   "--fp16": {
+    "default": true,
+    "line": "sample.py:120"
+   },
+   "--context": {
+    "default": "1",
+    "line": "sample.py:121"
+   },
+   "--sanity": {
+    "default": true,
+    "line": "sample.py:122",
+    "effect": "one cross-entropy forward on a fixed per-size sequence under autocast(enabled=fp16), asserted within 0.1 of the per-size constant in the file (sample.py:153-188)"
+   },
+   "boolean_parser": "type=lambda x: str(x).lower() == 'true' — any value other than the word true (any case) is False (sample.py:115, :120, :122)"
+  },
+  "likelihood.py": {
+   "--model": {
+    "default": "progen2-base",
+    "choices": [
+     "progen2-small",
+     "progen2-medium",
+     "progen2-oas",
+     "progen2-base",
+     "progen2-large",
+     "progen2-BFD90",
+     "progen2-xlarge"
+    ],
+    "line": "likelihood.py:122 (choices likelihood.py:112-116)"
+   },
+   "--device": {
+    "default": "cuda:0",
+    "line": "likelihood.py:123"
+   },
+   "--rng-seed": {
+    "default": 42,
+    "line": "likelihood.py:124"
+   },
+   "--rng-deterministic": {
+    "default": true,
+    "line": "likelihood.py:125",
+    "effect": "as sample.py (likelihood.py:38-45, :135)"
+   },
+   "--fp16": {
+    "default": true,
+    "line": "likelihood.py:126"
+   },
+   "--context": {
+    "default_length_chars": 422,
+     "default_head": "1MGHGVSRPPVV",
+    "default_tail": "RARGQAP2",
+    "line": "likelihood.py:127",
+    "note": "the 422-character string '1' + the GenBank TMF32756.1 protein + '2' (progen2/README.md:36-37 shows the same string on the command line)"
+   },
+   "--sanity": {
+    "default": false,
+    "line": "likelihood.py:128"
+   },
+   "boolean_parser": "as sample.py (likelihood.py:125, :126, :128)"
+  }
+ },
+ "precision": {
+  "fp16_flag": {
+   "sample.py": "--fp16 defaults True (sample.py:120)",
+   "likelihood.py": "--fp16 defaults True (likelihood.py:126)"
+  },
+  "per_size_choice_in_the_scripts": null,
+  "cpu_fallback": "no CUDA device: device becomes cpu and fp16 becomes False (sample.py:131-140, likelihood.py:137-146)",
+  "fp16_true_means": {
+   "construction": "torch_dtype=torch.float16 sets the default dtype while the module tree is built (modeling_utils.py:1460-1468, :537-560): every tensor created at construction is fp16 — scale_attn (modeling_progen.py:83), masked_bias (modeling_progen.py:71); the causal bias buffer is bool (modeling_progen.py:65-70)",
+   "loading": "low_cpu_mem_usage=True installs every checkpoint tensor AS STORED, no cast (modeling_utils.py:1525-1526, :1743-1804): the parameters' dtype is the checkpoint's stored dtype (config.json torch_dtype, per size under weights.<size>.config_fields)",
+   "revision": "revision='float16' is inert for a local directory (modeling_utils.py:1288: the local pytorch_model.bin is used; revision reaches only the hub path, :1342, :1377)",
+   "forward": "q·kᵀ, the scale, the mask and the softmax run in fp32 (modeling_progen.py:122-136); the probabilities are cast back to value.dtype (:136); lm_logits are cast to fp32 (modeling_progen.py:652)",
+   "autocast": "torch.cuda.amp.autocast(enabled=args.fp16) wraps the cross-entropy / likelihood forwards only (sample.py:159, likelihood.py:163, :176); generate() runs without autocast (sample.py:71-73)"
+  },
+  "fp16_false_means": "from_pretrained(ckpt) at the fp32 default dtype through the standard loader: checkpoint tensors are copied into the fp32 parameters by module._load_from_state_dict (modeling_utils.py:1527-1533, :1554, :1646-1659), which casts",
+  "note": "neither script chooses fp16 per size: --fp16 is True for every --model choice; what differs per size is the checkpoint's stored dtype, which the loader keeps"
+ },
+ "sizes": {
+  "names": [
+   "progen2-small",
+   "progen2-medium",
+   "progen2-oas",
+   "progen2-base",
+   "progen2-large",
+   "progen2-BFD90",
+   "progen2-xlarge"
+  ],
+  "parameters": {
+   "progen2-small": "151M",
+   "progen2-medium": "764M",
+   "progen2-oas": "764M",
+   "progen2-base": "764M",
+   "progen2-large": "2.7B",
+   "progen2-BFD90": "2.7B",
+   "progen2-xlarge": "6.4B"
+  },
+  "source": "sample.py:103-107 / likelihood.py:112-116 (the --model choices, grouped as models_151M / models_754M / models_2B / models_6B); progen2/README.md:6-14 (the parameter counts as upstream states them)",
+  "variant_name": "the size without the progen2- prefix, lower-case (small, medium, oas, base, large, bfd90, xlarge); the upstream name is the --model value"
+ },
+ "weights": {
+  "progen2-small": {
+   "url": "https://storage.googleapis.com/sfr-progen-research/checkpoints/progen2-small.tar.gz",
+   "parameters": "151M",
+   "checkpoint_dir": "./checkpoints/progen2-small",
+   "files": {
+    "pytorch_model.bin": {
+     "sha256": "8226a310edda873003b7ea50396d9be0195e34986b98392f79b5f782b67e3f05",
+     "size_bytes": 605674611,
+     "source": "re-derived at staging by the weights helper"
+    },
+    "config.json": {
+     "sha256": "342043fccffdd69c2c0ad126d99a40cc67fb4722625dc0efc123044ecf61c198",
+     "size_bytes": 829,
+     "source": "re-derived at staging by the weights helper"
+    }
+   },
+   "tarball": {
+    "sha256": "a6e1a77ff52f47dd53c08b819cb7fe9bfb4ff2965a9df6354f15e718f0a5e7b0",
+    "size_bytes": 561673660,
+    "members": [
+     "./config.json",
+     "./pytorch_model.bin"
+    ],
+    "source": "re-derived at staging by the weights helper"
+   },
+   "config_fields": {
+    "n_layer": 12,
+    "n_embd": 1024,
+    "n_head": 16,
+    "rotary_dim": 32,
+    "n_positions": 1024,
+    "vocab_size": 32,
+    "torch_dtype": "float32"
+   },
+   "config_fields_source": "the kits' pin module (its CONFIG table); equal to the staged config.json fields (read back at staging)"
+  },
+  "progen2-medium": {
+   "url": "https://storage.googleapis.com/sfr-progen-research/checkpoints/progen2-medium.tar.gz",
+   "parameters": "764M",
+   "checkpoint_dir": "./checkpoints/progen2-medium",
+   "files": {
+    "pytorch_model.bin": {
+     "sha256": "545f4d3e0072c0f422c90e221100d0ebe756989d0f09af3ede57736680adb9e2",
+     "size_bytes": 3060333315,
+     "source": "re-derived at staging by the weights helper"
+    },
+    "config.json": {
+     "sha256": "47b1053ce3bcf31e58566330b07c6cae8c75a9e532cae68a695d7126cc61d9c8",
+     "size_bytes": 829,
+     "source": "re-derived at staging by the weights helper"
+    }
+   },
+   "tarball": {
+    "sha256": "31c75b15f22eb2991627d364a08aa3e5071274b1226ab712038776aa56fb4b57",
+    "size_bytes": 2837387671,
+    "members": [
+     "./config.json",
+     "./pytorch_model.bin"
+    ],
+    "source": "re-derived at staging by the weights helper"
+   },
+   "config_fields": {
+    "n_layer": 27,
+    "n_embd": 1536,
+    "n_head": 16,
+    "rotary_dim": 48,
+    "n_positions": 1024,
+    "vocab_size": 32,
+    "torch_dtype": "float32"
+   },
+   "config_fields_source": "the kits' pin module (its CONFIG table); equal to the staged config.json fields (read back at staging)"
+  },
+  "progen2-oas": {
+   "url": "https://storage.googleapis.com/sfr-progen-research/checkpoints/progen2-oas.tar.gz",
+   "parameters": "764M",
+   "checkpoint_dir": "./checkpoints/progen2-oas",
+   "files": {
+    "pytorch_model.bin": {
+     "sha256": "6a0d5cea517a15aa9e4caa31681a309a48f13efe9b423418b7751259c762d299",
+     "size_bytes": 1530726083,
+     "source": "re-derived at staging by the weights helper"
+    },
+    "config.json": {
+     "sha256": "dbc935c29014581a42d9ecf1cd5170d37e4575b898c072d85349ba64da9d3144",
+     "size_bytes": 829,
+     "source": "re-derived at staging by the weights helper"
+    }
+   },
+   "tarball": {
+    "sha256": "a0a09cb970e1f9aa689fdd709855ecc10c76be70535a966b4bdaf0a3440066aa",
+    "size_bytes": 1407377999,
+    "members": [
+     "./config.json",
+     "./pytorch_model.bin"
+    ],
+    "source": "re-derived at staging by the weights helper"
+   },
+   "config_fields": {
+    "n_layer": 27,
+    "n_embd": 1536,
+    "n_head": 16,
+    "rotary_dim": 48,
+    "n_positions": 1024,
+    "vocab_size": 32,
+    "torch_dtype": "float16"
+   },
+   "config_fields_source": "the kits' pin module (its CONFIG table); equal to the staged config.json fields (read back at staging)"
+  },
+  "progen2-base": {
+   "url": "https://storage.googleapis.com/sfr-progen-research/checkpoints/progen2-base.tar.gz",
+   "parameters": "764M",
+   "checkpoint_dir": "./checkpoints/progen2-base",
+   "files": {
+    "pytorch_model.bin": {
+     "sha256": "393126403594e4c0d3d1a9eef06a3e92614c979af907f6aca06eb882b7c8aea8",
+     "size_bytes": 1533871811,
+     "source": "re-derived at staging by the weights helper"
+    },
+    "config.json": {
+     "sha256": "d399fad9aaeb115e29cbfe3c9a917b6a6d749f6bd23aa26012beae70bd3b4b64",
+     "size_bytes": 829,
+     "source": "re-derived at staging by the weights helper"
+    }
+   },
+   "tarball": {
+    "sha256": "2dcf831ce21e728dccd66d5910b60f7ff55c07311b8c0497d58aec46bbdc1e49",
+    "size_bytes": 1408351368,
+    "members": [
+     "./config.json",
+     "./pytorch_model.bin"
+    ],
+    "source": "re-derived at staging by the weights helper"
+   },
+   "config_fields": {
+    "n_layer": 27,
+    "n_embd": 1536,
+    "n_head": 16,
+    "rotary_dim": 48,
+    "n_positions": 2048,
+    "vocab_size": 32,
+    "torch_dtype": "float16"
+   },
+   "config_fields_source": "the kits' pin module (its CONFIG table); equal to the staged config.json fields (read back at staging)"
+  },
+  "progen2-large": {
+   "url": "https://storage.googleapis.com/sfr-progen-research/checkpoints/progen2-large.tar.gz",
+   "parameters": "2.7B",
+   "checkpoint_dir": "./checkpoints/progen2-large",
+   "files": {
+    "pytorch_model.bin": {
+     "sha256": "ab03cb15d6ba4a02baea20648f2406f6d2aa186f68bec1b811be1222aca7a4cd",
+     "size_bytes": 5559845203,
+     "source": "re-derived at staging by the weights helper"
+    },
+    "config.json": {
+     "sha256": "9102f2269266d6c442cabe812e94ced0295302e3b375924b377412d4174dafc9",
+     "size_bytes": 832,
+     "source": "re-derived at staging by the weights helper"
+    }
+   },
+   "tarball": {
+    "sha256": "b3ab24fd9bb4667ed653a0e728a5fe249097942c34648ecbaa9e401d175eb009",
+    "size_bytes": 5137860178,
+    "members": [
+     "./config.json",
+     "./pytorch_model.bin"
+    ],
+    "source": "re-derived at staging by the weights helper"
+   },
+   "config_fields": {
+    "n_layer": 32,
+    "n_embd": 2560,
+    "n_head": 32,
+    "rotary_dim": 64,
+    "n_positions": 1024,
+    "vocab_size": 51200,
+    "torch_dtype": "float16"
+   },
+   "config_fields_source": "the kits' pin module (its CONFIG table); equal to the staged config.json fields (read back at staging)"
+  },
+  "progen2-BFD90": {
+   "url": "https://storage.googleapis.com/sfr-progen-research/checkpoints/progen2-BFD90.tar.gz",
+   "parameters": "2.7B",
+   "checkpoint_dir": "./checkpoints/progen2-BFD90",
+   "files": {
+    "pytorch_model.bin": {
+     "sha256": "9c81810054fde79b4130e579dbd98b2b1e8e9772f1138aae497f71f5cb101a0c",
+     "size_bytes": 5559845203,
+     "source": "re-derived at staging by the weights helper"
+    },
+    "config.json": {
+     "sha256": "9102f2269266d6c442cabe812e94ced0295302e3b375924b377412d4174dafc9",
+     "size_bytes": 832,
+     "source": "re-derived at staging by the weights helper"
+    }
+   },
+   "tarball": {
+    "sha256": "85e76d8f76353b7a2a09679d648017e07a2d56305da619fa3043e1aadaa04f41",
+    "size_bytes": 5134552498,
+    "members": [
+     "./config.json",
+     "./pytorch_model.bin"
+    ],
+    "source": "re-derived at staging by the weights helper"
+   },
+   "config_fields": {
+    "n_layer": 32,
+    "n_embd": 2560,
+    "n_head": 32,
+    "rotary_dim": 64,
+    "n_positions": 1024,
+    "vocab_size": 51200,
+    "torch_dtype": "float16"
+   },
+   "config_fields_source": "the kits' pin module (its CONFIG table); equal to the staged config.json fields (read back at staging)"
+  },
+  "progen2-xlarge": {
+   "url": "https://storage.googleapis.com/sfr-progen-research/checkpoints/progen2-xlarge.tar.gz",
+   "parameters": "6.4B",
+   "checkpoint_dir": "./checkpoints/progen2-xlarge",
+   "files": {
+    "pytorch_model.bin": {
+     "sha256": "01e84cc6eec2ada7a5722adcc1a6f5c3e4baa3ccdf937446d5d02f8c99fdcda7",
+     "size_bytes": 12888412563,
+     "source": "re-derived at staging by the weights helper"
+    },
+    "config.json": {
+     "sha256": "d6a21809265aab925896127f3023306f36f5678b41b4412f6f36e95f029b42d6",
+     "size_bytes": 829,
+     "source": "re-derived at staging by the weights helper"
+    }
+   },
+   "tarball": {
+    "sha256": "acd69a3bb2bb830c37947c70e1f20cd8e8fce6d6761b052e6a96e8c79312e7fe",
+    "size_bytes": 11862447423,
+    "members": [
+     "./config.json",
+     "./pytorch_model.bin"
+    ],
+    "source": "re-derived at staging by the weights helper"
+   },
+   "config_fields": {
+    "n_layer": 32,
+    "n_embd": 4096,
+    "n_head": 16,
+    "rotary_dim": 64,
+    "n_positions": 1024,
+    "vocab_size": 32,
+    "torch_dtype": "float16"
+   },
+   "config_fields_source": "the kits' pin module (its CONFIG table); equal to the staged config.json fields (read back at staging)"
+  }
+ },
+ "weights_status": "every sha256 / byte count under \"weights\" is the kits' pin (their pin module's WEIGHTS_SHA256), re-derived at staging from the tarballs' bytes and equal (the staged SHA256SUMS beside the weights)",
+ "library_defaults": {
+  "transformers": "4.16.2 (the wheel above)",
+  "generate": {
+   "top_k": 50,
+   "top_k_note": "sample.py passes no top_k: generate() falls back to config.top_k (generation_utils.py:630), the PretrainedConfig class default 50 (configuration_utils.py:281) unless the checkpoint's config.json sets one (pending the weights helper's readback)",
+   "warper_order": "temperature (when != 1.0) → top-k (when != 0) → top-p (when < 1.0) (generation_utils.py:638-643), then softmax + torch.multinomial (generation_utils.py:1746-1747)",
+   "eos_token_id": "config.eos_token_id (generation_utils.py:1048); ProGenConfig's class default is 50256 (configuration_progen.py:46-47, :70-71), outside the 30-token vocabulary — whether generation stops at '2' before max_length depends on the checkpoint's config.json (pending); sample.py truncates the decoded text at the first '1' or '2' after position 0 regardless (sample.py:78-87, :194)",
+   "pad_token_id": "0 (<|pad|>), passed by sample.py (sample.py:193)",
+   "use_cache": "config.use_cache, ProGenConfig default True (configuration_progen.py:45)"
+  },
+  "config_class_defaults": {
+   "vocab_size": 50400,
+   "n_positions": 2048,
+   "n_ctx": 2048,
+   "n_embd": 4096,
+   "n_layer": 28,
+   "n_head": 16,
+   "rotary_dim": 64,
+   "activation_function": "gelu_new",
+   "resid_pdrop": 0.0,
+   "embd_pdrop": 0.0,
+   "attn_pdrop": 0.0,
+   "layer_norm_epsilon": 1e-05,
+   "scale_attn_weights": true,
+   "use_cache": true,
+   "bos_token_id": 50256,
+   "eos_token_id": 50256,
+   "note": "ProGenConfig.__init__ defaults (configuration_progen.py:27-48), not what the checkpoints carry (see weights.<size>.config_fields)"
+  },
+  "context_window": "the causal mask is a max_position_embeddings × max_position_embeddings buffer (= n_positions; modeling_progen.py:64-70, configuration_progen.py:73-75): a sequence longer than n_positions cannot run",
+  "precision_defaults": "PyTorch defaults untouched by the scripts: matmul TF32 off, cudnn TF32 on, float32_matmul_precision highest; no use_deterministic_algorithms; cudnn.deterministic/benchmark as set_seed leaves them"
+ },
+ "tokenizer": {
+  "file": "progen2/tokenizer.json",
+   "model": "BPE with an empty merge list (character tokens), ByteLevel pre-tokenizer / post-processor / decoder",
+  "vocab_size": 30,
+  "ids": {
+   "<|pad|>": 0,
+   "<|bos|>": 1,
+   "<|eos|>": 2,
+   "1": 3,
+   "2": 4,
+   "A..Z without J": "5..29 (25 letters, alphabetical)"
+  },
+  "terminals": "'1' (id 3) and '2' (id 4) are the N- and C-terminus markers: likelihood.py treats ids 3/4 as bos/eos (likelihood.py:185-191), scores ids 5..29 only (likelihood.py:194-198); sample.py truncates at the first '1' or '2' (sample.py:78-87)"
+ },
+ "outputs": {
+  "sample.py": "stdout: the print_time lines (volatile walls), the sanity line (sample.py:186), then the context, and per sample a blank line, the index and the truncated completion (sample.py:196-202), then 'done.' (sample.py:208)",
+  "likelihood.py": "stdout: the print_time lines, then ll_sum=<float> and ll_mean=<float> (likelihood.py:298-299), then 'done.' (likelihood.py:305); section (6), the left-to-right-only form, is commented out (likelihood.py:271-281)",
+  "files": "none — neither CLI writes a file"
+ },
+ "stock_environment": {
+  "reads": [],
+  "reads_note": "the stock CLIs read no environment variable of their own; they SET TOKENIZERS_PARALLELISM=false (sample.py:34-35, :128) and PYTHONHASHSEED=<seed> (sample.py:40) in-process; the CUDA runtime's own variables apply",
+  "must_be_absent_prefixes": [
+   "PROGEN2_",
+   "PROGEN2_KIT",
+   "PROGEN2_KIT_OFF"
+  ],
+  "allowed_exceptions": [
+   "PROGEN2_STOCK_DIR",
+   "PROGEN2_WEIGHTS"
+  ],
+  "note": "PROGEN2_* is the kits' own variable family (PROGEN2_KIT / PROGEN2_KIT_OFF / PROGEN2_KIT_SOCKET): stripped from every stock process; the exceptions are data-path names that switch nothing on. Nothing else is removed from or added to the caller's environment on either arm"
+ }
+}

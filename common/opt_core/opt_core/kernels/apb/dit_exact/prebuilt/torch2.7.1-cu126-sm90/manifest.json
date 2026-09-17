@@ -1,0 +1,35 @@
+{
+ "lever": "dit_attn_exact",
+ "kernel_version": "7",
+ "module_name": "dit_attn_exact_v7_sm90",
+ "so": "dit_attn_exact.so",
+ "so_sha256": "405933ef29262dd15ec073c1c28e93d091381017eaaf6e40b46f115238ddee2e",
+ "source_sha256": {
+  "dit_attn_exact.cu": "27af200d33676ad05fa1615bf1b3aa18b28a5c0dd211ed6ea60636c98ab8bc7c"
+ },
+ "torch": "2.7.1+cu126",
+ "cuda": "12.6",
+ "arch": [
+  "sm90"
+ ],
+ "python": "3.11.5",
+ "gpu": "NVIDIA H100 80GB HBM3",
+ "nvcc": "Build cuda_12.6.r12.6/compiler.35059454_0",
+ "nvcc_flags": [
+  "-O3",
+  "-std=c++17",
+  "-gencode=arch=compute_90a,code=sm_90a",
+  "--expt-relaxed-constexpr",
+  "-Xptxas=-O3",
+  "-Xcompiler -ffile-prefix-map=<build dir>/=./"
+ ],
+ "build_s": 43.3,
+ "built_utc": "2026-09-11T10:42:03Z",
+ "loadcheck_cases": 3,
+ "loadcheck_digests": [
+  "f902edd315402bf7a8063273c3e1bdf886034f1c2e6237555aa989e5641e6201",
+  "a3537288faab6c336ba577cf389c0b93ca83d2e5c8a424f93ca629c327e0367e",
+  "efc61a9806f577b6ee96fd802615a7f2796d4604a41ac1e191bd450a486f51c4"
+ ],
+ "loadcheck_bit_equal_vs_sdpa_at_build": true
+}

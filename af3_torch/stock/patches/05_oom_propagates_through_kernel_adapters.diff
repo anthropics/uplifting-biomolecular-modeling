@@ -1,0 +1,74 @@
+--- a/kernels/af3_kernels.py
++++ b/kernels/af3_kernels.py
+@@ -15,6 +15,7 @@
+ import os, sys, math, time, atexit
+ import torch
+ import torch.nn.functional as F
++from opt_core.oom import is_oom          # the shared core's one OOM recogniser: every kernel-error route below re-raises an OOM before anything else
+ 
+ LEVERS = ("trimul", "triattn", "transition", "apb", "graph_pairformer", "graph_diffusion")
+ _ON = set()
+@@ -147,6 +148,7 @@
+         _count(lever, "served:%s" % direction)
+         return out
+     except Exception as e:
++        if is_oom(e): raise                                                # OOM propagates; no fallback applied (opt_core.oom.is_oom)
+         _kernel_error(lever, e); return _ORIG["trimul"](self, pair, mask)
+ 
+ 
+@@ -212,6 +214,7 @@
+         _count(lever, "served:%s" % ("end" if self.transpose else "start"))
+         return F.linear(y, self.output_projection.weight)                                     # autocast -> bf16
+     except Exception as e:
++        if is_oom(e): raise                                                # OOM propagates; no fallback applied (opt_core.oom.is_oom)
+         _kernel_error(lever, e); return _ORIG["triattn"](self, pair, mask)
+ 
+ 
+@@ -257,6 +260,7 @@
+         _count(lever, "served:c=%d" % C)
+         return out
+     except Exception as e:
++        if is_oom(e): raise                                                # OOM propagates; no fallback applied (opt_core.oom.is_oom)
+         _kernel_error(lever, e); return _ORIG["transition"](self, x)
+ 
+ 
+@@ -296,6 +300,7 @@
+         _count(lever, "served:selfattn:c=%d" % (H * Dh))
+         return self.adaptive_zero_init(o, single_cond)
+     except Exception as e:
++        if is_oom(e): raise                                                # OOM propagates; no fallback applied (opt_core.oom.is_oom)
+         _kernel_error(lever, e); return _ORIG["selfattn"](self, x, mask, pair_logits, single_cond)
+ 
+ 
+@@ -320,6 +325,7 @@
+         _count("apb", "served:pairlogits")
+         return b16[..., :H].permute(2, 0, 1)
+     except Exception as e:
++        if is_oom(e): raise                                                # OOM propagates; no fallback applied (opt_core.oom.is_oom)
+         _kernel_error("apb", e); return None
+ 
+ 
+@@ -386,6 +392,7 @@
+             _log("graph_pairformer: captured %d-block stack for N=%d in %.2f s (levers %s)" % (len(blocks), pair.shape[-2], dt, key[7]))
+             _count("graph_pairformer", "captured:N=%d" % pair.shape[-2])
+         except Exception as e:
++            if is_oom(e): raise                                                # OOM propagates; no fallback applied (opt_core.oom.is_oom)
+             _kernel_error("graph_pairformer", e)
+             torch.cuda.synchronize()
+             return _stack_eager(blocks, pair, pair_mask, single, seq_mask)
+@@ -519,6 +526,7 @@
+             pl = pl.contiguous()
+         pl = _dt_premask(pl, mask, cent)
+     except Exception as e:
++        if is_oom(e): raise                                                # OOM propagates; no fallback applied (opt_core.oom.is_oom)
+         _kernel_error(lever, e); return _ORIG["dt_forward"](self, act, mask, single_cond, pair_cond, *args, **kwargs)
+     if os.environ.get("AF3K_DIFFUSION_GRAPH", "1") != "1":
+         _count(lever, "served:hoist-only"); return _dt_blocks(self, act, mask, single_cond, pl)
+@@ -549,6 +557,7 @@
+             _log("graph_diffusion: captured %d-block diffusion transformer for N=%d in %.2f s" % (self.num_blocks, act.shape[0], dt))
+             _count(lever, "captured:N=%d" % act.shape[0])
+         except Exception as e:
++            if is_oom(e): raise                                                # OOM propagates; no fallback applied (opt_core.oom.is_oom)
+             _kernel_error(lever, e); torch.cuda.synchronize()
+             return _dt_blocks(self, act, mask, single_cond, pl)
+     if ent["pl_src"] is not pl:

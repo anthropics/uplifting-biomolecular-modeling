@@ -1,0 +1,729 @@
+{
+ "10.0": {
+  "_fused_transition_kernel": {
+   "(0, 128, 256, False, 'torch.bfloat16', 'torch.bfloat16', 'torch.float32', 'torch.float32', 'torch.bfloat16', 'torch.bfloat16', 'torch.bfloat16')": {
+    "BH": 64,
+    "BM": 64,
+    "num_stages": 2,
+    "num_warps": 4
+   },
+   "(0, 128, 512, False, 'torch.bfloat16', 'torch.bfloat16', 'torch.float32', 'torch.float32', 'torch.bfloat16', 'torch.bfloat16', 'torch.bfloat16')": {
+    "BH": 64,
+    "BM": 64,
+    "num_stages": 2,
+    "num_warps": 4
+   },
+   "(0, 128, 512, True, 'torch.bfloat16', 'torch.bfloat16', 'torch.float32', 'torch.float32', 'torch.bfloat16', 'torch.bfloat16', 'torch.bfloat16')": {
+    "BH": 64,
+    "BM": 64,
+    "num_stages": 2,
+    "num_warps": 4
+   },
+   "(0, 64, 256, False, 'torch.bfloat16', 'torch.bfloat16', 'torch.float32', 'torch.float32', 'torch.bfloat16', 'torch.bfloat16', 'torch.bfloat16')": {
+    "BH": 64,
+    "BM": 128,
+    "num_stages": 2,
+    "num_warps": 8
+   },
+   "(0, 64, 256, True, 'torch.bfloat16', 'torch.bfloat16', 'torch.float32', 'torch.float32', 'torch.bfloat16', 'torch.bfloat16', 'torch.bfloat16')": {
+    "BH": 64,
+    "BM": 128,
+    "num_stages": 3,
+    "num_warps": 8
+   },
+   "(1, 128, 256, False, 'torch.bfloat16', 'torch.bfloat16', 'torch.float32', 'torch.float32', 'torch.bfloat16', 'torch.bfloat16', 'torch.bfloat16')": {
+    "BH": 64,
+    "BM": 64,
+    "num_stages": 2,
+    "num_warps": 4
+   },
+   "(1, 128, 512, False, 'torch.bfloat16', 'torch.bfloat16', 'torch.float32', 'torch.float32', 'torch.bfloat16', 'torch.bfloat16', 'torch.bfloat16')": {
+    "BH": 64,
+    "BM": 64,
+    "num_stages": 2,
+    "num_warps": 4
+   },
+   "(1, 128, 512, True, 'torch.bfloat16', 'torch.bfloat16', 'torch.float32', 'torch.float32', 'torch.bfloat16', 'torch.bfloat16', 'torch.bfloat16')": {
+    "BH": 64,
+    "BM": 64,
+    "num_stages": 2,
+    "num_warps": 4
+   },
+   "(1, 64, 256, False, 'torch.bfloat16', 'torch.bfloat16', 'torch.float32', 'torch.float32', 'torch.bfloat16', 'torch.bfloat16', 'torch.bfloat16')": {
+    "BH": 64,
+    "BM": 128,
+    "num_stages": 2,
+    "num_warps": 8
+   },
+   "(1, 64, 256, True, 'torch.bfloat16', 'torch.bfloat16', 'torch.float32', 'torch.float32', 'torch.bfloat16', 'torch.bfloat16', 'torch.bfloat16')": {
+    "BH": 64,
+    "BM": 128,
+    "num_stages": 2,
+    "num_warps": 8
+   },
+   "(2, 128, 256, False, 'torch.bfloat16', 'torch.bfloat16', 'torch.float32', 'torch.float32', 'torch.bfloat16', 'torch.bfloat16', 'torch.bfloat16')": {
+    "BH": 64,
+    "BM": 64,
+    "num_stages": 2,
+    "num_warps": 4
+   },
+   "(2, 128, 512, False, 'torch.bfloat16', 'torch.bfloat16', 'torch.float32', 'torch.float32', 'torch.bfloat16', 'torch.bfloat16', 'torch.bfloat16')": {
+    "BH": 64,
+    "BM": 64,
+    "num_stages": 2,
+    "num_warps": 4
+   },
+   "(2, 128, 512, True, 'torch.bfloat16', 'torch.bfloat16', 'torch.float32', 'torch.float32', 'torch.bfloat16', 'torch.bfloat16', 'torch.bfloat16')": {
+    "BH": 64,
+    "BM": 64,
+    "num_stages": 2,
+    "num_warps": 4
+   },
+   "(2, 64, 256, False, 'torch.bfloat16', 'torch.bfloat16', 'torch.float32', 'torch.float32', 'torch.bfloat16', 'torch.bfloat16', 'torch.bfloat16')": {
+    "BH": 64,
+    "BM": 128,
+    "num_stages": 2,
+    "num_warps": 8
+   },
+   "(2, 64, 256, True, 'torch.bfloat16', 'torch.bfloat16', 'torch.float32', 'torch.float32', 'torch.bfloat16', 'torch.bfloat16', 'torch.bfloat16')": {
+    "BH": 64,
+    "BM": 128,
+    "num_stages": 2,
+    "num_warps": 8
+   }
+  },
+  "_ln_linear_kernel": {
+   "(0, 128, 16, False, False, 'torch.bfloat16', 'torch.bfloat16', 'torch.bfloat16', 'torch.float32', 'torch.float32', 'torch.bfloat16')": {
+    "BM": 64,
+    "num_stages": 3,
+    "num_warps": 2
+   },
+   "(0, 128, 16, True, False, 'torch.bfloat16', 'torch.bfloat16', 'torch.bfloat16', 'torch.float32', 'torch.float32', 'torch.bfloat16')": {
+    "BM": 64,
+    "num_stages": 3,
+    "num_warps": 2
+   },
+   "(0, 128, 16, True, True, 'torch.bfloat16', 'torch.bfloat16', 'torch.bfloat16', 'torch.float32', 'torch.float32', 'torch.bfloat16')": {
+    "BM": 64,
+    "num_stages": 2,
+    "num_warps": 4
+   },
+   "(0, 64, 16, True, False, 'torch.bfloat16', 'torch.bfloat16', 'torch.bfloat16', 'torch.float32', 'torch.float32', 'torch.bfloat16')": {
+    "BM": 64,
+    "num_stages": 3,
+    "num_warps": 2
+   },
+   "(0, 64, 16, True, True, 'torch.bfloat16', 'torch.bfloat16', 'torch.bfloat16', 'torch.float32', 'torch.float32', 'torch.bfloat16')": {
+    "BM": 64,
+    "num_stages": 3,
+    "num_warps": 2
+   },
+   "(1, 128, 16, True, False, 'torch.bfloat16', 'torch.bfloat16', 'torch.bfloat16', 'torch.float32', 'torch.float32', 'torch.bfloat16')": {
+    "BM": 64,
+    "num_stages": 3,
+    "num_warps": 2
+   },
+   "(1, 128, 16, True, True, 'torch.bfloat16', 'torch.bfloat16', 'torch.bfloat16', 'torch.float32', 'torch.float32', 'torch.bfloat16')": {
+    "BM": 64,
+    "num_stages": 2,
+    "num_warps": 4
+   },
+   "(1, 64, 16, True, False, 'torch.bfloat16', 'torch.bfloat16', 'torch.bfloat16', 'torch.float32', 'torch.float32', 'torch.bfloat16')": {
+    "BM": 64,
+    "num_stages": 3,
+    "num_warps": 2
+   },
+   "(1, 64, 16, True, True, 'torch.bfloat16', 'torch.bfloat16', 'torch.bfloat16', 'torch.float32', 'torch.float32', 'torch.bfloat16')": {
+    "BM": 64,
+    "num_stages": 3,
+    "num_warps": 2
+   },
+   "(2, 128, 16, False, False, 'torch.bfloat16', 'torch.bfloat16', 'torch.bfloat16', 'torch.float32', 'torch.float32', 'torch.bfloat16')": {
+    "BM": 64,
+    "num_stages": 3,
+    "num_warps": 2
+   },
+   "(2, 128, 16, True, False, 'torch.bfloat16', 'torch.bfloat16', 'torch.bfloat16', 'torch.float32', 'torch.float32', 'torch.bfloat16')": {
+    "BM": 64,
+    "num_stages": 3,
+    "num_warps": 2
+   },
+   "(2, 128, 16, True, True, 'torch.bfloat16', 'torch.bfloat16', 'torch.bfloat16', 'torch.float32', 'torch.float32', 'torch.bfloat16')": {
+    "BM": 64,
+    "num_stages": 2,
+    "num_warps": 4
+   },
+   "(2, 64, 16, True, False, 'torch.bfloat16', 'torch.bfloat16', 'torch.bfloat16', 'torch.float32', 'torch.float32', 'torch.bfloat16')": {
+    "BM": 64,
+    "num_stages": 3,
+    "num_warps": 2
+   },
+   "(2, 64, 16, True, True, 'torch.bfloat16', 'torch.bfloat16', 'torch.bfloat16', 'torch.float32', 'torch.float32', 'torch.bfloat16')": {
+    "BM": 64,
+    "num_stages": 3,
+    "num_warps": 2
+   }
+  }
+ },
+ "10.3": {
+  "_fused_transition_kernel": {
+   "(0, 128, 256, False, 'torch.bfloat16', 'torch.bfloat16', 'torch.float32', 'torch.float32', 'torch.bfloat16', 'torch.bfloat16', 'torch.bfloat16')": {
+    "BH": 64,
+    "BM": 64,
+    "num_stages": 2,
+    "num_warps": 4
+   },
+   "(0, 128, 512, False, 'torch.bfloat16', 'torch.bfloat16', 'torch.float32', 'torch.float32', 'torch.bfloat16', 'torch.bfloat16', 'torch.bfloat16')": {
+    "BH": 64,
+    "BM": 64,
+    "num_stages": 2,
+    "num_warps": 4
+   },
+   "(0, 128, 512, True, 'torch.bfloat16', 'torch.bfloat16', 'torch.float32', 'torch.float32', 'torch.bfloat16', 'torch.bfloat16', 'torch.bfloat16')": {
+    "BH": 64,
+    "BM": 64,
+    "num_stages": 2,
+    "num_warps": 4
+   },
+   "(0, 64, 256, False, 'torch.bfloat16', 'torch.bfloat16', 'torch.float32', 'torch.float32', 'torch.bfloat16', 'torch.bfloat16', 'torch.bfloat16')": {
+    "BH": 64,
+    "BM": 128,
+    "num_stages": 2,
+    "num_warps": 8
+   },
+   "(0, 64, 256, True, 'torch.bfloat16', 'torch.bfloat16', 'torch.float32', 'torch.float32', 'torch.bfloat16', 'torch.bfloat16', 'torch.bfloat16')": {
+    "BH": 64,
+    "BM": 128,
+    "num_stages": 2,
+    "num_warps": 8
+   },
+   "(1, 128, 256, False, 'torch.bfloat16', 'torch.bfloat16', 'torch.float32', 'torch.float32', 'torch.bfloat16', 'torch.bfloat16', 'torch.bfloat16')": {
+    "BH": 64,
+    "BM": 64,
+    "num_stages": 2,
+    "num_warps": 4
+   },
+   "(1, 128, 512, False, 'torch.bfloat16', 'torch.bfloat16', 'torch.float32', 'torch.float32', 'torch.bfloat16', 'torch.bfloat16', 'torch.bfloat16')": {
+    "BH": 64,
+    "BM": 64,
+    "num_stages": 2,
+    "num_warps": 4
+   },
+   "(1, 128, 512, True, 'torch.bfloat16', 'torch.bfloat16', 'torch.float32', 'torch.float32', 'torch.bfloat16', 'torch.bfloat16', 'torch.bfloat16')": {
+    "BH": 64,
+    "BM": 64,
+    "num_stages": 2,
+    "num_warps": 4
+   },
+   "(1, 64, 256, False, 'torch.bfloat16', 'torch.bfloat16', 'torch.float32', 'torch.float32', 'torch.bfloat16', 'torch.bfloat16', 'torch.bfloat16')": {
+    "BH": 64,
+    "BM": 128,
+    "num_stages": 2,
+    "num_warps": 8
+   },
+   "(1, 64, 256, True, 'torch.bfloat16', 'torch.bfloat16', 'torch.float32', 'torch.float32', 'torch.bfloat16', 'torch.bfloat16', 'torch.bfloat16')": {
+    "BH": 64,
+    "BM": 128,
+    "num_stages": 3,
+    "num_warps": 8
+   },
+   "(2, 128, 256, False, 'torch.bfloat16', 'torch.bfloat16', 'torch.float32', 'torch.float32', 'torch.bfloat16', 'torch.bfloat16', 'torch.bfloat16')": {
+    "BH": 64,
+    "BM": 64,
+    "num_stages": 2,
+    "num_warps": 4
+   },
+   "(2, 128, 512, False, 'torch.bfloat16', 'torch.bfloat16', 'torch.float32', 'torch.float32', 'torch.bfloat16', 'torch.bfloat16', 'torch.bfloat16')": {
+    "BH": 64,
+    "BM": 64,
+    "num_stages": 2,
+    "num_warps": 4
+   },
+   "(2, 128, 512, True, 'torch.bfloat16', 'torch.bfloat16', 'torch.float32', 'torch.float32', 'torch.bfloat16', 'torch.bfloat16', 'torch.bfloat16')": {
+    "BH": 64,
+    "BM": 64,
+    "num_stages": 2,
+    "num_warps": 4
+   },
+   "(2, 64, 256, False, 'torch.bfloat16', 'torch.bfloat16', 'torch.float32', 'torch.float32', 'torch.bfloat16', 'torch.bfloat16', 'torch.bfloat16')": {
+    "BH": 64,
+    "BM": 128,
+    "num_stages": 2,
+    "num_warps": 8
+   },
+   "(2, 64, 256, True, 'torch.bfloat16', 'torch.bfloat16', 'torch.float32', 'torch.float32', 'torch.bfloat16', 'torch.bfloat16', 'torch.bfloat16')": {
+    "BH": 64,
+    "BM": 128,
+    "num_stages": 3,
+    "num_warps": 8
+   }
+  },
+  "_ln_linear_kernel": {
+   "(0, 128, 16, False, False, 'torch.bfloat16', 'torch.bfloat16', 'torch.bfloat16', 'torch.float32', 'torch.float32', 'torch.bfloat16')": {
+    "BM": 128,
+    "num_stages": 2,
+    "num_warps": 4
+   },
+   "(0, 128, 16, True, False, 'torch.bfloat16', 'torch.bfloat16', 'torch.bfloat16', 'torch.float32', 'torch.float32', 'torch.bfloat16')": {
+    "BM": 64,
+    "num_stages": 3,
+    "num_warps": 2
+   },
+   "(0, 128, 16, True, True, 'torch.bfloat16', 'torch.bfloat16', 'torch.bfloat16', 'torch.float32', 'torch.float32', 'torch.bfloat16')": {
+    "BM": 64,
+    "num_stages": 2,
+    "num_warps": 4
+   },
+   "(0, 64, 16, True, False, 'torch.bfloat16', 'torch.bfloat16', 'torch.bfloat16', 'torch.float32', 'torch.float32', 'torch.bfloat16')": {
+    "BM": 64,
+    "num_stages": 3,
+    "num_warps": 2
+   },
+   "(0, 64, 16, True, True, 'torch.bfloat16', 'torch.bfloat16', 'torch.bfloat16', 'torch.float32', 'torch.float32', 'torch.bfloat16')": {
+    "BM": 64,
+    "num_stages": 3,
+    "num_warps": 2
+   },
+   "(1, 128, 16, True, False, 'torch.bfloat16', 'torch.bfloat16', 'torch.bfloat16', 'torch.float32', 'torch.float32', 'torch.bfloat16')": {
+    "BM": 64,
+    "num_stages": 3,
+    "num_warps": 2
+   },
+   "(1, 128, 16, True, True, 'torch.bfloat16', 'torch.bfloat16', 'torch.bfloat16', 'torch.float32', 'torch.float32', 'torch.bfloat16')": {
+    "BM": 64,
+    "num_stages": 2,
+    "num_warps": 4
+   },
+   "(1, 64, 16, True, False, 'torch.bfloat16', 'torch.bfloat16', 'torch.bfloat16', 'torch.float32', 'torch.float32', 'torch.bfloat16')": {
+    "BM": 64,
+    "num_stages": 3,
+    "num_warps": 2
+   },
+   "(1, 64, 16, True, True, 'torch.bfloat16', 'torch.bfloat16', 'torch.bfloat16', 'torch.float32', 'torch.float32', 'torch.bfloat16')": {
+    "BM": 64,
+    "num_stages": 3,
+    "num_warps": 2
+   },
+   "(2, 128, 16, False, False, 'torch.bfloat16', 'torch.bfloat16', 'torch.bfloat16', 'torch.float32', 'torch.float32', 'torch.bfloat16')": {
+    "BM": 64,
+    "num_stages": 3,
+    "num_warps": 2
+   },
+   "(2, 128, 16, True, False, 'torch.bfloat16', 'torch.bfloat16', 'torch.bfloat16', 'torch.float32', 'torch.float32', 'torch.bfloat16')": {
+    "BM": 64,
+    "num_stages": 3,
+    "num_warps": 2
+   },
+   "(2, 128, 16, True, True, 'torch.bfloat16', 'torch.bfloat16', 'torch.bfloat16', 'torch.float32', 'torch.float32', 'torch.bfloat16')": {
+    "BM": 64,
+    "num_stages": 2,
+    "num_warps": 4
+   },
+   "(2, 64, 16, True, False, 'torch.bfloat16', 'torch.bfloat16', 'torch.bfloat16', 'torch.float32', 'torch.float32', 'torch.bfloat16')": {
+    "BM": 64,
+    "num_stages": 3,
+    "num_warps": 2
+   },
+   "(2, 64, 16, True, True, 'torch.bfloat16', 'torch.bfloat16', 'torch.bfloat16', 'torch.float32', 'torch.float32', 'torch.bfloat16')": {
+    "BM": 64,
+    "num_stages": 3,
+    "num_warps": 2
+   }
+  }
+ },
+ "9.0": {
+  "_fused_transition_kernel": {
+   "(0, 128, 256, False, 'torch.bfloat16', 'torch.bfloat16', 'torch.float32', 'torch.float32', 'torch.bfloat16', 'torch.bfloat16', 'torch.bfloat16')": {
+    "BH": 64,
+    "BM": 128,
+    "num_stages": 3,
+    "num_warps": 8
+   },
+   "(0, 128, 512, False, 'torch.bfloat16', 'torch.bfloat16', 'torch.float32', 'torch.float32', 'torch.bfloat16', 'torch.bfloat16', 'torch.bfloat16')": {
+    "BH": 64,
+    "BM": 128,
+    "num_stages": 3,
+    "num_warps": 8
+   },
+   "(0, 128, 512, True, 'torch.bfloat16', 'torch.bfloat16', 'torch.float32', 'torch.float32', 'torch.bfloat16', 'torch.bfloat16', 'torch.bfloat16')": {
+    "BH": 64,
+    "BM": 64,
+    "num_stages": 2,
+    "num_warps": 4
+   },
+   "(0, 64, 256, True, 'torch.bfloat16', 'torch.bfloat16', 'torch.float32', 'torch.float32', 'torch.bfloat16', 'torch.bfloat16', 'torch.bfloat16')": {
+    "BH": 64,
+    "BM": 64,
+    "num_stages": 2,
+    "num_warps": 4
+   },
+   "(1, 128, 256, False, 'torch.bfloat16', 'torch.bfloat16', 'torch.float32', 'torch.float32', 'torch.bfloat16', 'torch.bfloat16', 'torch.bfloat16')": {
+    "BH": 64,
+    "BM": 64,
+    "num_stages": 2,
+    "num_warps": 4
+   },
+   "(1, 128, 512, False, 'torch.bfloat16', 'torch.bfloat16', 'torch.float32', 'torch.float32', 'torch.bfloat16', 'torch.bfloat16', 'torch.bfloat16')": {
+    "BH": 64,
+    "BM": 128,
+    "num_stages": 3,
+    "num_warps": 8
+   },
+   "(1, 128, 512, True, 'torch.bfloat16', 'torch.bfloat16', 'torch.float32', 'torch.float32', 'torch.bfloat16', 'torch.bfloat16', 'torch.bfloat16')": {
+    "BH": 64,
+    "BM": 64,
+    "num_stages": 2,
+    "num_warps": 4
+   },
+   "(1, 64, 256, False, 'torch.bfloat16', 'torch.bfloat16', 'torch.float32', 'torch.float32', 'torch.bfloat16', 'torch.bfloat16', 'torch.bfloat16')": {
+    "BH": 64,
+    "BM": 64,
+    "num_stages": 2,
+    "num_warps": 4
+   },
+   "(1, 64, 256, True, 'torch.bfloat16', 'torch.bfloat16', 'torch.float32', 'torch.float32', 'torch.bfloat16', 'torch.bfloat16', 'torch.bfloat16')": {
+    "BH": 64,
+    "BM": 64,
+    "num_stages": 2,
+    "num_warps": 4
+   },
+   "(2, 128, 256, False, 'torch.bfloat16', 'torch.bfloat16', 'torch.float32', 'torch.float32', 'torch.bfloat16', 'torch.bfloat16', 'torch.bfloat16')": {
+    "BH": 64,
+    "BM": 64,
+    "num_stages": 2,
+    "num_warps": 4
+   },
+   "(2, 128, 512, False, 'torch.bfloat16', 'torch.bfloat16', 'torch.float32', 'torch.float32', 'torch.bfloat16', 'torch.bfloat16', 'torch.bfloat16')": {
+    "BH": 64,
+    "BM": 64,
+    "num_stages": 2,
+    "num_warps": 4
+   },
+   "(2, 128, 512, True, 'torch.bfloat16', 'torch.bfloat16', 'torch.float32', 'torch.float32', 'torch.bfloat16', 'torch.bfloat16', 'torch.bfloat16')": {
+    "BH": 64,
+    "BM": 64,
+    "num_stages": 2,
+    "num_warps": 4
+   },
+   "(2, 64, 256, False, 'torch.bfloat16', 'torch.bfloat16', 'torch.float32', 'torch.float32', 'torch.bfloat16', 'torch.bfloat16', 'torch.bfloat16')": {
+    "BH": 64,
+    "BM": 64,
+    "num_stages": 2,
+    "num_warps": 4
+   },
+   "(2, 64, 256, True, 'torch.bfloat16', 'torch.bfloat16', 'torch.float32', 'torch.float32', 'torch.bfloat16', 'torch.bfloat16', 'torch.bfloat16')": {
+    "BH": 64,
+    "BM": 64,
+    "num_stages": 2,
+    "num_warps": 4
+   }
+  },
+  "_ln_linear_kernel": {
+   "(0, 128, 16, True, False, 'torch.bfloat16', 'torch.bfloat16', 'torch.bfloat16', 'torch.float32', 'torch.float32', 'torch.bfloat16')": {
+    "BM": 128,
+    "num_stages": 2,
+    "num_warps": 8
+   },
+   "(0, 128, 16, True, True, 'torch.bfloat16', 'torch.bfloat16', 'torch.bfloat16', 'torch.float32', 'torch.float32', 'torch.bfloat16')": {
+    "BM": 128,
+    "num_stages": 3,
+    "num_warps": 4
+   },
+   "(0, 64, 16, True, False, 'torch.bfloat16', 'torch.bfloat16', 'torch.bfloat16', 'torch.float32', 'torch.float32', 'torch.bfloat16')": {
+    "BM": 64,
+    "num_stages": 2,
+    "num_warps": 4
+   },
+   "(0, 64, 16, True, True, 'torch.bfloat16', 'torch.bfloat16', 'torch.bfloat16', 'torch.float32', 'torch.float32', 'torch.bfloat16')": {
+    "BM": 64,
+    "num_stages": 2,
+    "num_warps": 4
+   },
+   "(1, 128, 16, True, False, 'torch.bfloat16', 'torch.bfloat16', 'torch.bfloat16', 'torch.float32', 'torch.float32', 'torch.bfloat16')": {
+    "BM": 64,
+    "num_stages": 3,
+    "num_warps": 2
+   },
+   "(1, 128, 16, True, True, 'torch.bfloat16', 'torch.bfloat16', 'torch.bfloat16', 'torch.float32', 'torch.float32', 'torch.bfloat16')": {
+    "BM": 128,
+    "num_stages": 2,
+    "num_warps": 8
+   },
+   "(1, 64, 16, True, False, 'torch.bfloat16', 'torch.bfloat16', 'torch.bfloat16', 'torch.float32', 'torch.float32', 'torch.bfloat16')": {
+    "BM": 64,
+    "num_stages": 2,
+    "num_warps": 4
+   },
+   "(1, 64, 16, True, True, 'torch.bfloat16', 'torch.bfloat16', 'torch.bfloat16', 'torch.float32', 'torch.float32', 'torch.bfloat16')": {
+    "BM": 64,
+    "num_stages": 2,
+    "num_warps": 4
+   },
+   "(2, 128, 16, False, False, 'torch.bfloat16', 'torch.bfloat16', 'torch.bfloat16', 'torch.float32', 'torch.float32', 'torch.bfloat16')": {
+    "BM": 64,
+    "num_stages": 2,
+    "num_warps": 4
+   },
+   "(2, 128, 16, True, False, 'torch.bfloat16', 'torch.bfloat16', 'torch.bfloat16', 'torch.float32', 'torch.float32', 'torch.bfloat16')": {
+    "BM": 64,
+    "num_stages": 3,
+    "num_warps": 2
+   },
+   "(2, 128, 16, True, True, 'torch.bfloat16', 'torch.bfloat16', 'torch.bfloat16', 'torch.float32', 'torch.float32', 'torch.bfloat16')": {
+    "BM": 128,
+    "num_stages": 2,
+    "num_warps": 8
+   },
+   "(2, 64, 16, True, False, 'torch.bfloat16', 'torch.bfloat16', 'torch.bfloat16', 'torch.float32', 'torch.float32', 'torch.bfloat16')": {
+    "BM": 64,
+    "num_stages": 2,
+    "num_warps": 4
+   },
+   "(2, 64, 16, True, True, 'torch.bfloat16', 'torch.bfloat16', 'torch.bfloat16', 'torch.float32', 'torch.float32', 'torch.bfloat16')": {
+    "BM": 128,
+    "num_stages": 2,
+    "num_warps": 8
+   }
+  }
+ },
+ "8.0": {
+  "_fused_transition_kernel": {
+   "(0, 128, 256, False, 'torch.bfloat16', 'torch.bfloat16', 'torch.float32', 'torch.float32', 'torch.bfloat16', 'torch.bfloat16', 'torch.bfloat16')": {
+    "BM": 64,
+    "BH": 64,
+    "num_warps": 4,
+    "num_stages": 2
+   },
+   "(1, 128, 256, False, 'torch.bfloat16', 'torch.bfloat16', 'torch.float32', 'torch.float32', 'torch.bfloat16', 'torch.bfloat16', 'torch.bfloat16')": {
+    "BM": 64,
+    "BH": 64,
+    "num_warps": 4,
+    "num_stages": 2
+   },
+   "(2, 128, 256, False, 'torch.bfloat16', 'torch.bfloat16', 'torch.float32', 'torch.float32', 'torch.bfloat16', 'torch.bfloat16', 'torch.bfloat16')": {
+    "BM": 64,
+    "BH": 64,
+    "num_warps": 4,
+    "num_stages": 2
+   },
+   "(0, 128, 512, False, 'torch.bfloat16', 'torch.bfloat16', 'torch.float32', 'torch.float32', 'torch.bfloat16', 'torch.bfloat16', 'torch.bfloat16')": {
+    "BM": 64,
+    "BH": 64,
+    "num_warps": 4,
+    "num_stages": 2
+   },
+   "(1, 128, 512, False, 'torch.bfloat16', 'torch.bfloat16', 'torch.float32', 'torch.float32', 'torch.bfloat16', 'torch.bfloat16', 'torch.bfloat16')": {
+    "BM": 64,
+    "BH": 64,
+    "num_warps": 4,
+    "num_stages": 3
+   },
+   "(2, 128, 512, False, 'torch.bfloat16', 'torch.bfloat16', 'torch.float32', 'torch.float32', 'torch.bfloat16', 'torch.bfloat16', 'torch.bfloat16')": {
+    "BM": 64,
+    "BH": 64,
+    "num_warps": 4,
+    "num_stages": 2
+   },
+   "(0, 128, 512, True, 'torch.bfloat16', 'torch.bfloat16', 'torch.float32', 'torch.float32', 'torch.bfloat16', 'torch.bfloat16', 'torch.bfloat16')": {
+    "BM": 64,
+    "BH": 64,
+    "num_warps": 4,
+    "num_stages": 2
+   },
+   "(1, 128, 512, True, 'torch.bfloat16', 'torch.bfloat16', 'torch.float32', 'torch.float32', 'torch.bfloat16', 'torch.bfloat16', 'torch.bfloat16')": {
+    "BM": 64,
+    "BH": 64,
+    "num_warps": 4,
+    "num_stages": 2
+   },
+   "(2, 128, 512, True, 'torch.bfloat16', 'torch.bfloat16', 'torch.float32', 'torch.float32', 'torch.bfloat16', 'torch.bfloat16', 'torch.bfloat16')": {
+    "BM": 64,
+    "BH": 64,
+    "num_warps": 4,
+    "num_stages": 2
+   },
+   "(0, 64, 256, False, 'torch.bfloat16', 'torch.bfloat16', 'torch.float32', 'torch.float32', 'torch.bfloat16', 'torch.bfloat16', 'torch.bfloat16')": {
+    "BM": 64,
+    "BH": 64,
+    "num_warps": 4,
+    "num_stages": 3
+   },
+   "(1, 64, 256, False, 'torch.bfloat16', 'torch.bfloat16', 'torch.float32', 'torch.float32', 'torch.bfloat16', 'torch.bfloat16', 'torch.bfloat16')": {
+    "BM": 64,
+    "BH": 64,
+    "num_warps": 4,
+    "num_stages": 3
+   },
+   "(2, 64, 256, False, 'torch.bfloat16', 'torch.bfloat16', 'torch.float32', 'torch.float32', 'torch.bfloat16', 'torch.bfloat16', 'torch.bfloat16')": {
+    "BM": 64,
+    "BH": 64,
+    "num_warps": 4,
+    "num_stages": 3
+   },
+   "(0, 64, 256, True, 'torch.bfloat16', 'torch.bfloat16', 'torch.float32', 'torch.float32', 'torch.bfloat16', 'torch.bfloat16', 'torch.bfloat16')": {
+    "BM": 64,
+    "BH": 64,
+    "num_warps": 4,
+    "num_stages": 2
+   },
+   "(1, 64, 256, True, 'torch.bfloat16', 'torch.bfloat16', 'torch.float32', 'torch.float32', 'torch.bfloat16', 'torch.bfloat16', 'torch.bfloat16')": {
+    "BM": 64,
+    "BH": 64,
+    "num_warps": 4,
+    "num_stages": 3
+   },
+   "(2, 64, 256, True, 'torch.bfloat16', 'torch.bfloat16', 'torch.float32', 'torch.float32', 'torch.bfloat16', 'torch.bfloat16', 'torch.bfloat16')": {
+    "BM": 64,
+    "BH": 64,
+    "num_warps": 4,
+    "num_stages": 3
+   },
+   "(0, 128, 256, True, 'torch.bfloat16', 'torch.bfloat16', 'torch.float32', 'torch.float32', 'torch.bfloat16', 'torch.bfloat16', 'torch.bfloat16')": {
+    "BM": 64,
+    "BH": 64,
+    "num_warps": 4,
+    "num_stages": 2
+   },
+   "(1, 128, 256, True, 'torch.bfloat16', 'torch.bfloat16', 'torch.float32', 'torch.float32', 'torch.bfloat16', 'torch.bfloat16', 'torch.bfloat16')": {
+    "BM": 64,
+    "BH": 64,
+    "num_warps": 4,
+    "num_stages": 2
+   },
+   "(2, 128, 256, True, 'torch.bfloat16', 'torch.bfloat16', 'torch.float32', 'torch.float32', 'torch.bfloat16', 'torch.bfloat16', 'torch.bfloat16')": {
+    "BM": 64,
+    "BH": 64,
+    "num_warps": 4,
+    "num_stages": 2
+   },
+   "(0, 64, 128, False, 'torch.bfloat16', 'torch.bfloat16', 'torch.float32', 'torch.float32', 'torch.bfloat16', 'torch.bfloat16', 'torch.bfloat16')": {
+    "BM": 64,
+    "BH": 128,
+    "num_warps": 4,
+    "num_stages": 2
+   },
+   "(1, 64, 128, False, 'torch.bfloat16', 'torch.bfloat16', 'torch.float32', 'torch.float32', 'torch.bfloat16', 'torch.bfloat16', 'torch.bfloat16')": {
+    "BM": 64,
+    "BH": 128,
+    "num_warps": 4,
+    "num_stages": 2
+   },
+   "(2, 64, 128, False, 'torch.bfloat16', 'torch.bfloat16', 'torch.float32', 'torch.float32', 'torch.bfloat16', 'torch.bfloat16', 'torch.bfloat16')": {
+    "BM": 64,
+    "BH": 128,
+    "num_warps": 4,
+    "num_stages": 2
+   },
+   "(0, 64, 128, True, 'torch.bfloat16', 'torch.bfloat16', 'torch.float32', 'torch.float32', 'torch.bfloat16', 'torch.bfloat16', 'torch.bfloat16')": {
+    "BM": 64,
+    "BH": 64,
+    "num_warps": 4,
+    "num_stages": 2
+   },
+   "(1, 64, 128, True, 'torch.bfloat16', 'torch.bfloat16', 'torch.float32', 'torch.float32', 'torch.bfloat16', 'torch.bfloat16', 'torch.bfloat16')": {
+    "BM": 64,
+    "BH": 64,
+    "num_warps": 4,
+    "num_stages": 2
+   },
+   "(2, 64, 128, True, 'torch.bfloat16', 'torch.bfloat16', 'torch.float32', 'torch.float32', 'torch.bfloat16', 'torch.bfloat16', 'torch.bfloat16')": {
+    "BM": 64,
+    "BH": 64,
+    "num_warps": 4,
+    "num_stages": 2
+   }
+  },
+  "_ln_linear_kernel": {
+   "(0, 128, 16, False, False, 'torch.bfloat16', 'torch.bfloat16', 'torch.bfloat16', 'torch.float32', 'torch.float32', 'torch.bfloat16')": {
+    "BM": 128,
+    "num_warps": 8,
+    "num_stages": 2
+   },
+   "(1, 128, 16, False, False, 'torch.bfloat16', 'torch.bfloat16', 'torch.bfloat16', 'torch.float32', 'torch.float32', 'torch.bfloat16')": {
+    "BM": 64,
+    "num_warps": 4,
+    "num_stages": 2
+   },
+   "(2, 128, 16, False, False, 'torch.bfloat16', 'torch.bfloat16', 'torch.bfloat16', 'torch.float32', 'torch.float32', 'torch.bfloat16')": {
+    "BM": 64,
+    "num_warps": 4,
+    "num_stages": 2
+   },
+   "(0, 128, 16, True, False, 'torch.bfloat16', 'torch.bfloat16', 'torch.bfloat16', 'torch.float32', 'torch.float32', 'torch.bfloat16')": {
+    "BM": 64,
+    "num_warps": 4,
+    "num_stages": 2
+   },
+   "(1, 128, 16, True, False, 'torch.bfloat16', 'torch.bfloat16', 'torch.bfloat16', 'torch.float32', 'torch.float32', 'torch.bfloat16')": {
+    "BM": 64,
+    "num_warps": 4,
+    "num_stages": 2
+   },
+   "(2, 128, 16, True, False, 'torch.bfloat16', 'torch.bfloat16', 'torch.bfloat16', 'torch.float32', 'torch.float32', 'torch.bfloat16')": {
+    "BM": 64,
+    "num_warps": 4,
+    "num_stages": 2
+   },
+   "(0, 128, 16, True, True, 'torch.bfloat16', 'torch.bfloat16', 'torch.bfloat16', 'torch.float32', 'torch.float32', 'torch.bfloat16')": {
+    "BM": 128,
+    "num_warps": 4,
+    "num_stages": 2
+   },
+   "(1, 128, 16, True, True, 'torch.bfloat16', 'torch.bfloat16', 'torch.bfloat16', 'torch.float32', 'torch.float32', 'torch.bfloat16')": {
+    "BM": 64,
+    "num_warps": 4,
+    "num_stages": 2
+   },
+   "(2, 128, 16, True, True, 'torch.bfloat16', 'torch.bfloat16', 'torch.bfloat16', 'torch.float32', 'torch.float32', 'torch.bfloat16')": {
+    "BM": 64,
+    "num_warps": 4,
+    "num_stages": 2
+   },
+   "(0, 64, 16, True, False, 'torch.bfloat16', 'torch.bfloat16', 'torch.bfloat16', 'torch.float32', 'torch.float32', 'torch.bfloat16')": {
+    "BM": 64,
+    "num_warps": 4,
+    "num_stages": 2
+   },
+   "(1, 64, 16, True, False, 'torch.bfloat16', 'torch.bfloat16', 'torch.bfloat16', 'torch.float32', 'torch.float32', 'torch.bfloat16')": {
+    "BM": 64,
+    "num_warps": 4,
+    "num_stages": 2
+   },
+   "(2, 64, 16, True, False, 'torch.bfloat16', 'torch.bfloat16', 'torch.bfloat16', 'torch.float32', 'torch.float32', 'torch.bfloat16')": {
+    "BM": 64,
+    "num_warps": 4,
+    "num_stages": 2
+   },
+   "(0, 64, 16, True, True, 'torch.bfloat16', 'torch.bfloat16', 'torch.bfloat16', 'torch.float32', 'torch.float32', 'torch.bfloat16')": {
+    "BM": 64,
+    "num_warps": 4,
+    "num_stages": 2
+   },
+   "(1, 64, 16, True, True, 'torch.bfloat16', 'torch.bfloat16', 'torch.bfloat16', 'torch.float32', 'torch.float32', 'torch.bfloat16')": {
+    "BM": 64,
+    "num_warps": 4,
+    "num_stages": 2
+   },
+   "(2, 64, 16, True, True, 'torch.bfloat16', 'torch.bfloat16', 'torch.bfloat16', 'torch.float32', 'torch.float32', 'torch.bfloat16')": {
+    "BM": 64,
+    "num_warps": 4,
+    "num_stages": 2
+   },
+   "(0, 64, 16, False, False, 'torch.bfloat16', 'torch.bfloat16', 'torch.bfloat16', 'torch.float32', 'torch.float32', 'torch.bfloat16')": {
+    "BM": 64,
+    "num_warps": 4,
+    "num_stages": 2
+   },
+   "(1, 64, 16, False, False, 'torch.bfloat16', 'torch.bfloat16', 'torch.bfloat16', 'torch.float32', 'torch.float32', 'torch.bfloat16')": {
+    "BM": 64,
+    "num_warps": 4,
+    "num_stages": 2
+   },
+   "(2, 64, 16, False, False, 'torch.bfloat16', 'torch.bfloat16', 'torch.bfloat16', 'torch.float32', 'torch.float32', 'torch.bfloat16')": {
+    "BM": 64,
+    "num_warps": 4,
+    "num_stages": 2
+   }
+  }
+ }
+}

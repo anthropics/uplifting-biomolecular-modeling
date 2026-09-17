@@ -1,0 +1,185 @@
+# Copyright 2026 AlQuraishi Laboratory
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+from typing import Annotated, Any, NamedTuple
+
+from pydantic import (
+    BaseModel,
+    BeforeValidator,
+    DirectoryPath,
+    FilePath,
+    field_serializer,
+    model_validator,
+)
+
+from openfold3.core.config import pocket_sampling_config as pocket_defaults
+from openfold3.core.config.config_utils import (
+    _cast_keys_to_int,
+    _convert_molecule_type,
+    _ensure_list,
+)
+from openfold3.core.data.resources.residues import MoleculeType
+
+
+# Definition for Bonds
+class Atom(NamedTuple):
+    chain_id: str
+    residue_id: int
+    atom_id: int
+
+
+class Bond(NamedTuple):
+    atom1: Atom
+    atom2: Atom
+
+
+class PocketResidue(NamedTuple):
+    """Residue address used to define a ligand pocket constraint."""
+
+    chain_id: str
+    residue_id: int
+
+
+class PocketConstraint(BaseModel):
+    """User-specified ligand-to-pocket site constraint for inference."""
+
+    model_config = {"extra": "forbid"}
+    ligand_chain_id: str
+    pocket_residues: list[PocketResidue]
+    max_distance: float = pocket_defaults.DEFAULT_POCKET_CONSTRAINT_MAX_DISTANCE
+
+    @model_validator(mode="after")
+    def validate_constraint(self) -> "PocketConstraint":
+        """Validate pocket constraint geometry inputs."""
+        if not self.pocket_residues:
+            raise ValueError("pocket_residues must contain at least one residue")
+        if self.max_distance <= 0:
+            raise ValueError("max_distance must be positive")
+        return self
+
+
+class Chain(BaseModel):
+    model_config = {
+        "use_enum_values": False,
+        "extra": "forbid",
+    }
+    molecule_type: Annotated[MoleculeType, BeforeValidator(_convert_molecule_type)]
+    chain_ids: Annotated[list[str], BeforeValidator(_ensure_list)]
+    description: str | None = None
+    sequence: str | None = None
+    non_canonical_residues: (
+        Annotated[dict[int, str], BeforeValidator(_cast_keys_to_int)] | None
+    ) = None
+    smiles: str | None = None
+    ccd_codes: Annotated[list[str], BeforeValidator(_ensure_list)] | None = None
+    paired_msa_file_paths: (
+        Annotated[list[FilePath | DirectoryPath], BeforeValidator(_ensure_list)] | None
+    ) = None
+    main_msa_file_paths: (
+        Annotated[list[FilePath | DirectoryPath], BeforeValidator(_ensure_list)] | None
+    ) = None
+    template_alignment_file_path: FilePath | None = None
+    template_entry_chain_ids: (
+        Annotated[list[str], BeforeValidator(_ensure_list)] | None
+    ) = None
+    template_cif_paths: (
+        Annotated[list[FilePath], BeforeValidator(_ensure_list)] | None
+    ) = None
+    template_cif_chain_ids: (
+        Annotated[list[str | None], BeforeValidator(_ensure_list)] | None
+    ) = None
+    sdf_file_path: FilePath | None = None
+    cyclic: bool = False
+
+    @field_serializer("molecule_type", return_type=str)
+    def serialize_enum_name(self, v: MoleculeType, _info):
+        return v.name
+
+    @model_validator(mode="after")
+    def validate_template_inputs(self) -> "Chain":
+        """Validate template input consistency."""
+        if (
+            self.template_alignment_file_path is not None
+            and self.template_cif_paths is not None
+        ):
+            raise ValueError(
+                f"Chain {self.chain_ids}: Cannot specify both "
+                "'template_alignment_file_path' and 'template_cif_paths'"
+            )
+
+        if self.template_cif_chain_ids is not None:
+            if self.template_cif_paths is None:
+                raise ValueError(
+                    f"Chain {self.chain_ids}: 'template_cif_chain_ids' can only "
+                    "be specified when 'template_cif_paths' is provided"
+                )
+            if len(self.template_cif_chain_ids) != len(self.template_cif_paths):
+                raise ValueError(
+                    f"Chain {self.chain_ids}: Length mismatch - "
+                    f"{len(self.template_cif_paths)} CIF files but "
+                    f"{len(self.template_cif_chain_ids)} chain IDs specified"
+                )
+
+        return self
+
+    # TODO(jennifer): Add validations to this class
+    # - if molecule type is protein / dna / rna - must specify sequence
+    # - if molecule type is ligand - either ccd or smiles needs to be specifified
+
+
+class Query(BaseModel):
+    query_name: str | None = None
+    chains: list[Chain]
+    use_msas: bool = True
+    use_paired_msas: bool = True
+    use_main_msas: bool = True
+    covalent_bonds: list[Bond] | None = None
+    pocket_constraint: PocketConstraint | None = None
+
+    @model_validator(mode="after")
+    def validate_pocket_constraint(self) -> "Query":
+        """Validate the query-level pocket constraint."""
+        if self.pocket_constraint is None:
+            return self
+
+        ligand_chain_ids = {
+            chain_id
+            for chain in self.chains
+            if chain.molecule_type == MoleculeType.LIGAND
+            for chain_id in chain.chain_ids
+        }
+        ligand_chain_id = self.pocket_constraint.ligand_chain_id
+        if ligand_chain_id not in ligand_chain_ids:
+            raise ValueError(
+                f"pocket constraint ligand_chain_id {ligand_chain_id!r} does not "
+                "match any ligand chain"
+            )
+        return self
+
+
+class InferenceQuerySet(BaseModel):
+    seeds: list[int] = [42]
+    queries: dict[str, Query]
+
+    @classmethod
+    def from_json(cls, json_path: FilePath) -> "InferenceQuerySet":
+        """Load InferenceQuerySet from a JSON file."""
+        with open(json_path) as f:
+            data = f.read()
+        return cls.model_validate_json(data)
+
+    def model_post_init(self, __context: Any) -> None:
+        """Add query name to the query objects."""
+        for name, query in self.queries.items():
+            query.query_name = name

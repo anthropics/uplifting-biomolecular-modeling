@@ -1,0 +1,37 @@
+{
+ "record": "the pre-compiled Triton caches shipped for this package's kernels.py, one entry per GPU architecture and triton/torch stack; an architecture without an entry (cuda-80 among them) compiles the kernels on first use in each fresh process, and the printed line says so",
+ "rule": "each entry sha-pinned on its SHA256SUMS; chosen by the GPU's arch + the installed triton/torch versions; an unlisted arch = cold JIT said on the line; the PIN-EQUALITY gate: every entry's JIT_IDENTITY.kernels_sha256_16 == the package's kernels.py sha (cache_identity.pin_gate)",
+ "entries": [
+  {
+   "arch": "cuda-90-32",
+   "device_classes": [
+    "NVIDIA H100",
+    "NVIDIA H200"
+   ],
+   "stack": {
+    "triton": "3.0.0",
+    "torch": "2.4.1+cu124"
+   },
+   "dir": "triton_cache_sm90",
+   "sha256sums_sha256_16": "8086e29c073f62a2",
+   "covers": "H100: the 3 regime tiles at B=1,2,4,32,64,256",
+   "served_classes_note": {
+    "H200": "H200: served by the sm90 entry \u2014 a cache populated on H200 has the same IR/PTX identity key as this H100-built one (chrombpnet_k1/arch_tiles.json note_h200); cache_witness() says after the first forward whether the shipped kernels were loaded or compiled"
+   }
+  },
+  {
+   "arch": "cuda-89-32",
+   "device_match": "L40S",
+   "device_classes": [
+    "NVIDIA L40S"
+   ],
+   "stack": {
+    "triton": "3.0.0",
+    "torch": "2.4.1+cu124"
+   },
+   "dir": "triton_cache_sm89_l40s",
+   "sha256sums_sha256_16": "ec6f092d9ca52013",
+   "covers": "L40S: the tile 64x256x16x8x3 at B=1,2,4,32,64,256; the counts form elementwise -> no dense_chains entry"
+  }
+ ]
+}

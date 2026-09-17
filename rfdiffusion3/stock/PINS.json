@@ -1,0 +1,103 @@
+{
+ "model": "rfdiffusion3",
+ "upstream": {
+  "foundry": {
+   "repo": "https://github.com/RosettaCommons/foundry",
+   "commit": "4010e3e2e7350edada3e25a45c908c6bf407df4d",
+   "tag": null,
+   "describe": "v0.2.0-13-g4010e3e",
+   "distribution": "rc-foundry",
+   "version": "0.2.1.dev13+g4010e3e2e",
+   "extra": "rfd3",
+   "install": "rc-foundry[rfd3] @ git+https://github.com/RosettaCommons/foundry.git@4010e3e2e7350edada3e25a45c908c6bf407df4d",
+   "archive": "stock/foundry-4010e3e.tar.gz",
+   "console_script": "rfd3 = rfd3.cli:app (pyproject.toml:92)",
+   "package_dir": "models/rfd3/src/rfd3 -> site-packages/rfd3 (pyproject.toml:118-125; configs force-included as rfd3/configs, :127-130)",
+   "note": "no tag at this commit (13 commits after v0.2.0); the commit is the pin. The version string comes from hatch-vcs at build time (pyproject.toml:105-108): a git checkout at the commit yields 0.2.1.dev13+g4010e3e2e; the archive has no .git and needs SETUPTOOLS_SCM_PRETEND_VERSION=0.2.1.dev13+g4010e3e2e. The kit installs the rfd3 extra (.[rfd3]); the in-job pin list also carries the four cuequivariance 0.11.1 packages of the rf3 extra (pyproject.toml:60-64)."
+  }
+ },
+ "archive_recipe": "git archive --format=tar --prefix=foundry-4010e3e2/ 4010e3e2e7350edada3e25a45c908c6bf407df4d <paths> | gzip -n -9  (foundry: pyproject.toml README.md LICENSE.md src models/rfd3/src models/rfd3/configs models/rf3/src models/rf3/configs models/rfd3na/src models/rfd3na/configs models/mpnn/src models/rfd3/docs/examples models/rfd3/docs/input_pdbs); build: SETUPTOOLS_SCM_PRETEND_VERSION=0.2.1.dev13+g4010e3e2e pip install --no-deps <extracted dir>",
+ "python": "3.12.1",
+ "pinned_stack": {
+  "tested_on": "NVIDIA H100 80GB HBM3 (sm90), driver 580.95.05, the versions below in two identical interpreters built by `recipe` (a documentation label; nothing reads or compares it)",
+  "recipe": "two Python 3.12.1 virtual environments with the same packages — <stock> (pristine: upstream at the pin, never touched by the kit's install.sh) and <kit> (the same, then opt/forward/xattempt_addon/install.sh applied once, STOCK.md 'Stack'): `pip install 'rc-foundry[rfd3]'` from the pinned commit or stock/foundry-4010e3e.tar.gz with environment/requirements.lock as constraints (torch 2.13.0+cu130, triton 3.7.1), the apex wheel below `--no-deps` into both, then `pip install -e ../common/opt_core -e opt` in both (README 'Setup')",
+  "python": "3.12.1",
+  "torch": "2.13.0+cu130",
+  "cuda": "13.0",
+  "triton": "3.7.1",
+  "driver": "580.95.05",
+  "gpu": "NVIDIA H100 80GB HBM3 (sm90)",
+  "apex": {
+   "version": "0.1",
+   "repo": "https://github.com/NVIDIA/apex",
+   "commit": "a1d527a857e8da64c4e7237ca89ec699fb4d9eaf",
+   "wheel": "apex-0.1-cp312-cp312-linux_x86_64.whl",
+   "wheel_sha256": "2da21fe056fd4d14542a228b309ed9e19f0500cd400778ea2b502d3c17d05080",
+   "build": "not distributed with the tree (no public wheel for this torch): built from the commit with APEX_CPP_EXT=1 APEX_CUDA_EXT=1 `python setup.py bdist_wheel` against torch 2.13.0+cu130 (nvcc 13.0.88, gcc 11.4.0, TORCH_CUDA_ARCH_LIST=8.0;9.0;10.0;12.0+PTX; 12 extension modules), then `pip install --no-deps <wheel>` into both interpreters; wheel_sha256 identifies the one wheel file the prebuilt container route accepts; a wheel compiled elsewhere has another digest",
+   "engaged_by": "upstream's own import guard, rfd3/model/layers/layer_utils.py:13-23: apex.normalization.fused_layer_norm.FusedRMSNorm bound as RMSNorm_ for every RMSNorm of the network when importable, torch.nn.RMSNorm otherwise; no flag, no kit lever",
+   "census_word": "KERNELS rmsnorm=engaged:apex.FusedRMSNorm(<n>-modules[+ext])@apex0.1 on every route of this stack, REQUIRED (routes.ROUTES: expected engaged; a pass bound to torch.nn.RMSNorm — fallback:torch.nn.RMSNorm(<n>-modules)@torch<version> — is refused, exit 5)",
+   "extensions": 12,
+   "installed_into": "both interpreters (the pristine stock one and the kit-patched one)"
+  },
+  "optional_packages": [
+   {
+    "name": "apex",
+    "required_by_upstream": false,
+    "installed_in_stack": true,
+    "note": "upstream's public install line (pip install 'rc-foundry[rfd3]') and pyproject carry no apex; its code binds apex's FusedRMSNorm when the module imports (layer_utils.py:13-23)"
+   }
+  ],
+  "in_job_pins": "environment/requirements.lock",
+  "in_job_pins_note": "the full list of these stack versions, `pip freeze --all` of either interpreter (apex==0.1 is the stack's one addition to upstream's install line); environment/Dockerfile installs it and the recipe uses the lines as pip constraints"
+ },
+ "stock_files_sha256": {
+  "foundry/utils/torch.py": "f22f87503943676932add0d5b05d60a2230a4119b38b10e068ee8e09678bdbf9"
+ },
+ "kit_new_files_absent_in_stock": [
+  "rfd3/model/hoist.py",
+  "rfd3/model/cudagraph_sampler.py"
+ ],
+ "checkpoint": {
+  "registry_name": "rfd3",
+  "registry_source": "foundry/inference_engines/checkpoint_registry.py:86-89",
+  "url": "https://files.ipd.uw.edu/pub/rfd3/rfd3_foundry_2025_12_01_remapped.ckpt",
+  "filename": "rfd3_latest.ckpt",
+  "source_filename": "rfd3_foundry_2025_12_01_remapped.ckpt",
+  "sha256": "9b3f85923e0d51e9453e15cdd2f8c666e7ce096a60577f57d11bbc54ae6d67c1",
+  "resolution": "ckpt_path=<file> on the command line, or ckpt_path=rfd3 (the config default, rfd3/configs/inference_engine/rfdiffusion3.yaml:10) resolved through FOUNDRY_CHECKPOINT_DIRS and ~/.foundry/checkpoints (checkpoint_registry.py:25-41,71-77)",
+  "note": "upstream registers no checksum (RegisteredCheckpoint.sha256 = None, checkpoint_registry.py:69)",
+  "bytes": 2690316669
+ },
+ "cli": {
+  "command": "rfd3 design <hydra overrides>",
+  "defaults": "rfd3/configs/inference_engine/rfdiffusion3.yaml (diffusion_batch_size 8 :20, n_batches 1 :21, num_timesteps 200 :44, step_scale 1.5 :45, noise_scale 1.003 :46, p 7 :47, gamma_0 0.6 :48, skip_existing True :12, n_recycle from the checkpoint :41), base.yaml (seed null :11)",
+  "output_files": "<out_dir>/<json basename>_<key>_<batch>_model_<k>.cif.gz and .json per design (engine.py:104-115,392,483; process_input :588)"
+ },
+ "stock_environment": {
+  "must_be_absent": [
+   "RFDIFFUSION3_OPT",
+   "RFD3_HOIST",
+   "RFD3_FZT",
+   "OPT_CORE_PF_ALLOW_CANDIDATE",
+   "RFD3_CUDAGRAPH",
+   "FOUNDRY_DET_SCATTER",
+   "CUBLAS_WORKSPACE_CONFIG",
+   "RFD3_INIT_CHUNK",
+   "RFD3_COMPILE",
+   "RFD3_TOKEN_SDPA",
+   "RFD3_GATHER_ATTN"
+  ],
+  "upstream_switches_unset": [
+   "RFD3_DENSE_SDPA_ATTENTION",
+   "RFD3_LOW_MEMORY_MODE"
+  ],
+  "reads": [
+   "FOUNDRY_CHECKPOINT_DIRS",
+   "FOUNDRY_CHECKPOINTS_DIR"
+  ],
+  "note": "names, not a prefix: upstream's own RFD3_DENSE_SDPA_ATTENTION / RFD3_LOW_MEMORY_MODE share the prefix and are asserted unset (upstream defaults: attention.py:427,430; the engine sets RFD3_LOW_MEMORY_MODE=1 itself under low_memory_mode=True, engine.py:205)"
+ },
+ "variants": [
+  "design"
+ ]
+}

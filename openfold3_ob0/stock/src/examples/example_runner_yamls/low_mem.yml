@@ -1,0 +1,5 @@
+# Model changes for low memory 
+model_update:
+  presets: 
+    - predict
+    - low_mem

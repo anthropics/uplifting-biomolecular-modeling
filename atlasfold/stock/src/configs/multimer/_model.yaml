@@ -1,0 +1,49 @@
+name: "atlasfold_multimer"
+lm_name: "atlaslm-3b-base"
+lm_path: null
+channel_s: 384
+channel_s_lm: 768
+channel_z: 128
+trunk:
+  num_heads: 16
+  num_tri_heads: 4
+  dropout_z: 0.25
+  num_lm_blocks: 4
+  num_blocks: 48
+  num_pair_to_single_blocks: 12
+  blocks_per_ckpt: null
+diffusion_head:
+  channel_a: 768
+  channel_atom: 96
+  channel_cond: 384
+  num_heads: 16
+  num_blocks: 12
+  num_atom_heads: 2
+  num_atom_blocks: 3
+  blocks_per_ckpt: null
+distogram_head:
+  num_bins: 64
+  min_dist: 2.0
+  max_dist: 22.0
+template_module:
+  channel_template: 64
+  num_blocks: 2
+  num_tri_heads: 4
+  dropout_z: 0.25
+  num_distogram_bins: 39
+  min_dist: 3.25
+  max_dist: 50.75
+  blocks_per_ckpt: null
+confidence_head:
+  num_tri_heads: 4
+  dropout_z: 0.25
+  num_blocks: 4
+  num_bins: 39
+  min_dist: 3.25
+  max_dist: 50.75
+  num_plddt_bins: 50
+  max_pae_error: 32.0
+  num_pae_bins: 64
+  max_pde_error: 32.0
+  num_pde_bins: 64
+  blocks_per_ckpt: null

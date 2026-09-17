@@ -1,0 +1,1 @@
+Stand-in `colabdesign` + `jax` for the package's CPU tests (tests/_stubs.py copies this tree into a temp site dir and adds the dist-info the pins read). Not a package of the kit; never on any path outside a test's child process.

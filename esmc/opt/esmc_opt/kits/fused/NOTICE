@@ -1,0 +1,10 @@
+fused (esmc_opt/kits/fused: _patch.py, _hs_write.py, SERVED.json) — third-party attributions. Kit-level table:
+../../../../THIRD_PARTY_NOTICES.md (esmc/THIRD_PARTY_NOTICES.md); verbatim licence texts: esmc/third_party_licenses/.
+
+_patch.py re-arranges, at run time and in memory, the forward computation of the installed ESM C modules esm.models.esmc.layers,
+esm.models.esmc.model and esm.models.esmc.compatibility (their files are pinned by sha256 and never modified on disk); its structure
+follows that upstream code — esm (ESM C), https://github.com/Biohub/esm at commit 43ccece2ad485f27db46afdb67da2a9601e8f106, MIT,
+"Copyright 2026 Chan Zuckerberg Biohub, Inc."; text: esmc/third_party_licenses/esm_(fork).MIT.txt (the same text as
+esmc/stock/src/esm/LICENSE.md). _hs_write.py is a kernel of this kit's own.
+Third-party software this patch calls and does not include or modify: PyTorch (BSD-style licence), NVIDIA Transformer Engine (Apache-2.0),
+FlashAttention (BSD-3-Clause), OpenAI Triton (MIT) — see the kit-level table.

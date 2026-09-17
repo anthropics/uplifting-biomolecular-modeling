@@ -1,0 +1,56 @@
+{
+ "package": {
+  "name": "borzoi-pytorch",
+  "version": "0.5.1",
+  "wheel": "borzoi_pytorch-0.5.1-py3-none-any.whl",
+  "upstream": "https://github.com/johahi/borzoi-pytorch",
+  "tag": "v0.5.1",
+  "commit": "8a05eb15dd56871806771b2870c98a0c1dd9e0c8"
+ },
+ "upstream": {
+  "borzoi-pytorch": {
+   "repo": "https://github.com/johahi/borzoi-pytorch",
+   "version": "0.5.1",
+   "tag": "v0.5.1",
+   "commit": "8a05eb15dd56871806771b2870c98a0c1dd9e0c8"
+  }
+ },
+ "stack": {
+  "python": "3.11",
+  "torch": "2.5.1",
+  "triton": "3.1.0",
+  "flash-attn": "2.7.0.post2",
+  "transformers": "4.57.6",
+  "cuda": "12.4",
+  "cudnn": "9.1.0.70",
+  "tested_on": "NVIDIA H100 80GB HBM3 with the pinned stack below"
+ },
+ "weights": {
+  "johahi/flashzoi-replicate-0": {
+   "revision": "72040fb525d4b9abab21ead1c53b76b6bd8b6d67",
+   "model.safetensors_sha256": "d0f17287f57da22af70a495d27e745b7d9908d2f3717214e7d0caf3dfe8c4d95",
+   "bytes": 788436548
+  },
+  "johahi/flashzoi-replicate-1": {
+   "revision": "3e54f34c90e007e6da7ebe7bc83282c2d70bfc18",
+   "model.safetensors_sha256": "1c3d206596009d881d429c1421c16eedcf94564b116d351948d4a67629e40c68",
+   "bytes": 788436548
+  },
+  "johahi/flashzoi-replicate-2": {
+   "revision": "524b05b3d3ed7f9acf28e51fc283f37affc26c28",
+   "model.safetensors_sha256": "51f8bb88d33e941db41a5305440b4e637bf6d06e30a2bb7005321c0f678cc3da",
+   "bytes": 788436548
+  },
+  "johahi/flashzoi-replicate-3": {
+   "revision": "336e45f85cbf0eafe8c8880984f1b561c79a5fe9",
+   "model.safetensors_sha256": "ca0df0ceaf106b47eb7f38ad48251a985d8b737f5791c296291806a794e5a007",
+   "bytes": 788436548
+  }
+ },
+ "config_json_sha256": "a537127cfb3ad8dc1d2c89f68f5a4309830990a6bcf08e0df9407550897474c9",
+ "shapes": {
+  "seq_len_bp": 524288,
+  "n_bins": 6144,
+  "n_tracks_human": 7611
+ }
+}

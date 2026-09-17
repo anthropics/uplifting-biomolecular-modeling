@@ -1,0 +1,7 @@
+{
+ "_doc": "sha256 of the WHOLE-PLANE TriMul tables the row-block members (kernels/fpf_trimul_rows, mem/rowpair/trimul_fused) must never touch. A deliberate edit by the tables' owner updates these digests in the same commit.",
+ "sha256": {
+  "fpf_trimul_v4/table.json": "b08834bd2effd3dd896ae032e691a4936bafda482487ccef56c7e19a325a6901",
+  "trimul/TRIMUL_CELLS.json": "addaa66cc63909d2937dc51b3a13c21a16985230f6136850fab1266522976077"
+ }
+}

@@ -1,0 +1,14 @@
+exactln (carried in opt_core: opt_core/kernels/ln/exactln) — third-party attributions.
+
+exactln_fwd.cu and triton_ln.py restate, bit for bit, the arithmetic order of PyTorch's CUDA `layer_norm` forward
+(aten/src/ATen/native/cuda/layer_norm_kernel.cu: the Welford row statistics and the normalise-scale-shift order) so
+that the kernel's output is byte-identical to `torch.nn.functional.layer_norm` on the measured stacks. No PyTorch
+source file is included; the restatement was written for this package. PyTorch: Copyright (c) 2016- Facebook, Inc
+(Adam Paszke) and the other copyright holders named in its licence, BSD-3-Clause, https://github.com/pytorch/pytorch.
+The licence text is carried as common/opt_core/third_party_licenses/PyTorch.LICENSE.txt; the package-wide list of
+third-party components is common/opt_core/THIRD_PARTY_NOTICES.md.
+
+prebuilt/<stack key>/*: built by build_prebuilt.py from exactly the exactln_fwd.cu whose sha256 the manifest records,
+with the CUDA toolkit (nvcc, CCCL headers; NVIDIA CUDA Toolkit EULA) against libtorch; no toolkit or PyTorch file is bundled.
+
+Third-party software this kernel calls and does not include or modify: PyTorch (BSD-3-Clause), OpenAI Triton (MIT).

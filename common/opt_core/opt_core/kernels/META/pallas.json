@@ -1,0 +1,33 @@
+{
+ "exports": {},
+ "kind": "package",
+ "license": "the carried sub-packages keep their donors' terms and attributions (each NOTICE beside the files: cd_trimul/NOTICE, cd_layers/NOTICE, mlp_transition/NOTICE, opm_pallas/NOTICE, rowshared_flash_pallas.NOTICE; portions derive from AlphaFold 2, Apache-2.0); the face (__init__.py, serve.py) and PALLAS_CELLS.json are the core's own",
+ "mechanism": "kernels.pallas.select / kernels.pallas.serve.{attention, triangle_attention_block, triangle_multiplication, glu_transposed_masked, transition, layer_norm, outer_product_mean}",
+ "name": "pallas",
+ "not_byte_identical": {},
+ "not_carried": {
+  "the donors' bench scripts, self-tests, as-built records, tile-sweep tables and branch notes": "kit / study evidence that stays with the donors; not release-tree files",
+  "the kits' adapters, lever words, registries and Haiku module subclasses around these kernels (the fused-projection trimul adapter, the triangle-attention lever, the module-tree surgery, install()/refuse() registry protocol callers)": "kit files: a kit binds a row through its own mechanism; the face serves arrays",
+  "the row-shared kernel's per-arch tile file (tiles_by_arch.json) and its package init": "the kernel reads no table (its defaults are in the module); the measured settings of this table are PALLAS_CELLS.json 'tuned' / cells"
+ },
+ "runtime_imports": [
+  "fpf_pallas",
+  "fpf_pallas_f32",
+  "fpf_trimul",
+  "pallas_attn",
+  "pallas_glut",
+  "pallas_triatt",
+  "triattn_xla"
+ ],
+ "runtime_imports_note": "serve.py imports jax and the rows' modules inside its functions only (fpf_* through kernels.fpf_pallas_serve, pallas_attn through kernels.pallas_attn_serve, glut through kernels.fpf_pallas_serve, the bridge kernels.triattn_xla, the triangle-attention forward + backward kernels.pallas_triatt (row cd_triatt), the optional tokamax library, the carried sub-packages); __init__.py (select, the table, the words) imports the standard library only; the carried sub-packages import jax at their own module level (cd_layers/layers_ln.py and layers_opm.py behind import guards)",
+ "served_note": "rows and their envelopes, numerics classes, backward support, settings and refusal words: PALLAS_CELLS.json 'rows' / 'words'; cells per (jax line, cc, dtype, op, family, size, direction) with every arm's ms, x vs the stock statement, peak MiB and class; the default rule (a row word serves that row at its own defaults; measured winners are opt-in through tier / arm words) in the package docstring",
+ "version": {
+  "cd_layers": "layers_ln v1, layers_opm v1 (kit 0.6.0); layers_transition v1",
+  "cd_trimul": "v2 padded planes (kit 0.6.0)",
+  "face": "1.0.0",
+  "mlp_transition": "pallas-transition 0.3",
+  "native_xla": "kernels.trimul_xla 1.0.0 (trimul_native 1.0.1 sm_90a units)",
+  "opm_pallas": "opm-pallas 0.2",
+  "rowshared_flash_pallas": "kopt-rowattn 0.2.0"
+ }
+}

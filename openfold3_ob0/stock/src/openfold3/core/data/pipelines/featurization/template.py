@@ -1,0 +1,137 @@
+# Copyright 2026 AlQuraishi Laboratory
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+"""This module contains preprocessing pipelines for template data."""
+
+import numpy as np
+import torch
+from biotite.structure import AtomArray
+
+from openfold3.core.data.primitives.featurization.padding import pad_token_dim
+from openfold3.core.data.primitives.featurization.structure import (
+    extract_starts_entities,
+)
+from openfold3.core.data.primitives.featurization.template import (
+    create_template_distogram,
+    create_template_feature_precursor_of3,
+    create_template_restype,
+    create_template_unit_vector,
+)
+from openfold3.core.data.primitives.quality_control.logging_utils import (
+    log_runtime_memory,
+)
+from openfold3.core.data.primitives.structure.template import TemplateSliceCollection
+
+
+def featurize_templates_dummy_of3(n_templ, n_token):
+    """Temporary function to generate dummy template features."""
+    return {
+        "template_restype": torch.ones((n_templ, n_token, 32)).int(),
+        "template_pseudo_beta_mask": torch.ones((n_templ, n_token)).float(),
+        "template_backbone_frame_mask": torch.ones((n_templ, n_token)).float(),
+        "template_distogram": torch.ones((n_templ, n_token, n_token, 39)).int(),
+        "template_unit_vector": torch.ones((n_templ, n_token, n_token, 3)).float(),
+    }
+
+
+@log_runtime_memory(runtime_dict_key="runtime-template-feat")
+def featurize_template_structures_of3(
+    atom_array: AtomArray,
+    template_slice_collection: TemplateSliceCollection,
+    n_templates: int,
+    n_tokens: int,
+    min_bin: float,
+    max_bin: float,
+    n_bins: int,
+) -> dict[str, torch.Tensor]:
+    """Featurizes template data for AF3.
+
+    Returned features:
+        - template_pseudo_beta_mask:
+            Mask indicating if pseudo beta atoms (C-alpha atom for GLY, C-beta
+            otherwise) are present in the corresponding token.
+        - template_backbone_frame_mask:
+            Mask indicating if backbone frame atoms (N, CA, C) are present in the
+            corresponding token.
+        - template_restype:
+            One-hot encoded residue types.
+        - template_distogram:
+            Distogram constructed from pseudo beta atoms distances.
+        - template_unit_vector:
+            Unit vector constructed from backbone frames.
+
+    Args:
+        template_slice_collection (TemplateSliceCollection):
+            The collection of cropped template atom arrays per chain, per template.
+        n_templates (int):
+            Number of templates.
+        n_tokens (int):
+            Number of tokens in the target structure.
+        min_bin (float):
+            The minimum distance for the distogram bins.
+        max_bin (float):
+            The maximum distance for the distogram bins.
+        n_bins (int):
+            The number of bins in the distogram.
+
+    Returns:
+        dict[str, torch.Tensor]:
+            The featurized template data.
+    """
+    template_feature_precursor = create_template_feature_precursor_of3(
+        template_slice_collection,
+        n_templates,
+        n_tokens,
+    )
+
+    # Create asym ID to mask inter-chain features and mask
+    token_starts_with_stop, _ = extract_starts_entities(atom_array)
+    token_starts = token_starts_with_stop[:-1]
+    chain_ids_token = atom_array.chain_id[token_starts]
+    _, renum_ids = np.unique(chain_ids_token, return_inverse=True)
+    asym_id = pad_token_dim(
+        {"asym_id": torch.tensor(renum_ids + 1, dtype=torch.int32)}, n_tokens
+    )["asym_id"]
+    multichain_pair_mask = (asym_id[..., None] == asym_id[..., None, :])[
+        ..., None, :, :, None
+    ]
+
+    # Create features
+    features = {}
+    features["template_pseudo_beta_mask"] = torch.tensor(
+        ~np.isnan(template_feature_precursor.pseudo_beta_atom_coords).any(axis=-1),
+        dtype=torch.float,
+    )
+    features["template_backbone_frame_mask"] = torch.tensor(
+        ~np.isnan(template_feature_precursor.frame_atom_coords).any(axis=(-2, -1)),
+        dtype=torch.float,
+    )
+    features["template_restype"] = create_template_restype(
+        template_feature_precursor.res_names,
+        features["template_pseudo_beta_mask"],
+    )
+    features["template_distogram"] = create_template_distogram(
+        template_feature_precursor.pseudo_beta_atom_coords,
+        features["template_pseudo_beta_mask"],
+        multichain_pair_mask,
+        min_bin,
+        max_bin,
+        n_bins,
+    )
+    features["template_unit_vector"] = create_template_unit_vector(
+        template_feature_precursor.frame_atom_coords,
+        features["template_backbone_frame_mask"],
+        multichain_pair_mask,
+    )
+    return features

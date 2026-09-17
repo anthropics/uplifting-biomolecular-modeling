@@ -1,0 +1,351 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright (c) 2026 Aureka AI Research
+from typing import Any, Optional
+
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
+
+from opendde.model.modules.primitives import LinearNoBias
+from opendde.model.modules.transformer import AtomAttentionEncoder
+
+
+class InputFeatureEmbedder(nn.Module):
+    """
+    Implements Algorithm 2 in AF3
+
+    Args:
+        c_atom (int, optional): atom embedding dim. Defaults to 128.
+        c_atompair (int, optional): atom pair embedding dim. Defaults to 16.
+        c_token (int, optional): token embedding dim. Defaults to 384.
+    """
+
+    def __init__(
+        self,
+        c_atom: int = 128,
+        c_atompair: int = 16,
+        c_token: int = 384,
+    ) -> None:
+        super(InputFeatureEmbedder, self).__init__()
+        self.c_atom = c_atom
+        self.c_atompair = c_atompair
+        self.c_token = c_token
+        self.atom_attention_encoder = AtomAttentionEncoder(
+            c_atom=c_atom,
+            c_atompair=c_atompair,
+            c_token=c_token,
+            has_coords=False,
+        )
+
+        # Line2
+        self.input_feature = {"restype": 32, "profile": 32, "deletion_mean": 1}
+
+    def forward(
+        self,
+        input_feature_dict: dict[str, Any],
+        inplace_safe: bool = False,
+        chunk_size: Optional[int] = None,
+    ) -> torch.Tensor:
+        """
+        Args:
+            input_feature_dict (Dict[str, Any]): dict of input features
+            inplace_safe (bool): Whether it is safe to use inplace operations. Defaults to False.
+            chunk_size (Optional[int]): Chunk size for memory-efficient operations. Defaults to None.
+
+        Returns:
+            torch.Tensor: token embedding
+                [..., N_token, 384 (c_token) + 32 + 32 + 1 :=449]
+        """
+        # Embed per-atom features.
+        a, _, _, _ = self.atom_attention_encoder(
+            input_feature_dict["atom_to_token_idx"],
+            input_feature_dict["ref_pos"],
+            input_feature_dict["ref_charge"],
+            input_feature_dict["ref_mask"],
+            input_feature_dict["ref_atom_name_chars"],
+            input_feature_dict["ref_element"],
+            input_feature_dict["d_lm"],
+            input_feature_dict["v_lm"],
+            input_feature_dict["pad_info"],
+            inplace_safe=inplace_safe,
+            chunk_size=chunk_size,
+        )  # [..., N_token, c_token]
+        # Concatenate the per-token features.
+        batch_shape = input_feature_dict["restype"].shape[:-1]
+        s_inputs = torch.cat(
+            [a]
+            + [
+                input_feature_dict[name].reshape(*batch_shape, d)
+                for name, d in self.input_feature.items()
+            ],
+            dim=-1,
+        )
+
+        return s_inputs
+
+
+class LazyRelativePositionEncodingFeatures:
+    """Compact relp inputs that can materialize dense one-hot rows on demand."""
+
+    def __init__(
+        self,
+        asym_id: torch.Tensor,
+        residue_index: torch.Tensor,
+        entity_id: torch.Tensor,
+        token_index: torch.Tensor,
+        sym_id: torch.Tensor,
+        r_max: int,
+        s_max: int,
+    ) -> None:
+        self.asym_id = asym_id
+        self.residue_index = residue_index
+        self.entity_id = entity_id
+        self.token_index = token_index
+        self.sym_id = sym_id
+        self.r_max = r_max
+        self.s_max = s_max
+
+    @property
+    def n_token(self) -> int:
+        return int(self.asym_id.shape[-1])
+
+    @property
+    def feature_dim(self) -> int:
+        return 4 * self.r_max + 2 * self.s_max + 7
+
+    @property
+    def shape(self) -> tuple[int, ...]:
+        return (*self.asym_id.shape[:-1], self.n_token, self.n_token, self.feature_dim)
+
+    @property
+    def device(self) -> torch.device:
+        return self.asym_id.device
+
+    def materialize(
+        self,
+        row_slice: slice = slice(None),
+        col_slice: slice = slice(None),
+        feature_slice: slice = slice(None),
+    ) -> torch.Tensor:
+        asym_row = self.asym_id[..., row_slice]
+        asym_col = self.asym_id[..., col_slice]
+        residue_row = self.residue_index[..., row_slice]
+        residue_col = self.residue_index[..., col_slice]
+        entity_row = self.entity_id[..., row_slice]
+        entity_col = self.entity_id[..., col_slice]
+        token_row = self.token_index[..., row_slice]
+        token_col = self.token_index[..., col_slice]
+        sym_row = self.sym_id[..., row_slice]
+        sym_col = self.sym_id[..., col_slice]
+
+        b_same_chain = (asym_row[..., :, None] == asym_col[..., None, :]).long()
+        b_same_residue = (residue_row[..., :, None] == residue_col[..., None, :]).long()
+        b_same_entity = (entity_row[..., :, None] == entity_col[..., None, :]).long()
+
+        d_residue = torch.clip(
+            input=residue_row[..., :, None] - residue_col[..., None, :] + self.r_max,
+            min=0,
+            max=2 * self.r_max,
+        ) * b_same_chain + (1 - b_same_chain) * (2 * self.r_max + 1)
+        # Fill a single pre-allocated float buffer section by section instead of
+        # concatenating int64 one-hots: ``torch.cat`` would hold every operand
+        # plus the joined result plus its float copy alive at once.
+        relp = torch.empty(
+            (*d_residue.shape, self.feature_dim),
+            dtype=torch.float32,
+            device=d_residue.device,
+        )
+        offset = 0
+        position_dim = 2 * (self.r_max + 1)
+        position = F.one_hot(d_residue, position_dim)
+        relp[..., offset : offset + position_dim].copy_(position)
+        del d_residue, position
+        offset += position_dim
+
+        d_token = torch.clip(
+            input=token_row[..., :, None] - token_col[..., None, :] + self.r_max,
+            min=0,
+            max=2 * self.r_max,
+        ) * b_same_chain * b_same_residue + (1 - b_same_chain * b_same_residue) * (
+            2 * self.r_max + 1
+        )
+        token = F.one_hot(d_token, position_dim)
+        relp[..., offset : offset + position_dim].copy_(token)
+        del d_token, token
+        offset += position_dim
+
+        relp[..., offset].copy_(b_same_entity)
+        offset += 1
+
+        d_chain = torch.clip(
+            input=sym_row[..., :, None] - sym_col[..., None, :] + self.s_max,
+            min=0,
+            max=2 * self.s_max,
+        ) * b_same_entity + (1 - b_same_entity) * (2 * self.s_max + 1)
+        chain_dim = 2 * (self.s_max + 1)
+        chain = F.one_hot(d_chain, chain_dim)
+        relp[..., offset : offset + chain_dim].copy_(chain)
+        return relp[..., feature_slice]
+
+    def __getitem__(self, index: Any) -> torch.Tensor:
+        if not isinstance(index, tuple):
+            index = (index,)
+        if index and index[0] is Ellipsis:
+            index = index[1:]
+        if len(index) == 3:
+            row_slice, col_slice, feature_slice = index
+        elif len(index) == 2:
+            row_slice, col_slice = index
+            feature_slice = slice(None)
+        else:
+            raise IndexError(
+                "LazyRelativePositionEncodingFeatures supports row/column/feature slices only."
+            )
+        if isinstance(row_slice, int):
+            row_slice = slice(row_slice, row_slice + 1)
+        if isinstance(col_slice, int):
+            col_slice = slice(col_slice, col_slice + 1)
+        return self.materialize(row_slice, col_slice, feature_slice)
+
+
+class RelativePositionEncoding(nn.Module):
+    """
+    Implements Algorithm 3 in AF3
+
+    Args:
+        r_max (int, optional): Relative position indices clip value. Defaults to 32.
+        s_max (int, optional): Relative chain indices clip value. Defaults to 2.
+        c_z (int, optional): hidden dim [for pair embedding]. Defaults to 128.
+    """
+
+    def __init__(self, r_max: int = 32, s_max: int = 2, c_z: int = 128) -> None:
+        super(RelativePositionEncoding, self).__init__()
+        self.r_max = r_max
+        self.s_max = s_max
+        self.c_z = c_z
+        self.linear_no_bias = LinearNoBias(
+            in_features=(4 * self.r_max + 2 * self.s_max + 7), out_features=self.c_z
+        )
+        self.input_feature = {
+            "asym_id": 1,
+            "residue_index": 1,
+            "entity_id": 1,
+            "sym_id": 1,
+            "token_index": 1,
+        }
+
+    def generate_relp(
+        self, input_feature_dict: dict[str, Any], lazy: bool = False
+    ) -> dict[str, Any]:
+        """asym_id, residue_index, entity_id, token_index, sym_id"""
+        with torch.no_grad():
+            asym_id = input_feature_dict["asym_id"]
+            residue_index = input_feature_dict["residue_index"]
+            entity_id = input_feature_dict["entity_id"]
+            token_index = input_feature_dict["token_index"]
+            sym_id = input_feature_dict["sym_id"]
+
+            if lazy:
+                input_feature_dict["relp"] = LazyRelativePositionEncodingFeatures(
+                    asym_id=asym_id,
+                    residue_index=residue_index,
+                    entity_id=entity_id,
+                    token_index=token_index,
+                    sym_id=sym_id,
+                    r_max=self.r_max,
+                    s_max=self.s_max,
+                )
+                return input_feature_dict
+
+            b_same_chain = (
+                asym_id[..., :, None] == asym_id[..., None, :]
+            ).long()  # [..., N_token, N_token]
+            b_same_residue = (
+                residue_index[..., :, None] == residue_index[..., None, :]
+            ).long()  # [..., N_token, N_token]
+            b_same_entity = (
+                entity_id[..., :, None] == entity_id[..., None, :]
+            ).long()  # [..., N_token, N_token]
+            d_residue = torch.clip(
+                input=residue_index[..., :, None]
+                - residue_index[..., None, :]
+                + self.r_max,
+                min=0,
+                max=2 * self.r_max,
+            ) * b_same_chain + (1 - b_same_chain) * (
+                2 * self.r_max + 1
+            )  # [..., N_token, N_token]
+            a_rel_pos = F.one_hot(d_residue, 2 * (self.r_max + 1))
+            d_token = torch.clip(
+                input=token_index[..., :, None]
+                - token_index[..., None, :]
+                + self.r_max,
+                min=0,
+                max=2 * self.r_max,
+            ) * b_same_chain * b_same_residue + (1 - b_same_chain * b_same_residue) * (
+                2 * self.r_max + 1
+            )  # [..., N_token, N_token]
+            a_rel_token = F.one_hot(d_token, 2 * (self.r_max + 1))
+            d_chain = torch.clip(
+                input=sym_id[..., :, None] - sym_id[..., None, :] + self.s_max,
+                min=0,
+                max=2 * self.s_max,
+            ) * b_same_entity + (1 - b_same_entity) * (
+                2 * self.s_max + 1
+            )  # [..., N_token, N_token]
+            a_rel_chain = F.one_hot(d_chain, 2 * (self.s_max + 1))
+
+            relp = torch.cat(
+                [a_rel_pos, a_rel_token, b_same_entity[..., None], a_rel_chain],
+                dim=-1,
+            ).float()
+            input_feature_dict["relp"] = relp
+        return input_feature_dict
+
+    def forward(self, relp_feature) -> torch.Tensor:
+        """
+        Args:
+            asym_id / residue_index / entity_id / sym_id / token_index
+                [..., N_tokens]
+        Returns:
+            torch.Tensor: relative position encoding
+                [..., N_token, N_token, c_z]
+        """
+        if isinstance(relp_feature, LazyRelativePositionEncodingFeatures):
+            relp_feature = relp_feature.materialize()
+        return self.linear_no_bias(relp_feature)
+
+
+class FourierEmbedding(nn.Module):
+    """
+    Implements Algorithm 22 in AF3
+
+    Args:
+        c (int): embedding dim.
+        seed (int, optional): random seed. Defaults to 42.
+    """
+
+    def __init__(self, c: int, seed: int = 42) -> None:
+        super(FourierEmbedding, self).__init__()
+        self.c = c
+        self.seed = seed
+        generator = torch.Generator()
+        generator.manual_seed(seed)
+        w_value = torch.randn(size=(c,), generator=generator)
+        self.w = nn.Parameter(w_value, requires_grad=False)
+        b_value = torch.randn(size=(c,), generator=generator)
+        self.b = nn.Parameter(b_value, requires_grad=False)
+
+    def forward(self, t_hat_noise_level: torch.Tensor) -> torch.Tensor:
+        """
+        Args:
+            t_hat_noise_level (torch.Tensor): the noise level
+                [..., N_sample]
+
+        Returns:
+            torch.Tensor: the output fourier embedding
+                [..., N_sample, c]
+        """
+        return torch.cos(
+            input=2 * torch.pi * (t_hat_noise_level.unsqueeze(dim=-1) * self.w + self.b)
+        )

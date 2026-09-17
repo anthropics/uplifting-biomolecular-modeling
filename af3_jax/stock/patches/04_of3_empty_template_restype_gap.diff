@@ -1,0 +1,24 @@
+# The stock exception (STOCK.md 'The stock exception'): with --of3_weights, an absent (padding) template slot presents the GAP one-hot to
+#   SingleTemplateEmbedding instead of restype 0 (ALA) — OpenFold3's convention, which the ported weights were trained on. Gated on global_config.of3_weights;
+#   behaviour with AlphaFold 3's own weights unchanged. Applies with `patch -p1` in the archive root (alphafold3-bc32b22f/), alone on the pinned commit.
+#   Licence: Apache-2.0, the same as the file it patches. In this kit: applied in every mode, off included (stock/PINS.json upstream.patches; STOCK.md).
+diff --git a/src/alphafold3/model/network/template_modules.py b/src/alphafold3/model/network/template_modules.py
+index 38b4d67..832f2c3 100644
+--- a/src/alphafold3/model/network/template_modules.py
++++ b/src/alphafold3/model/network/template_modules.py
+@@ -283,6 +283,15 @@ class SingleTemplateEmbedding(hk.Module):
+       pseudo_beta_mask_2d = pseudo_beta_mask_2d.astype(dtype)
+       to_concat = [(dgram, 1), (pseudo_beta_mask_2d, 0)]
+ 
++      if gc.of3_weights:
++        # OpenFold3 featurises the tokens of absent (padding) templates as GAP,
++        # whereas AF3 pads template_aatype with 0 (= ALA). Both codes always run
++        # the template embedder over the padded template stack (also in
++        # template-free mode), so with OF3 weights an all-empty template must
++        # present GAP one-hots to aatype_linear_1/2 to match native inputs.
++        template_is_empty = jnp.all(dense_atom_mask == 0)
++        gap_idx = residue_names.PROTEIN_TYPES_ONE_LETTER_WITH_UNKNOWN_AND_GAP.index('-')
++        aatype = jnp.where(template_is_empty, gap_idx, aatype)
+       aatype = jax.nn.one_hot(
+           aatype,
+           residue_names.POLYMER_TYPES_NUM_WITH_UNKNOWN_AND_GAP,

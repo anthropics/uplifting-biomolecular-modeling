@@ -1,0 +1,15 @@
+[
+  {
+    "name": "foldcp_demo_placeholder",
+    "modelSeeds": [101],
+    "sequences": [
+      {
+        "proteinChain": {
+          "sequence": "ACDEFGHIKLMNPQRSTVWYACDEFGHIKLMNPQRSTVWY",
+          "count": 1,
+          "id": ["A"]
+        }
+      }
+    ]
+  }
+]

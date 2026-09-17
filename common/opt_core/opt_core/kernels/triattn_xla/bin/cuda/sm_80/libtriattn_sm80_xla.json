@@ -1,0 +1,160 @@
+{
+ "abi_version": 1,
+ "arch": "sm_80",
+ "build_s": 50.2,
+ "built_utc": "2026-09-12T06:50:17Z",
+ "bytes": 12939960,
+ "cudart": "static",
+ "entry": "triattn_sm80_xla_fwd",
+ "file": "bin/cuda/sm_80/libtriattn_sm80_xla.so",
+ "head_dims": [
+  16,
+  32,
+  64
+ ],
+ "kind": "cuda",
+ "needed": [
+  "libc.so.6",
+  "libgcc_s.so.1",
+  "libm.so.6",
+  "libstdc++.so.6"
+ ],
+ "nvcc": "Build cuda_13.0.r13.0/compiler.36424714_0",
+ "nvcc_flags": [
+  "-O3",
+  "-std=c++17",
+  "-gencode",
+  "arch=compute_80,code=sm_80",
+  "--expt-relaxed-constexpr",
+  "-lineinfo",
+  "-Xptxas",
+  "-v",
+  "-DNDEBUG",
+  "-DTS_HAVE_D16",
+  "-DTS_HAVE_D32",
+  "-DTS_HAVE_D64"
+ ],
+ "package_generation": "v11",
+ "ptxas": "Build cuda_13.0.r13.0/compiler.36424714_0",
+ "ptxas_registers": {
+  "2triattn_sm8017stage_bias_kernelI13__nv_bfloat16EEvPKT_xxxxPKhPfiiiiif": 26,
+  "_ZN12triattn_sm8014mask_or_kernelILi0EEEvPKhxxPhiii": 32,
+  "_ZN12triattn_sm8016mask_rows_kernelILi0EEEvPKhxxS2_P4int4PjPiS6_iiiiii": 39,
+  "_ZN12triattn_sm8017stage_bias_kernelIfEEvPKT_xxxxPKhPfiiiiif": 32,
+  "_ZN12triattn_sm8018count_flags_kernelILi0EEEvPKiiPi": 12,
+  "_kernelINS_6TraitsILi16ELi2ELi1ELi4ELi4ELb0ELb0ELb0ELi2EEEEEvNS_4ArgsE": 128,
+  "_kernelINS_6TraitsILi16ELi2ELi1ELi4ELi4ELb0ELb1ELb0ELi2EEEEEvNS_4ArgsE": 128,
+  "_kernelINS_6TraitsILi16ELi2ELi1ELi4ELi4ELb0ELb1ELb1ELi2EEEEEvNS_4ArgsE": 128,
+  "_kernelINS_6TraitsILi16ELi2ELi1ELi4ELi4ELb1ELb1ELb0ELi1EEEEEvNS_4ArgsE": 136,
+  "_kernelINS_6TraitsILi16ELi2ELi1ELi4ELi4ELb1ELb1ELb1ELi1EEEEEvNS_4ArgsE": 139,
+  "_kernelINS_6TraitsILi16ELi2ELi2ELi2ELi4ELb0ELb0ELb0ELi2EEEEEvNS_4ArgsE": 222,
+  "_kernelINS_6TraitsILi16ELi2ELi2ELi2ELi4ELb0ELb1ELb0ELi2EEEEEvNS_4ArgsE": 247,
+  "_kernelINS_6TraitsILi16ELi2ELi2ELi2ELi4ELb0ELb1ELb1ELi2EEEEEvNS_4ArgsE": 252,
+  "_kernelINS_6TraitsILi16ELi2ELi2ELi2ELi4ELb1ELb1ELb0ELi1EEEEEvNS_4ArgsE": 226,
+  "_kernelINS_6TraitsILi16ELi2ELi2ELi2ELi4ELb1ELb1ELb1ELi1EEEEEvNS_4ArgsE": 230,
+  "_kernelINS_6TraitsILi32ELi2ELi2ELi2ELi3ELb0ELb0ELb0ELi2EEEEEvNS_4ArgsE": 255,
+  "_kernelINS_6TraitsILi32ELi2ELi2ELi2ELi3ELb0ELb1ELb0ELi2EEEEEvNS_4ArgsE": 255,
+  "_kernelINS_6TraitsILi32ELi2ELi2ELi2ELi3ELb0ELb1ELb1ELi2EEEEEvNS_4ArgsE": 255,
+  "_kernelINS_6TraitsILi32ELi2ELi2ELi2ELi3ELb1ELb1ELb0ELi1EEEEEvNS_4ArgsE": 255,
+  "_kernelINS_6TraitsILi32ELi2ELi2ELi2ELi3ELb1ELb1ELb1ELi1EEEEEvNS_4ArgsE": 255,
+  "_kernelINS_6TraitsILi32ELi2ELi2ELi4ELi3ELb0ELb0ELb0ELi1EEEEEvNS_4ArgsE": 255,
+  "_kernelINS_6TraitsILi32ELi2ELi2ELi4ELi3ELb0ELb1ELb0ELi1EEEEEvNS_4ArgsE": 255,
+  "_kernelINS_6TraitsILi32ELi2ELi2ELi4ELi3ELb0ELb1ELb1ELi1EEEEEvNS_4ArgsE": 255,
+  "_kernelINS_6TraitsILi32ELi2ELi2ELi4ELi3ELb1ELb1ELb0ELi1EEEEEvNS_4ArgsE": 255,
+  "_kernelINS_6TraitsILi32ELi2ELi2ELi4ELi3ELb1ELb1ELb1ELi1EEEEEvNS_4ArgsE": 255,
+  "_kernelINS_6TraitsILi64ELi1ELi1ELi4ELi3ELb0ELb0ELb0ELi2EEEEEvNS_4ArgsE": 231,
+  "_kernelINS_6TraitsILi64ELi1ELi1ELi4ELi3ELb0ELb1ELb0ELi2EEEEEvNS_4ArgsE": 236,
+  "_kernelINS_6TraitsILi64ELi1ELi1ELi4ELi3ELb0ELb1ELb1ELi2EEEEEvNS_4ArgsE": 244,
+  "_kernelINS_6TraitsILi64ELi1ELi1ELi4ELi3ELb1ELb1ELb0ELi1EEEEEvNS_4ArgsE": 229,
+  "_kernelINS_6TraitsILi64ELi1ELi1ELi4ELi3ELb1ELb1ELb1ELi1EEEEEvNS_4ArgsE": 232,
+  "_kernelINS_6TraitsILi64ELi2ELi1ELi2ELi3ELb0ELb0ELb0ELi2EEEEEvNS_4ArgsE": 240,
+  "_kernelINS_6TraitsILi64ELi2ELi1ELi2ELi3ELb0ELb1ELb0ELi2EEEEEvNS_4ArgsE": 248,
+  "_kernelINS_6TraitsILi64ELi2ELi1ELi2ELi3ELb0ELb1ELb1ELi2EEEEEvNS_4ArgsE": 250,
+  "_kernelINS_6TraitsILi64ELi2ELi1ELi2ELi3ELb1ELb1ELb0ELi1EEEEEvNS_4ArgsE": 231,
+  "_kernelINS_6TraitsILi64ELi2ELi1ELi2ELi3ELb1ELb1ELb1ELi1EEEEEvNS_4ArgsE": 235
+ },
+ "ptxas_spills": {
+  "_kernelINS_6TraitsILi16ELi2ELi1ELi4ELi4ELb0ELb0ELb0ELi2EEEEEvNS_4ArgsE": [
+   8,
+   4,
+   4
+  ],
+  "_kernelINS_6TraitsILi16ELi2ELi1ELi4ELi4ELb0ELb1ELb0ELi2EEEEEvNS_4ArgsE": [
+   32,
+   40,
+   68
+  ],
+  "_kernelINS_6TraitsILi16ELi2ELi1ELi4ELi4ELb0ELb1ELb1ELi2EEEEEvNS_4ArgsE": [
+   40,
+   36,
+   48
+  ],
+  "_kernelINS_6TraitsILi32ELi2ELi2ELi2ELi3ELb0ELb0ELb0ELi2EEEEEvNS_4ArgsE": [
+   16,
+   12,
+   24
+  ],
+  "_kernelINS_6TraitsILi32ELi2ELi2ELi2ELi3ELb0ELb1ELb0ELi2EEEEEvNS_4ArgsE": [
+   80,
+   96,
+   168
+  ],
+  "_kernelINS_6TraitsILi32ELi2ELi2ELi2ELi3ELb0ELb1ELb1ELi2EEEEEvNS_4ArgsE": [
+   104,
+   128,
+   172
+  ],
+  "_kernelINS_6TraitsILi32ELi2ELi2ELi2ELi3ELb1ELb1ELb0ELi1EEEEEvNS_4ArgsE": [
+   64,
+   76,
+   92
+  ],
+  "_kernelINS_6TraitsILi32ELi2ELi2ELi2ELi3ELb1ELb1ELb1ELi1EEEEEvNS_4ArgsE": [
+   56,
+   72,
+   76
+  ],
+  "_kernelINS_6TraitsILi32ELi2ELi2ELi4ELi3ELb0ELb0ELb0ELi1EEEEEvNS_4ArgsE": [
+   8,
+   4,
+   8
+  ],
+  "_kernelINS_6TraitsILi32ELi2ELi2ELi4ELi3ELb0ELb1ELb0ELi1EEEEEvNS_4ArgsE": [
+   112,
+   124,
+   184
+  ],
+  "_kernelINS_6TraitsILi32ELi2ELi2ELi4ELi3ELb0ELb1ELb1ELi1EEEEEvNS_4ArgsE": [
+   120,
+   136,
+   256
+  ],
+  "_kernelINS_6TraitsILi32ELi2ELi2ELi4ELi3ELb1ELb1ELb0ELi1EEEEEvNS_4ArgsE": [
+   88,
+   92,
+   124
+  ],
+  "_kernelINS_6TraitsILi32ELi2ELi2ELi4ELi3ELb1ELb1ELb1ELi1EEEEEvNS_4ArgsE": [
+   80,
+   92,
+   136
+  ]
+ },
+ "requires": {
+  "CXXABI_max": "1.3",
+  "GLIBCXX_max": "3.4",
+  "GLIBC_max": "2.34"
+ },
+ "role": "sm80_fwd",
+ "sha256": "463526b03d9be3ebe7f19e45a2dfca92f370dff42860963f5fe7781ee34ed686",
+ "sources_sha256": {
+  "kernels/triattn/triattn_native/pkg/v11/triattn_pkg/cuda_80/csrc/inst_d16.cu": "76539b983a51e623a3b8e492b0b3310dad6d4a05f995a890746514a94355327a",
+  "kernels/triattn/triattn_native/pkg/v11/triattn_pkg/cuda_80/csrc/inst_d32.cu": "b26c55672bef4df47d50db2e59adde8d1d40e4720c996088c79f0cdde8db95d6",
+  "kernels/triattn/triattn_native/pkg/v11/triattn_pkg/cuda_80/csrc/inst_d64.cu": "44aee8ff73ab7163286fcf0866ca678c15bf97dae25b69d1f9528f83b51b74df",
+  "kernels/triattn/triattn_native/pkg/v11/triattn_pkg/cuda_80/csrc/inst_sm80.h": "11e0875f43676a211dbf5d78bf50202a4c51bf80d7cb5337602aa3c5811aae72",
+  "kernels/triattn/triattn_native/pkg/v11/triattn_pkg/cuda_80/csrc/launch_sm80.cuh": "977ad52e011f71406bc6a3c1fb538e85f29c364d669858c33c2ec328cf59be28",
+  "kernels/triattn/triattn_native/pkg/v11/triattn_pkg/cuda_80/csrc/triattn_sm80.cuh": "239ed0c6ee3e34402a46fc4269f926bff6d056ebab235907b672a2cdbd236def",
+  "triattn_sm80_abi.h": "514bc383c23e9bf7d2f076beff3988ac19ac2c2d82d09f2a1af160f183dd1a25",
+  "triattn_sm80_xla.cu": "6c8bfdef669c4f95a6f0d8048e9e7a62c0a1427270acf469020cd58808bf771a"
+ }
+}

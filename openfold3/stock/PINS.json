@@ -1,0 +1,123 @@
+{
+ "openfold3_version": "0.4.1",
+ "upstream": {
+  "repo": "https://github.com/aqlaboratory/openfold-3",
+  "tag": "0.4.1",
+  "commit": "d12f59554adacf8638e41f1ebc2d7725a8bb7a4b",
+  "archive": {
+   "file": "openfold3-0.4.1-py3-none-any.whl",
+   "kind": "the PyPI wheel of the tag (py3-none-any): what README route B and environment/Dockerfile install stock from when it is in the tree"
+  },
+  "install": "python -m pip install --no-deps openfold3==0.4.1"
+ },
+ "wheel": {
+  "file": "stock/openfold3-0.4.1-py3-none-any.whl",
+  "pypi_upload": "2026-04-09T15:14:49Z",
+  "sdist_sha256": "7121e931a382b21532dbe2ed77ba3a31b9e513d4e53f75348bda54f001d9e6c9"
+ },
+ "source": {
+  "dir": "stock/src",
+  "files": 504,
+  "wheel_vs_source": "342/342 files of the wheel's openfold3/ package byte-identical to stock/src/openfold3/ (check_pins.py --wheel-vs-source); 23 files of the tagged tree under openfold3/core/data/resources/ (reference_molecule_data.json, reference_mols/*.sdf) are not packaged in the wheel"
+ },
+ "console_script": {
+  "run_openfold": "openfold3.run_openfold:cli",
+  "predict": "openfold3/run_openfold.py:149-159 (predict(query_json, inference_ckpt_path, inference_ckpt_name, num_diffusion_samples, num_model_seeds, runner_yaml, use_msa_server, use_templates, output_dir))"
+ },
+ "weights": {
+  "file": "of3-p2-155k.pt",
+  "name": "OpenFold3 preview-2",
+  "url": "https://openfold.s3.amazonaws.com/staging/of3-p2-155k.pt",
+  "path_env": "OPENFOLD3_CKPT",
+  "licence": "Apache-2.0",
+  "registry": "openfold3/entry_points/parameters.py:43,50 (checkpoint of3-p2-155k.pt, version_compatibility >=0.4; DEFAULT_CHECKPOINT_NAME openfold3-p2-155k); cache root OPENFOLD_CACHE or ~/.openfold3 (parameters.py:26,117)",
+  "sha256": "3ae79a701f55dbc184002d010c92d347a35faabb981314c2fd1325211af40b77"
+ },
+ "stock_config": {
+  "file": "opt/openfold3_opt/stock_cueq_on_predict.yml",
+  "sets": {
+   "pl_trainer_args.precision": "bf16-mixed",
+   "model_update.custom.settings.memory.eval.use_cueq_triangle_kernels": true
+  },
+  "det_file": "opt/openfold3_opt/stock_cueq_on_det_predict.yml",
+  "det_sets": {
+   "pl_trainer_args.precision": "bf16-mixed",
+   "model_update.custom.settings.memory.eval.use_deepspeed_evo_attention": false,
+   "model_update.custom.settings.memory.eval.use_cueq_triangle_kernels": true
+  },
+  "reason": "stock = upstream's predict preset as shipped (use_deepspeed_evo_attention true on CUDA, openfold3/projects/of3_all_atom/config/model_config.py:115) with the two documented settings that make it faster on this stack: the cuEquivariance triangle kernels on (cuequivariance_torch is in the pinned stack; the kernels take precedence over DS4Sci for triangle attention, openfold3/core/model/primitives/attention.py) and Lightning's bf16-mixed precision (pl_trainer_args.precision: the trunk, MSA module, template embedder and confidence heads under bf16 autocast; the diffusion rollout stays in upstream's fp32 region) \u2014 passed as --runner-yaml on the stock arm and as the base of exact; under the det recipe (--det 1|2) both arms run det_file, the same with the DS4Sci attention off (that kernel is not run-to-run deterministic), and exact is bitwise identical to it",
+  "kernels_off_file": "opt/forward/fast_inference/config/stock_predict.yml"
+ },
+ "pinned_stack": {
+  "python": "3.11.5",
+  "torch": "2.10.0+cu128",
+  "triton": "3.6.0",
+  "cuda": "12.8",
+  "cudnn": "9.10.2.21",
+  "deepspeed": "0.19.2",
+  "pytorch_lightning": "2.6.5",
+  "numpy": "2.4.6",
+  "rdkit": "2026.3.3",
+  "cuequivariance_torch": "0.10.0",
+  "biotite": "1.6.0",
+  "os": "Ubuntu 22.04.4 LTS",
+  "freeze": "environment/requirements.lock",
+  "freeze_pins": 115,
+  "tested_on": "NVIDIA H100 80GB HBM3 (driver 580), the stack above installed from the lock; a documentation line only, no gate reads it"
+ },
+ "wheel_requires": {
+  "torch": "unpinned",
+  "pytorch-lightning": ">=2.1",
+  "deepspeed": "unpinned",
+  "numpy": "unpinned",
+  "cuda-python": "<12.9.1",
+  "nvidia-cutlass": "<4",
+  "extra cuequivariance": "cuequivariance>=0.6.1, cuequivariance-torch>=0.6.1, cuequivariance-ops-torch-cu12>=0.6.1, torch>=2.7",
+  "requires_python": ">=3.10",
+  "note": "the wheel's own ranges float; the versions above are the stack the kit ran on"
+ },
+ "upstream_declared_stack": {
+  "source": "stock/src/environments/production-linux-64.lock (conda-lock) + stock/src/docker/Dockerfile (base nvidia/cuda:12.1.1-cudnn8-devel-ubuntu22.04, default BUILD_MODE=yaml)",
+  "python": "3.12.13",
+  "pytorch": "2.5.1",
+  "pytorch_cuda": "12.4",
+  "torchtriton": "3.1.0",
+  "deepspeed": "0.18.7",
+  "numpy": "2.3.5",
+  "rdkit": "2025.09.3",
+  "pytorch_lightning": "2.6.1"
+ },
+ "cli_defaults": {
+  "num_model_seeds": 1,
+  "start_seed": 42,
+  "seed_stream": "generate_seeds(42, num_model_seeds) (openfold3/entry_points/experiment_runner.py:600-601)",
+  "num_diffusion_samples": 5,
+  "num_recycles": 3,
+  "diffusion_steps": 200,
+  "num_workers": 10,
+  "use_msa_server": true,
+  "use_templates": true,
+  "precision": "fp32 weights, TF32 matmuls (torch.set_float32_matmul_precision('high'), openfold3/entry_points/import_utils.py)",
+  "source": "openfold3/projects/of3_all_atom/config/model_config.py:174,180,182 (num_recycles, no_full_rollout_samples, no_full_rollout_steps); openfold3/entry_points/validator.py:112 (num_workers); openfold3/run_openfold.py:156-157 (use_msa_server, use_templates)"
+ },
+ "stock_environment": {
+  "reads": [
+   "OPENFOLD3_CKPT",
+   "OPENFOLD_CACHE"
+  ],
+  "must_be_absent_prefixes": [
+   "OF3_",
+   "OF3T_",
+   "OF3FPF_",
+   "OF3FLASHPF_",
+   "OF3O_",
+   "OF3TP_",
+   "BFTP_",
+   "OPENFOLD3_OPT",
+   "CUBLAS_WORKSPACE_CONFIG",
+   "CUDA_MPS_",
+   "CUTLASS_PATH"
+  ],
+  "note": "every entry is a name prefix: the lever switch families (OF3_*, OF3T_*, OF3FPF_*, OF3FLASHPF_*, OF3O_*, OF3TP_*, BFTP_*), the package's own switches (OPENFOLD3_OPT*), the deterministic-recipe workspace variable (set by the stock caller itself under --det 1, after the proof), CUDA MPS and the DS4Sci CUTLASS override; a stock process carries none of them and no add-on directory on PYTHONPATH"
+ }
+}

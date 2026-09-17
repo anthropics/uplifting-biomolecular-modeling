@@ -1,0 +1,630 @@
+{
+ "cells": [
+  {
+   "binary_fingerprint": {
+    "sm_90": {
+     "cuda12.6": "1943bdb4c28ec3879e03c0b948d623ccfc0a16a5699b890497ab217512f49c59",
+     "cuda13.0": "9a5746f8fa2b358f6a4f77f638190f7da12b7ab6d774d9bece4a2fadf929ea5a"
+    }
+   },
+   "id": "cuda_mma_v3.3+prebuilt/0.11.1/cu13/H100/bf16/D32/S101-4160/env-unset",
+   "route": "cuda_mma",
+   "route_fingerprint": {
+    "sha256": "6b3ba45e9eaa445f10291c3e150fb0bfa7f65ffcb3d6c60cba05ccbfdc9d5c56"
+   },
+   "status": "proven",
+   "when": {
+    "B_max": 3,
+    "H": [
+     2,
+     4,
+     8,
+     12
+    ],
+    "N_equals_S": false,
+    "S_max": 4160,
+    "S_min": 101,
+    "bias_dtype": [
+     "bfloat16",
+     "float32"
+    ],
+    "device_family": [
+     "H100"
+    ],
+    "dtype": "bfloat16",
+    "fallback_threshold_env": "unset",
+    "head_dim": 32,
+    "kv_lengths_via_mask": true,
+    "lib_version": [
+     "0.11.1"
+    ],
+    "mask_dtype": [
+     "bool"
+    ],
+    "ops_build": "cu13",
+    "square": true
+   }
+  },
+  {
+   "binary_fingerprint": {
+    "sm_90": {
+     "cuda12.6": "1943bdb4c28ec3879e03c0b948d623ccfc0a16a5699b890497ab217512f49c59",
+     "cuda13.0": "9a5746f8fa2b358f6a4f77f638190f7da12b7ab6d774d9bece4a2fadf929ea5a"
+    }
+   },
+   "id": "cuda_mma_v3.3+prebuilt/0.10.0/cu13/H100/bf16/D32/S101-4160/env-unset",
+   "route": "cuda_mma",
+   "route_fingerprint": {
+    "sha256": "6b3ba45e9eaa445f10291c3e150fb0bfa7f65ffcb3d6c60cba05ccbfdc9d5c56"
+   },
+   "status": "proven",
+   "when": {
+    "B_max": 3,
+    "H": [
+     2,
+     4,
+     8,
+     12
+    ],
+    "N_equals_S": false,
+    "S_max": 4160,
+    "S_min": 101,
+    "bias_dtype": [
+     "bfloat16",
+     "float32"
+    ],
+    "device_family": [
+     "H100"
+    ],
+    "dtype": "bfloat16",
+    "fallback_threshold_env": "unset",
+    "head_dim": 32,
+    "lib_version": [
+     "0.10.0"
+    ],
+    "mask_dtype": [
+     "bool"
+    ],
+    "ops_build": "cu13",
+    "square": true
+   }
+  },
+  {
+   "binary_fingerprint": {
+    "sm_90": {
+     "cuda12.6": "1943bdb4c28ec3879e03c0b948d623ccfc0a16a5699b890497ab217512f49c59",
+     "cuda13.0": "9a5746f8fa2b358f6a4f77f638190f7da12b7ab6d774d9bece4a2fadf929ea5a"
+    }
+   },
+   "id": "cuda_mma_v3.3+prebuilt/0.11.1/cu13/H200/bf16/D32/S101-4160/env-unset",
+   "route": "cuda_mma",
+   "route_fingerprint": {
+    "sha256": "6b3ba45e9eaa445f10291c3e150fb0bfa7f65ffcb3d6c60cba05ccbfdc9d5c56"
+   },
+   "status": "proven",
+   "when": {
+    "B_max": 3,
+    "H": [
+     2,
+     4,
+     8,
+     12
+    ],
+    "N_equals_S": false,
+    "S_max": 4160,
+    "S_min": 101,
+    "bias_dtype": [
+     "bfloat16",
+     "float32"
+    ],
+    "device_family": [
+     "H200"
+    ],
+    "dtype": "bfloat16",
+    "fallback_threshold_env": "unset",
+    "head_dim": 32,
+    "kv_lengths_via_mask": true,
+    "lib_version": [
+     "0.11.1"
+    ],
+    "mask_dtype": [
+     "bool"
+    ],
+    "ops_build": "cu13",
+    "square": true
+   }
+  },
+  {
+   "binary_fingerprint": {
+    "sm_80": {
+     "cuda12.6": "ddea8ab62cf7692e81060a2449d605c415f0a015a390c37626fc9114a14e6c08",
+     "cuda13.0": "be562c5832a4275ea8f00c0fa8d241a6024f8cde61f47fd51d797f70198a5b97"
+    }
+   },
+   "id": "cuda_mma_v3.3+prebuilt/0.11.1/cu13/A100_80GB/bf16/D32/S101-4160/env-unset",
+   "route": "cuda_mma",
+   "route_fingerprint": {
+    "sha256": "6b3ba45e9eaa445f10291c3e150fb0bfa7f65ffcb3d6c60cba05ccbfdc9d5c56"
+   },
+   "status": "proven",
+   "when": {
+    "B_max": 3,
+    "H": [
+     2,
+     4,
+     8,
+     12
+    ],
+    "N_equals_S": false,
+    "S_max": 4160,
+    "S_min": 101,
+    "bias_dtype": [
+     "bfloat16",
+     "float32"
+    ],
+    "device_family": [
+     "A100_80GB"
+    ],
+    "dtype": "bfloat16",
+    "fallback_threshold_env": "unset",
+    "head_dim": 32,
+    "kv_lengths_via_mask": true,
+    "lib_version": [
+     "0.11.1"
+    ],
+    "mask_dtype": [
+     "bool"
+    ],
+    "ops_build": "cu13",
+    "square": true
+   }
+  },
+  {
+   "binary_fingerprint": {
+    "sm_90": {
+     "cuda12.6": "1943bdb4c28ec3879e03c0b948d623ccfc0a16a5699b890497ab217512f49c59",
+     "cuda13.0": "9a5746f8fa2b358f6a4f77f638190f7da12b7ab6d774d9bece4a2fadf929ea5a"
+    }
+   },
+   "id": "cuda_mma_v3.3+prebuilt/0.10.0/cu13/H200/bf16/D32/S101-4160/env-unset",
+   "route": "cuda_mma",
+   "route_fingerprint": {
+    "sha256": "6b3ba45e9eaa445f10291c3e150fb0bfa7f65ffcb3d6c60cba05ccbfdc9d5c56"
+   },
+   "status": "proven",
+   "when": {
+    "B_max": 3,
+    "H": [
+     2,
+     4,
+     8,
+     12
+    ],
+    "N_equals_S": false,
+    "S_max": 4160,
+    "S_min": 101,
+    "bias_dtype": [
+     "bfloat16",
+     "float32"
+    ],
+    "device_family": [
+     "H200"
+    ],
+    "dtype": "bfloat16",
+    "fallback_threshold_env": "unset",
+    "head_dim": 32,
+    "lib_version": [
+     "0.10.0"
+    ],
+    "mask_dtype": [
+     "bool"
+    ],
+    "ops_build": "cu13",
+    "square": true
+   }
+  },
+  {
+   "binary_fingerprint": {
+    "sm_80": {
+     "cuda12.6": "ddea8ab62cf7692e81060a2449d605c415f0a015a390c37626fc9114a14e6c08",
+     "cuda13.0": "be562c5832a4275ea8f00c0fa8d241a6024f8cde61f47fd51d797f70198a5b97"
+    }
+   },
+   "id": "cuda_mma_v3.3+prebuilt/0.10.0/cu13/A100_80GB/bf16/D32/S101-4160/env-unset",
+   "route": "cuda_mma",
+   "route_fingerprint": {
+    "sha256": "6b3ba45e9eaa445f10291c3e150fb0bfa7f65ffcb3d6c60cba05ccbfdc9d5c56"
+   },
+   "status": "proven",
+   "when": {
+    "B_max": 3,
+    "H": [
+     2,
+     4,
+     8,
+     12
+    ],
+    "N_equals_S": false,
+    "S_max": 4160,
+    "S_min": 101,
+    "bias_dtype": [
+     "bfloat16",
+     "float32"
+    ],
+    "device_family": [
+     "A100_80GB"
+    ],
+    "dtype": "bfloat16",
+    "fallback_threshold_env": "unset",
+    "head_dim": 32,
+    "lib_version": [
+     "0.10.0"
+    ],
+    "mask_dtype": [
+     "bool"
+    ],
+    "ops_build": "cu13",
+    "square": true
+   }
+  },
+  {
+   "binary_fingerprint": {
+    "sm_90": {
+     "cuda12.6": "1943bdb4c28ec3879e03c0b948d623ccfc0a16a5699b890497ab217512f49c59",
+     "cuda13.0": "9a5746f8fa2b358f6a4f77f638190f7da12b7ab6d774d9bece4a2fadf929ea5a"
+    }
+   },
+   "id": "cuda_mma_v3.3+prebuilt/0.10.0/cu12/H100/bf16/D32/S101-4160/env-unset",
+   "route": "cuda_mma",
+   "route_fingerprint": {
+    "sha256": "6b3ba45e9eaa445f10291c3e150fb0bfa7f65ffcb3d6c60cba05ccbfdc9d5c56"
+   },
+   "status": "proven",
+   "when": {
+    "B_max": 3,
+    "H": [
+     2,
+     4,
+     8,
+     12
+    ],
+    "N_equals_S": false,
+    "S_max": 4160,
+    "S_min": 101,
+    "bias_dtype": [
+     "bfloat16",
+     "float32"
+    ],
+    "device_family": [
+     "H100"
+    ],
+    "dtype": "bfloat16",
+    "fallback_threshold_env": "unset",
+    "head_dim": 32,
+    "lib_version": [
+     "0.10.0"
+    ],
+    "mask_dtype": [
+     "bool"
+    ],
+    "ops_build": "cu12",
+    "square": true
+   }
+  },
+  {
+   "binary_fingerprint": {
+    "sm_90": {
+     "cuda12.6": "1943bdb4c28ec3879e03c0b948d623ccfc0a16a5699b890497ab217512f49c59",
+     "cuda13.0": "9a5746f8fa2b358f6a4f77f638190f7da12b7ab6d774d9bece4a2fadf929ea5a"
+    }
+   },
+   "id": "cuda_mma_v3.3+prebuilt/0.11.1/cu12/H100/bf16/D32/S101-4160/env-unset",
+   "route": "cuda_mma",
+   "route_fingerprint": {
+    "sha256": "6b3ba45e9eaa445f10291c3e150fb0bfa7f65ffcb3d6c60cba05ccbfdc9d5c56"
+   },
+   "status": "proven",
+   "when": {
+    "B_max": 3,
+    "H": [
+     2,
+     4,
+     8,
+     12
+    ],
+    "N_equals_S": false,
+    "S_max": 4160,
+    "S_min": 101,
+    "bias_dtype": [
+     "bfloat16",
+     "float32"
+    ],
+    "device_family": [
+     "H100"
+    ],
+    "dtype": "bfloat16",
+    "fallback_threshold_env": "unset",
+    "head_dim": 32,
+    "kv_lengths_via_mask": true,
+    "lib_version": [
+     "0.11.1"
+    ],
+    "mask_dtype": [
+     "bool"
+    ],
+    "ops_build": "cu12",
+    "square": true
+   }
+  },
+  {
+   "binary_fingerprint": {
+    "sm_90": {
+     "cuda12.6": "1943bdb4c28ec3879e03c0b948d623ccfc0a16a5699b890497ab217512f49c59",
+     "cuda13.0": "9a5746f8fa2b358f6a4f77f638190f7da12b7ab6d774d9bece4a2fadf929ea5a"
+    }
+   },
+   "id": "cuda_mma_v3.3+prebuilt/0.11.1/cu13/H100/bf16/D32/S16-100/env-0/forced",
+   "route": "cuda_mma",
+   "route_fingerprint": {
+    "sha256": "6b3ba45e9eaa445f10291c3e150fb0bfa7f65ffcb3d6c60cba05ccbfdc9d5c56"
+   },
+   "status": "proven",
+   "when": {
+    "B_max": 3,
+    "H": [
+     2,
+     4,
+     8,
+     12
+    ],
+    "N_equals_S": false,
+    "S_max": 100,
+    "S_min": 16,
+    "bias_dtype": [
+     "bfloat16",
+     "float32"
+    ],
+    "device_family": [
+     "H100"
+    ],
+    "dtype": "bfloat16",
+    "fallback_threshold_env": {
+     "max": 0
+    },
+    "head_dim": 32,
+    "lib_version": [
+     "0.11.1"
+    ],
+    "mask_dtype": [
+     "bool"
+    ],
+    "ops_build": "cu13",
+    "square": true
+   }
+  },
+  {
+   "binary_fingerprint": {
+    "sm_90": {
+     "cuda12.6": "1943bdb4c28ec3879e03c0b948d623ccfc0a16a5699b890497ab217512f49c59",
+     "cuda13.0": "9a5746f8fa2b358f6a4f77f638190f7da12b7ab6d774d9bece4a2fadf929ea5a"
+    }
+   },
+   "id": "cuda_mma_v3.3+prebuilt/0.10.0/cu13/H100/bf16/D32/S16-100/env-0/forced",
+   "route": "cuda_mma",
+   "route_fingerprint": {
+    "sha256": "6b3ba45e9eaa445f10291c3e150fb0bfa7f65ffcb3d6c60cba05ccbfdc9d5c56"
+   },
+   "status": "proven",
+   "when": {
+    "B_max": 3,
+    "H": [
+     2,
+     4,
+     8,
+     12
+    ],
+    "N_equals_S": false,
+    "S_max": 100,
+    "S_min": 16,
+    "bias_dtype": [
+     "bfloat16",
+     "float32"
+    ],
+    "device_family": [
+     "H100"
+    ],
+    "dtype": "bfloat16",
+    "fallback_threshold_env": {
+     "max": 0
+    },
+    "head_dim": 32,
+    "lib_version": [
+     "0.10.0"
+    ],
+    "mask_dtype": [
+     "bool"
+    ],
+    "ops_build": "cu13",
+    "square": true
+   }
+  },
+  {
+   "binary_fingerprint": {
+    "sm_80": {
+     "cuda12.6": "ddea8ab62cf7692e81060a2449d605c415f0a015a390c37626fc9114a14e6c08",
+     "cuda13.0": "be562c5832a4275ea8f00c0fa8d241a6024f8cde61f47fd51d797f70198a5b97"
+    }
+   },
+   "id": "cuda_mma_v3.3+prebuilt/0.11.1/cu12/A100_80GB/bf16/D32/S101-4160/env-unset",
+   "route": "cuda_mma",
+   "route_fingerprint": {
+    "sha256": "6b3ba45e9eaa445f10291c3e150fb0bfa7f65ffcb3d6c60cba05ccbfdc9d5c56"
+   },
+   "status": "proven",
+   "when": {
+    "B_max": 3,
+    "H": [
+     2,
+     4,
+     8,
+     12
+    ],
+    "N_equals_S": false,
+    "S_max": 4160,
+    "S_min": 101,
+    "bias_dtype": [
+     "bfloat16",
+     "float32"
+    ],
+    "device_family": [
+     "A100_80GB"
+    ],
+    "dtype": "bfloat16",
+    "fallback_threshold_env": "unset",
+    "head_dim": 32,
+    "kv_lengths_via_mask": true,
+    "lib_version": [
+     "0.11.1"
+    ],
+    "mask_dtype": [
+     "bool"
+    ],
+    "ops_build": "cu12",
+    "square": true
+   }
+  },
+  {
+   "binary_fingerprint": {
+    "sm_80": {
+     "cuda12.6": "ddea8ab62cf7692e81060a2449d605c415f0a015a390c37626fc9114a14e6c08",
+     "cuda13.0": "be562c5832a4275ea8f00c0fa8d241a6024f8cde61f47fd51d797f70198a5b97"
+    }
+   },
+   "id": "cuda_mma_v3.3+prebuilt/0.10.0/cu12/A100_80GB/bf16/D32/S101-4160/env-unset",
+   "route": "cuda_mma",
+   "route_fingerprint": {
+    "sha256": "6b3ba45e9eaa445f10291c3e150fb0bfa7f65ffcb3d6c60cba05ccbfdc9d5c56"
+   },
+   "status": "proven",
+   "when": {
+    "B_max": 3,
+    "H": [
+     2,
+     4,
+     8,
+     12
+    ],
+    "N_equals_S": false,
+    "S_max": 4160,
+    "S_min": 101,
+    "bias_dtype": [
+     "bfloat16",
+     "float32"
+    ],
+    "device_family": [
+     "A100_80GB"
+    ],
+    "dtype": "bfloat16",
+    "fallback_threshold_env": "unset",
+    "head_dim": 32,
+    "lib_version": [
+     "0.10.0"
+    ],
+    "mask_dtype": [
+     "bool"
+    ],
+    "ops_build": "cu12",
+    "square": true
+   }
+  },
+  {
+   "binary_fingerprint": {
+    "sm_90": {
+     "cuda12.6": "1943bdb4c28ec3879e03c0b948d623ccfc0a16a5699b890497ab217512f49c59",
+     "cuda13.0": "9a5746f8fa2b358f6a4f77f638190f7da12b7ab6d774d9bece4a2fadf929ea5a"
+    }
+   },
+   "id": "cuda_mma_v3.3+prebuilt/0.11.1/cu12/H200/bf16/D32/S101-4160/env-unset",
+   "route": "cuda_mma",
+   "route_fingerprint": {
+    "sha256": "6b3ba45e9eaa445f10291c3e150fb0bfa7f65ffcb3d6c60cba05ccbfdc9d5c56"
+   },
+   "status": "proven",
+   "when": {
+    "B_max": 3,
+    "H": [
+     2,
+     4,
+     8,
+     12
+    ],
+    "N_equals_S": false,
+    "S_max": 4160,
+    "S_min": 101,
+    "bias_dtype": [
+     "bfloat16",
+     "float32"
+    ],
+    "device_family": [
+     "H200"
+    ],
+    "dtype": "bfloat16",
+    "fallback_threshold_env": "unset",
+    "head_dim": 32,
+    "kv_lengths_via_mask": true,
+    "lib_version": [
+     "0.11.1"
+    ],
+    "mask_dtype": [
+     "bool"
+    ],
+    "ops_build": "cu12",
+    "square": true
+   }
+  },
+  {
+   "binary_fingerprint": {
+    "sm_90": {
+     "cuda12.6": "1943bdb4c28ec3879e03c0b948d623ccfc0a16a5699b890497ab217512f49c59",
+     "cuda13.0": "9a5746f8fa2b358f6a4f77f638190f7da12b7ab6d774d9bece4a2fadf929ea5a"
+    }
+   },
+   "id": "cuda_mma_v3.3+prebuilt/0.10.0/cu12/H200/bf16/D32/S101-4160/env-unset",
+   "route": "cuda_mma",
+   "route_fingerprint": {
+    "sha256": "6b3ba45e9eaa445f10291c3e150fb0bfa7f65ffcb3d6c60cba05ccbfdc9d5c56"
+   },
+   "status": "proven",
+   "when": {
+    "B_max": 3,
+    "H": [
+     2,
+     4,
+     8,
+     12
+    ],
+    "N_equals_S": false,
+    "S_max": 4160,
+    "S_min": 101,
+    "bias_dtype": [
+     "bfloat16",
+     "float32"
+    ],
+    "device_family": [
+     "H200"
+    ],
+    "dtype": "bfloat16",
+    "fallback_threshold_env": "unset",
+    "head_dim": 32,
+    "lib_version": [
+     "0.10.0"
+    ],
+    "mask_dtype": [
+     "bool"
+    ],
+    "ops_build": "cu12",
+    "square": true
+   }
+  }
+ ]
+}

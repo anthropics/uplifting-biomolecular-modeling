@@ -1,0 +1,45 @@
+Genie 3 kit — opt/forward: fast_inference/driver/g3fast.py, fast_inference/driver/g3fast_patches.py, g3cap/g3cap.py, g3cap/g3lean.py
+Copyright 2026 Anthropic, PBC for the kit's own code in these files, licensed under the Apache License, Version 2.0 (../../LICENSE).
+
+These files drive, patch in memory and restate parts of Genie 3 (https://github.com/aqlaboratory/genie3 at commit
+d77ae5ac04212ff1e8b29b585859a3244c614804, version 0.0.1), which is licensed under the Apache License, Version 2.0; upstream's LICENSE
+prints no copyright line of its own (the appendix template line only) and the upstream repository has no NOTICE file at that commit. To the extent they contain
+modified copies or restatements of upstream code they are derivative works under that licence. Modified upstream material, per file
+(Apache License 2.0, section 4(b)):
+
+  fast_inference/driver/g3fast_patches.py   modified copies of batched_gather (src/genie3/generation/utils/tensor_utils.py),
+                                            quat_to_rot (src/genie3/generation/utils/affine_utils.py), sinusoidal_encoding
+                                            (src/genie3/generation/utils/encode_utils.py) and _compute_frenet_frames
+                                            (src/genie3/generation/utils/geo_utils.py); re-executes the source of
+                                            V1PairFeatureNet.forward (src/genie3/generation/model/embedder/pair/v1.py) with one
+                                            expression replaced, in memory, at run time
+  fast_inference/driver/g3fast.py           restates DDIMSampler._step and its step schedule
+                                            (src/genie3/generation/diffusion/sampler/ddim.py, sampler.py), the set-up order of
+                                            src/genie3/generation/workflow.py and runner/runner.py, and the call order of the
+                                            denoiser forward (src/genie3/generation/model/implementation/v1.py)
+  g3cap/g3cap.py, g3cap/g3lean.py            restate V1PairFeatureNet.forward (model/embedder/pair/v1.py), LatentTransformer and
+                                            LatentTransformerBlock.forward (model/latent/transformer.py) and
+                                            TriangleMultiplicativeUpdate.forward (model/module/triangular_multiplicative_update.py)
+
+tensor_utils.py, affine_utils.py and triangular_multiplicative_update.py carry the following per-file header upstream, which travels
+with the portions taken from them and is reproduced here exactly as printed:
+
+# Adapted from OpenFold
+# Copyright 2021 AlQuraishi Laboratory
+# Copyright 2021 DeepMind Technologies Limited
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+The Apache License 2.0 text is ../../third_party_licenses/Genie.Apache-2.0.txt (upstream's LICENSE, byte-identical) and ../../LICENSE.
+No upstream file is redistributed in this directory; the unmodified upstream sources are under ../../stock/. No model weights and no
+third-party data files are in this directory. The kit-level summary is ../../THIRD_PARTY_NOTICES.md.

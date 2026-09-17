@@ -1,0 +1,2 @@
+# opt_core autoload guard: package=genie3_opt env=GENIE3_OPT tag=genie3-opt exit=3
+import os as _o, sys as _s; exec("try:\n import genie3_opt._autoload\nexcept SystemExit as _x:\n _s.stderr.flush(); _o._exit(_x.code if isinstance(_x.code, int) else 3)\nexcept BaseException as _e:\n if (_o.environ.get('GENIE3_OPT') or '').strip().lower() not in ('', 'off'):\n  _s.stderr.write('[genie3-opt] NOT ACTIVE: genie3_opt._autoload is not importable (%s: %s) under GENIE3_OPT=%s (exit 3)\\n' % (type(_e).__name__, _e, _o.environ.get('GENIE3_OPT'))); _s.stderr.flush(); _o._exit(3)\n")

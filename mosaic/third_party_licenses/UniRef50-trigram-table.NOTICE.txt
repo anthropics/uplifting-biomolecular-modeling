@@ -1,0 +1,8 @@
+trigram_seg.pkl
+---------------
+Trigram amino-acid frequencies computed from UniRef50 (UniProt), which is
+distributed under the Creative Commons Attribution 4.0 International (CC BY 4.0)
+license: https://www.uniprot.org/help/license. UniProt is credited below.
+
+Citation: The UniProt Consortium, "UniProt: the Universal Protein Knowledgebase",
+Nucleic Acids Research.

@@ -1,0 +1,14 @@
+{
+ "exports": {},
+ "files_note": "pallas_glut.py = the kit's levers module lines 28-74 bytes unchanged (the L-GLUT kernel _glu_T_kernel and its wrapper glu_transposed_masked; slice sha256 b1a8fe43958f8dbf77092a083062dccbfc1812e9c06b97be4773b4d91b4a99ec) under a module docstring and the import lines the slice reads (functools, jax, pallas, tokamax internals); the levers module's other sections are not kernels",
+ "kind": "module",
+ "license": "Apache-2.0 (this repository's own code: common/opt_core/LICENSE); re-implements the Pallas-Triton gated-linear-unit kernel of tokamax (Apache-2.0) with a transposed, masked epilogue; third-party attributions in pallas_glut.NOTICE beside the module",
+ "mechanism": "attn.triangle_multiplication (GLU prologue: tokamax gated_linear_unit + transpose + mask as one Pallas-Triton kernel, bitwise to the stock call)",
+ "name": "pallas_glut",
+ "not_carried": {
+  "make_patched_trimul_class, apply_levers, LEVERS (the same levers module)": "the Haiku TriangleMultiplication subclass whose body calls the kernel, and the environment-driven lever switchboard (L-GLUT / L-ATTNCFG / L-UNCHUNK): framework-module surgery and kit switches, stay in the kit",
+  "the stock-script wrapper, 0001_L-GLUT_*.diff, tools/, tests/, HOWTO.md, MANIFEST.json": "the add-on's stock-script wrapper, the equivalent source diff, timing tools, self-test and as-built record: kit evidence, cited from the kit"
+ },
+ "runtime_imports": [],
+ "version": "pallas-levers-glut@47caf516:28-74"
+}

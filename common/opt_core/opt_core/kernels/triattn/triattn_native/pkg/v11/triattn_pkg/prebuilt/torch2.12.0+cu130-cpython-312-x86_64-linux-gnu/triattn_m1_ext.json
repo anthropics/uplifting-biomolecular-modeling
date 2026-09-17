@@ -1,0 +1,48 @@
+{
+ "arch": [
+  "arch=compute_90a,code=sm_90a"
+ ],
+ "build_s": 79.4,
+ "built_by": "tools/build_prebuilt.py: the kernel directory's own _build() in the target stack",
+ "built_utc": "2026-09-12T02:10:54Z",
+ "cutlass_tag": "v4.7.1",
+ "cxx11abi": true,
+ "device": "NVIDIA H100 80GB HBM3",
+ "dir": "cuda_b",
+ "ext": "triattn_m1_ext",
+ "loadcheck": {
+  "s1024_prefix": "94c8550906990e5c",
+  "s512_prefixvar": "489a59714e79094d"
+ },
+ "loadcheck_bitwise": {
+  "s1024_prefix": true,
+  "s512_prefixvar": true
+ },
+ "module": "triattn_m1",
+ "module_sha256": {
+  "triattn_m1.py": "cc8b90f05a40ee267555d05a341d64547f65e4e2e456cef4afcd65b81495c4bb"
+ },
+ "nvcc": "Build cuda_13.0.r13.0/compiler.36424714_0",
+ "ptxas": {
+  "path": "/usr/local/cuda-13.4/bin/ptxas",
+  "version": "Build cuda_13.4.r13.4/compiler.38657139_0"
+ },
+ "python": "3.12.1",
+ "route": "cuda_b",
+ "so_bytes": 1581672,
+ "so_sha256": "f963f480c39138b9fcdd2118c6566cd864504ecae0f7f188722e8e49c22aa0cd",
+ "soabi": "cpython-312-x86_64-linux-gnu",
+ "source_sha256": {
+  "fa3_utils.h": "776172706a741081ba0a32058ca6d0ce94bea976a5689d0965b162eaf7f5d9cc",
+  "launch.cuh": "a92a67355e2cfe74db776e62c02feb26d50aaef20d20c54687b373256afdbb7a",
+  "m1/launch_m1.cuh": "2427f32f712ca9eafa05971d4d2dd0009d2959bb2e25e678bbf9793c7287402e",
+  "m1/m1_binding.cu": "a9f7ef0193d75445106a524120ea621cb56c615a391fad9033938de7ec1de1f0",
+  "m1/triattn_m1_sm90.cuh": "55f5262071d0a26e74e6831610252d7795e81a06ca852bd6a92f5f555d3a1c75",
+  "prep.cu": "08d73f555e26c10720d7680b094266b8ed77105f0004684c4138f05337058367",
+  "triattn_b_binding.cu": "13a10745c7ede491ff60603cf98143ee8a51a236a4bfaa31984a1f4aea2b8d5c",
+  "triattn_b_sm90.cuh": "c7fcb6c1bb85769a33583feb0557386456a0b90e9f954a50ddbfe2859a9bc33b"
+ },
+ "stack_tag": "torch2.12.0+cu130-cpython-312-x86_64-linux-gnu",
+ "torch": "2.12.0+cu130",
+ "torch_cuda": "13.0"
+}

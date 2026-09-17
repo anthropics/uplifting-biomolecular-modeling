@@ -1,0 +1,12 @@
+{
+ "typing_extensions": {
+  "version": "4.13.2",
+  "file": "typing_extensions.py",
+  "license": "PSF-2.0 (LICENSE.typing_extensions beside)",
+  "source": "PyPI wheel typing_extensions-4.13.2-py3-none-any.whl sha256 a439e7c04b49fec3e5d3e2beaa21755cadbbdc391694e28ccdd36ca4a1408f8c",
+  "requires_python": [
+   "Requires-Python: >=3.8"
+  ],
+  "why": "when TensorFlow is imported before torch (the deterministic recipe imports it first), an older typing_extensions (one without 'deprecated') can already sit in sys.modules and torch 2.4.1 then fails to import; the package's _te_guard replaces the loaded module with this copy before importing torch"
+ }
+}

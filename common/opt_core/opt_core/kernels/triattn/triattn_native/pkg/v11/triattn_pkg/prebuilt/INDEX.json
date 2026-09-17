@@ -1,0 +1,618 @@
+{
+ "schema": "triattn_pkg_prebuilt/v2",
+ "what": "Prebuilt torch C++/CUDA extensions of the CUDA routes, one directory per stack tag (torch<version>-<CPython SOABI>), four per stack: triattn_sm90_ext (cuda), triattn_mw_ext_g3x4 (cuda_c), triattn_m1_ext (cuda_b) -- sm_90a code -- and triattn_sm80_ext (cuda_80) -- sm_80 code. Each <ext>.json beside an <ext>.so is its build record: kernel directory, torch / CUDA / python / nvcc versions, the ptxas that assembled it, the CUTLASS tag where headers are used, the -gencode flags, and the digests so_sha256 / source_sha256 (every file under the directory's csrc/) / module_sha256 plus loadcheck = {test-vector id: sha256/16 of the output bytes on a device of the extension's architecture}. Every binary was built by tools/build_prebuilt.py inside the stack's own image (its nvcc / ptxas; CUTLASS 4.7.1 headers; TORCH_CUDA_ARCH_LIST scoped per extension) from exactly the sources in this package (tools/check_prebuilt.py re-verifies the digests); output bytes are identical across stacks (equal loadcheck digests).",
+ "arch": {
+  "triattn_sm90_ext": "sm_90a",
+  "triattn_mw_ext_g3x4": "sm_90a",
+  "triattn_m1_ext": "sm_90a",
+  "triattn_sm80_ext": "sm_80 (routed on cc 8.0 only)"
+ },
+ "ptxas_policy": "triattn_m1_ext is assembled with /usr/local/cuda-13.4/bin/ptxas when that file exists in the build image (the family stack's record says so), else with the toolkit's ptxas; the other three always use the toolkit's ptxas. Output bytes do not depend on the choice (equal loadcheck digests).",
+ "stacks": {
+  "torch2.10.0+cu128-cpython-311-x86_64-linux-gnu": {
+   "for": "torch 2.10.0+cu128, CPython 3.11",
+   "extensions": {
+    "triattn_m1_ext": {
+     "route": "cuda_b",
+     "dir": "cuda_b",
+     "arch": "sm_90a",
+     "generation": "11",
+     "module": "triattn_m1",
+     "torch": "2.10.0+cu128",
+     "torch_cuda": "12.8",
+     "python": "3.11.5",
+     "nvcc": "Build cuda_12.8.r12.8/compiler.35583870_0",
+     "ptxas": "Build cuda_12.8.r12.8/compiler.35583870_0",
+     "so_bytes": 1538440,
+     "built_utc": "2026-09-12T02:18:54Z",
+     "sha256": "0a4c9a58e07261ddf60528bd237d3563c2afab1a0324053b00ab4d76c891a7fd",
+     "loadcheck": {
+      "s1024_prefix": "94c8550906990e5c",
+      "s512_prefixvar": "489a59714e79094d"
+     },
+     "cutlass_tag": "v4.7.1"
+    },
+    "triattn_mw_ext_g3x4": {
+     "route": "cuda_c",
+     "dir": "cuda_c",
+     "arch": "sm_90a",
+     "generation": "11",
+     "module": "triattn_mw",
+     "torch": "2.10.0+cu128",
+     "torch_cuda": "12.8",
+     "python": "3.11.5",
+     "nvcc": "Build cuda_12.8.r12.8/compiler.35583870_0",
+     "ptxas": "Build cuda_12.8.r12.8/compiler.35583870_0",
+     "so_bytes": 1339472,
+     "built_utc": "2026-09-12T02:19:38Z",
+     "sha256": "cbe38d76985291c25d8d98485123ed4527d16bcf998115d0aa4a003e9bdc4cc5",
+     "loadcheck": {
+      "s3584_prefix": "e9c37e84cb11c294"
+     }
+    },
+    "triattn_sm80_ext": {
+     "route": "cuda_80",
+     "dir": "cuda_80",
+     "arch": "sm_80",
+     "generation": "11",
+     "module": "triattn_sm80",
+     "torch": "2.10.0+cu128",
+     "torch_cuda": "12.8",
+     "python": "3.11.5",
+     "nvcc": "Build cuda_12.8.r12.8/compiler.35583870_0",
+     "ptxas": "Build cuda_12.8.r12.8/compiler.35583870_0",
+     "so_bytes": 12235360,
+     "built_utc": "2026-09-12T04:15:52Z",
+     "sha256": "488c9a490adef8b834c8cbab7d6df74b9b429a7531a7f8332bc8c9fd7a8598b8",
+     "loadcheck": {
+      "a80_d64_s512_none": "12d730e5cc87f467",
+      "a80_s1024_endstrided": "bc687e4bc4ee5d4e",
+      "a80_s512_prefixvar": "9644519dab388306"
+     }
+    },
+    "triattn_sm90_ext": {
+     "route": "cuda",
+     "dir": "cuda",
+     "arch": "sm_90a",
+     "generation": "11",
+     "module": "triattn_cuda",
+     "torch": "2.10.0+cu128",
+     "torch_cuda": "12.8",
+     "python": "3.11.5",
+     "nvcc": "Build cuda_12.8.r12.8/compiler.35583870_0",
+     "ptxas": "Build cuda_12.8.r12.8/compiler.35583870_0",
+     "so_bytes": 763016,
+     "built_utc": "2026-09-12T02:21:11Z",
+     "sha256": "3704a21ca6c44916aad6ea6b46e52d637d20a6a7cf09ca2a1ad935855ca42bac",
+     "loadcheck": {
+      "s384_endstrided": "b51395b940080c97"
+     },
+     "cutlass_tag": "v4.7.1"
+    }
+   }
+  },
+  "torch2.12.0+cu130-cpython-311-x86_64-linux-gnu": {
+   "for": "torch 2.12.0+cu130, CPython 3.11",
+   "extensions": {
+    "triattn_m1_ext": {
+     "route": "cuda_b",
+     "dir": "cuda_b",
+     "arch": "sm_90a",
+     "generation": "11",
+     "module": "triattn_m1",
+     "torch": "2.12.0+cu130",
+     "torch_cuda": "13.0",
+     "python": "3.11.12",
+     "nvcc": "Build cuda_13.0.r13.0/compiler.36424714_0",
+     "ptxas": "Build cuda_13.0.r13.0/compiler.36424714_0",
+     "so_bytes": 1568680,
+     "built_utc": "2026-09-12T02:16:37Z",
+     "sha256": "b6206d366755c4651e097267708a3a5b5c80174a766ec5ad9908dfe30924d157",
+     "loadcheck": {
+      "s1024_prefix": "94c8550906990e5c",
+      "s512_prefixvar": "489a59714e79094d"
+     },
+     "cutlass_tag": "v4.7.1"
+    },
+    "triattn_mw_ext_g3x4": {
+     "route": "cuda_c",
+     "dir": "cuda_c",
+     "arch": "sm_90a",
+     "generation": "11",
+     "module": "triattn_mw",
+     "torch": "2.12.0+cu130",
+     "torch_cuda": "13.0",
+     "python": "3.11.12",
+     "nvcc": "Build cuda_13.0.r13.0/compiler.36424714_0",
+     "ptxas": "Build cuda_13.0.r13.0/compiler.36424714_0",
+     "so_bytes": 1339920,
+     "built_utc": "2026-09-12T02:17:25Z",
+     "sha256": "d047ccdfd86472adcb57cf4d3a5558932c8afb9efe3cd73ad6040f1f5cf98004",
+     "loadcheck": {
+      "s3584_prefix": "e9c37e84cb11c294"
+     }
+    },
+    "triattn_sm80_ext": {
+     "route": "cuda_80",
+     "dir": "cuda_80",
+     "arch": "sm_80",
+     "generation": "11",
+     "module": "triattn_sm80",
+     "torch": "2.12.0+cu130",
+     "torch_cuda": "13.0",
+     "python": "3.11.12",
+     "nvcc": "Build cuda_13.0.r13.0/compiler.36424714_0",
+     "ptxas": "Build cuda_13.0.r13.0/compiler.36424714_0",
+     "so_bytes": 12264224,
+     "built_utc": "2026-09-12T04:15:19Z",
+     "sha256": "91bdd45a755b29ef5ad12fba872e86217feed20341597d7cbbdb3fb8ea85725b",
+     "loadcheck": {
+      "a80_d64_s512_none": "12d730e5cc87f467",
+      "a80_s1024_endstrided": "bc687e4bc4ee5d4e",
+      "a80_s512_prefixvar": "9644519dab388306"
+     }
+    },
+    "triattn_sm90_ext": {
+     "route": "cuda",
+     "dir": "cuda",
+     "arch": "sm_90a",
+     "generation": "11",
+     "module": "triattn_cuda",
+     "torch": "2.12.0+cu130",
+     "torch_cuda": "13.0",
+     "python": "3.11.12",
+     "nvcc": "Build cuda_13.0.r13.0/compiler.36424714_0",
+     "ptxas": "Build cuda_13.0.r13.0/compiler.36424714_0",
+     "so_bytes": 760880,
+     "built_utc": "2026-09-12T02:19:02Z",
+     "sha256": "c9cb37f59cc21cb7b7b997e9493b95a60594d303c82ec6173f6f68002947253e",
+     "loadcheck": {
+      "s384_endstrided": "b51395b940080c97"
+     },
+     "cutlass_tag": "v4.7.1"
+    }
+   }
+  },
+  "torch2.12.0+cu130-cpython-312-x86_64-linux-gnu": {
+   "for": "torch 2.12.0+cu130, CPython 3.12 (CUDA 13.0 toolkit; the bench stack of the cells and of the test vectors)",
+   "extensions": {
+    "triattn_m1_ext": {
+     "route": "cuda_b",
+     "dir": "cuda_b",
+     "arch": "sm_90a",
+     "generation": "11",
+     "module": "triattn_m1",
+     "torch": "2.12.0+cu130",
+     "torch_cuda": "13.0",
+     "python": "3.12.1",
+     "nvcc": "Build cuda_13.0.r13.0/compiler.36424714_0",
+     "ptxas": "Build cuda_13.4.r13.4/compiler.38657139_0",
+     "so_bytes": 1581672,
+     "built_utc": "2026-09-12T02:10:54Z",
+     "sha256": "f963f480c39138b9fcdd2118c6566cd864504ecae0f7f188722e8e49c22aa0cd",
+     "loadcheck": {
+      "s1024_prefix": "94c8550906990e5c",
+      "s512_prefixvar": "489a59714e79094d"
+     },
+     "cutlass_tag": "v4.7.1"
+    },
+    "triattn_mw_ext_g3x4": {
+     "route": "cuda_c",
+     "dir": "cuda_c",
+     "arch": "sm_90a",
+     "generation": "11",
+     "module": "triattn_mw",
+     "torch": "2.12.0+cu130",
+     "torch_cuda": "13.0",
+     "python": "3.12.1",
+     "nvcc": "Build cuda_13.0.r13.0/compiler.36424714_0",
+     "ptxas": "Build cuda_13.0.r13.0/compiler.36424714_0",
+     "so_bytes": 1361792,
+     "built_utc": "2026-09-12T02:11:29Z",
+     "sha256": "8a7c304fe7dc51b39026bfbc76b1c0535a3f1b6cd5334fa56e3f424e6d047454",
+     "loadcheck": {
+      "s3584_prefix": "e9c37e84cb11c294"
+     }
+    },
+    "triattn_sm80_ext": {
+     "route": "cuda_80",
+     "dir": "cuda_80",
+     "arch": "sm_80",
+     "generation": "11",
+     "module": "triattn_sm80",
+     "torch": "2.12.0+cu130",
+     "torch_cuda": "13.0",
+     "python": "3.12.1",
+     "nvcc": "Build cuda_13.0.r13.0/compiler.36424714_0",
+     "ptxas": "Build cuda_13.0.r13.0/compiler.36424714_0",
+     "so_bytes": 12286424,
+     "built_utc": "2026-09-12T04:05:29Z",
+     "sha256": "3652de0be1ed25b7700fb242665a7c94c1fc11d5143cfd3c6b8468376db420a8",
+     "loadcheck": {
+      "a80_d64_s512_none": "12d730e5cc87f467",
+      "a80_s1024_endstrided": "bc687e4bc4ee5d4e",
+      "a80_s512_prefixvar": "9644519dab388306"
+     }
+    },
+    "triattn_sm90_ext": {
+     "route": "cuda",
+     "dir": "cuda",
+     "arch": "sm_90a",
+     "generation": "11",
+     "module": "triattn_cuda",
+     "torch": "2.12.0+cu130",
+     "torch_cuda": "13.0",
+     "python": "3.12.1",
+     "nvcc": "Build cuda_13.0.r13.0/compiler.36424714_0",
+     "ptxas": "Build cuda_13.0.r13.0/compiler.36424714_0",
+     "so_bytes": 778032,
+     "built_utc": "2026-09-12T02:12:51Z",
+     "sha256": "b3d990831c5eb87697ec648a5cb21b813beb17007a6de833a67ad05bb1b82d84",
+     "loadcheck": {
+      "s384_endstrided": "b51395b940080c97"
+     },
+     "cutlass_tag": "v4.7.1"
+    }
+   }
+  },
+  "torch2.13.0+cu130-cpython-311-x86_64-linux-gnu": {
+   "for": "torch 2.13.0+cu130, CPython 3.11",
+   "extensions": {
+    "triattn_m1_ext": {
+     "route": "cuda_b",
+     "dir": "cuda_b",
+     "arch": "sm_90a",
+     "generation": "11",
+     "module": "triattn_m1",
+     "torch": "2.13.0+cu130",
+     "torch_cuda": "13.0",
+     "python": "3.11.5",
+     "nvcc": "Build cuda_13.0.r13.0/compiler.36424714_0",
+     "ptxas": "Build cuda_13.0.r13.0/compiler.36424714_0",
+     "so_bytes": 1594744,
+     "built_utc": "2026-09-12T02:12:10Z",
+     "sha256": "714e181b18ce73446ea20052c440cb46f181d556bbfb425ecbafcd1379aa77d2",
+     "loadcheck": {
+      "s1024_prefix": "94c8550906990e5c",
+      "s512_prefixvar": "489a59714e79094d"
+     },
+     "cutlass_tag": "v4.7.1"
+    },
+    "triattn_mw_ext_g3x4": {
+     "route": "cuda_c",
+     "dir": "cuda_c",
+     "arch": "sm_90a",
+     "generation": "11",
+     "module": "triattn_mw",
+     "torch": "2.13.0+cu130",
+     "torch_cuda": "13.0",
+     "python": "3.11.5",
+     "nvcc": "Build cuda_13.0.r13.0/compiler.36424714_0",
+     "ptxas": "Build cuda_13.0.r13.0/compiler.36424714_0",
+     "so_bytes": 1374864,
+     "built_utc": "2026-09-12T02:12:55Z",
+     "sha256": "9799ab896262a713fdf1840f2ab869cb012c9bd00a0baa2e6c1663c528498a35",
+     "loadcheck": {
+      "s3584_prefix": "e9c37e84cb11c294"
+     }
+    },
+    "triattn_sm80_ext": {
+     "route": "cuda_80",
+     "dir": "cuda_80",
+     "arch": "sm_80",
+     "generation": "11",
+     "module": "triattn_sm80",
+     "torch": "2.13.0+cu130",
+     "torch_cuda": "13.0",
+     "python": "3.11.5",
+     "nvcc": "Build cuda_13.0.r13.0/compiler.36424714_0",
+     "ptxas": "Build cuda_13.0.r13.0/compiler.36424714_0",
+     "so_bytes": 12304024,
+     "built_utc": "2026-09-12T04:11:54Z",
+     "sha256": "89a76f04e99e7df4737a4c1bb0150e2efad18c8a77831b4d8a5e069159013e9f",
+     "loadcheck": {
+      "a80_d64_s512_none": "12d730e5cc87f467",
+      "a80_s1024_endstrided": "bc687e4bc4ee5d4e",
+      "a80_s512_prefixvar": "9644519dab388306"
+     }
+    },
+    "triattn_sm90_ext": {
+     "route": "cuda",
+     "dir": "cuda",
+     "arch": "sm_90a",
+     "generation": "11",
+     "module": "triattn_cuda",
+     "torch": "2.13.0+cu130",
+     "torch_cuda": "13.0",
+     "python": "3.11.5",
+     "nvcc": "Build cuda_13.0.r13.0/compiler.36424714_0",
+     "ptxas": "Build cuda_13.0.r13.0/compiler.36424714_0",
+     "so_bytes": 786336,
+     "built_utc": "2026-09-12T02:14:36Z",
+     "sha256": "a8d81396a93f4badef40b20bbfb14d2dd62dc2b4bce9f836e0b8e2215d385d9f",
+     "loadcheck": {
+      "s384_endstrided": "b51395b940080c97"
+     },
+     "cutlass_tag": "v4.7.1"
+    }
+   }
+  },
+  "torch2.13.0+cu130-cpython-312-x86_64-linux-gnu": {
+   "for": "torch 2.13.0+cu130, CPython 3.12",
+   "extensions": {
+    "triattn_m1_ext": {
+     "route": "cuda_b",
+     "dir": "cuda_b",
+     "arch": "sm_90a",
+     "generation": "11",
+     "module": "triattn_m1",
+     "torch": "2.13.0+cu130",
+     "torch_cuda": "13.0",
+     "python": "3.12.1",
+     "nvcc": "Build cuda_13.0.r13.0/compiler.36424714_0",
+     "ptxas": "Build cuda_13.0.r13.0/compiler.36424714_0",
+     "so_bytes": 1575768,
+     "built_utc": "2026-09-12T02:12:46Z",
+     "sha256": "47fcac98ae07d3a700a92cf0ccee8db9924f41f5c341efb55e12ec6be8e01ae6",
+     "loadcheck": {
+      "s1024_prefix": "94c8550906990e5c",
+      "s512_prefixvar": "489a59714e79094d"
+     },
+     "cutlass_tag": "v4.7.1"
+    },
+    "triattn_mw_ext_g3x4": {
+     "route": "cuda_c",
+     "dir": "cuda_c",
+     "arch": "sm_90a",
+     "generation": "11",
+     "module": "triattn_mw",
+     "torch": "2.13.0+cu130",
+     "torch_cuda": "13.0",
+     "python": "3.12.1",
+     "nvcc": "Build cuda_13.0.r13.0/compiler.36424714_0",
+     "ptxas": "Build cuda_13.0.r13.0/compiler.36424714_0",
+     "so_bytes": 1363864,
+     "built_utc": "2026-09-12T02:13:31Z",
+     "sha256": "39c4861285f409f9157db16c73dbae19b290d16423689eae151fe8413db82be1",
+     "loadcheck": {
+      "s3584_prefix": "e9c37e84cb11c294"
+     }
+    },
+    "triattn_sm80_ext": {
+     "route": "cuda_80",
+     "dir": "cuda_80",
+     "arch": "sm_80",
+     "generation": "11",
+     "module": "triattn_sm80",
+     "torch": "2.13.0+cu130",
+     "torch_cuda": "13.0",
+     "python": "3.12.1",
+     "nvcc": "Build cuda_13.0.r13.0/compiler.36424714_0",
+     "ptxas": "Build cuda_13.0.r13.0/compiler.36424714_0",
+     "so_bytes": 12292192,
+     "built_utc": "2026-09-12T04:12:28Z",
+     "sha256": "cec8ffbf306b02de84b0997f1c916d40b9e702a46c733b71ba843f25c5452fba",
+     "loadcheck": {
+      "a80_d64_s512_none": "12d730e5cc87f467",
+      "a80_s1024_endstrided": "bc687e4bc4ee5d4e",
+      "a80_s512_prefixvar": "9644519dab388306"
+     }
+    },
+    "triattn_sm90_ext": {
+     "route": "cuda",
+     "dir": "cuda",
+     "arch": "sm_90a",
+     "generation": "11",
+     "module": "triattn_cuda",
+     "torch": "2.13.0+cu130",
+     "torch_cuda": "13.0",
+     "python": "3.12.1",
+     "nvcc": "Build cuda_13.0.r13.0/compiler.36424714_0",
+     "ptxas": "Build cuda_13.0.r13.0/compiler.36424714_0",
+     "so_bytes": 780304,
+     "built_utc": "2026-09-12T02:15:09Z",
+     "sha256": "153f6d6e8399d3cc355a1c6e9bd440e2ff8229012b85dc848a6849768dec339b",
+     "loadcheck": {
+      "s384_endstrided": "b51395b940080c97"
+     },
+     "cutlass_tag": "v4.7.1"
+    }
+   }
+  },
+  "torch2.7.1+cu126-cpython-311-x86_64-linux-gnu": {
+   "for": "torch 2.7.1+cu126, CPython 3.11",
+   "extensions": {
+    "triattn_m1_ext": {
+     "route": "cuda_b",
+     "dir": "cuda_b",
+     "arch": "sm_90a",
+     "generation": "11",
+     "module": "triattn_m1",
+     "torch": "2.7.1+cu126",
+     "torch_cuda": "12.6",
+     "python": "3.11.5",
+     "nvcc": "Build cuda_12.6.r12.6/compiler.35059454_0",
+     "ptxas": "Build cuda_12.6.r12.6/compiler.35059454_0",
+     "so_bytes": 1531056,
+     "built_utc": "2026-09-12T02:24:10Z",
+     "sha256": "d2d35e8ca4f56f9d64296cb7310dc9aa856d6961e7146c40dd67ebb8f08942ca",
+     "loadcheck": {
+      "s1024_prefix": "94c8550906990e5c",
+      "s512_prefixvar": "489a59714e79094d"
+     },
+     "cutlass_tag": "v4.7.1"
+    },
+    "triattn_mw_ext_g3x4": {
+     "route": "cuda_c",
+     "dir": "cuda_c",
+     "arch": "sm_90a",
+     "generation": "11",
+     "module": "triattn_mw",
+     "torch": "2.7.1+cu126",
+     "torch_cuda": "12.6",
+     "python": "3.11.5",
+     "nvcc": "Build cuda_12.6.r12.6/compiler.35059454_0",
+     "ptxas": "Build cuda_12.6.r12.6/compiler.35059454_0",
+     "so_bytes": 1320664,
+     "built_utc": "2026-09-12T02:24:52Z",
+     "sha256": "0eec9468d07b20beb0981045ffb039ed173ced172c020de85dac989bf25a1106",
+     "loadcheck": {
+      "s3584_prefix": "e9c37e84cb11c294"
+     }
+    },
+    "triattn_sm80_ext": {
+     "route": "cuda_80",
+     "dir": "cuda_80",
+     "arch": "sm_80",
+     "generation": "11",
+     "module": "triattn_sm80",
+     "torch": "2.7.1+cu126",
+     "torch_cuda": "12.6",
+     "python": "3.11.5",
+     "nvcc": "Build cuda_12.6.r12.6/compiler.35059454_0",
+     "ptxas": "Build cuda_12.6.r12.6/compiler.35059454_0",
+     "so_bytes": 12220480,
+     "built_utc": "2026-09-12T04:19:03Z",
+     "sha256": "32134d39a21f94200212b56a59e663b53a977c41ac787519a321d88497ba2341",
+     "loadcheck": {
+      "a80_d64_s512_none": "12d730e5cc87f467",
+      "a80_s1024_endstrided": "bc687e4bc4ee5d4e",
+      "a80_s512_prefixvar": "9644519dab388306"
+     }
+    },
+    "triattn_sm90_ext": {
+     "route": "cuda",
+     "dir": "cuda",
+     "arch": "sm_90a",
+     "generation": "11",
+     "module": "triattn_cuda",
+     "torch": "2.7.1+cu126",
+     "torch_cuda": "12.6",
+     "python": "3.11.5",
+     "nvcc": "Build cuda_12.6.r12.6/compiler.35059454_0",
+     "ptxas": "Build cuda_12.6.r12.6/compiler.35059454_0",
+     "so_bytes": 748800,
+     "built_utc": "2026-09-12T02:26:23Z",
+     "sha256": "ce003571c418571d6eb37064adc5b33a9493d25be70e4a5b966051ed6e27efe5",
+     "loadcheck": {
+      "s384_endstrided": "b51395b940080c97"
+     },
+     "cutlass_tag": "v4.7.1"
+    }
+   }
+  },
+  "torch2.7.1+cu128-cpython-311-x86_64-linux-gnu": {
+   "for": "torch 2.7.1+cu128, CPython 3.11",
+   "extensions": {
+    "triattn_m1_ext": {
+     "route": "cuda_b",
+     "dir": "cuda_b",
+     "arch": "sm_90a",
+     "generation": "11",
+     "module": "triattn_m1",
+     "torch": "2.7.1+cu128",
+     "torch_cuda": "12.8",
+     "python": "3.11.13",
+     "nvcc": "Build cuda_12.8.r12.8/compiler.35404655_0",
+     "ptxas": "Build cuda_12.8.r12.8/compiler.35404655_0",
+     "so_bytes": 1509120,
+     "built_utc": "2026-09-12T02:19:43Z",
+     "sha256": "c0c5352b1f6eca9c496376749daf6afe6876ca4b4b76fe96f029300e879e3283",
+     "loadcheck": {
+      "s1024_prefix": "94c8550906990e5c",
+      "s512_prefixvar": "489a59714e79094d"
+     },
+     "cutlass_tag": "v4.7.1"
+    },
+    "triattn_mw_ext_g3x4": {
+     "route": "cuda_c",
+     "dir": "cuda_c",
+     "arch": "sm_90a",
+     "generation": "11",
+     "module": "triattn_mw",
+     "torch": "2.7.1+cu128",
+     "torch_cuda": "12.8",
+     "python": "3.11.13",
+     "nvcc": "Build cuda_12.8.r12.8/compiler.35404655_0",
+     "ptxas": "Build cuda_12.8.r12.8/compiler.35404655_0",
+     "so_bytes": 1314408,
+     "built_utc": "2026-09-12T02:20:14Z",
+     "sha256": "5fc55e3b0622d62de102e5488b8c1e2001e03ef596ad85d6995de9a205df3448",
+     "loadcheck": {
+      "s3584_prefix": "e9c37e84cb11c294"
+     }
+    },
+    "triattn_sm80_ext": {
+     "route": "cuda_80",
+     "dir": "cuda_80",
+     "arch": "sm_80",
+     "generation": "11",
+     "module": "triattn_sm80",
+     "torch": "2.7.1+cu128",
+     "torch_cuda": "12.8",
+     "python": "3.11.13",
+     "nvcc": "Build cuda_12.8.r12.8/compiler.35404655_0",
+     "ptxas": "Build cuda_12.8.r12.8/compiler.35404655_0",
+     "so_bytes": 12206072,
+     "built_utc": "2026-09-12T04:17:00Z",
+     "sha256": "a0199b13157ddb7051d82ed07a0b535f802928b5532b6a3a742bb30fd7416159",
+     "loadcheck": {
+      "a80_d64_s512_none": "12d730e5cc87f467",
+      "a80_s1024_endstrided": "bc687e4bc4ee5d4e",
+      "a80_s512_prefixvar": "9644519dab388306"
+     }
+    },
+    "triattn_sm90_ext": {
+     "route": "cuda",
+     "dir": "cuda",
+     "arch": "sm_90a",
+     "generation": "11",
+     "module": "triattn_cuda",
+     "torch": "2.7.1+cu128",
+     "torch_cuda": "12.8",
+     "python": "3.11.13",
+     "nvcc": "Build cuda_12.8.r12.8/compiler.35404655_0",
+     "ptxas": "Build cuda_12.8.r12.8/compiler.35404655_0",
+     "so_bytes": 735048,
+     "built_utc": "2026-09-12T02:21:26Z",
+     "sha256": "9c15f6646492dd99a7a421333647e7deaa25fbf21a6a7c58642d499d9e7705f5",
+     "loadcheck": {
+      "s384_endstrided": "b51395b940080c97"
+     },
+     "cutlass_tag": "v4.7.1"
+    }
+   }
+  }
+ },
+ "verified": {
+  "torch2.12.0+cu130-cpython-312-x86_64-linux-gnu": {
+   "9.0": "H100 80GB HBM3: test_pkg 17/17 bitwise with these binaries (all three sm_90a extensions built by this generation's builder from this tree's sources; outputs byte-identical to generation 10's binaries on all 17 vectors) == the same sources JIT-built == the live router; generation 10's own test_pkg 17/17 beside it",
+   "8.0": "A100-SXM4-80GB: test_pkg 22/22 bitwise with triattn_sm80_ext (TRIATTN_PKG_PREBUILT=always) == the same sources JIT-built == the live router; the a80 vectors were generated with this stack; loadcheck digests in the record"
+  },
+  "torch2.10.0+cu128-cpython-311-x86_64-linux-gnu": {
+   "9.0": "H100 80GB HBM3: test_pkg 17/17 bitwise with these binaries (TRIATTN_PKG_PREBUILT=always); loadcheck digests in the records equal the family stack's",
+   "8.0": "A100-SXM4-80GB: test_pkg 22/22 bitwise with this stack's triattn_sm80_ext (TRIATTN_PKG_PREBUILT=always); loadcheck digests equal the family stack's"
+  },
+  "torch2.12.0+cu130-cpython-311-x86_64-linux-gnu": {
+   "9.0": "H100 80GB HBM3: test_pkg 17/17 bitwise with these binaries (TRIATTN_PKG_PREBUILT=always); loadcheck digests in the records equal the family stack's",
+   "8.0": "A100-SXM4-80GB: test_pkg 22/22 bitwise with this stack's triattn_sm80_ext (TRIATTN_PKG_PREBUILT=always); loadcheck digests equal the family stack's"
+  },
+  "torch2.13.0+cu130-cpython-311-x86_64-linux-gnu": {
+   "9.0": "H100 80GB HBM3: test_pkg 17/17 bitwise with these binaries (TRIATTN_PKG_PREBUILT=always); loadcheck digests in the records equal the family stack's",
+   "8.0": "A100-SXM4-80GB: test_pkg 22/22 bitwise with this stack's triattn_sm80_ext (TRIATTN_PKG_PREBUILT=always); loadcheck digests equal the family stack's"
+  },
+  "torch2.13.0+cu130-cpython-312-x86_64-linux-gnu": {
+   "9.0": "H100 80GB HBM3: test_pkg 17/17 bitwise with these binaries (TRIATTN_PKG_PREBUILT=always); loadcheck digests in the records equal the family stack's",
+   "8.0": "A100 80GB PCIe: test_pkg 22/22 bitwise with this stack's triattn_sm80_ext (TRIATTN_PKG_PREBUILT=always); loadcheck digests equal the family stack's"
+  },
+  "torch2.7.1+cu126-cpython-311-x86_64-linux-gnu": {
+   "9.0": "H100 80GB HBM3: test_pkg 13/13 of the vectors this stack can serve, bitwise, with these binaries; the 4 S <= 256 vectors route to k13, a Gluon kernel, and this stack's Triton 3.3 has no triton.experimental.gluon: the router raises Unsupported('needs_triton_gluon: ...') by name before any work; loadcheck digests equal the family stack's",
+   "8.0": "A100-SXM4-80GB: test_pkg 22/22 bitwise with this stack's triattn_sm80_ext (TRIATTN_PKG_PREBUILT=always); loadcheck digests equal the family stack's"
+  },
+  "torch2.7.1+cu128-cpython-311-x86_64-linux-gnu": {
+   "9.0": "H100 80GB HBM3: test_pkg 13/13 of the vectors this stack can serve, bitwise, with these binaries; the 4 S <= 256 vectors route to k13, a Gluon kernel, and this stack's Triton 3.3 has no triton.experimental.gluon: the router raises Unsupported('needs_triton_gluon: ...') by name before any work; loadcheck digests equal the family stack's",
+   "8.0": "A100-SXM4-80GB: test_pkg 22/22 bitwise with this stack's triattn_sm80_ext (TRIATTN_PKG_PREBUILT=always); loadcheck digests equal the family stack's"
+  }
+ },
+ "other_stacks": "python tools/build_prebuilt.py --exts all inside the target interpreter (nvcc + ninja; CUTLASS >= 4 headers at $CUTLASS_PATH for cuda / cuda_b) writes prebuilt/<its tag>/ with the same records; test_pkg.py --record-loadcheck fills loadcheck on a device of each architecture."
+}

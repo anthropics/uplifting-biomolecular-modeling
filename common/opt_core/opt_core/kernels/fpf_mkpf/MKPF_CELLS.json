@@ -1,0 +1,16 @@
+{
+ "schema": "MKPF_CELLS v0.3: entries keyed by (cc|triton major.minor). f1 = kernels.prologue_ln cfg; f3 = transition_ln_v{V} cfg. ln_arith: 'welford' (fast_layernorm bit-emulation, FMA flags 111; EXACT vs the pinned statement on triton 3.7.1) | 'fused' (two-pass fp32; TIER-2). nodes_default: which tri-att nodes F1 serves when PTX_MK_PF=F1.",
+ "version": "0.3",
+ "by_cc_triton": {"9.0|3.3": "sm90_t33", "9.0|3.7": "sm90_t37", "10.0|3.7": "sm100_t37", "8.0|3.7": "sm80_t37"},
+ "by_cc": {"9.0": "sm90_t33", "10.0": "sm100_t37", "8.0": "sm80_t37"},
+ "entries": {
+  "sm90_t33":  {"ln_arith": "fused", "fma_flags": [1,1,1], "class": "TIER-2 (two-pass LN; welford emulation does not compile in bounded time on triton 3.3.1)", "nodes_default": ["END"],
+                "f1": {"cfg": {"BI": 8, "BJ": 16, "num_warps": 8, "num_stages": 2, "BN": 64, "NUM_STAGES_W": 3, "WS": 0, "GROUP_I": 0}, "status": "op-cert b35307f2; sweep 1f31c985 candidate {16,8,8w,1st,BN128,NSW2} pending a cross-size check"}},
+  "sm90_t37":  {"ln_arith": "welford", "fma_flags": [1,1,1], "class": "EXACT (torch.equal vs the pinned statement a3ad854c)", "nodes_default": ["END", "START"],
+                "f1": {"cfg": {"BI": 8, "BJ": 16, "num_warps": 8, "num_stages": 2, "BN": 64, "NUM_STAGES_W": 3, "WS": 0, "GROUP_I": 0}, "status": "EXACT cert a3ad854c"}},
+  "sm100_t37": {"ln_arith": "welford", "fma_flags": [1,1,1], "class": "EXACT (torch.equal vs the pinned statement c35dd2c9)", "nodes_default": ["END", "START"],
+                "f1": {"cfg": {"BI": 8, "BJ": 16, "num_warps": 8, "num_stages": 2, "BN": 128, "NUM_STAGES_W": 2, "WS": 0, "GROUP_I": 0}, "status": "EXACT cert c35dd2c9"},
+                "f3": {"cfg": {"BM": 128, "BH": 32, "num_warps": 8, "num_stages": 3, "IL": 1, "WS": 1, "RES_MODE": 0, "V": 2}, "status": "EXACT cert c35dd2c9"}},
+  "sm80_t37":  {"ln_arith": "welford", "fma_flags": [1, 1, 1], "class": "EXACT (--det 1 predictions byte-identical to --mode off end to end at 400 and 956 tokens on A100-SXM4-80GB, torch 2.13 / triton 3.7.1, inside the composed block statement from CELLS.json blk2_triatt_min_tokens up)", "nodes_default": ["END", "START"], "f1": {"cfg": {"BI": 8, "BJ": 8, "num_warps": 8, "num_stages": 1, "BN": 64, "NUM_STAGES_W": 2, "WS": 0, "GROUP_I": 0}, "status": "8x8 tiles, 8 warps, 1 stage, BN 64 with a 2-stage W pipeline: within sm_80's 164 KB shared memory"}, "provenance": "carried verbatim from the former sm80 cell tables of the c_z-256, 8-head x 32 pairformer kit (kit release 0.3.43, A100 pass: NVIDIA A100-SXM4-80GB cc 8.0, torch 2.13.0+cu130 / triton 3.7.1 / cuequivariance 0.11.1; --det 1 predictions byte-identical to --mode off end to end at 400 and 956 tokens inside the composed block statement); to be re-measured"}
+ }
+}

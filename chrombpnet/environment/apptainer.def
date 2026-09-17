@@ -1,0 +1,27 @@
+# ChromBPNet optimization kit — Apptainer / Singularity image made FROM the container image of chrombpnet/environment/Dockerfile: the same stack and
+# the same /kit, for hosts that run Apptainer instead of Docker. The source is the image tagged chrombpnet-kit:dev in the local Docker daemon (build
+# it first: README.md 'Setup'); for a published tag the two header lines read `Bootstrap: docker` / `From: <registry>/chrombpnet-kit:<tag>`.
+#   apptainer build chrombpnet.sif chrombpnet/environment/apptainer.def
+#   apptainer run --nv --cleanenv --bind /path/to/weights:/weights --bind /path/to/data:/data --env CHROMBPNET_OPT_WEIGHTS=/weights \
+#     --env CHROMBPNET_OPT_DATA=/data --bind "$PWD/out":/out chrombpnet.sif warm --config h100 --out /out/warm
+# The image is read-only: give every verb an output prefix / --out on a bound, writable path; the Triton and CUDA driver caches go under $HOME
+# (bound by default); %environment keeps a host user site-packages (PEP 370) from shadowing the pinned stack, --cleanenv keeps the host's variables out.
+Bootstrap: docker-daemon
+From: chrombpnet-kit:dev
+
+%environment
+    export PYTHONNOUSERSITE=1
+    # Triton <= 3.5 links its launcher stub with -lcuda: offer the unversioned name when --nv bound only libcuda.so.1
+    if [ -z "${TRITON_LIBCUDA_PATH:-}" ] && [ -e /opt/culib/libcuda.so ]; then export TRITON_LIBCUDA_PATH=/opt/culib; fi
+
+%post
+    mkdir -p /opt/culib && ln -s /.singularity.d/libs/libcuda.so.1 /opt/culib/libcuda.so && ln -s /.singularity.d/libs/libcuda.so.1 /opt/culib/libcuda.so.1
+
+%runscript
+    cd /kit/chrombpnet && exec bash /kit/chrombpnet/run.sh "$@"
+
+%help
+    ChromBPNet optimization kit: `fast` runs stock chrombpnet 1.0.1's `pred_bw` job through the kit's entry script (a Triton forward on H100 /
+    H200, the stock TensorFlow path elsewhere) with the same seven outputs; `off` is the stock CLI exactly. `apptainer run --nv chrombpnet.sif
+    <verb> ...` = `bash /kit/chrombpnet/run.sh <verb> ...` (verbs: install, pred_bw, check, warm; /kit/chrombpnet/README.md inside the image).
+    Requires an NVIDIA driver that runs CUDA 12.4 (550 or newer) and CHROMBPNET_OPT_WEIGHTS / CHROMBPNET_OPT_DATA naming the weights and data roots.

@@ -1,0 +1,31 @@
+# Boltz-2 optimization kit — Apptainer / Singularity image made FROM the container image of boltz2/environment/Dockerfile: the same stack and the
+# same /kit, for hosts that run Apptainer instead of Docker. The source is the image tagged boltz2-kit:dev in the local Docker daemon (build it
+# first: README.md 'Setup'); for a published tag the two header lines read `Bootstrap: docker` / `From: <registry>/boltz2-kit:<tag>`.
+#   apptainer build boltz2.sif boltz2/environment/apptainer.def
+#   apptainer run --nv --cleanenv --bind /path/to/boltz_cache:/weights --env BOLTZ_CACHE=/weights --bind "$PWD/out":/out boltz2.sif \
+#     pred --config h100 --mode fast --input /kit/boltz2/inputs/1BRS_barnase_barstar.yaml --out_dir /out/fast --seeds 0
+# The image is read-only: give every verb an --out_dir / --out on a bound, writable path; the JIT caches go under $HOME (bound by default) unless
+# MODEL_OPT_JIT_ROOT names another bound directory (caches shipped in the image under /opt/jit_cache are read-only here: run.sh seeds a writable copy
+# under ${TMPDIR:-/tmp}/model_opt_jit-uid<uid> once; bind a persistent directory as MODEL_OPT_JIT_ROOT and run `warm` once per mode to keep compiled kernels across runs); %environment keeps a host user site-packages (PEP 370) from shadowing the pinned stack,
+# --cleanenv keeps the host's variables out.
+Bootstrap: docker-daemon
+From: boltz2-kit:dev
+
+%environment
+    export PYTHONNOUSERSITE=1
+    # Triton <= 3.5 links its launcher stub with -lcuda: offer the unversioned name when --nv bound only libcuda.so.1
+    if [ -z "${TRITON_LIBCUDA_PATH:-}" ] && [ -e /opt/culib/libcuda.so ]; then export TRITON_LIBCUDA_PATH=/opt/culib; fi
+
+%post
+    mkdir -p /opt/culib && ln -s /.singularity.d/libs/libcuda.so.1 /opt/culib/libcuda.so && ln -s /.singularity.d/libs/libcuda.so.1 /opt/culib/libcuda.so.1
+
+%runscript
+    cd /kit/boltz2 && exec bash /kit/boltz2/run.sh "$@"
+
+%help
+    Boltz-2 optimization kit: drop-in modes that make stock Boltz-2 (boltz 2.2.1, `boltz predict`) faster or lighter on GPU memory with the same
+    YAML inputs and the same per-prediction files — off = stock exactly; exact = identical outputs, faster; fast = small documented numeric
+    differences, faster still (the default); big = lowest memory, with --n_gpu P to shard one prediction over P GPUs.
+    `apptainer run --nv boltz2.sif <verb> ...` = `bash /kit/boltz2/run.sh <verb> ...` (verbs: install, pred, check, warm; /kit/boltz2/README.md
+    inside the image). Requires an NVIDIA driver that runs CUDA 13.0 (580 or newer) and BOLTZ_CACHE naming the cache directory
+    (`run.sh install --weights DIR` fills it once).

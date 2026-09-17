@@ -1,0 +1,31 @@
+# borzoi_opt — explicit interface to the Borzoi (TensorFlow) inference optimizations (kit code: opt/datapath/pipeline_tf).
+# Install editable from this directory: `pip install -e borzoi/opt`. The kit it wraps lives beside the package (opt/datapath/pipeline_tf)
+# and is resolved from the package location (or $MODEL_OPT), so the install must stay editable. No install-time dependency on the
+# stock: the stock pin (calico/borzoi + baskerville, stock/PINS.json) is checked at activation. The build backend is setuptools plus
+# one step that ships borzoi_opt_autoload.pth at the wheel root, which is what makes `BORZOI_OPT=<mode>` activate without code changes
+# (see borzoi_opt/_autoload.py).
+[build-system]
+requires = ["setuptools>=64"]
+build-backend = "_build_backend"
+backend-path = ["."]
+
+[project]
+name = "borzoi_opt"
+dynamic = ["version"]
+description = "Borzoi (TensorFlow, calico/borzoi) inference optimizations: modes exact/off, the BORZOI_OPT hook, --det, the activation report"
+requires-python = ">=3.10"
+classifiers = ["Private :: Do Not Upload"]
+dependencies = []
+
+[project.optional-dependencies]
+test = ["pytest"]                                   # the package's CPU tests (no TensorFlow, no stock needed)
+
+[project.scripts]
+borzoi-opt = "borzoi_opt.cli:main"                 # `borzoi-opt sad|check ...` == `python -m borzoi_opt ...`
+
+[tool.setuptools]
+packages = ["borzoi_opt", "borzoi_opt.tests"]
+include-package-data = false
+
+[tool.setuptools.dynamic]
+version = {attr = "borzoi_opt.__version__"}

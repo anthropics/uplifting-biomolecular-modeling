@@ -1,0 +1,37 @@
+--- a/af2_initial_guess/predict_pdb.py
++++ b/af2_initial_guess/predict_pdb.py
+@@ -91,6 +91,7 @@
+ # Front-end arguments (new)
+ parser.add_argument( "-af2_dir", type=str, default=os.path.join(script_dir, 'model_weights'),
+                      help='Directory that contains params/params_model_1_ptm.npz (default: <this dir>/model_weights, as predict.py)' )
++parser.add_argument( "-seed", type=int, default=0, help='Seed of the TF feature pipeline (random_seed) and of the model call (jax.random.PRNGKey); 0 = predict.py' )
+ parser.add_argument( "-timers", type=str, default='', help='Optional path of a JSONL file receiving per-design wall-clock timers (does not change any computation)' )
+ parser.add_argument( "-sort_by_length", action="store_true", default=False, help='Process inputs sorted by total length instead of by file name' )
+ 
+@@ -473,7 +474,7 @@
+         feature_dict['residue_index'] = af2_util.insert_truncations(feature_dict['residue_index'], breaks)
+ 
+         t = time.time()
+-        feature_dict = self.model_runner.process_features(feature_dict, random_seed=0)
++        feature_dict = self.model_runner.process_features(feature_dict, random_seed=args.seed)
+         feat_holder.t_tf = time.time() - t
+ 
+         return feature_dict, initial_guess
+@@ -628,7 +629,7 @@
+         start = timer()
+         print(f'Running {self.model_name}')
+ 
+-        model_args = (self.model_runner.params, jax.random.PRNGKey(0), feature_dict, initial_guess)
++        model_args = (self.model_runner.params, jax.random.PRNGKey(args.seed), feature_dict, initial_guess)
+         prog_rec = None
+         if PROGLIB is not None:
+             # L7/L13: the program prepared ahead of the call (loaded, or traced+lowered+compiled once per signature), then run — the
+@@ -909,7 +910,7 @@
+         t = time.time()
+         # AOT: the program is traced, lowered and compiled (or loaded, -program_cache) WITHOUT running a forward — nothing is discarded and no
+         # activation memory is taken here; the loop runs the prepared executable
+-        _, rec = af2_runner.model_program((af2_runner.model_runner.params, jax.random.PRNGKey(0), feat, ig), L)
++        _, rec = af2_runner.model_program((af2_runner.model_runner.params, jax.random.PRNGKey(args.seed), feat, ig), L)
+         af2_runner.seen_lengths.add(L)
+         return rec
+     # 0.7.7 — STREAMING: the first length of the loop's order is prepared first and ALONE, the others on the N threads once it is ready; the loop

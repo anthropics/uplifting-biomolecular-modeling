@@ -1,0 +1,35 @@
+# e1_opt — the E1 optimization kit's package: modes, the activation report, the command line.
+# Install editable from this directory: `pip install -e e1/opt`. The kit code it wraps lives beside the package (forward/ — the kit
+# tree; the kit's entry is forward/engines/e1/kits/eager) and is resolved from the package location, so the
+# install must stay editable (or point MODEL_OPT at the e1/ directory). No install-time dependency on the upstream package (E1 at
+# its pinned commit: the kit's pins module): its version is checked at activation. The build backend is setuptools plus one step
+# that ships e1_opt_autoload.pth at the wheel root, which is what makes `E1_OPT=<mode> E1_VARIANT=<variant>` activate without code
+# changes (see e1_opt/_autoload.py).
+[build-system]
+requires = ["setuptools>=64"]
+build-backend = "_build_backend"
+backend-path = ["."]
+
+[project]
+name = "e1_opt"
+dynamic = ["version"]
+description = "E1 inference optimizations: modes off/exact, variants 150m/300m/600m, lazy autoload, activation report"
+requires-python = ">=3.10"
+classifiers = ["Private :: Do Not Upload"]        # not for PyPI: uploads carrying this classifier are rejected
+dependencies = []
+
+[project.optional-dependencies]
+test = ["pytest"]                                    # the package's CPU tests (stdlib + a stub upstream; no torch, no GPU)
+
+[project.scripts]
+e1-opt = "e1_opt.cli:main"                           # `e1-opt score|check|warm ...` == `python -m e1_opt ...`
+
+[tool.setuptools]
+packages = ["e1_opt", "e1_opt.tests"]
+include-package-data = true
+
+[tool.setuptools.package-data]
+"e1_opt.tests" = ["fixtures/warm/*.fasta"]
+
+[tool.setuptools.dynamic]
+version = {attr = "e1_opt.__version__"}

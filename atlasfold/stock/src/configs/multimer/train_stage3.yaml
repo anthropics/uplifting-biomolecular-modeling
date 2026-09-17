@@ -1,0 +1,60 @@
+model:
+  _yaml_: _model.yaml
+  diffusion_head:
+    blocks_per_ckpt: null
+  confidence_head:
+    blocks_per_ckpt: null
+
+train:
+  _yaml_: _train_base.yaml
+  name: stage3-768
+
+  init_from_ema: ['trunk']
+
+  training:
+    train_trunk: false
+
+  optimizer:
+    max_lr: 0.001
+    lr_decay_factor: 1.0
+
+  data:
+    max_length: 768
+    max_seq_length: 1536
+    max_templates: 2
+    max_contiguous_chains: 8
+
+    batch_size: 1
+    global_batch_size: 256
+
+    data_root: /data/atlasfold_data/
+    train_datasets:
+      - name: rcsb_multimer
+        type: rcsb
+        is_multimer: true
+        is_distillation: false
+        use_templates: true
+        weight: 0.490
+        template_prob: 0.4
+      - name: disordered_pdb_afm
+        type: rcsb
+        is_multimer: true
+        is_distillation: true
+        use_templates: false
+        weight: 0.010
+      - name: mgnify_long
+        type: monomer_distillation
+        is_multimer: false
+        is_distillation: true
+        use_templates: false
+        weight: 0.495
+      - name: mgnify_short
+        type: monomer_distillation
+        is_multimer: false
+        is_distillation: true
+        use_templates: false
+        weight: 0.005
+    val_dataset:
+      name: rcsb_multimer_val
+      type: rcsb
+      use_templates: false

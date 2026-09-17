@@ -1,0 +1,9 @@
+Fused diffusion-sampler blocks (the fpf_ditfast component: fused block schedules and their Triton row kernels) — original work of this
+repository, licensed under the Apache License 2.0 (LICENSE at the top of this tree). No third-party source file is included.
+The schedules re-implement, on the served model's own weights, the arithmetic of the diffusion-sampler modules DiffusionTransformerBlock /
+AtomTransformerBlock / DiffusionConditioning as defined in Protenix (https://github.com/bytedance/Protenix; Apache License 2.0, Copyright
+2024 ByteDance and/or its affiliates) and in the engines derived from it; the row kernels (AdaLN tail, SwiGLU, gate + residual; the shared
+copy is opt_core/kernels/apb/ditfast/) fuse the element-wise work around each block's projections; the attention inside the blocks is served
+by the shared pair-bias attention provider (opt_core.kernels.apb) and is not part of this component. The component is carried unchanged,
+under a kit-prefixed directory name, in each kit that uses it; that kit's STOCK.md names the upstream engine and release it is bound to,
+and this notice travels with every copy byte for byte.

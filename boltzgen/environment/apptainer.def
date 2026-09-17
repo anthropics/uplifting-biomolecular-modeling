@@ -1,0 +1,29 @@
+# BoltzGen optimization kit — Apptainer / Singularity image made FROM the container image of boltzgen/environment/Dockerfile: the same stack and
+# the same /kit, for hosts that run Apptainer instead of Docker. The source is the image tagged boltzgen-kit:dev in the local Docker daemon (build
+# it first: README.md 'Setup', route A); for a published tag the two header lines read `Bootstrap: docker` / `From: <registry>/boltzgen-kit:<tag>`.
+#   apptainer build boltzgen.sif boltzgen/environment/apptainer.def
+#   apptainer run --nv --cleanenv --bind /path/to/boltzgen-cache:/weights --env BOLTZGEN_CACHE=/weights --bind "$PWD/runs":/runs boltzgen.sif \
+#     design --config h100 --mode fast /kit/boltzgen/opt/forward/fast_inference/tests/specs/pdl1_ref.yaml --output /runs/fast --num_designs 16 --seed 0
+# The image is read-only: give every verb an --output on a bound, writable path; the Triton / extension caches go under a writable MODEL_OPT_JIT_ROOT
+# when you set one (bind it), else under the libraries' defaults in $HOME (bound by default); %environment keeps a host user site-packages
+# (PEP 370) from shadowing the pinned stack, --cleanenv keeps the host's variables out.
+Bootstrap: docker-daemon
+From: boltzgen-kit:dev
+
+%post
+    mkdir -p /opt/culib && ln -s /.singularity.d/libs/libcuda.so.1 /opt/culib/libcuda.so && ln -s /.singularity.d/libs/libcuda.so.1 /opt/culib/libcuda.so.1
+
+%environment
+    export PYTHONNOUSERSITE=1
+    # Triton <= 3.5 links its launcher stub with -lcuda: offer the unversioned name when --nv bound only libcuda.so.1
+    if [ -z "${TRITON_LIBCUDA_PATH:-}" ] && [ -e /opt/culib/libcuda.so ]; then export TRITON_LIBCUDA_PATH=/opt/culib; fi
+
+%runscript
+    cd /kit/boltzgen && exec bash /kit/boltzgen/run.sh "$@"
+
+%help
+    BoltzGen optimization kit: drop-in modes that make the stock BoltzGen 0.3.2 pipeline faster and lighter on GPU memory without changing how
+    it is called — off = stock exactly; exact = identical outputs at equal seed, faster; fast = small documented numeric differences, faster
+    still (the default); big = lowest memory. `apptainer run --nv boltzgen.sif <verb> ...` = `bash /kit/boltzgen/run.sh <verb> ...` (verbs:
+    install, design, check, warm; /kit/boltzgen/README.md inside the image). Requires an NVIDIA driver that runs CUDA 13.0 (580 or newer) and
+    BOLTZGEN_CACHE naming the weights directory.

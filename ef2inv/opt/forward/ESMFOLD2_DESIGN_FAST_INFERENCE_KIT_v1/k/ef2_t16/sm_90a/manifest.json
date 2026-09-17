@@ -1,0 +1,77 @@
+{
+ "arch": "sm_90a",
+ "build": {
+  "built_utc": "2026-09-11T09:07:50Z",
+  "host": "Linux-x86_64",
+  "nvrtc": "13.0",
+  "python": "3.12.14",
+  "versions": {
+   "cuda-bindings": "13.3.1",
+   "nvidia-cuda-cccl": "13.0.85",
+   "nvidia-cuda-nvrtc": "13.0.88",
+   "nvidia-cuda-runtime": "13.0.96",
+   "nvidia-cutlass": "4.2.0.0",
+   "torch": null
+  }
+ },
+ "check": {
+  "cuda_bindings": "13.3.1",
+  "driver": "13.0",
+  "gpu": "NVIDIA H100 80GB HBM3",
+  "torch": "2.13.0+cu130",
+  "utc": "2026-09-11T09:08:07Z"
+ },
+ "cubins": {
+  "ef2_transition_cute": {
+   "arch": "sm_90a",
+   "bytes": 591392,
+   "c7512": false,
+   "c7517_count": 0,
+   "canary_digest": "6a3438b92fece86f0140b5f42a916ed47436f2d02c6d3df6db6c5c7a7bda9296",
+   "compile_secs": 19.4,
+   "cubin_sha256": "2f600bd17b86cbee53cc0509c3a9238e5ce7ca5a97158e1543089d95f4077af3",
+   "diagnostics": [],
+   "entry": "ef2_transition",
+   "file": "ef2_transition_cute.cubin",
+   "lever": "t16",
+   "loadcheck": "canary pass:102 (rows=147461/262147, 50 back-to-back launches each, bytewise == launch 0; max_abs_vs_recipe=0.03125 max_abs_vs_fp32=0.02377)",
+   "loadcheck_digest": "6a3438b92fece86f0140b5f42a916ed47436f2d02c6d3df6db6c5c7a7bda9296",
+   "loadcheck_max_abs": 0.03125,
+   "macros": {},
+   "module": "ef2_transition_cute",
+   "nvrtc": "13.0",
+   "options": [
+    "--gpu-architecture=sm_90a",
+    "-std=c++17",
+    "-default-device",
+    "-DCUTE_ARCH_MMA_SM90A_ENABLED",
+    "-DCUTLASS_ARCH_MMA_SM90A_ENABLED=1"
+   ],
+   "ptxas_lines": [
+    "ptxas info    : 6950 bytes gmem",
+    "ptxas info    : Compiling entry function 'ef2_transition' for 'sm_90a'",
+    "ptxas info    : Function properties for ef2_transition",
+    "ptxas         .     0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads",
+    "ptxas info    : Used 168 registers, used 16 barriers",
+    "ptxas info    : Compile time = 572.217 ms"
+   ],
+   "ptxas_source": "ptxas statistics read from a twin build with --ptxas-options=-v; every ELF section but .note.nv.tkinfo identical to the shipped cubin",
+   "ptxas_twin_sha256": "45d5fbaab3101ebefed40be42c89fede9b60fb2eecdc87d727bca6c4abfa115d",
+   "regs": 168,
+   "regs_ptxas": 168,
+   "sass_scan": null,
+   "smem": 230512,
+   "source_file": "ef2_transition_cute.cuh",
+   "source_key": "8c7536d9b578b0179292a0508d587cea8e96e372f4505b1d0ea7ec79f716d7a7",
+   "source_sha256": "1d6ea12897078d58b1414076c440c9f51abc5a2acdaa281c100b2419ea184446",
+   "spill_bytes": 0,
+   "spill_free_required": true,
+   "spill_loads": 0,
+   "spill_stores": 0,
+   "stack_bytes": 0,
+   "tag": "ef2_transition_cute transition_cute.1.0"
+  }
+ },
+ "helper": "ef2_nvjit",
+ "kit": "esmfold2"
+}

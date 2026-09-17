@@ -1,0 +1,30 @@
+# ESMFold2 optimization kit — Apptainer / Singularity image made FROM the container image of esmfold2/environment/Dockerfile: the same stack and
+# the same /kit, for hosts that run Apptainer instead of Docker. The source is the image tagged esmfold2-kit:dev in the local Docker daemon (build
+# it first: README.md 'Setup'); for an image held in a registry the two header lines read `Bootstrap: docker` / `From: <its reference>`.
+#   apptainer build esmfold2.sif esmfold2/environment/apptainer.def
+#   apptainer run --nv --cleanenv --bind /path/to/hf_home:/weights --env HF_HOME=/weights --bind "$PWD/out":/out esmfold2.sif \
+#     pred --config h100 --variant fast --mode fast --input /kit/esmfold2/opt/forward/fast_inference/tests/w4_public_slice.json --out_dir /out/fast --seeds 0
+# The image is read-only: give every verb an --out_dir on a bound, writable path; the JIT caches go under $HOME/.cache and the system temp
+# dir (bound by default); %environment keeps a host user site-packages (PEP 370) from shadowing the pinned stack, --cleanenv keeps the host's
+# variables out.
+Bootstrap: docker-daemon
+From: esmfold2-kit:dev
+
+%post
+    mkdir -p /opt/culib && ln -s /.singularity.d/libs/libcuda.so.1 /opt/culib/libcuda.so && ln -s /.singularity.d/libs/libcuda.so.1 /opt/culib/libcuda.so.1
+
+%environment
+    export PYTHONNOUSERSITE=1
+    # Triton <= 3.5 links its launcher stub with -lcuda: offer the unversioned name when --nv bound only libcuda.so.1
+    if [ -z "${TRITON_LIBCUDA_PATH:-}" ] && [ -e /opt/culib/libcuda.so ]; then export TRITON_LIBCUDA_PATH=/opt/culib; fi
+
+%runscript
+    cd /kit/esmfold2 && exec bash /kit/esmfold2/run.sh "$@"
+
+%help
+    ESMFold2 optimization kit: drop-in modes that make stock ESMFold2 (Biohub esm 3.3.0 + the transformers 4.57.6 fork; variants fast /
+    full_msa / full_nomsa) faster and lighter on GPU memory without changing how it is called — off = stock exactly; exact = identical outputs,
+    faster; fast = small documented numeric differences, faster still (the default); big = lowest memory, also across 2/4/8 GPUs.
+    `apptainer run --nv esmfold2.sif <verb> ...` = `bash /kit/esmfold2/run.sh <verb> ...` (verbs: install, pred, check, warm;
+    /kit/esmfold2/README.md inside the image). Requires an NVIDIA driver that runs CUDA 13.0 (580 or newer) on an sm_90 GPU (H100/H200) and
+    HF_HOME naming the weights.

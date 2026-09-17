@@ -1,0 +1,36 @@
+# af3_jax_opt — explicit interface to the inference optimizations of the AlphaFold 3 open code running the ported OF3-p2 checkpoint.
+# Install editable, the core first: `pip install -e common/opt_core -e af3_jax/opt` — into any Python >= 3.10; the package never imports the fork, it
+# composes and launches the fork's command line under the fork's own interpreter (configs/<gpu>.env: AF3_JAX_PY). The kit code it wraps lives
+# beside the package (forward/{fast_inference,pallas_addon,flashpairformer}/, carried under version control, no manifest over them) and is resolved from the
+# package location, so the install must stay editable (or point AF3_JAX_OPT_HOME at the opt/ directory). The build backend is setuptools plus one step that
+# ships af3_jax_opt_autoload.pth at the wheel root (af3_jax_opt/_autoload.py: on this model it applies nothing and says so).
+[build-system]
+requires = ["setuptools>=64", "wheel"]
+build-backend = "_build_backend"
+backend-path = ["."]
+
+[project]
+name = "af3_jax_opt"
+dynamic = ["version"]
+description = "AlphaFold 3 open code + the ported OF3-p2 checkpoint: modes off/exact/fast/big, variant p2, the stock flags passed through, activation report, opt manifest"
+requires-python = ">=3.10"
+classifiers = ["Private :: Do Not Upload"]
+dependencies = []
+
+[project.optional-dependencies]
+test = ["pytest", "numpy"]                         # the package's CPU tests (tests/test_portable_cache_key.py builds its stand-in jax on numpy)
+
+[project.scripts]
+af3-jax-opt = "af3_jax_opt.__main__:main"          # `af3-jax-opt pred|check|warm ...` == `python -m af3_jax_opt ...`
+
+# the shared core (common/opt_core), pinned by path and by minimum version: opt_core.gates.core_pin_check is the first gate of every activation
+[tool.opt_core]
+path = "../../common/opt_core"
+version = "0.5.215.0"                                                     # >= the core whose provider opt_core.kernels.pallas serves the tier words exact | fast | big on every face this kit binds, whose kernels.triattn_xla is the provider\'s bridge, and whose row-sharded pair stack issues its all_to_all transposes in pieces below 2^31 elements
+
+[tool.setuptools]
+packages = ["af3_jax_opt", "af3_jax_opt.inprocess", "af3_jax_opt.tests"]
+include-package-data = false
+
+[tool.setuptools.dynamic]
+version = {attr = "af3_jax_opt.__version__"}

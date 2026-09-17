@@ -1,0 +1,2 @@
+v6.1
+sealed 2026-09-11; = v6 (ef2_trimul_v5 + ef2_trimul_v6 @ 74556e72d68d) + k3v6 release-ordering fix (src/PATCHES); k3v6.1 cubins fastsig 0|1 / lnfold 1 / NACC 2, nvrtc 13.0.88 sm_90a, 0 spill

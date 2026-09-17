@@ -1,0 +1,73 @@
+# Copyright 2024 DeepMind Technologies Limited
+#
+# AlphaFold 3 source code is licensed under the Apache License, Version 2.0
+# (the "License"); you may not use this file except in compliance with the
+# License. You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+# To request access to the AlphaFold 3 model parameters, follow the process set
+# out at https://github.com/google-deepmind/alphafold3. You may only use these
+# if received directly from Google. Use is subject to terms of use available at
+# https://github.com/google-deepmind/alphafold3/blob/main/WEIGHTS_TERMS_OF_USE.md
+
+"""Script for building intermediate data."""
+
+from importlib import resources
+import os
+import pathlib
+import site
+
+import pickle
+
+import alphafold3.constants.converters
+from alphafold3.constants.converters import ccd_pickle_gen
+from alphafold3.constants.converters import chemical_component_sets_gen
+from alphafold3.common import safe_pickle
+
+
+def build_data():
+  """Builds intermediate data."""
+  libcifpp_data_dir = os.environ.get('LIBCIFPP_DATA_DIR')
+  if libcifpp_data_dir:
+    cif_path = pathlib.Path(libcifpp_data_dir) / 'components.cif'
+  else:
+    for site_path in site.getsitepackages():
+      path = pathlib.Path(site_path) / 'share/libcifpp/components.cif'
+      if path.exists():
+        cif_path = path
+        break
+    else:
+      raise ValueError(
+          'Could not find components.cif. If libcifpp is installed in a'
+          ' non-standard location, please set the LIBCIFPP_DATA_DIR environment'
+          ' variable to the directory where libcifpp is installed.'
+      )
+
+  out_root = resources.files(alphafold3.constants.converters)
+  ccd_pickle_path = out_root.joinpath('ccd.pickle')
+  chemical_component_sets_pickle_path = out_root.joinpath(
+      'chemical_component_sets.pickle'
+  )
+  ccd_codes_path = out_root.joinpath('ccd_codes.txt')
+
+  ccd_pickle_gen.main(['', str(cif_path), str(ccd_pickle_path)])
+
+  print(f'Loading {ccd_pickle_path}', flush=True)
+  with open(str(ccd_pickle_path), 'rb') as f:
+    ccd = safe_pickle.load(f)
+
+  result = chemical_component_sets_gen.find_ions_and_glycans_in_ccd(ccd)
+  with open(str(chemical_component_sets_pickle_path), 'wb') as f:
+    pickle.dump(result, f)
+  print(f'Written {chemical_component_sets_pickle_path}', flush=True)
+
+  codes = sorted(ccd.keys())
+  pathlib.Path(ccd_codes_path).write_text('\n'.join(codes))
+  print(f'Wrote {len(codes):,} CCD codes to {ccd_codes_path}', flush=True)

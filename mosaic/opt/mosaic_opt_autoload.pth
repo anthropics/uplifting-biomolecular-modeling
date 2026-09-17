@@ -1,0 +1,2 @@
+# opt_core autoload guard: package=mosaic_opt env=MOSAIC_OPT tag=mosaic-opt exit=3
+import os as _o, sys as _s; exec("try:\n import mosaic_opt._autoload\nexcept SystemExit as _x:\n _s.stderr.flush(); _o._exit(_x.code if isinstance(_x.code, int) else 3)\nexcept BaseException as _e:\n if (_o.environ.get('MOSAIC_OPT') or '').strip().lower() not in ('', 'off'):\n  _s.stderr.write('[mosaic-opt] NOT ACTIVE: mosaic_opt._autoload is not importable (%s: %s) under MOSAIC_OPT=%s (exit 3)\\n' % (type(_e).__name__, _e, _o.environ.get('MOSAIC_OPT'))); _s.stderr.flush(); _o._exit(3)\n")

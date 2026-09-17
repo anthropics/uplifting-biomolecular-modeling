@@ -1,0 +1,203 @@
+{
+ "model": "e1",
+ "upstream": {
+  "E1": {
+   "repo": "https://github.com/Profluent-AI/E1",
+   "commit": "bfd2620a602248499f3d2583d85a7ecddf0b6e02",
+   "version": "1.0.0",
+   "tag": null,
+   "install": "E1 @ git+https://github.com/Profluent-AI/E1.git@bfd2620a602248499f3d2583d85a7ecddf0b6e02",
+   "archive": "stock/E1-bfd2620a.tar.gz",
+   "package_dir": "src/E1",
+   "build_backend": "hatchling.build",
+   "requires_python": ">= 3.12, <3.14",
+   "declared_ranges": {
+    "torch": ">=2.7.0,<2.9.0",
+    "transformers": "<4.57.0"
+   },
+   "cite": "opt/forward/engines/e1/kits/pins.py STOCK L15-17; the archive's pyproject.toml L4-6 (name, requires-python, version), L9 (transformers), L20 (torch), L25-26 (build backend)"
+  }
+ },
+ "archive_recipe": "git archive --format=tar.gz --prefix=E1-bfd2620a/ bfd2620a602248499f3d2583d85a7ecddf0b6e02 (the whole tree at the commit; git 2.43.0, its built-in gzip)",
+ "archive": {
+  "file": "E1-bfd2620a.tar.gz",
+  "bytes": 84187,
+  "tar_bytes": 440320,
+  "members": 45,
+  "git_version": "2.43.0"
+ },
+ "python": "3.12",
+ "pinned_stack": {
+  "python": "3.12",
+  "torch": "2.8.0",
+  "torch_version_str": "2.8.0+cu128",
+  "cuda": "12.8",
+  "triton": "3.4.0",
+  "transformers": "4.56.2",
+  "tokenizers": "0.22.1",
+  "kernels": "0.11.0",
+  "flash_attn": "2.8.3.post1",
+  "cite": "opt/forward/engines/e1/kits/pins.py STACK L20-26 (= the stock's own lock: pixi.lock @ bfd2620a L38 python-3.12.12, L70 kernels-0.11.0, L110 tokenizers-0.22.1, L111 torch-2.8.0, L115 transformers-4.56.2, L116 triton-3.4.0; linux-64)",
+  "tested_on": "python 3.12.10, torch 2.8.0+cu128 (CUDA 12.8, cuDNN 91002), triton 3.4.0, transformers 4.56.2, tokenizers 0.22.1, kernels 0.11.0, flash_attn 2.8.3.post1, numpy 2.3.4, polars 1.35.2, biotite 1.5.0, click 8.3.0, safetensors 0.6.2, huggingface_hub 0.36.0, E1 1.0.0 from git @ bfd2620a602248499f3d2583d85a7ecddf0b6e02; PYTHONHASHSEED=0; weights not in the image (a record of where the numbers were taken; nothing reads or compares it)"
+ },
+ "pins": {
+  "torch": "2.8.0",
+  "triton": "3.4.0",
+  "transformers": "4.56.2",
+  "tokenizers": "0.22.1",
+  "kernels": "0.11.0",
+  "flash_attn": "2.8.3.post1",
+  "E1": "1.0.0"
+ },
+ "flash_attn_wheel": {
+  "file": "flash_attn-2.8.3.post1+cu12torch2.8cxx11abiTRUE-cp312-cp312-linux_x86_64.whl",
+  "release": "https://github.com/Dao-AILab/flash-attention/releases/tag/v2.8.3.post1",
+  "url": "https://github.com/Dao-AILab/flash-attention/releases/download/v2.8.3.post1/flash_attn-2.8.3.post1+cu12torch2.8cxx11abiTRUE-cp312-cp312-linux_x86_64.whl",
+  "bytes": 256040449,
+  "cite": "opt/forward/engines/e1/kits/pins.py STACK cite L24-25 (file name, release, size)"
+ },
+ "weights": {
+  "150m": {
+   "repo": "Profluent-Bio/E1-150m",
+   "rev": "c4dbfe827e4aa6ed7f95eaef50dc1e084f4d77dc",
+   "file": "model.safetensors",
+   "sha256": "ba2656339005e6598642836acfdafde480fecc7e145ce0058eb54adf572c3484",
+   "bytes": 308869268,
+   "hidden_size": 768,
+   "snapshot": "$HF_HOME/hub/models--Profluent-Bio--E1-150m/snapshots/c4dbfe827e4aa6ed7f95eaef50dc1e084f4d77dc"
+  },
+  "300m": {
+   "repo": "Profluent-Bio/E1-300m",
+   "rev": "5a2871c587eadbcc9237bc686ea45e5b4d28dfb3",
+   "file": "model.safetensors",
+   "sha256": "31e09a2542f45b04e6ce4adafb3b657f21e2d56d12bf68fd2266b1576a80bc9b",
+   "bytes": 548657620,
+   "hidden_size": 1024,
+   "snapshot": "$HF_HOME/hub/models--Profluent-Bio--E1-300m/snapshots/5a2871c587eadbcc9237bc686ea45e5b4d28dfb3"
+  },
+  "600m": {
+   "repo": "Profluent-Bio/E1-600m",
+   "rev": "52d959fb87a609d15cf223a485127b29ed5c382a",
+   "file": "model.safetensors",
+   "sha256": "cfc108d4b98baaa62932331b40be265eae39dc382595bc3cde4a5ab55db1bf7a",
+   "bytes": 1282911716,
+   "hidden_size": 1280,
+   "snapshot": "$HF_HOME/hub/models--Profluent-Bio--E1-600m/snapshots/52d959fb87a609d15cf223a485127b29ed5c382a"
+  },
+  "layout": "$HF_HOME/hub/models--Profluent-Bio--E1-<size>/snapshots/<rev>/model.safetensors (one file per size; the snapshot dir is the --model-name of the command)",
+  "cite": "opt/forward/engines/e1/kits/pins.py WEIGHTS L27-34 (sha256 of model.safetensors, bytes, hidden_size); weights_snapshot() L1948-1952 (the cache path form)"
+ },
+ "hub_kernel": {
+  "repo": "kernels-community/triton-layer-norm",
+  "rev": "5ebc83aa387c282ff3f233bc3022c3a8be33a013",
+  "file": "build/torch-universal/triton_layer_norm/layer_norm.py",
+  "layer_norm_py_sha256": "e7a4a0000fc6254431adfbc99455ed838c2829d181962f7fa0efb4fbd371d529",
+  "bytes": 42646,
+  "license": "bsd-3-clause",
+  "vendored": "stock/hub_kernel/triton_layer_norm \u2014 the package directory build/torch-universal/triton_layer_norm of the pinned revision, shipped in the tree; run.sh install (python -m e1_opt.weights) copies it into the cache layout below and points refs/main at the revision \u2014 no network for the kernel",
+  "files_sha256": {
+   "__init__.py": "b65ec2ce248a3dca3ffeb503a6501f272e23d9a80e313dd71ed37770bc8f717b",
+   "_ops.py": "821ba40c6c652c2e1d7381797d2da4f5ce924c7f8ea8d3be2cd143650655a61d",
+   "layer_norm.py": "e7a4a0000fc6254431adfbc99455ed838c2829d181962f7fa0efb4fbd371d529",
+   "layers.py": "6df68a1ea128428c96016af91d2f53599224df6b41967d564ff4712cd1c4db08",
+   "utils/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "utils/library.py": "9ca4c99801cd4aa737d20f79fcd3c3b6fab33f819681837404d874d79005cd83",
+   "utils/torch.py": "ee6565585ac2184ed7b822cef681dae59f1ce073cb627134a2360e24787c2624"
+  },
+  "source": "huggingface.co/kernels-community/triton-layer-norm, repository type 'kernel', commit f17bf36ff115829f6a08ed37a3925bb6878871ae ('Migrated from kernels-community/triton-layer-norm'): its build/torch-universal/triton_layer_norm files. The Hub moved the repository from the 'model' type, under which rev was recorded and which it no longer serves, to the 'kernel' type; layer_norm.py there hashes to layer_norm_py_sha256, the digest recorded at pin time.",
+  "loaded_by": "src/E1/modeling.py L22-26 get_kernel('kernels-community/triton-layer-norm') at import (revision main at resolution; the pin is this rev)",
+  "cache_layout": "<root>/models--kernels-community--triton-layer-norm/snapshots/<rev>/build/<variant>/triton_layer_norm/layer_norm.py (the kernels package: KERNELS_CACHE or the Hugging Face hub cache; variant torch-universal)",
+  "cache_roots_searched": [
+   "$KERNELS_CACHE",
+   "$HF_KERNELS_CACHE",
+   "$HF_HUB_CACHE",
+   "$HF_HOME/hub",
+   "~/.cache/huggingface/hub"
+  ],
+  "autotune": "layer_norm.py L164-167 @triton.autotune over triton_autotune_configs() (L32-41: one config per num_warps) keyed on the row width N and the flag set; the pin: opt/forward/engines/e1/kits/pins.py apply_autotune_pin L2017-2046",
+  "cite": "opt/forward/engines/e1/kits/pins.py KERNEL L38-41"
+ },
+ "entry_point": {
+  "cli": "python -m E1.tools.score --model-name <snapshot dir> --parent-path <parent.fasta> --mutants-path <mutants.fasta> --output-path <scores.csv>",
+  "module": "src/E1/tools/score.py",
+  "command": "score (click) L15-31",
+  "options": {
+   "--model-name": "required L16",
+   "--mutants-path": "required L17",
+   "--parent-path": "required L18",
+   "--output-path": "required L19",
+   "--context-path": "optional L20",
+   "--max-batch-tokens": "65536 L21-23",
+   "--scoring-method": "masked_marginal L24-29",
+   "--context-reduction": "mean L30"
+  },
+  "load": "E1ForMaskedLM.from_pretrained(model_name, dtype=torch.float).to(dist.get_device()); model.eval() L43-44",
+  "forward": "torch.autocast('cuda', dtype=torch.bfloat16) in E1Predictor.predict_batch_padded, src/E1/predictor.py L138-139",
+  "output": "scores.csv, columns id,context_id,score (src/E1/scorer.py L166; written by rank 0, src/E1/tools/score.py L68-70)",
+  "api": "E1Scorer(model, method=<EncoderScoreMethod>, max_batch_tokens=65536).score(parent_sequence, sequences, sequence_ids, context_seqs, context_reduction) \u2014 the constructor is __init__(self, model, method, data_prep_config=None, max_batch_tokens=65536), src/E1/scorer.py L48-54 (the command calls it by keyword, src/E1/tools/score.py L59); score() L98-105"
+ },
+ "library_defaults": {
+  "E1Predictor": {
+   "max_batch_tokens": 65536,
+   "use_cache": true,
+   "cache_size": 4,
+   "save_masked_positions_only": false,
+   "keep_predictions_in_gpu": false,
+   "cite": "src/E1/predictor.py L28-37"
+  },
+  "E1Scorer": {
+   "fields_to_save": [
+    "logits"
+   ],
+   "remove_X_tokens": true,
+   "cite": "src/E1/scorer.py L48-60"
+  },
+  "one_parent": "src/E1/tools/score.py L50-52 (exactly one parent sequence per command)"
+ },
+ "variants": {
+  "150m": {
+   "hf_repo": "Profluent-Bio/E1-150m",
+   "snapshot_commit": "c4dbfe827e4aa6ed7f95eaef50dc1e084f4d77dc",
+   "hidden_size": 768,
+   "model_name_must_contain": "E1-150m"
+  },
+  "300m": {
+   "hf_repo": "Profluent-Bio/E1-300m",
+   "snapshot_commit": "5a2871c587eadbcc9237bc686ea45e5b4d28dfb3",
+   "hidden_size": 1024,
+   "model_name_must_contain": "E1-300m"
+  },
+  "600m": {
+   "hf_repo": "Profluent-Bio/E1-600m",
+   "snapshot_commit": "52d959fb87a609d15cf223a485127b29ed5c382a",
+   "hidden_size": 1280,
+   "model_name_must_contain": "E1-600m"
+  }
+ },
+ "det_recipe": {
+  "source": "opt/forward/engines/e1/kits/pins.py DET_RECIPE L1929-1933 (read at run time by the package's det switch; not copied here) + apply_autotune_pin(size) L2017-2046 (the size pin: one autotune config before the first forward)",
+  "applies_to": "every arm, stock included (the pin selects one of the stock's own autotune outcomes; the kit adds no numerics)"
+ },
+ "stock_environment": {
+  "reads": {
+   "HF_HOME": "the weights cache root (huggingface_hub)",
+   "HF_HUB_OFFLINE": "huggingface_hub (no fetch when set)",
+   "KERNELS_CACHE": "the hub kernel cache root (the kernels package; legacy alias HF_KERNELS_CACHE)",
+   "USE_FLASH_ATTN": "src/E1/model/flash_attention.py L16 \u2014 default on; '0' sends the within-sequence layers to the varlen-flex route (a different stock)",
+   "FAST_BLOCK_MASK": "src/E1/model/varlen_flex_attention.py L103 \u2014 read only on the varlen-flex route",
+   "RANK / LOCAL_RANK / WORLD_SIZE": "src/E1/dist.py (single process when unset)",
+   "PYTHONHASHSEED / CUDA_VISIBLE_DEVICES": "the interpreter / the CUDA runtime"
+  },
+  "must_be_absent_prefixes": [
+   "E1_OPT",
+   "E1_KIT",
+   "E1_VARIANT",
+   "MODEL_OPT"
+  ],
+  "must_be_absent_or_default": {
+   "USE_FLASH_ATTN": "unset or '1'",
+   "FAST_BLOCK_MASK": "unset or '1'"
+  },
+  "kit_variables_by_name": {}
+ }
+}

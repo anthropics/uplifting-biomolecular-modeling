@@ -1,0 +1,74 @@
+{
+ "model": "ProteinMPNN / SolubleMPNN (inverse folding: backbone -> sequences)",
+ "upstream": {
+  "repo": "https://github.com/dauparas/ProteinMPNN",
+  "commit": "8907e6671bfbfc92303b5f79c4b5e6ce47cdef57",
+  "tag": null,
+  "package": null,
+  "install": "git clone https://github.com/dauparas/ProteinMPNN $MPNN_DIR && git -C $MPNN_DIR checkout 8907e6671bfbfc92303b5f79c4b5e6ce47cdef57",
+  "git_required": "the .fa header embeds `git rev-parse HEAD` of the checkout (protein_mpnn_run.py:377,384); a checkout without .git writes git_hash=unknown, so MPNN_DIR is the clone when the headers are to name the commit",
+  "entry_points": [
+   "helper_scripts/parse_multiple_chains.py",
+   "protein_mpnn_run.py"
+  ],
+  "declared_versions": "none at the pin (no setup.py, requirements.txt, environment.yml, Dockerfile or lock file); README.md:5 asks for Python>=3.0, PyTorch, Numpy",
+  "license": "MIT (LICENSE at the pin; the repository weights are distributed under the same file)"
+ },
+ "weights": {
+  "soluble": {
+   "path": "soluble_model_weights/v_48_020.pt",
+   "sha256": "7af52d090172c230c7f0e9d21e02203f6b3a38b16db58d3c7a3960e0a9a6e31a",
+   "bytes": 6681301,
+   "in_repository": true
+  },
+  "vanilla": {
+   "path": "vanilla_model_weights/v_48_020.pt",
+   "sha256": "c9cb4a671d79604111231f8dbfc7c590e06f1197453b7a6854ac6661a642f5bd",
+   "bytes": 6681301,
+   "in_repository": true
+  }
+ },
+ "variants": {
+  "soluble": {
+   "upstream": "ProteinMPNN",
+   "weights": "soluble",
+   "entry": "protein_mpnn_run.py",
+   "path_to_model_weights": "$MPNN_DIR/soluble_model_weights",
+   "model_name": "v_48_020"
+  },
+  "vanilla": {
+   "upstream": "ProteinMPNN",
+   "weights": "vanilla",
+   "entry": "protein_mpnn_run.py",
+   "path_to_model_weights": "$MPNN_DIR/vanilla_model_weights",
+   "model_name": "v_48_020"
+  }
+ },
+ "pinned_stack": {
+  "record": "environment/Dockerfile builds this stack from environment/requirements-mpnn.lock; the versions below summarize that lock",
+  "tested_on": "the kit's pinned stack (environment/requirements-mpnn.lock: torch 2.5.1+cu124, numpy 1.26.4, biopython 1.84) on H100 80GB and A100 80GB; documentation only: nothing reads or compares it",
+  "base": "nvidia/cuda:12.4.1-runtime-ubuntu22.04 + python-build-standalone cpython 3.11.5",
+  "python": "3.11",
+  "torch": "2.5.1+cu124",
+  "cuda": "12.4",
+  "numpy": "1.26.4",
+  "biopython": "1.84",
+  "triton": "3.1.0 (torch's dependency; unused by the kit)",
+  "lock": "environment/requirements-mpnn.lock",
+  "stack_key": "torch2.5.1-cu124"
+ },
+ "must_be_absent_prefixes": [
+  "PROTEINMPNN_",
+  "MPNN_",
+  "SELFTEST_",
+  "PYTORCH_CUDA_ALLOC_CONF",
+  "CUBLAS_WORKSPACE_CONFIG"
+ ],
+ "must_be_absent_except": [
+  "MPNN_DIR"
+ ],
+ "kit_directories": [
+  "opt/forward/mpnn_exact_worker",
+  "opt/forward/mpnn_pdb_parser"
+ ]
+}

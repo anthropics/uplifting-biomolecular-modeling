@@ -1,0 +1,29 @@
+# PXDesign optimization kit — Apptainer / Singularity image made FROM the container image of pxdesign/environment/Dockerfile: the same stack and
+# the same /kit, for hosts that run Apptainer instead of Docker. The source is the image tagged pxdesign-kit:dev in the local Docker daemon (build
+# it first: `docker build -f pxdesign/environment/Dockerfile -t pxdesign-kit:dev .` from the bundle's top directory); for a published tag the two header lines read `Bootstrap: docker` / `From: <registry>/pxdesign-kit:<tag>`.
+#   apptainer build pxdesign.sif pxdesign/environment/apptainer.def
+#   apptainer run --nv --cleanenv --bind /path/to/pxdesign_data:/weights --env PXDESIGN_CKPT_DIR=/weights/checkpoint --env PROTENIX_DATA_ROOT_DIR=/weights/ccd_cache \
+#     --bind "$PWD/out":/out pxdesign.sif warm --config h100 --mode fast --out_dir /out/warm
+# The image is read-only: give every verb an --out_dir on a bound, writable path (stock's LayerNorm CUDA extension is compiled inside the image,
+# so no verb needs to write beside the installed packages); %environment keeps a host user site-packages (PEP 370) from shadowing the pinned
+# stack, --cleanenv keeps the host's variables out.
+Bootstrap: docker-daemon
+From: pxdesign-kit:dev
+
+%post
+    mkdir -p /opt/culib && ln -s /.singularity.d/libs/libcuda.so.1 /opt/culib/libcuda.so && ln -s /.singularity.d/libs/libcuda.so.1 /opt/culib/libcuda.so.1
+
+%environment
+    export PYTHONNOUSERSITE=1
+    # Triton <= 3.5 links its launcher stub with -lcuda: offer the unversioned name when --nv bound only libcuda.so.1
+    if [ -z "${TRITON_LIBCUDA_PATH:-}" ] && [ -e /opt/culib/libcuda.so ]; then export TRITON_LIBCUDA_PATH=/opt/culib; fi
+
+%runscript
+    cd /kit/pxdesign && exec bash /kit/pxdesign/run.sh "$@"
+
+%help
+    PXDesign optimization kit: drop-in modes that make stock PXDesign binder design (pxdesign 0.1.0 on protenix 0.5.0+pxd) faster and lighter
+    on GPU memory without changing how it is called — off = stock exactly; exact = identical outputs under the deterministic recipe, faster;
+    fast = small documented numeric differences, faster still (the default); big = lowest memory. `apptainer run --nv pxdesign.sif <verb> ...`
+    = `bash /kit/pxdesign/run.sh <verb> ...` (verbs: install, design, check, warm; /kit/pxdesign/README.md inside the image). Requires an NVIDIA
+    driver that runs CUDA 12.1 (525.60 or newer), PXDESIGN_CKPT_DIR naming the checkpoint directory and PROTENIX_DATA_ROOT_DIR the CCD cache.

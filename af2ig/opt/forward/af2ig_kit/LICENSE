@@ -1,0 +1,18 @@
+AF2IG_FAST_INFERENCE_KIT (fast-inference kit for the AlphaFold2 "initial guess" interface filter of dl_binder_design)
+
+Redistributed / patched third-party files and their licences (full texts under upstream/):
+   - dl_binder_design (af2_initial_guess/predict.py -> predict_pdb.py, af2_util.py): MIT, Copyright (c) 2023 Nathaniel R.
+     Bennett -- upstream/LICENSE.dl_binder_design.MIT.txt
+   - AlphaFold 2 source files vendored in dl_binder_design under af2_initial_guess/alphafold/ (used from the archive; this kit
+     modifies alphafold/model/config.py, alphafold/model/modules.py and alphafold/data/mmcif_parsing.py -- patched copies under
+     patches/patched_files/, changes = patches 00 and 05): Apache License 2.0, Copyright 2021 DeepMind Technologies Limited --
+     upstream/LICENSE.alphafold.Apache-2.0.txt; verbatim licence text: af2ig/third_party_licenses/AlphaFold.Apache-2.0.txt
+   - tests/inputs/pdbs/*.pdb: processed coordinate files derived from RCSB PDB entries 1BRS, 5JDS, 6M0J, 1YY9
+     (wwPDB/RCSB usage policy, CC0); provenance in tests/inputs/PUBLIC_INPUTS_README.md
+   - AlphaFold 2 model parameters are NOT included. They are available from DeepMind under CC BY 4.0
+     (https://github.com/google-deepmind/alphafold#model-parameters-license); the user supplies their path.
+   - PyRosetta / Rosetta: not used, not required, not evaluated by this kit (upstream's silent-file path needs it; the
+     PDB-directory front end of this kit does not).
+
+Kit-level notices (every component, copyright lines, statement of changes) and the verbatim licence texts: af2ig/THIRD_PARTY_NOTICES.md,
+af2ig/third_party_licenses/.

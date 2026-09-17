@@ -1,0 +1,9 @@
+OpenDDE optimization kit — the served-levers hook and the ACCEL levers (odde_served_levers.py, odde_accel_v2.py, sitecustomize.py).
+Original code of this package: Copyright 2026 Anthropic, PBC; licensed under the Apache License, Version 2.0 (the package's LICENSE file,
+../../../../../LICENSE). No statement of OpenDDE or Protenix is restated in these three files.
+These files change the run-time behaviour of OpenDDE (Copyright 2026 Aureka AI Research, Apache-2.0, PyPI 'opendde'; itself derived from
+Protenix, Copyright 2024 ByteDance and/or its affiliates, Apache-2.0) by wrapping its functions in the running process; no file of the installed
+package is modified. The LICENSE file in this directory is the Apache License, Version 2.0 text as distributed with Protenix (appendix line
+"Copyright 2024 ByteDance and/or its affiliates."): the licence of the OpenDDE and Protenix functions these files wrap, not a separate grant over the
+original code.
+They call, and do not include, PyTorch (BSD-3-Clause), Triton (MIT) and NVIDIA cuEquivariance (NVIDIA licence, as installed).

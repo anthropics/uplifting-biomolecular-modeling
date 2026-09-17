@@ -1,0 +1,33 @@
+# chrombpnet_opt — explicit interface to the chrombpnet pred_bw optimizations.
+# Install editable from this directory: `pip install -e chrombpnet/opt`. The kit it wraps lives beside the package (opt/kit_ho/ with
+# opt/kit/ beside it — the documented line is opt/kit_ho/tf/pred_bw_fast.py) and is resolved from the package location, so the install must stay editable (or point
+# CHROMBPNET_OPT_HOME at the tree). No install-time dependency on the upstream package (chrombpnet, tensorflow:
+# stock/PINS.json). The build backend is setuptools plus one step that ships chrombpnet_opt_autoload.pth at the wheel root, which is what
+# makes `CHROMBPNET_OPT=<mode>` act without code changes (see chrombpnet_opt/_autoload.py). The kit's stack runs python 3.8 with a
+# setuptools older than the editable hooks: install with pip's isolated build environment (plain `pip install -e opt`, never
+# `--no-build-isolation`), which fetches the pinned setuptools for the build and leaves the environment's own setuptools untouched.
+[build-system]
+requires = ["setuptools==75.3.2"]              # the backend needs the PEP 660 editable hooks (setuptools >= 64); pinned to the last line that supports python 3.8; pip's isolated build env supplies it
+build-backend = "_build_backend"
+backend-path = ["."]
+
+[project]
+name = "chrombpnet_opt"
+dynamic = ["version"]
+description = "chrombpnet pred_bw optimizations: modes off/fast, the stock caller, the deterministic recipe, the --items form, lazy autoload, activation report"
+requires-python = ">=3.8"
+classifiers = ["Private :: Do Not Upload"]
+dependencies = []
+
+[project.optional-dependencies]
+test = ["pytest"]                                  # the package's CPU tests (no tensorflow, no torch, no chrombpnet needed)
+
+[project.scripts]
+chrombpnet-opt = "chrombpnet_opt.__main__:main"   # `chrombpnet-opt pred_bw|check|warm ...` == `python -m chrombpnet_opt ...`
+
+[tool.setuptools]
+packages = ["chrombpnet_opt", "chrombpnet_opt.tests"]
+include-package-data = false
+
+[tool.setuptools.dynamic]
+version = {attr = "chrombpnet_opt.__version__"}

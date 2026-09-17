@@ -1,0 +1,406 @@
+{
+ "schema": "fpf_cells/v1",
+ "stack": "H100 80GB HBM3 (cc 9.0), torch 2.13.0+cu130, triton 3.7.1, cuequivariance_torch 0.11.1; SMOKE (CUDA-graph replay interleaved, medians, SM 1980 MHz); sources: ptx2_pairbias_MICROBENCH.md (tools/bench_apb.py, bench_atom.py, bench_pf.py, tests/test_msa_triton.py)",
+ "units": "ms per call; tflops = useful FLOPs / time; errors = max_abs / rms_rel vs an fp64 evaluation on N(0,1) data unless noted",
+ "package": "protenix_fpf_apb",
+ "cells": [
+  {
+   "cc": "9.0",
+   "site": "dit_token_attention",
+   "lever": "dit_attn(+dit_attn_fp16)",
+   "S": 5,
+   "heads": 16,
+   "head_dim": 48,
+   "c_z": null,
+   "N": 400,
+   "direction": null,
+   "bias": "fp32 [16,N,N] broadcast over S",
+   "dtype_in": "fp32",
+   "operands": "fp16 (precast cell, dit_attn_fp16)",
+   "ms": 0.048,
+   "incumbent": {
+    "name": "stock fp32 SDPA (cutlass fmha, 3xTF32)",
+    "ms": 0.181
+   },
+   "also": {
+    "cudnn_sdpa_bf16": 0.036,
+    "flex_attention_bf16": 0.031,
+    "torch_flash_bf16_NO_bias": 0.04
+   },
+   "err": "1.1e-3 / 3.7e-4 (fp16 operands; = TF32 GEMM floor)"
+  },
+  {
+   "cc": "9.0",
+   "site": "dit_token_attention",
+   "lever": "dit_attn(+dit_attn_fp16)",
+   "S": 5,
+   "heads": 16,
+   "head_dim": 48,
+   "c_z": null,
+   "N": 400,
+   "direction": null,
+   "bias": "fp32 [16,N,N] broadcast over S",
+   "dtype_in": "bf16",
+   "operands": "bf16 (Sampler low-precision feed)",
+   "ms": 0.028,
+   "incumbent": {
+    "name": "stock fp32 SDPA (cutlass fmha, 3xTF32)",
+    "ms": 0.181
+   },
+   "also": {
+    "cudnn_sdpa_bf16": 0.036,
+    "flex_attention_bf16": 0.031,
+    "torch_flash_bf16_NO_bias": 0.04,
+    "opt_core_apb_attn_bf16": 0.0412
+   },
+   "err": "8e-3 / 2.9e-3 (bf16 operands, fp32 bias/logits)"
+  },
+  {
+   "cc": "9.0",
+   "site": "dit_token_attention",
+   "lever": "dit_attn(+dit_attn_fp16)",
+   "S": 5,
+   "heads": 16,
+   "head_dim": 48,
+   "c_z": null,
+   "N": 800,
+   "direction": null,
+   "bias": "fp32 [16,N,N] broadcast over S",
+   "dtype_in": "fp32",
+   "operands": "fp16 (precast cell, dit_attn_fp16)",
+   "ms": 0.096,
+   "incumbent": {
+    "name": "stock fp32 SDPA (cutlass fmha, 3xTF32)",
+    "ms": 0.568
+   },
+   "also": {
+    "cudnn_sdpa_bf16": 0.088,
+    "flex_attention_bf16": 0.082,
+    "torch_flash_bf16_NO_bias": 0.09
+   },
+   "err": "1.1e-3 / 3.7e-4 (fp16 operands; = TF32 GEMM floor)"
+  },
+  {
+   "cc": "9.0",
+   "site": "dit_token_attention",
+   "lever": "dit_attn(+dit_attn_fp16)",
+   "S": 5,
+   "heads": 16,
+   "head_dim": 48,
+   "c_z": null,
+   "N": 800,
+   "direction": null,
+   "bias": "fp32 [16,N,N] broadcast over S",
+   "dtype_in": "bf16",
+   "operands": "bf16 (Sampler low-precision feed)",
+   "ms": 0.067,
+   "incumbent": {
+    "name": "stock fp32 SDPA (cutlass fmha, 3xTF32)",
+    "ms": 0.568
+   },
+   "also": {
+    "cudnn_sdpa_bf16": 0.088,
+    "flex_attention_bf16": 0.082,
+    "torch_flash_bf16_NO_bias": 0.09,
+    "opt_core_apb_attn_bf16": 0.1005
+   },
+   "err": "8e-3 / 2.9e-3 (bf16 operands, fp32 bias/logits)"
+  },
+  {
+   "cc": "9.0",
+   "site": "dit_token_attention",
+   "lever": "dit_attn(+dit_attn_fp16)",
+   "S": 5,
+   "heads": 16,
+   "head_dim": 48,
+   "c_z": null,
+   "N": 1408,
+   "direction": null,
+   "bias": "fp32 [16,N,N] broadcast over S",
+   "dtype_in": "fp32",
+   "operands": "fp16 (precast cell, dit_attn_fp16)",
+   "ms": 0.243,
+   "incumbent": {
+    "name": "stock fp32 SDPA (cutlass fmha, 3xTF32)",
+    "ms": 1.557
+   },
+   "also": {
+    "cudnn_sdpa_bf16": 0.211,
+    "flex_attention_bf16": 0.192,
+    "torch_flash_bf16_NO_bias": 0.179
+   },
+   "err": "1.1e-3 / 3.7e-4 (fp16 operands; = TF32 GEMM floor)"
+  },
+  {
+   "cc": "9.0",
+   "site": "dit_token_attention",
+   "lever": "dit_attn(+dit_attn_fp16)",
+   "S": 5,
+   "heads": 16,
+   "head_dim": 48,
+   "c_z": null,
+   "N": 1408,
+   "direction": null,
+   "bias": "fp32 [16,N,N] broadcast over S",
+   "dtype_in": "bf16",
+   "operands": "bf16 (Sampler low-precision feed)",
+   "ms": 0.191,
+   "incumbent": {
+    "name": "stock fp32 SDPA (cutlass fmha, 3xTF32)",
+    "ms": 1.557
+   },
+   "also": {
+    "cudnn_sdpa_bf16": 0.211,
+    "flex_attention_bf16": 0.192,
+    "torch_flash_bf16_NO_bias": 0.179,
+    "opt_core_apb_attn_bf16": null
+   },
+   "err": "8e-3 / 2.9e-3 (bf16 operands, fp32 bias/logits)"
+  },
+  {
+   "cc": "9.0",
+   "site": "dit_token_attention",
+   "lever": "dit_attn(+dit_attn_fp16)",
+   "S": 5,
+   "heads": 16,
+   "head_dim": 48,
+   "c_z": null,
+   "N": 2048,
+   "direction": null,
+   "bias": "fp32 [16,N,N] broadcast over S",
+   "dtype_in": "bf16",
+   "operands": "bf16 (Sampler low-precision feed)",
+   "ms": 0.346,
+   "incumbent": {
+    "name": "stock fp32 SDPA (cutlass fmha, 3xTF32)",
+    "ms": 3.206
+   },
+   "also": {
+    "cudnn_sdpa_bf16": 0.38,
+    "flex_attention_bf16": 0.387,
+    "torch_flash_bf16_NO_bias": 0.353,
+    "opt_core_apb_attn_bf16": null
+   },
+   "err": "8e-3 / 2.9e-3 (bf16 operands, fp32 bias/logits)"
+  },
+  {
+   "cc": "9.0",
+   "site": "dit_token_attention",
+   "lever": "dit_attn (tf32x3 cell, engineering lever alone)",
+   "S": 5,
+   "heads": 16,
+   "head_dim": 48,
+   "N": "400/800/1408/2048",
+   "dtype_in": "fp32",
+   "operands": "tf32x3 (fp32-faithful)",
+   "ms": {
+    "400": 0.128,
+    "800": 0.34,
+    "1408": 0.978,
+    "2048": 2.026
+   },
+   "incumbent": {
+    "name": "stock fp32 SDPA (cutlass fmha, 3xTF32)",
+    "ms": {
+     "400": 0.181,
+     "800": 0.568,
+     "1408": 1.557,
+     "2048": 3.206
+    }
+   },
+   "err": "1.7e-6 / 3.5e-7 vs fp64 (exact-class, not bitwise)"
+  },
+  {
+   "cc": "9.0",
+   "site": "atom_local_attention (32q x 128k windows)",
+   "lever": "atom_attn",
+   "S": 5,
+   "heads": 4,
+   "head_dim": 32,
+   "N_atom": 3300,
+   "dtype_in": "fp32",
+   "operands": "tf32rn (cvt.rna.tf32)",
+   "ms": 0.057,
+   "incumbent": {
+    "name": "stock primitives._local_attention fp32 (graph replay of the whole statement: pad, unfold, chunked math attention)",
+    "ms": 0.364
+   },
+   "err": "max abs vs stock 1.2-1.3e-3 (= stock's own distance to fp32-exact); vs tf32x3 1.4-1.5e-3",
+   "also": {
+    "atom_apb_tf32_truncating": 0.043,
+    "atom_apb_tf32x3": 0.102,
+    "atom_apb_bf16": 0.051
+   }
+  },
+  {
+   "cc": "9.0",
+   "site": "atom_local_attention (32q x 128k windows)",
+   "lever": "atom_attn",
+   "S": 5,
+   "heads": 4,
+   "head_dim": 32,
+   "N_atom": 6600,
+   "dtype_in": "fp32",
+   "operands": "tf32rn (cvt.rna.tf32)",
+   "ms": 0.107,
+   "incumbent": {
+    "name": "stock primitives._local_attention fp32 (graph replay of the whole statement: pad, unfold, chunked math attention)",
+    "ms": 0.766
+   },
+   "err": "max abs vs stock 1.2-1.3e-3 (= stock's own distance to fp32-exact); vs tf32x3 1.4-1.5e-3",
+   "also": {
+    "atom_apb_tf32_truncating": 0.08,
+    "atom_apb_tf32x3": 0.194,
+    "atom_apb_bf16": 0.098
+   }
+  },
+  {
+   "cc": "9.0",
+   "site": "atom_local_attention (32q x 128k windows)",
+   "lever": "atom_attn",
+   "S": 5,
+   "heads": 4,
+   "head_dim": 32,
+   "N_atom": 11500,
+   "dtype_in": "fp32",
+   "operands": "tf32rn (cvt.rna.tf32)",
+   "ms": 0.18,
+   "incumbent": {
+    "name": "stock primitives._local_attention fp32 (graph replay of the whole statement: pad, unfold, chunked math attention)",
+    "ms": 1.581
+   },
+   "err": "max abs vs stock 1.2-1.3e-3 (= stock's own distance to fp32-exact); vs tf32x3 1.4-1.5e-3",
+   "also": {
+    "atom_apb_tf32_truncating": 0.132,
+    "atom_apb_tf32x3": 0.332,
+    "atom_apb_bf16": 0.164
+   }
+  },
+  {
+   "cc": "9.0",
+   "site": "pairformer AttentionPairBias (whole module: LN(z)+linear bias producer + core + gate)",
+   "lever": "pf_attn",
+   "S": 1,
+   "heads": 16,
+   "head_dim": 24,
+   "c_z": 256,
+   "N": 400,
+   "dtype_in": "z bf16, q/k/v bf16 (autocast)",
+   "operands": "bf16 (stock's own)",
+   "ms": 0.138,
+   "incumbent": {
+    "name": "stock module (FusedLayerNorm + autocast Linear + SDPA math path)",
+    "ms": 0.181
+   },
+   "also": {
+    "core_only_vs_cudnn_flex_cueq": "parity (MICROBENCH PF table: 0.016/0.025 cuDNN, 0.014/0.024 flex, 0.012/0.035 cuEq-tri vs ours 0.014/0.027 @400/800)"
+   },
+   "err": "max 4.5e-4 / rms 3.2e-3 vs fp64 (below stock's 4.9e-4 / 4.0e-3)"
+  },
+  {
+   "cc": "9.0",
+   "site": "pairformer AttentionPairBias (whole module: LN(z)+linear bias producer + core + gate)",
+   "lever": "pf_attn",
+   "S": 1,
+   "heads": 16,
+   "head_dim": 24,
+   "c_z": 256,
+   "N": 800,
+   "dtype_in": "z bf16, q/k/v bf16 (autocast)",
+   "operands": "bf16 (stock's own)",
+   "ms": 0.384,
+   "incumbent": {
+    "name": "stock module (FusedLayerNorm + autocast Linear + SDPA math path)",
+    "ms": 0.481
+   },
+   "also": {
+    "core_only_vs_cudnn_flex_cueq": "parity (MICROBENCH PF table: 0.016/0.025 cuDNN, 0.014/0.024 flex, 0.012/0.035 cuEq-tri vs ours 0.014/0.027 @400/800)"
+   },
+   "err": "max 4.5e-4 / rms 3.2e-3 vs fp64 (below stock's 4.9e-4 / 4.0e-3)"
+  },
+  {
+   "cc": "9.0",
+   "site": "pairformer AttentionPairBias (whole module: LN(z)+linear bias producer + core + gate)",
+   "lever": "pf_attn",
+   "S": 1,
+   "heads": 16,
+   "head_dim": 24,
+   "c_z": 256,
+   "N": 1400,
+   "dtype_in": "z bf16, q/k/v bf16 (autocast)",
+   "operands": "bf16 (stock's own)",
+   "ms": 1.05,
+   "incumbent": {
+    "name": "stock module (FusedLayerNorm + autocast Linear + SDPA math path)",
+    "ms": 1.507
+   },
+   "also": {
+    "core_only_vs_cudnn_flex_cueq": "parity (MICROBENCH PF table: 0.016/0.025 cuDNN, 0.014/0.024 flex, 0.012/0.035 cuEq-tri vs ours 0.014/0.027 @400/800)"
+   },
+   "err": "max 4.5e-4 / rms 3.2e-3 vs fp64 (below stock's 4.9e-4 / 4.0e-3)"
+  },
+  {
+   "cc": "9.0",
+   "site": "pairformer AttentionPairBias (whole module: LN(z)+linear bias producer + core + gate)",
+   "lever": "pf_attn",
+   "S": 1,
+   "heads": 16,
+   "head_dim": 24,
+   "c_z": 256,
+   "N": 400,
+   "dtype_in": "z fp32, q/k/v bf16 (autocast)",
+   "operands": "bf16 (stock's own)",
+   "ms": 0.154,
+   "incumbent": {
+    "name": "stock module (FusedLayerNorm + autocast Linear + SDPA math path)",
+    "ms": 0.261
+   },
+   "also": {
+    "core_only_vs_cudnn_flex_cueq": "parity (MICROBENCH PF table: 0.016/0.025 cuDNN, 0.014/0.024 flex, 0.012/0.035 cuEq-tri vs ours 0.014/0.027 @400/800)"
+   },
+   "err": "max 4.5e-4 / rms 3.2e-3 vs fp64 (below stock's 4.9e-4 / 4.0e-3)"
+  },
+  {
+   "cc": "9.0",
+   "site": "pairformer AttentionPairBias (whole module: LN(z)+linear bias producer + core + gate)",
+   "lever": "pf_attn",
+   "S": 1,
+   "heads": 16,
+   "head_dim": 24,
+   "c_z": 256,
+   "N": 800,
+   "dtype_in": "z fp32, q/k/v bf16 (autocast)",
+   "operands": "bf16 (stock's own)",
+   "ms": 0.439,
+   "incumbent": {
+    "name": "stock module (FusedLayerNorm + autocast Linear + SDPA math path)",
+    "ms": 0.794
+   },
+   "also": {
+    "core_only_vs_cudnn_flex_cueq": "parity (MICROBENCH PF table: 0.016/0.025 cuDNN, 0.014/0.024 flex, 0.012/0.035 cuEq-tri vs ours 0.014/0.027 @400/800)"
+   },
+   "err": "max 4.5e-4 / rms 3.2e-3 vs fp64 (below stock's 4.9e-4 / 4.0e-3)"
+  },
+  {
+   "cc": "9.0",
+   "site": "pairformer AttentionPairBias (whole module: LN(z)+linear bias producer + core + gate)",
+   "lever": "pf_attn",
+   "S": 1,
+   "heads": 16,
+   "head_dim": 24,
+   "c_z": 256,
+   "N": 1400,
+   "dtype_in": "z fp32, q/k/v bf16 (autocast)",
+   "operands": "bf16 (stock's own)",
+   "ms": 1.209,
+   "incumbent": {
+    "name": "stock module (FusedLayerNorm + autocast Linear + SDPA math path)",
+    "ms": 2.469
+   },
+   "also": {
+    "core_only_vs_cudnn_flex_cueq": "parity (MICROBENCH PF table: 0.016/0.025 cuDNN, 0.014/0.024 flex, 0.012/0.035 cuEq-tri vs ours 0.014/0.027 @400/800)"
+   },
+   "err": "max 4.5e-4 / rms 3.2e-3 vs fp64 (below stock's 4.9e-4 / 4.0e-3)"
+  }
+ ]
+}

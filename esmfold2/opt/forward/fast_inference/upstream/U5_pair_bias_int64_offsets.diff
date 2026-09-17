@@ -1,0 +1,88 @@
+diff --git a/src/transformers/models/esmfold2/kernels/fused_attention_pair_bias.py b/src/transformers/models/esmfold2/kernels/fused_attention_pair_bias.py
+index 98b7223..f80c8ca 100644
+--- a/src/transformers/models/esmfold2/kernels/fused_attention_pair_bias.py
++++ b/src/transformers/models/esmfold2/kernels/fused_attention_pair_bias.py
+@@ -89,8 +89,7 @@ def _pair_bias_kernel(
+ 
+     z_full_ptrs = (
+         z_ptr
+-        + pid_b * Q * K * DIM_Z
+-        + pid_q * K * DIM_Z
++        + (pid_b.to(tl.int64) * Q + pid_q) * K * DIM_Z
+         + offs_k[:, None] * DIM_Z
+         + offs_z_full[None, :]
+     )
+@@ -109,9 +108,9 @@ def _pair_bias_kernel(
+     # head-blocks have the same value so this avoids racy duplicate writes.
+     if SAVE_STATS:
+         if pid_hblk == 0:
+-            stats_ptrs = mean_ptr + pid_b * Q * K + pid_q * K + offs_k
++            stats_ptrs = mean_ptr + (pid_b.to(tl.int64) * Q + pid_q) * K + offs_k
+             tl.store(stats_ptrs, mean, mask=mask_k)
+-            stats_ptrs2 = rstd_ptr + pid_b * Q * K + pid_q * K + offs_k
++            stats_ptrs2 = rstd_ptr + (pid_b.to(tl.int64) * Q + pid_q) * K + offs_k
+             tl.store(stats_ptrs2, rstd, mask=mask_k)
+ 
+     acc = tl.zeros([TILE_K, HEADS_PER_BLK], dtype=tl.float32)
+@@ -122,8 +121,7 @@ def _pair_bias_kernel(
+ 
+         z_slice_ptrs = (
+             z_ptr
+-            + pid_b * Q * K * DIM_Z
+-            + pid_q * K * DIM_Z
++            + (pid_b.to(tl.int64) * Q + pid_q) * K * DIM_Z
+             + offs_k[:, None] * DIM_Z
+             + offs_c[None, :]
+         )
+@@ -155,9 +153,7 @@ def _pair_bias_kernel(
+ 
+     out_ptrs = (
+         out_ptr
+-        + pid_b * NUM_HEADS * Q * K
+-        + offs_h[None, :] * Q * K
+-        + pid_q * K
++        + ((pid_b.to(tl.int64) * NUM_HEADS + offs_h[None, :]) * Q + pid_q) * K
+         + offs_k[:, None]
+     )
+     tl.store(
+@@ -231,16 +227,15 @@ def _pair_bias_backward_kernel(
+ 
+     z_ptrs = (
+         z_ptr
+-        + pid_b * Q * K * DIM_Z
+-        + pid_q * K * DIM_Z
++        + (pid_b.to(tl.int64) * Q + pid_q) * K * DIM_Z
+         + offs_k[:, None] * DIM_Z
+         + offs_z[None, :]
+     )
+     z = tl.load(z_ptrs, mask=mask_k[:, None] & mask_z[None, :], other=0.0).to(
+         tl.float32
+     )
+-    mean_ptrs = mean_ptr + pid_b * Q * K + pid_q * K + offs_k
+-    rstd_ptrs = rstd_ptr + pid_b * Q * K + pid_q * K + offs_k
++    mean_ptrs = mean_ptr + (pid_b.to(tl.int64) * Q + pid_q) * K + offs_k
++    rstd_ptrs = rstd_ptr + (pid_b.to(tl.int64) * Q + pid_q) * K + offs_k
+     mean = tl.load(mean_ptrs, mask=mask_k, other=0.0)
+     rstd = tl.load(rstd_ptrs, mask=mask_k, other=0.0)
+ 
+@@ -259,9 +254,7 @@ def _pair_bias_backward_kernel(
+ 
+     d_bias_ptrs = (
+         d_bias_ptr
+-        + pid_b * NUM_HEADS * Q * K
+-        + offs_h[None, :] * Q * K
+-        + pid_q * K
++        + ((pid_b.to(tl.int64) * NUM_HEADS + offs_h[None, :]) * Q + pid_q) * K
+         + offs_k[:, None]
+     )
+     d_bias = tl.load(d_bias_ptrs, mask=mask_k[:, None] & mask_h[None, :], other=0.0).to(
+@@ -298,8 +291,7 @@ def _pair_bias_backward_kernel(
+ 
+     d_z_ptrs = (
+         d_z_ptr
+-        + pid_b * Q * K * DIM_Z
+-        + pid_q * K * DIM_Z
++        + (pid_b.to(tl.int64) * Q + pid_q) * K * DIM_Z
+         + offs_k[:, None] * DIM_Z
+         + offs_z[None, :]
+     )

@@ -1,0 +1,59 @@
+# Patch: 07_subbatch.diff
+# Lever: L9, the inference sub-batch of predict_pdb.py: -subbatch N sets alphafold global_config.subbatch_size (the rows per chunk of every Attention module and every Transition, run through mapping.inference_subbatch; stock 4) to N before the model runner is built; the decision and its per-compiled-length record come from the model-opt tree's shared sub-batch policy (opt_core.jax_design.subbatch_policy) through the kit adapter af2ig_opt.subbatch and are written as `subbatch` timer records (alphafold/model/*.py untouched)
+# Numerics class: TIER-2: changes numerics (other GEMM shapes and accumulation order per chunk; the same per-row math; not bitwise vs the stock body)
+# Default: off; enabled only by predict_pdb.py -subbatch N (the af2ig_opt mode `fast` passes -subbatch 128, and `big` on its fast base)
+# Applies to: nrbennet/dl_binder_design @ cafa3853ac94dceb1b908c8d9e6954d71749871a with 00-06 applied; apply with: patch -p1 < 07_subbatch.diff  (from the repository root)
+# Licence: MIT, same as upstream dl_binder_design
+#
+--- a/af2_initial_guess/predict_pdb.py
++++ b/af2_initial_guess/predict_pdb.py
+@@ -98,12 +98,20 @@
+ parser.add_argument( "-host_outputs", action="store_true", default=False, help='L6: copy the model outputs to host NumPy arrays in one transfer (jax.device_get) before post-processing, instead of letting numpy/scipy pull each device array lazily op by op; the arrays (float32 values) are the same' )
+ parser.add_argument( "-precompile", type=int, default=0, help='L7: before the prediction loop, featurize one input per distinct length and trigger the XLA compilations of the jitted model for all of them from N host threads in parallel (0 = off). The compiled executables are the ones the loop would have compiled serially; outputs unchanged' )
+ parser.add_argument( "-flash_attn", action="store_true", default=False, help='L8 (changes numerics slightly, see CHANGES.md): the attention core (logits + bias, softmax, weighted sum) of every eligible alphafold Attention call computed by the kit adapter af2ig_opt.flash_attn over the shared Pallas flash-attention kernel of the model-opt tree (opt_core.kernels.pallas_attn) instead of the three XLA ops; ineligible calls run the stock ops and are counted in the flash_attn timer record' )
++parser.add_argument( "-subbatch", type=int, default=0, help='L9: the row sub-batch of every Attention module and every Transition (alphafold global_config.subbatch_size, run through mapping.inference_subbatch; stock 4 rows, sized for 16 GB cards) set to N rows: the same per-row math in N-row chunks, N/rows scan iterations of large GEMMs instead of many small ones; the decision record is the model-opt tree\'s shared sub-batch policy (opt_core.jax_design.subbatch_policy via af2ig_opt.subbatch). 0 = stock' )
+ parser.add_argument( "-fast", action="store_true", default=False, help='Recommended exact stack: -host_outputs -device_params -sort_by_length (all exact: the stock output bytes)' )
+ parser.add_argument( "-trimul_chunk", type=str, default='', help='M1 memory lever (changes numerics slightly, see CHANGES.md): "<rows>:<min residues>" — TriangleMultiplication evaluated in row chunks of <rows> pair rows once the compiled length reaches <min residues>, through the model-opt tree\'s shared row-chunk producer (opt_core.mem.rowpair_jax.rowchunk via af2ig_opt.pairstack); shorter lengths run the stock body' )
+ 
+ args = parser.parse_args()
+ if args.fast:
+     args.device_params = True; args.host_outputs = True; args.sort_by_length = True
++SUBBATCH = None
++if args.subbatch:
++    # L9: the inference sub-batch (rows per Attention / Transition chunk), decided and recorded through the tree's shared policy.
++    from af2ig_opt import subbatch as SUBBATCH
++    _sb = SUBBATCH.setup(args.subbatch)
++    print(f"subbatch: {_sb['rows']} rows per Attention/Transition chunk (stock {_sb['stock_rows']}; {_sb['policy']})")
++
+ FLASH_ATTN = None
+ if args.flash_attn:
+     # L8: the kit's adapter over the model-opt tree's shared Pallas flash-attention kernel. The kernel is
+@@ -297,6 +305,9 @@
+         model_params = data.get_model_haiku_params(model_name=self.model_name, data_dir=params_dir)
+         timers.emit('params_loaded', dt=time.time() - t, params_dir=params_dir)
+ 
++        if SUBBATCH is not None:
++            # L9: rows per chunk of every inference_subbatch call (Attention modules, Transitions): mapping.inference_subbatch reads global_config.subbatch_size at trace time
++            model_config.model.global_config.subbatch_size = SUBBATCH.rows()
+         if FLASH_ATTN is not None:
+             # L8: the attention core of eligible Attention calls on the flash-attention kernel (modules.py Attention, patch 05)
+             model_config.model.global_config.use_flash_attention = True
+@@ -524,6 +535,9 @@
+         if PAIRSTACK is not None and new_shape:
+             # M1 evidence: the pair-stack install's census (trimul_chunk traces engaged / disengaged)
+             timers.emit('pairstack', L_compiled=L, **PAIRSTACK.census())
++        if SUBBATCH is not None and new_shape:
++            # L9 evidence: the shared policy's decision record for this compiled length (rows, source, stock value)
++            timers.emit('subbatch', L_compiled=L, **SUBBATCH.record(L))
+         timers.emit('design', tag=usetag, L=L, L_compiled=L, binderlen=binderlen, monomer=monomer, new_shape=new_shape,
+                     t_load=feat_holder.t_load, t_feat=feat_holder.t_feat, t_tf=feat_holder.t_tf,
+                     t_wait_inputs=t_feat - t_start, t_model=t_model - t_feat, t_output=t_out - t_model, t_total=t_out - t_start,
+@@ -734,6 +748,8 @@
+                 timers.emit('flash_attn', L_compiled=L, **FLASH_ATTN.census())
+             if PAIRSTACK is not None:
+                 timers.emit('pairstack', L_compiled=L, **PAIRSTACK.census())
++            if SUBBATCH is not None:
++                timers.emit('subbatch', L_compiled=L, **SUBBATCH.record(L))
+     timers.emit('precompile_done', n_shapes=len(prepared), threads=num_threads, dt=time.time() - t0)
+     print(f'precompile: done in {time.time() - t0:.1f} s')
+ 

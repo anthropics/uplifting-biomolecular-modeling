@@ -1,0 +1,37 @@
+$ nvcc -cubin -arch=sm_90a -O3 -std=c++17 -DNDEBUG --expt-relaxed-constexpr -Xptxas -v -I csrc -Xptxas --warn-on-spills -DTMN_CZ=384 -DTMN_CH=256 -o /tmp/tn_build_l3d8dar8/tmn90w_z384_h256.cubin csrc/tmn_sm90_wide.cu
+ptxas warning : Registers are spilled to local memory in function 'tmn_k3w_z384_h256_b_t1x64_s4a1_l1', 116 bytes spill stores, 132 bytes spill loads
+ptxas warning : Registers are spilled to local memory in function 'tmn_k1_z384_h256_b_t2x64_s6k2_m1_l2_v0', 52 bytes spill stores, 52 bytes spill loads
+ptxas warning : Registers are spilled to local memory in function 'tmn_k1_z384_h256_b_t2x64_s6k2_m0_l2_v0', 44 bytes spill stores, 44 bytes spill loads
+ptxas warning : Registers are spilled to local memory in function 'tmn_k1_z384_h256_b_t2x64_s6k2_m1_l1_v0', 12 bytes spill stores, 12 bytes spill loads
+ptxas warning : Registers are spilled to local memory in function 'tmn_k1_z384_h256_b_t2x64_s6k2_m0_l1_v0', 12 bytes spill stores, 12 bytes spill loads
+ptxas info    : 0 bytes gmem
+ptxas info    : Compiling entry function 'tmn_info' for 'sm_90a'
+ptxas info    : Function properties for tmn_info
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 26 registers, used 0 barriers
+ptxas info    : Compile time = 2.162 ms
+ptxas info    : Compiling entry function 'tmn_k3w_z384_h256_b_t1x64_s4a1_l1' for 'sm_90a'
+ptxas info    : Function properties for tmn_k3w_z384_h256_b_t1x64_s4a1_l1
+    120 bytes stack frame, 116 bytes spill stores, 132 bytes spill loads
+ptxas info    : Used 168 registers, used 4 barriers, 120 bytes cumulative stack size
+ptxas info    : Compile time = 250.972 ms
+ptxas info    : Compiling entry function 'tmn_k1_z384_h256_b_t2x64_s6k2_m1_l2_v0' for 'sm_90a'
+ptxas info    : Function properties for tmn_k1_z384_h256_b_t2x64_s6k2_m1_l2_v0
+    56 bytes stack frame, 52 bytes spill stores, 52 bytes spill loads
+ptxas info    : Used 168 registers, used 16 barriers, 56 bytes cumulative stack size
+ptxas info    : Compile time = 223.451 ms
+ptxas info    : Compiling entry function 'tmn_k1_z384_h256_b_t2x64_s6k2_m0_l2_v0' for 'sm_90a'
+ptxas info    : Function properties for tmn_k1_z384_h256_b_t2x64_s6k2_m0_l2_v0
+    48 bytes stack frame, 44 bytes spill stores, 44 bytes spill loads
+ptxas info    : Used 168 registers, used 16 barriers, 48 bytes cumulative stack size
+ptxas info    : Compile time = 218.832 ms
+ptxas info    : Compiling entry function 'tmn_k1_z384_h256_b_t2x64_s6k2_m1_l1_v0' for 'sm_90a'
+ptxas info    : Function properties for tmn_k1_z384_h256_b_t2x64_s6k2_m1_l1_v0
+    16 bytes stack frame, 12 bytes spill stores, 12 bytes spill loads
+ptxas info    : Used 168 registers, used 16 barriers, 16 bytes cumulative stack size
+ptxas info    : Compile time = 205.936 ms
+ptxas info    : Compiling entry function 'tmn_k1_z384_h256_b_t2x64_s6k2_m0_l1_v0' for 'sm_90a'
+ptxas info    : Function properties for tmn_k1_z384_h256_b_t2x64_s6k2_m0_l1_v0
+    16 bytes stack frame, 12 bytes spill stores, 12 bytes spill loads
+ptxas info    : Used 168 registers, used 16 barriers, 16 bytes cumulative stack size
+ptxas info    : Compile time = 204.831 ms

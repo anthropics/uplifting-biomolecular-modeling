@@ -1,0 +1,45 @@
+{
+ "slug": "a100_80gb",
+ "class": "a100_80gb",
+ "sm": [
+  8,
+  0
+ ],
+ "binaries": {
+  "enformer_fastkit_fused.so": {
+   "sha256": "3c79f7960eb4fc4f7243a739be6abef362abd2660011780f40d62cdcc49eb715",
+   "bytes": 1755208,
+   "sass_targets": [
+    "sm_80"
+   ]
+  },
+  "enformer_xattn_ext.so": {
+   "sha256": "d48d1649cc6ccce57510c0b1452e05a2ac104a9cb5c635f175a464931a426a05",
+   "bytes": 1642928,
+   "sass_targets": [
+    "sm_80"
+   ]
+  }
+ },
+ "sources_sha256": {
+  "enformer_fastkit.py:_CUDA_SRC": "5047c9c9ead3b544593550e71e5afca07993f12a236d6a6670a66f246f2fe56a",
+  "enformer_fastkit.py:_CPP_SRC": "39d68cb56e259b426be472249cd6a5c2b4f70785b80ccb48a93df7f490cfc7d7",
+  "enformer_xattn.cu": "c508046e8f9792b9b83ce8d4cf55776f075291047f739d6e88ba2e381edb99ba"
+ },
+ "build_image": "the release stack (environment/requirements.lock: python 3.11, torch 2.13.0+cu130, CUDA 13.0, cuDNN 9.20) + the CUDA 13.0 compiler wheels (nvidia-cuda-nvcc / crt / nvvm 13.0.88, nvidia-cuda-cccl 13.0.85) — kits/v0_2/BUILD.json's toolchain with sm_80 as the target",
+ "nvcc": [
+  "Cuda compilation tools, release 13.0, V13.0.88",
+  "Build cuda_13.0.r13.0/compiler.36424714_0"
+ ],
+ "flags": {
+  "TORCH_CUDA_ARCH_LIST": "8.0",
+  "extra_cuda_cflags": [
+   "-O3"
+  ],
+  "builder": "the kit's own load_inline builders (kits/v0_2 enformer_fastkit.fused_ext / enformer_xattn.ext)"
+ },
+ "device": "NVIDIA A100 (SXM4); enformer_fastkit_fused.so rebuilt 2026-09-10 on A100-SXM4-40GB, enformer_xattn_ext.so built 2026-09-06 on A100-SXM4-80GB",
+ "built": "2026-09-10",
+ "levers": "kits/v0_2 KIT_PINS levers: poscache, fused, graph, xattn",
+ "sources_note": "the kernel sources these objects were built from: enformer_xattn.cu (the xattn extension) and the _CUDA_SRC / _CPP_SRC strings inside kits/v0_2/enformer_fastkit.py (the fused extension), each by sha256 — the python around them is not part of the build"
+}

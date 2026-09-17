@@ -1,0 +1,172 @@
+{
+ "schema": "fpf_trimul_rows/v1",
+ "_doc": "ROWS-ONLY tile table of the row-block members (opt_core.mem.rowpair.trimul_fused, P > 1). Keys '<cc M.m>|C<c_z>|H<c_hidden>'. An entry with kernels=fpf_trimul_rows carries k1 (a-layout: the resident A block), k1b (b-layout: a b sub-block written in its GEMM layout when b_direct) and k3 (the tile epilogue) launch cells {BM, BN, num_warps, num_stages}, b_direct (bool), min_tokens (the lever's size floor at this capability x width; absent = the provider's DEFAULT_MIN_TOKENS), measured (bool) + status/evidence. measured=false / status PLACEHOLDER = tiles seeded from a neighbouring sweep, NOT raced at this unit's shapes: the provider declines such a width by name (c=<c_z>/<c_h>, the torch statements) unless ROWPAIR_TRIMUL_ROWS_UNMEASURED=1. An entry with kernels=fpf_trimul_v4 carries no tiles (those widths run the whole-plane unit's kernels with its own table.json row, unchanged) and only names the floor. 'safe': per capability ('<cc>' exact, '*' any) the conservative cells a BUILD failure of a tuned cell falls to by name. Nothing outside trimul_fused reads this file; no whole-plane provider (kernels.trimul TRIMUL_CELLS.json, fpf_trimul_v4 table.json) is affected by it. Capability coverage: cc 9.0 (H100 sweep) and cc 8.0 (A100 cells pass, opt_core 0.5.220.1); other cards have no key and keep declining c=384/384 / c=64/64 by name.",
+ "cells": {
+  "9.0|C384|H384": {
+   "kernels": "fpf_trimul_rows",
+   "k1": {
+    "BM": 64,
+    "BN": 128,
+    "num_warps": 4,
+    "num_stages": 1
+   },
+   "k1b": {
+    "BM": 64,
+    "BN": 128,
+    "num_warps": 4,
+    "num_stages": 1
+   },
+   "k3": {
+    "BM": 64,
+    "BN": 128,
+    "num_warps": 8,
+    "num_stages": 1
+   },
+   "b_direct": true,
+   "min_tokens": 1400,
+   "measured": true,
+   "status": "MEASURED_OP (tile sweep on one H100, bf16 z; an op-level measurement): K1 a-layout: num_stages=2 cells with BM,BN >= 64 exceed shared memory (8 BUILD_FAIL of 36 candidates, per layout); smaller s2 cells (BM 32 or BN 32) built and ran; chosen 64x128 w4 s1 fastest at every grid shape rows {256,512,768,1536} x N {1400,2432,5802,11604} ((1536,11604) not timed: torch-piece OOM), 0.76..17.6 ms = 8.5-11.6x the torch LN+projection+gate+mask+permute-copy statements (bf16 autocast); K1 b-layout (b sub-block 512 rows written in GEMM-B layout) 64x128 w4 s1, 1.40..11.0 ms at N 1400..11604 = 0.97x the a-layout kernel time AND no [384,N,512] transpose copy (1.9..15.9 ms) -> b_direct; K3 in place 64x128 w8 s1 (fastest at rows >= 512; 128x128 w8 is 2% faster at 256 rows), 0.49..2.54 ms for rows 256..1536 x w 512 = 4.2-5.0x the torch epilogue statements (+0.27..1.49 ms of window staging copies avoided). min_tokens 1400 = the smallest measured N (8.5x there); below 1400 unmeasured -> below_gate. No 8.0 key: no A100 pass yet (declined c=384/384 there).",
+   "evidence": "sweep run-A (1x NVIDIA H100 80GB HBM3: torch 2.10.0+cu128 / triton 3.6.0 / python 3.11.5; tree 0ff63df1b970, opt_core 0.5.214.2, fpf_trimul_rows 0.1.0; 470 csv rows); correctness on the same box: K1 max|err| 0.031 (a- and b-layout, +/-bias, bf16 and fp32 z) at plane scale ~11 (<= 1 bf16 ulp), a==b bitwise; K3 max|err| 0.031-0.0625 at scale ~11 (<= 1 ulp), in-place == staged bitwise, bytes outside the window untouched; 3 launches run-to-run bitwise"
+  },
+  "9.0|C64|H64": {
+   "kernels": "fpf_trimul_rows",
+   "k1": {
+    "BM": 128,
+    "BN": 32,
+    "num_warps": 4,
+    "num_stages": 2
+   },
+   "k1b": {
+    "BM": 64,
+    "BN": 32,
+    "num_warps": 4,
+    "num_stages": 2
+   },
+   "k3": {
+    "BM": 128,
+    "BN": 32,
+    "num_warps": 4,
+    "num_stages": 1
+   },
+   "b_direct": true,
+   "min_tokens": 2048,
+   "measured": true,
+   "status": "MEASURED_OP (tile sweep on one H100, bf16 z; an op-level measurement): K1 a-layout 128x32 w4 s2 (top-ranked of 24 candidates, all built; within ~7 % of the per-shape best at the smallest shape (256,3000), <= 2.3 % at the anchors (1024,5802) / (2048,11604), <= 1.1 % at every other grid shape) 0.14..5.9 ms over rows {256,1024,2048} x N {3000,5802,11604,22011} = 26-36x the torch statements; K1 b-layout (256-row sub-block) 64x32 w4 s2, 0.14..0.73 ms = 0.94x the a-layout kernel time and no [64,N,256] transpose copy (0.34..2.8 ms) -> b_direct; K3 in place 128x32 w4 s1 (fastest at rows >= 1024; 64x64 w4 is 3% faster at 256 rows), 0.06..0.16 ms for rows 256..2048 x w 256 = 5.9-15x the torch epilogue. min_tokens stays the provider default 2048: every measured size (N >= 3000) wins by >= 26x; no point below 3000 was timed. No 8.0 key: no A100 pass yet (declined c=64/64 there).",
+   "evidence": "sweep run-A (1x NVIDIA H100 80GB HBM3: torch 2.10.0+cu128 / triton 3.6.0 / python 3.11.5; tree 0ff63df1b970, opt_core 0.5.214.2, fpf_trimul_rows 0.1.0; 470 csv rows); correctness on the same box: K1 / K3 outputs BITWISE EQUAL to fpf_trimul_v4 _k1c / _k3c launched with the same cell on contiguous copies (C 64, also C 128 and C 256), max|err| vs the fp32 reference 0.0078 at scale ~3.3 (<= 1 bf16 ulp), a==b bitwise, in-place == staged, outside-window bytes untouched"
+  },
+  "9.0|C256|H256": {
+   "kernels": "fpf_trimul_v4",
+   "min_tokens": 0,
+   "measured": true,
+   "status": "FLOOR (measured at (512..1024) x (1400, 2000) on H100, see evidence): on cc 9.0 the (256, 256) row blocks serve at EVERY sharded pair size (floor = the sharding floor of the calling line) instead of the provider's 2048-token default; the tiles are fpf_trimul_v4's own table.json row exactly as before (this entry carries none)",
+   "evidence": "H100 80GB x2 anchors of a c_z 256 engine's sharded trunk: the fused row blocks are faster than the torch statements at every measured size down to 1400 tokens (trunk pass 4.16 -> 1.90 s at 1400); the single-GPU op probe (H100): K1 6.2-11.4x the torch projection + layout statements and K3 1.7-3.6x the torch epilogue at 3000..12000 tokens; (768, 1400) / (1024, 2000) piece timings pending the row-block sweep; run-A floor rows (same box as the 384/64 keys): fpf_trimul_v4 row-block cells 9.0|* (k1 128x128 w8 s1, k3 64x64 w4 s1) vs the torch statements at (rows,N) = (768,1400) K1 1.29 vs 15.9 ms (12.4x), K3 staged 1.04 vs 4.38 ms (4.2x); (704,1400) 12.3x / 4.1x; (1024,2000) 2.13 vs 30.3 ms (14.2x), 1.37 vs 6.53 ms (4.8x); (512,1400) 12.3x / 4.1x; (512,2000) 13.8x / 4.2x -> floor 0 holds at the smallest sharded sizes"
+  },
+  "8.0|C384|H384": {
+   "kernels": "fpf_trimul_rows",
+   "k1": {
+    "BM": 64,
+    "BN": 64,
+    "num_warps": 4,
+    "num_stages": 1
+   },
+   "k1b": {
+    "BM": 64,
+    "BN": 64,
+    "num_warps": 4,
+    "num_stages": 1
+   },
+   "k3": {
+    "BM": 64,
+    "BN": 128,
+    "num_warps": 8,
+    "num_stages": 1
+   },
+   "b_direct": true,
+   "min_tokens": 1400,
+   "measured": true,
+   "status": "MEASURED_OP (tile sweep on one H100, bf16 z; an op-level measurement): K1 a-layout 64x64 w4 s1 fastest at 9 of 13 grid shapes rows {256,512,1024,1536} x N {1400,2432,5802} + (1280,2432) (128x32 w8 s2 wins the four N 5802 shapes by 1.2-9.1 %; 64x64 within 9.1 % there, 0 % elsewhere), 1.81..41.3 ms = 7.3-11.9x the torch LN+projection+gate+mask+permute-copy statements (bf16 autocast); num_stages=2 K1 cells with BN >= 64 exceed the 164 KB shared memory (8 BUILD_FAIL of 36 per layout: 32/64/128 x 128 and 128 x 64; 64x64 s2 and every BN 32 cell built); K1 b-layout 64x64 w4 s1 fastest at all 3 shapes, 3.41..13.8 ms at N 1400..5802 = 0.97x the a-layout kernel time and no [384,N,512] transpose copy (3.1..12.9 ms) -> b_direct; K3 in place 64x128 w8 s1 (fastest at rows 256/512/1536, 2.6 % behind 32x128 w4 at 1280; every BM 128 K3 cell exceeds shared memory at C 384: 6 BUILD_FAIL), 1.16..5.33 ms for rows 256..1536 x w 512 = 5.1-6.7x the torch epilogue (+0.51..2.45 ms staging copies avoided). min_tokens 1400 = the smallest measured N (7.3-7.8x there).",
+   "evidence": "sweep run-B (1x NVIDIA A100-SXM4-80GB: torch 2.10.0+cu128 / triton 3.6.0 / python 3.11.5; tree a10892493479, opt_core 0.5.220.0, fpf_trimul_rows 0.1.0; 438 csv rows); correctness on the same box: K1 max|err| 0.0311-0.0314 (a/b layout, +/-bias, bf16 and fp32 z) at plane scale ~11 (<= 1 bf16 ulp), a==b bitwise; K3 0.031 / 0.0625 (add) at scale ~11 (<= 1 ulp), in-place == staged bitwise, bytes outside the window untouched; run-to-run bitwise"
+  },
+  "8.0|C64|H64": {
+   "kernels": "fpf_trimul_rows",
+   "k1": {
+    "BM": 128,
+    "BN": 32,
+    "num_warps": 4,
+    "num_stages": 1
+   },
+   "k1b": {
+    "BM": 128,
+    "BN": 32,
+    "num_warps": 4,
+    "num_stages": 1
+   },
+   "k3": {
+    "BM": 128,
+    "BN": 32,
+    "num_warps": 4,
+    "num_stages": 1
+   },
+   "b_direct": true,
+   "min_tokens": 2048,
+   "measured": true,
+   "status": "MEASURED_OP (tile sweep on one H100, bf16 z; an op-level measurement): K1 a-layout 128x32 w4 s1 fastest at 6 of 8 grid shapes rows {1024,2048} x N {2048,5802,11604,22011} (within 0.5 % at the other two; all 24 candidates built), 0.51..11.3 ms = 26-30x the torch statements; K1 b-layout (256-row sub-block) 128x32 w4 s1 fastest at all 4 shapes, 0.22..1.39 ms at N 2048..22011 = 0.95-1.05x the a-layout kernel time and no [64,N,256] transpose copy (0.43..3.84 ms) -> b_direct; K3 in place 128x32 w4 s1 fastest at rows 1024/2048 x w 256, 0.19/0.31 ms = 12.1x/14.5x the torch epilogue. min_tokens 2048 = the smallest measured N (27x/19x there).",
+   "evidence": "sweep run-B (1x NVIDIA A100-SXM4-80GB: torch 2.10.0+cu128 / triton 3.6.0 / python 3.11.5; tree a10892493479, opt_core 0.5.220.0, fpf_trimul_rows 0.1.0; 438 csv rows); correctness on the same box: K1 / K3 outputs BITWISE EQUAL to fpf_trimul_v4 _k1c / _k3c at the same cell (C 64, also C 128 and C 256; bf16 and fp32 z, +/- residual), max|err| vs the fp32 reference 0.0078 at scale ~3.3 (<= 1 bf16 ulp), a==b bitwise, in-place == staged, outside-window bytes untouched"
+  },
+  "8.0|C256|H256": {
+   "kernels": "fpf_trimul_v4",
+   "min_tokens": 0,
+   "measured": true,
+   "status": "FLOOR (measured at (512..1024) x (1400, 2000) on A100, see evidence)",
+   "evidence": "run-B floor rows on the A100 (same box as the 8.0 384/64 keys): fpf_trimul_v4 row-block cells 8.0|3.6 (k1 128x64 w8 s2, k3 64x64 w4 s1) vs the torch statements at (rows,N) = (768,1400) K1 3.26 vs 30.7 ms (9.4x), K3 staged 2.84 vs 11.4 ms (4.0x); (704,1400) 10.8x / 4.0x; (1024,2000) 4.63 vs 56.0 ms (12.1x), 3.16 vs 13.6 ms (4.3x); (512,1400) 10.6x / 4.8x; (512,2000) 11.9x / 4.2x -> the (256,256) row blocks are faster than the statements at the smallest sharded sizes: floor 0 on cc 8.0 (no tiles here: those widths keep fpf_trimul_v4's own table.json row, unchanged)"
+  }
+ },
+ "safe": {
+  "_doc": "SAFE cells of the fpf_trimul_rows kernels per capability: single stage, small tiles (K1 32x32 w4 s1, K3 32x32 w4 s1); served BY NAME (stderr line + census settings=safe:build_failed:<Type>) only after a tuned cell fails to BUILD. 9.0: built and ran in the H100 sweep at C 384 (K1 16.3-20.5 ms at (512,5802)/(1536,2432), K3 2.0/5.8 ms at 512/1536 rows) and C 64 \u2014 valid, ~3x slower than the tuned cells. 8.0: built and ran in the A100 cells pass. '*': the same cells, unmeasured on other cards.",
+  "9.0": {
+   "k1": {
+    "BM": 32,
+    "BN": 32,
+    "num_warps": 4,
+    "num_stages": 1
+   },
+   "k3": {
+    "BM": 32,
+    "BN": 32,
+    "num_warps": 4,
+    "num_stages": 1
+   },
+   "status": "SAFE:built (H100 sweep, triton 3.6.0)"
+  },
+  "*": {
+   "k1": {
+    "BM": 32,
+    "BN": 32,
+    "num_warps": 4,
+    "num_stages": 1
+   },
+   "k3": {
+    "BM": 32,
+    "BN": 32,
+    "num_warps": 4,
+    "num_stages": 1
+   },
+   "status": "SAFE:inferred"
+  },
+  "8.0": {
+   "k1": {
+    "BM": 32,
+    "BN": 32,
+    "num_warps": 4,
+    "num_stages": 1
+   },
+   "k3": {
+    "BM": 32,
+    "BN": 32,
+    "num_warps": 4,
+    "num_stages": 1
+   },
+   "status": "SAFE:built (A100 cells pass, triton 3.6.0: K1 26.7/27.8 ms at (512,5802)/(1280,2432) C 384, 3.2/10.1 ms C 64; K3 3.7/11.0 ms C 384, 0.49 ms C 64)"
+  }
+ }
+}

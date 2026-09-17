@@ -1,0 +1,14 @@
+{
+ "exports": {},
+ "kind": "module",
+ "license": "in-house Triton row-LayerNorm kernel of a kit's fast tier (no third-party kernel bytes); Triton itself is MIT",
+ "mechanism": "norm.row_layernorm (fp32 last-dim LayerNorm, one Triton program per row, biased variance, fp32 accumulation, no atomics)",
+ "name": "rfd_layernorm",
+ "not_carried": {
+  "the kit's driver switch handling (apply()/RFD_TRITON_LN) is carried but unused by the core": "the ln provider's row `rfd` (opt_core.kernels.ln) serves the kernel by word; a kit that binds the module directly installs, gates and counts it itself"
+ },
+ "runtime_imports": [],
+ "runtime_imports_note": "imports opt_core.oom at module import (the core itself) and triton lazily inside a try (absence = HAVE_TRITON False)",
+ "served_note": "triton_layer_norm(input, normalized_shape, weight, bias, eps): CUDA fp32 input, len(normalized_shape)==1, 8 <= N <= 1024, no live autograd; BLOCK = next_pow2(N), num_warps by BLOCK and the size gate (min_numel) from the device capability's settings row (_SETTINGS_BY_CC, else _SETTINGS; opt_core.kernels.safe_settings); a one-time cross-check of the low-overhead launch path against the JIT path (one synchronize on the first served call); everything else falls to torch.nn.functional.layer_norm",
+ "version": "rfd_layernorm K2 (Triton row LayerNorm; fast launch cache keyed by specialization)"
+}

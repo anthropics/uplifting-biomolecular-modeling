@@ -1,0 +1,8 @@
+CHAI1_FAST_INFERENCE_KIT v1
+The files under kit/, tests/ and the *.md documents, and the worker ../errata_02/chai_worker.py
+drive and wrap the inference loop of chai-lab (https://github.com/chaidiscovery/chai-lab, Apache-2.0,
+Copyright 2024 Chai Discovery, Inc.), whose licence file is reproduced in LICENSE; Chai-1's code and model weights are released under the
+Apache License 2.0 per the upstream README, and no weights are redistributed here. ../errata_02/chai_worker.py restates the per-seed
+trunk-sample loop of chai_lab/chai1.py (run_inference) and is to that extent a derivative work under the same licence.
+No model weights and no third-party sequences other than the public PDB entry 1BRS (tests/public_inputs, provenance in PACK.json) are included.
+No other project's NOTICE applies to the files shipped here.
