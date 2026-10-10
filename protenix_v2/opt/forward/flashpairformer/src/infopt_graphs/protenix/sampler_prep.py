@@ -242,7 +242,8 @@ def release_statics(loop, key):
     if not ent:
         return None
     g = ent.get("graph")
-    for k in ("st", "cond", "bc", "dit_hoist"):
+    # The capture callable closes over st/cond and otherwise keeps them alive.
+    for k in ("st", "cond", "bc", "dit_hoist", "body"):
         if k in ent:
             ent[k] = None
     STATS["statics_released"] += 1
