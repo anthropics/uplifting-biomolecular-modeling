@@ -150,7 +150,10 @@ def _maxabs_opt(a, b):
 
 
 class _Entry:
-    __slots__ = ("graph", "s_in", "z_in", "m_in", "s_out", "z_out", "armed", "n_tok", "uses", "pool_bytes")
+    __slots__ = ("graph", "s_in", "z_in", "m_in", "s_out", "z_out", "armed", "n_tok", "uses", "pool_bytes", "payload_caches")
+
+    def __init__(self):
+        self.payload_caches = ()
 
 
 _CACHE: "collections.OrderedDict[tuple, _Entry]" = collections.OrderedDict()
@@ -454,8 +457,14 @@ def install(model=None) -> str:
                 captured = False
                 _clear_global_ptr_caches()          # every data_ptr-keyed cached tensor the graph reads must be PRODUCED inside the graph (see _GLOBAL_PTR_CACHES)
                 try:
-                    with _capture_ctx(), torch.cuda.graph(g, pool=pool, capture_error_mode="thread_local"):   # autocast cache DISABLED: weight casts recorded in the graph (read persistent fp32 params)
+                    from opt_core.kernels.trimul import native
+                    with native.retain_payload_caches() as payload_caches, _capture_ctx(), torch.cuda.graph(g, pool=pool, capture_error_mode="thread_local"):   # autocast cache DISABLED: weight casts recorded in the graph (read persistent fp32 params)
                         e.s_out, e.z_out = _orig(self, e.s_in, e.z_in, **kw_st)
+                    # A graph reads these workspace addresses on every replay;
+                    # the geometry LRU must not control their lifetime.
+                    # Warm-up workspaces precede _free_c0: the graph budget
+                    # accounts for private pools, not every owned workspace.
+                    e.payload_caches = tuple(payload_caches.values())
                     captured = True
                     _clear_global_ptr_caches()      # eager code never holds graph-private-pool tensors through these caches
                 finally:
@@ -485,7 +494,7 @@ def install(model=None) -> str:
                     ST["refused"] += 1
                     ST["check_fail_maxabs"].append([e.n_tok, float((e.z_out.float() - z_ref.float()).abs().max()), _maxabs_opt(e.s_out, s_ref), region])
                     if region == "templ": ST["templ"]["refused"] += 1
-                    e.graph = None; e.s_out = e.z_out = e.s_in = e.z_in = None
+                    e.graph = None; e.s_out = e.z_out = e.s_in = e.z_in = None; e.payload_caches = ()
                     _log(f"REFUSED N_tok={e.n_tok}: replay != eager (maxabs {ST['check_fail_maxabs'][-1]})")
                 _CACHE[sig] = e; ST["sigs"] = len(_CACHE); _evict_lru()
             except Exception as ex:
@@ -494,7 +503,7 @@ def install(model=None) -> str:
                 # the process ("Offset increment outside graph capture").  Policy: disable the lever for the WHOLE process (all later calls eager), record why,
                 # best-effort cleanup; the eager reference result of this call is still returned (it was computed before the capture attempt).
                 ST["refused"] += 1; ST["why"] = f"capture error (lever disabled for this process): {ex!r}"[:400]; ST["disabled"] = True
-                e.armed = False; e.graph = None; e.s_out = e.z_out = e.s_in = e.z_in = None
+                e.armed = False; e.graph = None; e.s_out = e.z_out = e.s_in = e.z_in = None; e.payload_caches = ()
                 try:
                     _CACHE[sig] = e
                     torch.cuda.synchronize()
@@ -522,11 +531,15 @@ def uninstall():
     if getattr(PF.PairformerStack, "_fpf_stackgraph", False):
         PF.PairformerStack.forward = PF.PairformerStack._fpf_stackgraph_orig
         PF.PairformerStack._fpf_stackgraph = False
-    _CACHE.clear(); torch.cuda.empty_cache()
+    reset_cache()
 
 
 def reset_cache():
-    _CACHE.clear(); ST["sigs"] = 0; torch.cuda.empty_cache()
+    torch.cuda.synchronize()
+    _CACHE.clear(); ST["sigs"] = 0
+    _BUDGET["pool_total"] = 0
+    ST["pool_gb"] = 0; ST["pool_bytes_by_ntok"] = {}
+    torch.cuda.empty_cache()
 
 
 def _atexit():

@@ -44,9 +44,10 @@ import json
 import os
 import sys
 import threading
+from ._lifetime import PayloadCache as _PayloadCache, _CAPTURE_CACHES, retain_payload_caches
 
 __all__ = ["ACTIVE_PKG", "VERSION", "DIGESTS", "ARCHS", "WIDTHS", "Unavailable", "pkg_dir", "verify_digests", "manifest", "vectors_manifest",
-           "device_classes", "face", "module", "admits", "install", "report", "pack", "forward", "notices", "payload_cache", "shared_geometries", "workspace_bytes", "SHARED_GEOMETRIES", "served", "STAMP_ENV", "stamp_dir", "stamp_dirs", "stamp_facts", "stamp_read", "stamp_write", "payload_version"]
+           "device_classes", "face", "module", "admits", "install", "report", "pack", "forward", "notices", "payload_cache", "retain_payload_caches", "shared_geometries", "workspace_bytes", "SHARED_GEOMETRIES", "served", "STAMP_ENV", "stamp_dir", "stamp_dirs", "stamp_facts", "stamp_read", "stamp_write", "payload_version"]
 
 ACTIVE_PKG = "v5"                                   # pkg/<ACTIVE_PKG>/ is served; earlier payload directories may stay on disk unreferenced
 VERSION = "v5 1.2.2"                             # the payload's VERSION line as sealed (the record; install() re-reads the payload's own)
@@ -266,11 +267,13 @@ def payload_cache(device_index, n_tokens, c_z, c_hidden):
         d = _SHARED.get(key)
         if d is not None:
             _SHARED.move_to_end(key)
-            return d
-        d = _SHARED[key] = {}
-        mine = [k for k in _SHARED if k[0] == device_index]
-        for k in mine[:-SHARED_GEOMETRIES]:
-            _SHARED.pop(k, None)
+        else:
+            d = _SHARED[key] = _PayloadCache()
+            mine = [k for k in _SHARED if k[0] == device_index]
+            for k in mine[:-SHARED_GEOMETRIES]:
+                _SHARED.pop(k, None)
+        for scope in getattr(_CAPTURE_CACHES, "scopes", ()):
+            scope[id(d)] = d
         return d
 
 
@@ -348,6 +351,8 @@ def _packclass_keys(cache):
 
 def _evict_key(cache, key, w_ptr=None, why="gc"):
     """Drop one pack-class entry (and the per-call memo entries of that weight address) from ``cache``; counts in _PACK_STATS."""
+    if isinstance(cache, _PayloadCache):
+        cache.detach_owner(key)
     if cache.pop(key, None) is not None:
         _PACK_STATS["%s_evicted" % why] = _PACK_STATS.get("%s_evicted" % why, 0) + 1
     calls = cache.get(CALLS_MEMO_KEY)
@@ -378,7 +383,12 @@ def after_call(cache, weights, keys_before=()):
                 if owner is None:
                     continue
                 try:
-                    weakref.finalize(owner, _evict_key, cache, k, w_ptr, "gc")
+                    if isinstance(cache, _PayloadCache):
+                        cache.bind_owner(k, owner, w_ptr, _evict_key)
+                    else:
+                        # Plain caller-owned dicts cannot be weak-referenced;
+                        # they are outside the shared geometry LRU policy.
+                        weakref.finalize(owner, _evict_key, cache, k, w_ptr, "gc")
                 except TypeError:                                            # an owner that cannot be weak-referenced: the LRU cap still bounds the dict
                     pass
                 break
@@ -409,7 +419,7 @@ def apply_pack_policy(cache, weights, policy):
         trip = tuple(x for x in k if isinstance(x, tuple) and len(x) == 3)
         quad = tuple((x[1], x[3], x[2]) for x in k if isinstance(x, tuple) and len(x) == 4)   # plain-weight keys: (name, ptr, dtype, shape) -> (ptr, shape, dtype)
         if (trip or quad) and not (set(trip or quad) <= set(sig)):          # another layer's pack / plain copy (its (ptr, shape, dtype) triples differ)
-            cache.pop(k, None); n += 1
+            _evict_key(cache, k, None, "policy"); n += 1
     calls = cache.get(CALLS_MEMO_KEY)
     if isinstance(calls, dict) and n:
         wp = _wget(weights, "w_ap"); cur = int(wp.data_ptr()) if wp is not None else None
