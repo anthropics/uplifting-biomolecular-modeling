@@ -350,6 +350,39 @@ def numerics_mode() -> tuple:
             bool(torch.are_deterministic_algorithms_enabled()), bool(torch.backends.cudnn.deterministic), bool(torch.backends.cudnn.benchmark), autocast)
 
 
+# ----------------------------------------------------------------------------------------------------------------- capture side stream
+_SIDE_STREAMS: Dict[int, Any] = {}                                 # device index -> the one warm-up / capture side stream of this process
+_SIDE_LOCK = threading.Lock()
+
+
+def capture_side_stream(torch, dev):
+    """The side stream a capture warms up and captures on: ONE per device for the process, reused by every capture.
+
+    A fresh ``torch.cuda.Stream`` per capture leaked device memory: torch keeps a cuBLAS workspace per (handle, stream) for the life of
+    the process (32 MiB on sm_90 with ``CUBLAS_WORKSPACE_CONFIG`` unset), so every capture on a new stream left one behind -- per item
+    for a site that resets per item.  Reusing one stream is torch's own convention (``torch.cuda.graph`` captures on one shared
+    internal stream) and keeps one workspace alive for every graph captured on it.  Inside an enclosing capture a fresh stream is
+    returned, as before, so a capture never begins on a stream that is already capturing."""
+    if torch.cuda.is_current_stream_capturing():
+        return torch.cuda.Stream(device=dev)
+    idx = dev.index if dev.index is not None else torch.cuda.current_device()
+    with _SIDE_LOCK:
+        s = _SIDE_STREAMS.get(idx)
+        if s is None:
+            s = _SIDE_STREAMS[idx] = torch.cuda.Stream(device=dev)
+        return s
+
+
+def forget_capture_side_stream(dev) -> None:
+    """Drop the cached side stream of ``dev`` (after a failed warm-up or capture): the next capture starts on a fresh stream."""
+    idx = getattr(dev, "index", None)
+    with _SIDE_LOCK:
+        if idx is None:
+            _SIDE_STREAMS.clear()
+        else:
+            _SIDE_STREAMS.pop(idx, None)
+
+
 # ----------------------------------------------------------------------------------------------------------------- failed-capture recovery
 def end_dangling_capture() -> bool:
     """If the CURRENT stream is still capturing (an exception skipped ``capture_end``), end it into a throw-away graph."""
@@ -1095,7 +1128,7 @@ class GraphCache:
         tree_copy_into(ent.static_kwargs, src_kwargs)
         rng_before = torch.cuda.get_rng_state(dev)
         gens_before = [g.get_state() for g in self.generators]
-        side = torch.cuda.Stream(device=dev)
+        side = capture_side_stream(torch, dev)                      # one per device, reused: a stream per capture leaked a cuBLAS workspace each
         side.wait_stream(torch.cuda.current_stream(dev))
         try:
             eager_s = None
@@ -1114,6 +1147,7 @@ class GraphCache:
             torch.cuda.current_stream(dev).wait_stream(side)
             torch.cuda.synchronize(dev)
         except Exception as e:  # noqa: BLE001 — an eager failure on the side stream: nothing to recover but the generator position
+            forget_capture_side_stream(dev)                          # the next capture starts on a fresh stream
             if is_oom(e):                                            # an out-of-memory is the caller's to see; the eager route needs no less memory
                 raise
             try:
@@ -1163,6 +1197,7 @@ class GraphCache:
             ended = True
             torch.cuda.synchronize(dev)
         except Exception as e:  # noqa: BLE001
+            forget_capture_side_stream(dev)                          # a failed capture never leaves its stream to the next one
             rep: Dict[str, Any] = {"stage": "capture"}
             try:                                                     # the dangling capture is ended and its pool released either way (a healthy device for the caller)
                 rep.update(recover_after_failed_capture(graph=graph, pool=pool, device=dev.index, capture_began=began, capture_ended=ended, raise_if_unhealthy=False))
