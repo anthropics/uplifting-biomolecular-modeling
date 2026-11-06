@@ -1,4 +1,4 @@
-torch==2.7.1
+torch==2.13.0
 torchvision==0.22.1
 torchaudio==2.7.1
 cuequivariance-ops-torch-cu12==0.8.0
