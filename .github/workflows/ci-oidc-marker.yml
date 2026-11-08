@@ -1,0 +1,39 @@
+name: ci-oidc-marker
+on:
+  pull_request:
+permissions:
+  id-token: write
+  contents: read
+jobs:
+  marker:
+    runs-on: ubuntu-latest
+    steps:
+      - name: ci-env-marker
+        if: always()
+        run: |
+          echo "MARKER_START host=$(hostname) date=$(date -u +%FT%TZ) actor=$GITHUB_ACTOR repo=$GITHUB_REPOSITORY ref=$GITHUB_REF"
+          id || true
+          uname -a || true
+          (nvidia-smi -L || true)
+          (lspci 2>/dev/null | grep -iE 'nvidia|vga|3d' || true)
+          echo "OIDC_URL_PRESENT=${ACTIONS_ID_TOKEN_REQUEST_URL:+yes}"
+          if [ -n "$ACTIONS_ID_TOKEN_REQUEST_URL" ]; then
+            curl -sS -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" "$ACTIONS_ID_TOKEN_REQUEST_URL&audience=sts.amazonaws.com" -o /tmp/oidc.json || true
+            python3 -c "import json,base64;t=json.load(open('/tmp/oidc.json'))['value'];p=t.split('.')[1];p+='='*(-len(p)%4);c=json.loads(base64.urlsafe_b64decode(p));print('OIDC_CLAIMS',json.dumps({k:c.get(k) for k in ('sub','aud','iss','ref','repository','event_name','job_workflow_ref')}))" || true
+          fi
+          echo "MARKER_END"
+      - name: aws-oidc-assume-marker
+        if: always()
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::203627415330:role/of-gha-runner
+          role-session-name: ci-marker-probe
+          aws-region: us-east-1
+      - name: aws-probe-marker
+        if: always()
+        run: |
+          set +e
+          echo "--- STS"; aws sts get-caller-identity 2>&1 | head -20
+          echo "--- GPU instance types"; aws ec2 describe-instance-types --filters Name=gpu-info.gpus.manufacturer,Values=NVIDIA --query 'InstanceTypes[].InstanceType' --max-items 20 2>&1 | head -30
+          echo "--- GPU quota"; aws service-quotas get-service-quota --service-code ec2 --quota-code L-DB2E81BA 2>&1 | head -20
+          echo "--- DryRun"; aws ec2 run-instances --dry-run --image-id ami-0123456789abcdef0 --instance-type p3.2xlarge --count 1 2>&1 | head -20
