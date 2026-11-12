@@ -36,7 +36,7 @@ classifiers = [
 ]
 
 dependencies = [
-  "torch==2.7.1",
+  "torch==2.13.0",
   "click>=8.1.0",
   "scipy>=1.9.0",
   "ml_collections==1.1.0",
