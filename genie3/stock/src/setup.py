@@ -17,7 +17,7 @@ setup(
       install_requires=[
             'tqdm',
             'numpy>=2.0.2,<3',
-            'torch==2.7.1',
+            'torch==2.13.0',
             'scipy',
             'wandb',
             'pandas',
