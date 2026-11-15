@@ -24,7 +24,7 @@ dependencies = [
     "jablang",
     "torchvision>=v0.22.0",
     "equinox>=0.13.0",
-    "torch==2.7.1",
+    "torch==2.13.0",
     "numpy>=2.1",
     "protenix",
     "httpx>=0.28.1",
