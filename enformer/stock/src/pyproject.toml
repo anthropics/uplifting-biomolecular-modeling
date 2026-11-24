@@ -31,7 +31,7 @@ dependencies = [
     "polars",
     "pyfaidx",
     "pyyaml",
-    "transformers[torch]==4.56.2",
+    "transformers[torch]==5.10.1",
 ]
 
 [project.urls]
