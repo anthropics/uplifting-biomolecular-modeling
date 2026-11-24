@@ -5,7 +5,7 @@ description = "Proteina-Complexa"
 requires-python = ">=3.12"
 dependencies = [
     # Core utilities
-    "python-dotenv==1.0.1",
+    "python-dotenv==1.2.2",
     "einops==0.6",
     "dm-tree==0.1.8",
     "loguru==0.7.2",
