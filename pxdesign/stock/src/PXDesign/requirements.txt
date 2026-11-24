@@ -11,7 +11,7 @@ biotite==1.0.1
 scikit-learn
 scikit-learn-extra
 deepspeed>=0.15.1
-protobuf==3.20.2
+protobuf==5.29.6
 icecream
 ipdb
 wandb
