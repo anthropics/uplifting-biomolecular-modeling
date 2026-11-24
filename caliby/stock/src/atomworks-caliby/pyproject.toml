@@ -33,7 +33,7 @@ dependencies = [
     "scipy>=1.13.1,<2",
     # ... data tools
     "pandas>=2.2,<2.4", # Data manipulation and analysis
-    "pyarrow==17.0.0", # Columnar data format for efficient data storage and processing  # TODO: Test later versions
+    "pyarrow==23.0.1", # Columnar data format for efficient data storage and processing  # TODO: Test later versions
     # ... compression
     "zstandard>=0.21.0,<1", # Zstandard compression for MSA files and other data
     # ... bioinformatics
