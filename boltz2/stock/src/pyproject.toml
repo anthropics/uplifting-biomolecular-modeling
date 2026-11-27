@@ -15,7 +15,7 @@ dependencies = [
     "pytorch-lightning==2.5.0",
     "rdkit>=2024.3.2",
     "dm-tree==0.1.8",
-    "requests==2.32.3",
+    "requests==2.33.0",
     "pandas>=2.2.2",
     "types-requests",
     "einops==0.8.0",
